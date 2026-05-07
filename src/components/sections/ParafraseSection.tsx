@@ -154,7 +154,7 @@ export default function ParafraseSection() {
   return (
     <section id="parafrase" className="bg-dark-800 section-padding">
       <div className="container-custom">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -162,25 +162,25 @@ export default function ParafraseSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block bg-primary-600/20 text-primary-400 font-semibold text-sm px-4 py-2 rounded-full mb-4">
+            <span className="inline-block bg-primary-600/20 text-primary-400 font-semibold text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full mb-3 sm:mb-4">
               Parafrase Dokumen
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
               PARAFRASE DOKUMLN
             </h2>
-            <p className="text-2xl md:text-3xl font-bold text-green-400 mb-6">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-400 mb-4 sm:mb-6">
               Rp 2.000/HALAMAN
             </p>
-            <p className="text-gray-400 text-lg mb-8">
+            <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
               Termurah di Pasaran dan Terpercaya 2K+ Customer
             </p>
 
             {/* Benefits Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
               {benefits.map((benefit, index) => (
                 <motion.div
                   key={benefit.text}
-                  className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4"
+                  className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -192,8 +192,8 @@ export default function ParafraseSection() {
                   }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <benefit.icon className="w-5 h-5 text-primary-400" />
-                  <span className="text-white font-medium text-sm">
+                  <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />
+                  <span className="text-white font-medium text-xs sm:text-sm">
                     {benefit.text}
                   </span>
                 </motion.div>
@@ -204,7 +204,7 @@ export default function ParafraseSection() {
               href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Parafrase"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-green-500/20"
+              className="inline-flex items-center gap-2 bg-green-500 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl shadow-lg shadow-green-500/20 text-sm sm:text-base"
               whileHover={{
                 scale: 1.02,
                 boxShadow: '0 10px 40px rgba(34, 197, 94, 0.4)',
@@ -212,7 +212,7 @@ export default function ParafraseSection() {
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              <RefreshCw className="w-5 h-5" />
+              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
               Pesan Parafrase
             </motion.a>
           </motion.div>
@@ -225,18 +225,18 @@ export default function ParafraseSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-linear-to-br from-primary-800/20 to-primary-600/10 border border-primary-600/20 rounded-3xl p-8">
+            <div className="bg-linear-to-br from-primary-800/20 to-primary-600/10 border border-primary-600/20 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8">
               {/* Before Card */}
               <motion.div
-                className="bg-dark-700 rounded-2xl p-6 mb-4 border border-white/10"
+                className="bg-dark-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-3 sm:mb-4 border border-white/10"
                 layout
                 key={`card-orig-${pairIndex}`}
               >
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
                   <div className="w-3 h-3 bg-red-500 rounded-full" />
                   <div className="w-3 h-3 bg-yellow-500 rounded-full" />
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
-                  <span className="text-gray-500 text-sm ml-2">Original</span>
+                  <span className="text-gray-500 text-xs sm:text-sm ml-2">Original</span>
                   {/* Typing dots */}
                   <div className="ml-auto flex gap-1">
                     <motion.span
@@ -262,7 +262,7 @@ export default function ParafraseSection() {
                     />
                   </div>
                 </div>
-                <p className="text-gray-500 text-sm font-mono leading-relaxed min-h-14">
+                <p className="text-gray-500 text-xs sm:text-sm font-mono leading-relaxed min-h-10 sm:min-h-14">
                   {origText}
                   <span
                     className={`${showOrigCursor ? 'opacity-100' : 'opacity-0'} text-gray-400`}
@@ -271,39 +271,39 @@ export default function ParafraseSection() {
                   </span>
                 </p>
                 <motion.div
-                  className="mt-4 flex items-center gap-2"
+                  className="mt-3 sm:mt-4 flex items-center gap-2"
                   animate={simOrigVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 5 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <Clock className="w-4 h-4 text-red-400" />
-                  <span className="text-red-400 text-sm font-semibold">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
+                  <span className="text-red-400 text-xs sm:text-sm font-semibold">
                     Similarity: {pair.similarityOriginal}
                   </span>
                 </motion.div>
               </motion.div>
 
               {/* Arrow */}
-              <div className="flex justify-center my-6">
+              <div className="flex justify-center my-3 sm:my-6">
                 <motion.div
-                  className="bg-primary-600 rounded-full p-4"
+                  className="bg-primary-600 rounded-full p-2 sm:p-4"
                   animate={{ y: [0, 5, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <RefreshCw className="w-6 h-6 text-white" />
+                  <RefreshCw className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </motion.div>
               </div>
 
               {/* After Card */}
               <motion.div
-                className="bg-dark-700 rounded-2xl p-6 border border-green-500/30"
+                className="bg-dark-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-500/30"
                 layout
                 key={`card-para-${pairIndex}`}
               >
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
                   <div className="w-3 h-3 bg-red-500 rounded-full" />
                   <div className="w-3 h-3 bg-yellow-500 rounded-full" />
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
-                  <span className="text-green-400 text-sm ml-2">Paraphrased</span>
+                  <span className="text-green-400 text-xs sm:text-sm ml-2">Paraphrased</span>
                   {/* Typing dots */}
                   <div className="ml-auto flex gap-1">
                     <motion.span
@@ -329,7 +329,7 @@ export default function ParafraseSection() {
                     />
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm font-mono leading-relaxed min-h-14">
+                <p className="text-gray-300 text-xs sm:text-sm font-mono leading-relaxed min-h-10 sm:min-h-14">
                   {paraText}
                   <span
                     className={`${showParaCursor ? 'opacity-100' : 'opacity-0'} text-green-400`}
@@ -338,12 +338,12 @@ export default function ParafraseSection() {
                   </span>
                 </p>
                 <motion.div
-                  className="mt-4 flex items-center gap-2"
+                  className="mt-3 sm:mt-4 flex items-center gap-2"
                   animate={simParaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 5 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <Shield className="w-4 h-4 text-green-400" />
-                  <span className="text-green-400 text-sm font-semibold">
+                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
+                  <span className="text-green-400 text-xs sm:text-sm font-semibold">
                     Similarity: {pair.similarityParaphrased}
                   </span>
                 </motion.div>

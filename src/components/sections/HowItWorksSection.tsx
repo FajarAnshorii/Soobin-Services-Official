@@ -32,20 +32,20 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-12 sm:py-16 md:py-24 bg-white">
       <div className="container-custom">
         {/* Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-dark-800 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-dark-800 mb-3 sm:mb-4">
             Cara Kerja
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
             Proses pemesanan sangat mudah dan cepat, hanya dalam 4 langkah
           </p>
         </motion.div>
@@ -63,7 +63,7 @@ export default function HowItWorksSection() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={step.number}
@@ -75,7 +75,7 @@ export default function HowItWorksSection() {
               >
                 {/* Step Number Badge */}
                 <motion.div
-                  className="relative z-10 w-16 h-16 mx-auto mb-6 bg-primary-800 rounded-full flex items-center justify-center shadow-lg shadow-primary-800/30"
+                  className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-4 sm:mb-6 bg-primary-800 rounded-full flex items-center justify-center shadow-lg shadow-primary-800/30"
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
@@ -87,14 +87,14 @@ export default function HowItWorksSection() {
                   }}
                   whileHover={{ scale: 1.1 }}
                 >
-                  <span className="text-white font-bold text-xl">
+                  <span className="text-white font-bold text-lg sm:text-xl">
                     {step.number}
                   </span>
                 </motion.div>
 
                 {/* Icon */}
                 <motion.div
-                  className="w-14 h-14 mx-auto mb-4 bg-primary-100 rounded-2xl flex items-center justify-center"
+                  className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 bg-primary-100 rounded-2xl flex items-center justify-center"
                   initial={{ opacity: 0, scale: 0.5 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -108,14 +108,14 @@ export default function HowItWorksSection() {
                     backgroundColor: 'rgb(45, 100, 148)',
                   }}
                 >
-                  <step.icon className="w-7 h-7 text-primary-800" />
+                  <step.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary-800" />
                 </motion.div>
 
                 {/* Content */}
-                <h3 className="text-lg font-bold text-dark-800 mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-dark-800 mb-1 sm:mb-2">
                   {step.title}
                 </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed px-1">
                   {step.desc}
                 </p>
               </motion.div>
@@ -125,7 +125,7 @@ export default function HowItWorksSection() {
 
         {/* CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-10 sm:mt-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -135,7 +135,7 @@ export default function HowItWorksSection() {
             href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Tanya%20Layanan"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-green-500/30"
+            className="inline-flex items-center gap-2 bg-green-500 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl shadow-lg shadow-green-500/30 text-sm sm:text-base"
             whileHover={{
               scale: 1.02,
               boxShadow: '0 10px 40px rgba(34, 197, 94, 0.4)',
@@ -143,7 +143,7 @@ export default function HowItWorksSection() {
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           >
-            <MessageCircle className="w-5 h-5" />
+            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             Mulai Pesan Sekarang
           </motion.a>
         </motion.div>

@@ -24,13 +24,13 @@ export default function Footer() {
 
   return (
     <footer className="bg-dark-800 text-white">
-      <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-6">
-              <ShieldCheck className="w-8 h-8 text-primary-600" />
+      <div className="container-custom py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-4 sm:mb-6">
+              <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8 text-primary-600" />
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-white tracking-tight">
+                <span className="text-lg sm:text-xl font-bold text-white tracking-tight">
                   SOOBIN
                 </span>
                 <span className="text-xs text-gray-400 font-medium -mt-1">
@@ -38,7 +38,7 @@ export default function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">
+            <p className="text-gray-400 text-sm leading-relaxed mb-4 sm:mb-6">
               Solusi terpercaya untuk kebutuhan akademik Anda. Tersedia layanan
               Cek Turnitin, Parafrase, Joki Tugas, dan Unlock Dokumen dengan
               harga termurah di pasaran.
@@ -50,8 +50,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-6">Layanan</h3>
-            <ul className="space-y-3">
+            <h3 className="text-white font-semibold mb-4 sm:mb-6">Layanan</h3>
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.layanan.map((link, index) => (
                 <li key={`layanan-${index}`}>
                   <Link
@@ -66,8 +66,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-6">Informasi</h3>
-            <ul className="space-y-3">
+            <h3 className="text-white font-semibold mb-4 sm:mb-6">Informasi</h3>
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.info.map((link, index) => (
                 <li key={`info-${index}`}>
                   <Link
@@ -81,9 +81,9 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-white font-semibold mb-6">Hubungi Kami</h3>
-            <ul className="space-y-4">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <h3 className="text-white font-semibold mb-4 sm:mb-6">Hubungi Kami</h3>
+            <ul className="space-y-3 sm:space-y-4">
               <li className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-primary-500 mt-1" />
                 <a
@@ -114,13 +114,13 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-dark-600">
-        <div className="container-custom py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-500 text-sm">
+        <div className="container-custom py-4 sm:py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-center">
+            <p className="text-gray-500 text-xs sm:text-sm">
               © {currentYear} Soobin Services. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
-              <span className="text-gray-500 text-sm">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <span className="text-gray-500 text-xs sm:text-sm">
                 Termurah • Terpercaya • 20K+ Customer
               </span>
             </div>

@@ -94,10 +94,10 @@ function AnimatedStat({
 
     return (
       <div className={`text-center lg:text-left ${className}`}>
-        <p className="text-3xl md:text-4xl font-bold text-white">
+        <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">
           <span ref={counter.ref}>{counter.display}</span>
         </p>
-        <p className="text-gray-400 text-sm">{label}</p>
+        <p className="text-gray-400 text-xs sm:text-sm">{label}</p>
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Main Heading - Typewriter Effect */}
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
               <TypewriterText
                 text="SOOBIN"
                 delay={300}
@@ -176,7 +176,7 @@ export default function Hero() {
 
             {/* Subtitle - Fade in after typewriter */}
             <motion.p
-              className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-400 mb-6"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-primary-400 mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: subtitleVisible ? 1 : 0, y: subtitleVisible ? 0 : 20 }}
               transition={{ duration: 0.4 }}
@@ -191,7 +191,7 @@ export default function Hero() {
 
             {/* Description */}
             <motion.p
-              className="text-lg md:text-xl text-gray-300 mb-8 max-w-xl mx-auto lg:mx-0"
+              className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-xl mx-auto lg:mx-0 px-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: typewriterDone ? 1 : 0, y: typewriterDone ? 0 : 20 }}
               transition={{ duration: 0.5 }}
@@ -201,7 +201,7 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: typewriterDone ? 1 : 0, y: typewriterDone ? 0 : 20 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -210,7 +210,7 @@ export default function Hero() {
                 href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Joki%20Tugas"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto bg-green-500 text-white font-bold py-4 px-8 rounded-xl text-center shadow-lg shadow-green-500/30"
+                className="w-full sm:w-auto bg-green-500 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl text-center shadow-lg shadow-green-500/30 text-sm sm:text-base"
                 whileHover={{
                   scale: 1.02,
                   boxShadow: '0 10px 40px rgba(34, 197, 94, 0.4)',
@@ -222,7 +222,7 @@ export default function Hero() {
               </motion.a>
               <motion.a
                 href="/layanan"
-                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold py-4 px-8 rounded-xl text-center"
+                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold py-3 px-6 sm:py-4 sm:px-8 rounded-xl text-center text-sm sm:text-base"
                 whileHover={{
                   scale: 1.02,
                   backgroundColor: 'rgba(255,255,255,0.15)',
@@ -237,14 +237,14 @@ export default function Hero() {
 
             {/* Stats - Animated Counters */}
             <motion.div
-              className="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-white/10"
+              className="grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-8 sm:pt-12 border-t border-white/10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <AnimatedStat value={10000} suffix="+" label="Customer" />
-              <AnimatedStat value={30000} suffix="+" label="Tugas Selesai" />
-              <AnimatedStat value={4.9} decimals={1} suffix="★" label="Rating" />
+              <AnimatedStat value={10000} suffix="+" label="Customer" className="text-center lg:text-left" />
+              <AnimatedStat value={30000} suffix="+" label="Tugas Selesai" className="text-center lg:text-left" />
+              <AnimatedStat value={4.9} decimals={1} suffix="★" label="Rating" className="text-center lg:text-left" />
             </motion.div>
           </motion.div>
 
@@ -255,11 +255,11 @@ export default function Hero() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6"
+                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
@@ -271,11 +271,11 @@ export default function Hero() {
                   }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <feature.icon className="w-8 h-8 text-primary-400 mb-4" />
-                  <h3 className="text-white font-semibold mb-2">
+                  <feature.icon className="w-6 h-6 sm:w-8 sm:h-8 text-primary-400 mb-3 sm:mb-4" />
+                  <h3 className="text-white font-semibold text-sm sm:text-base mb-1 sm:mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-400 text-sm">{feature.desc}</p>
+                  <p className="text-gray-400 text-xs sm:text-sm">{feature.desc}</p>
                 </motion.div>
               ))}
             </div>
