@@ -235,16 +235,25 @@ export default function Hero() {
               </motion.a>
             </motion.div>
 
-            {/* Stats - Animated Counters */}
+            {/* Stats - Simple Format */}
             <motion.div
               className="grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-8 sm:pt-12 border-t border-white/10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <AnimatedStat value={10000} suffix="+" label="Customer" className="text-center lg:text-left" />
-              <AnimatedStat value={30000} suffix="+" label="Tugas Selesai" className="text-center lg:text-left" />
-              <AnimatedStat value={4.9} decimals={1} suffix="★" label="Rating" className="text-center lg:text-left" />
+              <div className="text-center lg:text-left">
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">10.000+</p>
+                <p className="text-gray-400 text-xs sm:text-sm">Customer</p>
+              </div>
+              <div className="text-center lg:text-left">
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">30.000+</p>
+                <p className="text-gray-400 text-xs sm:text-sm">Tugas Selesai</p>
+              </div>
+              <div className="text-center lg:text-left">
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">4.9★</p>
+                <p className="text-gray-400 text-xs sm:text-sm">Rating</p>
+              </div>
             </motion.div>
           </motion.div>
 
