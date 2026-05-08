@@ -4,6 +4,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'SOOBIN Services | Turnitin, Parafrase & Joki Tugas Termurah',
   description: 'Solusi terpercaya untuk kebutuhan akademik Anda',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
