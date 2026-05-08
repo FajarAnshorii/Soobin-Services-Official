@@ -283,9 +283,9 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - Hide on small mobile */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
