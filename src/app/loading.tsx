@@ -46,15 +46,15 @@ export default function Loading() {
         </motion.div>
 
         {/* Loading Bar */}
-        <div className="w-32 sm:w-40 md:w-48 h-1 bg-gray-700 rounded-full overflow-hidden mx-auto">
+        <div className="w-32 sm:w-40 md:w-48 h-1.5 bg-gray-700 rounded-full overflow-hidden mx-auto">
           <motion.div
-            className="h-full bg-primary-600 rounded-full"
-            initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
+            className="h-full bg-linear-to-r from-primary-600 to-primary-400 rounded-full"
+            initial={{ width: '0%', x: 0 }}
+            animate={{ width: '100%', x: 0 }}
             transition={{
-              duration: 1,
+              duration: 4,
               repeat: Infinity,
-              ease: 'linear',
+              ease: 'easeInOut',
             }}
           />
         </div>
@@ -65,7 +65,7 @@ export default function Loading() {
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          Memuat...
+          Memuat halaman...
         </motion.p>
       </div>
     </div>
