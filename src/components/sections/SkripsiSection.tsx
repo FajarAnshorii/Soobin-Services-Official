@@ -295,15 +295,15 @@ export default function SkripsiSection() {
         >
           <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center">
             <div>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">300+</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">200+</p>
               <p className="text-gray-400 text-xs sm:text-sm">Skripsi Selesai</p>
             </div>
             <div>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">50+</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">300+</p>
               <p className="text-gray-400 text-xs sm:text-sm">Jurusan Ditangani</p>
             </div>
             <div>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">24/7</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-400 mb-1 sm:mb-2">50+</p>
               <p className="text-gray-400 text-xs sm:text-sm">Support Konsultasi</p>
             </div>
           </div>

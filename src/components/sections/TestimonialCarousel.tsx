@@ -145,7 +145,7 @@ export default function TestimonialCarousel() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-4 sm:gap-4 md:gap-6"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
