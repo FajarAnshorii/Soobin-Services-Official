@@ -13,8 +13,8 @@ const services = [
   { icon: ClipboardList, label: 'Daftar Isi Otomatis', price: '10.000' },
   { icon: FileText, label: 'Pengetikan File', price: '1.000/Hal' },
   { icon: Database, label: 'Olah Data SPSS', price: 'Chat Admin' },
-  { icon: FileSpreadsheet, label: 'Olah Data Eviews', price: 'Chat Admin' },
-  { icon: Code, label: 'Olah Data Python', price: 'Chat Admin' },
+  { icon: Code, label: 'Olah Data Matlab', price: 'Chat Admin' },
+  { icon: Database, label: 'Olah Data TablePlus', price: 'Chat Admin' },
   { icon: FileText, label: 'Review Jurnal', price: '25k/Review' },
 ];
 
@@ -115,7 +115,7 @@ export default function JokiTugasSection() {
             {mainServices.map((service, index) => (
               <motion.div
                 key={service.label}
-                className="bg-gradient-to-br from-dark-800 to-primary-900 border border-primary-700/30 rounded-xl p-3 sm:p-4 lg:p-5 flex items-center justify-between"
+                className="bg-linear-to-br from-dark-800 to-primary-900 border border-primary-700/30 rounded-xl p-3 sm:p-4 lg:p-5 flex items-center justify-between"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
