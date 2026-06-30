@@ -6,18 +6,20 @@ import { motion } from 'framer-motion';
 const row1Partners = [
   { name: 'Turnitin', logo: '/logo-turnitin.png' },
   { name: 'ZeroGPT', logo: '/logo-zerogpt.png' },
-  { name: 'SOOBIN Services', logo: '/logo-soobin.png' },
+  { name: 'GPTZero', logo: '/logo-gptzero.png' },
+  { name: 'SPSS', logo: '/logo-spss.png' },
 ];
 
 const row2Partners = [
   { name: 'SOOBIN Services', logo: '/logo-soobin.png' },
-  { name: 'ZeroGPT', logo: '/logo-zerogpt.png' },
-  { name: 'Turnitin', logo: '/logo-turnitin.png' },
+  { name: 'TablePlus', logo: '/logo-tableplus.png' },
+  { name: 'Google Colab', logo: '/logo-colab.png' },
+  { name: 'Google Scholar', logo: '/logo-scholar.png' },
 ];
 
 // Duplicate items to ensure smooth infinite loop
-const duplicatedRow1 = [...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners];
-const duplicatedRow2 = [...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners];
+const duplicatedRow1 = [...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners];
+const duplicatedRow2 = [...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners];
 
 export default function PartnerSection() {
   return (
