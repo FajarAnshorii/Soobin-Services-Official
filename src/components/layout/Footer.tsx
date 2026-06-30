@@ -1,7 +1,8 @@
 'use client';
 
-import { ShieldCheck, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const footerLinks = {
   layanan: [
@@ -27,16 +28,14 @@ export default function Footer() {
       <div className="container-custom py-12 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4 sm:mb-6">
-              <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8 text-primary-600" />
-              <div className="flex flex-col">
-                <span className="text-lg sm:text-xl font-bold text-white tracking-tight">
-                  SOOBIN
-                </span>
-                <span className="text-xs text-gray-400 font-medium -mt-1">
-                  Services
-                </span>
-              </div>
+            <Link href="/" className="relative h-10 w-44 sm:h-12 sm:w-52 mb-4 sm:mb-6 block">
+              <Image
+                src="/logo.png"
+                alt="SOOBIN Services Logo"
+                fill
+                className="object-contain object-left brightness-0 invert"
+                priority
+              />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 sm:mb-6">
               Solusi terpercaya untuk kebutuhan akademik Anda. Tersedia layanan

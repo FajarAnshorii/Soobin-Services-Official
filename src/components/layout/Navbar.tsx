@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -35,16 +36,14 @@ export default function Navbar() {
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <ShieldCheck className="w-8 h-8 text-primary-800" />
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-primary-800 tracking-tight">
-                SOOBIN
-              </span>
-              <span className="text-xs text-gray-500 font-medium -mt-1">
-                Services
-              </span>
-            </div>
+          <Link href="/" className="relative h-10 w-44 sm:h-12 sm:w-52 block">
+            <Image
+              src="/logo.png"
+              alt="SOOBIN Services Logo"
+              fill
+              className="object-contain object-left"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
