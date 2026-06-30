@@ -12,9 +12,6 @@ const services = [
   { icon: Presentation, label: 'Pembuatan PPT', price: '3.000/Hal' },
   { icon: ClipboardList, label: 'Daftar Isi Otomatis', price: '10.000' },
   { icon: FileText, label: 'Pengetikan File', price: '1.000/Hal' },
-  { icon: Database, label: 'Olah Data SPSS', price: 'Chat Admin' },
-  { icon: Code, label: 'Olah Data Matlab', price: 'Chat Admin' },
-  { icon: Database, label: 'Olah Data TablePlus', price: 'Chat Admin' },
   { icon: FileText, label: 'Review Jurnal', price: '25k/Review' },
 ];
 
