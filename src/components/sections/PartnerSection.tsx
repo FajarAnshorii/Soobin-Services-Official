@@ -36,7 +36,7 @@ export default function PartnerSection() {
             Partner Resmi
           </h2>
           <p className="text-gray-500 text-xs mt-1">
-            Didukung oleh teknologi dan layanan terpercaya
+            Didukung oleh Layanan Resmi dan Partner Company Resmi
           </p>
         </motion.div>
       </div>
