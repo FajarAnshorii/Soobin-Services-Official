@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { FileCheck, Zap, Shield, Clock } from 'lucide-react';
 
 const plans = [
-  { amount: '1x', price: 'Rp 4.000', badge: null },
-  { amount: '3x', price: 'Rp 12.000', badge: 'Hemat!' },
-  { amount: '6x', price: 'Rp 24.000', badge: 'Best Deal!' },
+  { amount: '1x', price: 'Rp 8.000', badge: null },
+  { amount: '3x', price: 'Rp 24.000', badge: 'Hemat!' },
+  { amount: '6x', price: 'Rp 48.000', badge: 'Best Deal!' },
 ];
 
 const aiPlans = [
@@ -33,12 +33,12 @@ export default function TurnitinSection() {
             CEK TURNITIN & CEK A.I
           </h2>
           <p className="text-gray-600 text-base sm:text-lg px-4">
-            <span className="text-primary-800 font-bold text-xl sm:text-2xl">Rp 4.000/CEK</span>
+            <span className="text-primary-800 font-bold text-xl sm:text-2xl">Rp 8.000/CEK</span>
             <br />
             Termurah di Pasaran dan Lebih dari 5K+ Files Checked
           </p>
         </motion.div>
-
+ 
         {/* Turnitin Plans */}
         <motion.div
           className="mb-12"
@@ -50,7 +50,7 @@ export default function TurnitinSection() {
           <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <FileCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary-800" />
             <h3 className="text-lg sm:text-xl font-bold text-dark-800">Cek Turnitin</h3>
-            <span className="text-xs sm:text-sm text-gray-500 ml-auto hidden sm:inline">Harga Turnitin belum stabil</span>
+            <span className="text-xs sm:text-sm text-gray-500 ml-auto hidden sm:inline">Harga Turnitin masih naik turun karena susahnya stok Turnitin</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {plans.map((plan, index) => (

@@ -32,9 +32,9 @@ const categories = [
 ];
 
 const services = [
-  { id: 1, category: 'turnitin', name: 'Cek Turnitin 1x', price: 'Rp 4.000', icon: FileCheck, badge: null },
-  { id: 2, category: 'turnitin', name: 'Cek Turnitin 3x', price: 'Rp 12.000', icon: FileCheck, badge: 'Hemat!' },
-  { id: 3, category: 'turnitin', name: 'Cek Turnitin 6x', price: 'Rp 24.000', icon: FileCheck, badge: 'Best Deal!' },
+  { id: 1, category: 'turnitin', name: 'Cek Turnitin 1x', price: 'Rp 8.000', icon: FileCheck, badge: null },
+  { id: 2, category: 'turnitin', name: 'Cek Turnitin 3x', price: 'Rp 24.000', icon: FileCheck, badge: 'Hemat!' },
+  { id: 3, category: 'turnitin', name: 'Cek Turnitin 6x', price: 'Rp 48.000', icon: FileCheck, badge: 'Best Deal!' },
   { id: 4, category: 'turnitin', name: 'Cek AI 1x', price: 'Rp 5.000', icon: FileCheck, badge: null },
   { id: 5, category: 'turnitin', name: 'Cek AI 2x', price: 'Rp 10.000', icon: FileCheck, badge: null },
   { id: 6, category: 'parafrase', name: 'Parafrase Dokumen', price: 'Rp 2.000/Hal', icon: RefreshCw, badge: null },
