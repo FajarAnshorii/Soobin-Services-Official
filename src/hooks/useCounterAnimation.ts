@@ -11,6 +11,7 @@ interface UseCounterAnimationOptions {
   prefix?: string;
   suffix?: string;
   separator?: string;
+  decimalSeparator?: string;
   startOnView?: boolean;
 }
 
@@ -22,6 +23,7 @@ export function useCounterAnimation({
   prefix = '',
   suffix = '',
   separator = '.',
+  decimalSeparator = ',',
   startOnView = true,
 }: UseCounterAnimationOptions) {
   const [count, setCount] = useState(0);
@@ -78,7 +80,7 @@ export function useCounterAnimation({
   const withSeparator = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 
   const displayValue = decimals > 0
-    ? `${withSeparator},${decPart}`
+    ? `${withSeparator}${decimalSeparator}${decPart}`
     : withSeparator;
 
   return {

@@ -76,12 +76,14 @@ function AnimatedStat({
     value,
     decimals = 0,
     suffix = '+',
+    decimalSeparator = ',',
     label,
     className = '',
   }: {
     value: number;
     decimals?: number;
     suffix?: string;
+    decimalSeparator?: string;
     label: string;
     className?: string;
   }) {
@@ -90,6 +92,7 @@ function AnimatedStat({
       duration: 2000,
       decimals,
       suffix,
+      decimalSeparator,
     });
 
     return (
@@ -114,7 +117,7 @@ export default function Hero() {
   const [typewriterDone, setTypewriterDone] = useState(false);
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-dark-800 via-primary-900 to-dark-800 overflow-hidden pt-20">
+    <section className="relative min-h-screen bg-linear-to-br from-dark-800 via-primary-900 to-dark-800 overflow-hidden pt-20">
       {/* Background Pattern - Parallax */}
       <motion.div
         className="absolute inset-0 opacity-5"
@@ -242,18 +245,9 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">10.000+</p>
-                <p className="text-gray-400 text-xs sm:text-sm">Customer</p>
-              </div>
-              <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">30.000+</p>
-                <p className="text-gray-400 text-xs sm:text-sm">Tugas Selesai</p>
-              </div>
-              <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">4.9★</p>
-                <p className="text-gray-400 text-xs sm:text-sm">Rating</p>
-              </div>
+              <AnimatedStat value={10000} label="Customer" suffix="+" />
+              <AnimatedStat value={30000} label="Tugas Selesai" suffix="+" />
+              <AnimatedStat value={4.9} decimals={1} decimalSeparator="." label="Rating" suffix="★" />
             </motion.div>
           </motion.div>
 
