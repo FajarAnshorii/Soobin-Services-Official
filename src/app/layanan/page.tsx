@@ -879,40 +879,60 @@ export default function LayananPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {visibleServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                className={`group relative bg-white rounded-xl p-4 sm:p-5 lg:p-6 border transition-all duration-500 ${
-                  service.badge ? 'border-primary-800 shadow-md' : 'border-gray-200 hover:border-primary-800'
-                }`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4, boxShadow: "0 12px 24px rgba(26, 35, 126, 0.15)" }}
-              >
-                {service.badge && (
-                  <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
-                    {service.badge}
-                  </span>
-                )}
-                <div className="flex items-start justify-between mb-3 sm:mb-4">
-                  <div className="bg-primary-800/10 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center">
-                    <service.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary-800" />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-dark-800 text-sm sm:text-base mb-2 group-hover:text-primary-800 transition-colors line-clamp-2">{service.name}</h3>
-                <p className="text-primary-800 font-bold text-sm sm:text-base mb-3">{service.price}</p>
-                <motion.a
-                  href={`https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20${encodeURIComponent(service.name)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center bg-primary-800 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm"
-                  whileTap={{ scale: 0.98 }}
+            {visibleServices.map((service, index) => {
+              const displayBadge = service.badge || (() => {
+                switch (service.category) {
+                  case 'turnitin': return 'Turnitin';
+                  case 'parafrase': return 'Parafrase';
+                  case 'joki-tugas': return 'Tugas';
+                  case 'joki-skripsi': return 'Skripsi';
+                  case 'laporan-akademik': return 'Laporan';
+                  case 'tugas-sekolah': return 'Sekolah';
+                  case 'unlock': return 'Unlock';
+                  case 'umum': return 'Umum';
+                  case 'medsos': return 'Sosmed';
+                  case 'desain': return 'Desain';
+                  case 'digital': return 'Digital';
+                  case 'uiux': return 'UI/UX';
+                  default: return null;
+                }
+              })();
+
+              return (
+                <motion.div
+                  key={service.id}
+                  className={`group relative bg-white rounded-xl p-4 sm:p-5 lg:p-6 border transition-all duration-500 ${
+                    displayBadge ? 'border-primary-800 shadow-md' : 'border-gray-200 hover:border-primary-800'
+                  }`}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4, boxShadow: "0 12px 24px rgba(26, 35, 126, 0.15)" }}
                 >
-                  Pesan
-                </motion.a>
-              </motion.div>
-            ))}
+                  {displayBadge && (
+                    <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                      {displayBadge}
+                    </span>
+                  )}
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="bg-primary-800/10 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center">
+                      <service.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary-800" />
+                    </div>
+                  </div>
+                  <h3 className="font-semibold text-dark-800 text-sm sm:text-base mb-2 group-hover:text-primary-800 transition-colors line-clamp-2">{service.name}</h3>
+                  <p className="text-primary-800 font-bold text-sm sm:text-base mb-3">{service.price}</p>
+                  <motion.a
+                    href={`https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20${encodeURIComponent(service.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center bg-primary-800 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm"
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Pesan
+                  </motion.a>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {filteredServices.length === 0 && (
