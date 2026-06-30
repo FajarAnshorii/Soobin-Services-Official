@@ -765,6 +765,236 @@ const services = [
   { id: 553, category: 'uiux', name: 'Paket Design System Basic', price: 'Start 750k', icon: MonitorCheck, badge: null },
 ];
 
+const getDisplayBadge = (service: any): string | null => {
+  let badgeText = '';
+  
+  if (service.badge) {
+    badgeText = service.badge;
+  } else {
+    const nameLower = service.name.toLowerCase();
+    
+    if (service.category === 'turnitin') {
+      if (nameLower.includes('ai')) {
+        badgeText = 'ZEROGPT';
+      } else {
+        badgeText = 'TURNITIN';
+      }
+    } else if (service.category === 'parafrase') {
+      badgeText = 'PARAFRASE';
+    } else if (service.category === 'laporan-akademik') {
+      if (nameLower.includes('proposal')) {
+        badgeText = 'PROPOSAL';
+      } else if (nameLower.includes('logbook')) {
+        badgeText = 'LOGBOOK';
+      } else if (nameLower.includes('tugas')) {
+        badgeText = 'TUGAS KULIAH';
+      } else {
+        badgeText = 'LAPORAN';
+      }
+    } else if (service.category === 'joki-skripsi') {
+      if (nameLower.includes('sempro')) {
+        badgeText = 'SEMPRO';
+      } else if (nameLower.includes('bab')) {
+        badgeText = 'BAB SKRIPSI';
+      } else if (nameLower.includes('referensi')) {
+        badgeText = 'REFERENSI';
+      } else if (nameLower.includes('kuesioner')) {
+        badgeText = 'KUESIONER';
+      } else if (nameLower.includes('wawancara')) {
+        badgeText = 'WAWANCARA';
+      } else if (nameLower.includes('instrumen') || nameLower.includes('kisi-kisi')) {
+        badgeText = 'INSTRUMEN';
+      } else {
+        badgeText = 'SKRIPSI';
+      }
+    } else if (service.category === 'unlock') {
+      badgeText = service.name.replace(/unlock\s+/i, '').trim();
+    } else if (service.category === 'tugas-sekolah') {
+      if (nameLower.includes('soal') || nameLower.includes('pembahasan')) {
+        badgeText = 'SOAL SEKOLAH';
+      } else if (nameLower.includes('laporan')) {
+        badgeText = 'LAPORAN SEKOLAH';
+      } else if (nameLower.includes('proposal')) {
+        badgeText = 'PROPOSAL SEKOLAH';
+      } else if (nameLower.includes('catatan') || nameLower.includes('materi') || nameLower.includes('ringkasan') || nameLower.includes('mind map')) {
+        badgeText = 'CATATAN SEKOLAH';
+      } else if (nameLower.includes('teks') || nameLower.includes('pidato') || nameLower.includes('mc') || nameLower.includes('debat') || nameLower.includes('drama') || nameLower.includes('naskah') || nameLower.includes('script')) {
+        badgeText = 'TEKS SEKOLAH';
+      } else if (nameLower.includes('bahasa')) {
+        badgeText = 'BAHASA';
+      } else if (nameLower.includes('matematika') || nameLower.includes('mtk') || nameLower.includes('ekonomi') || nameLower.includes('akuntansi')) {
+        badgeText = 'MATEMATIKA & EKONOMI';
+      } else if (nameLower.includes('fisika') || nameLower.includes('kimia') || nameLower.includes('biologi')) {
+        badgeText = 'SAINS';
+      } else if (nameLower.includes('sejarah') || nameLower.includes('geografi') || nameLower.includes('pkn') || nameLower.includes('agama')) {
+        badgeText = 'SOSIAL & AGAMA';
+      } else if (nameLower.includes('multimedia') || nameLower.includes('desain') || nameLower.includes('rpl') || nameLower.includes('tkj')) {
+        badgeText = 'TEKNOLOGI & MULTIMEDIA';
+      } else if (nameLower.includes('smk')) {
+        badgeText = 'KEJURUAN SMK';
+      } else {
+        badgeText = 'SEKOLAH';
+      }
+    } else if (service.category === 'joki-tugas') {
+      if (nameLower.includes('translate')) {
+        badgeText = 'TRANSLATE';
+      } else if (nameLower.includes('pustaka') || nameLower.includes('mendeley')) {
+        badgeText = 'REFERENSI';
+      } else if (nameLower.includes('ppt')) {
+        badgeText = 'PRESENTASI';
+      } else if (nameLower.includes('isi otomatis') || nameLower.includes('halaman') || nameLower.includes('ketik') || nameLower.includes('resume') || nameLower.includes('rangkuman')) {
+        badgeText = 'DOKUMEN';
+      } else if (nameLower.includes('makalah')) {
+        badgeText = 'MAKALAH';
+      } else if (nameLower.includes('artikel')) {
+        badgeText = 'ARTIKEL';
+      } else if (nameLower.includes('jurnal')) {
+        badgeText = 'JURNAL';
+      } else if (nameLower.includes('essay') || nameLower.includes('esai')) {
+        badgeText = 'ESSAY';
+      } else if (nameLower.includes('coding') || nameLower.includes('informatika') || nameLower.includes('colab')) {
+        badgeText = 'CODING';
+      } else if (nameLower.includes('laporan')) {
+        badgeText = 'LAPORAN TUGAS';
+      } else if (nameLower.includes('kuesioner') || nameLower.includes('instrumen') || nameLower.includes('wawancara') || nameLower.includes('observasi') || nameLower.includes('sampling') || nameLower.includes('metode') || nameLower.includes('hipotesis') || nameLower.includes('variabel') || nameLower.includes('gap') || nameLower.includes('roadmap') || nameLower.includes('novelty') || nameLower.includes('rumusan') || nameLower.includes('tujuan') || nameLower.includes('manfaat') || nameLower.includes('kerangka')) {
+        badgeText = 'METODOLOGI';
+      } else if (nameLower.includes('akuntansi') || nameLower.includes('keuangan') || nameLower.includes('audit') || nameLower.includes('pajak')) {
+        badgeText = 'AKUNTANSI & KEUANGAN';
+      } else if (nameLower.includes('manajemen') || nameLower.includes('pemasaran') || nameLower.includes('ekonomi')) {
+        badgeText = 'BISNIS & MANAJEMEN';
+      } else if (nameLower.includes('komunikasi') || nameLower.includes('public relations') || nameLower.includes('broadcasting') || nameLower.includes('pariwisata') || nameLower.includes('perhotelan')) {
+        badgeText = 'KOMUNIKASI & SOSIAL';
+      } else if (nameLower.includes('teknik') || nameLower.includes('arsitektur') || nameLower.includes('dkv') || nameLower.includes('desain')) {
+        badgeText = 'TEKNIK & DESAIN';
+      } else if (nameLower.includes('keperawatan') || nameLower.includes('kebidanan') || nameLower.includes('farmasi') || nameLower.includes('gizi') || nameLower.includes('kesehatan')) {
+        badgeText = 'KESEHATAN & FARMASI';
+      } else if (nameLower.includes('agribisnis') || nameLower.includes('peternakan') || nameLower.includes('perikanan') || nameLower.includes('kehutanan')) {
+        badgeText = 'PERTANIAN & ALAM';
+      } else {
+        badgeText = 'JOKI TUGAS';
+      }
+    } else if (service.category === 'umum') {
+      if (nameLower.includes('entry') || nameLower.includes('input') || nameLower.includes('database') || nameLower.includes('rekap') || nameLower.includes('monitoring') || nameLower.includes('inventory')) {
+        badgeText = 'DATA ENTRY';
+      } else if (nameLower.includes('invoice') || nameLower.includes('kwitansi') || nameLower.includes('surat jalan') || nameLower.includes('kas masuk')) {
+        badgeText = 'DOKUMEN KEUANGAN';
+      } else if (nameLower.includes('absensi') || nameLower.includes('laporan harian') || nameLower.includes('laporan mingguan') || nameLower.includes('laporan bulanan')) {
+        badgeText = 'LAPORAN KANTOR';
+      } else if (nameLower.includes('form') || nameLower.includes('survey')) {
+        badgeText = 'SURVEY & FORM';
+      } else if (nameLower.includes('meeting') || nameLower.includes('notulen') || nameLower.includes('minutes of meeting') || nameLower.includes('rundown')) {
+        badgeText = 'MEETING & ACARA';
+      } else if (nameLower.includes('sop') || nameLower.includes('job description') || nameLower.includes('kpi') || nameLower.includes('organisasi') || nameLower.includes('checklist')) {
+        badgeText = 'SOP & ORGANISASI';
+      } else if (nameLower.includes('proposal bisnis') || nameLower.includes('company profile') || nameLower.includes('pitch deck') || nameLower.includes('bmc') || nameLower.includes('business model')) {
+        badgeText = 'PROPOSAL BISNIS';
+      } else if (nameLower.includes('swot') || nameLower.includes('kompetitor') || nameLower.includes('pasar') || nameLower.includes('riset') || nameLower.includes('produk')) {
+        badgeText = 'RISET PASAR';
+      } else if (nameLower.includes('hpp') || nameLower.includes('bep') || nameLower.includes('profit') || nameLower.includes('keuangan') || nameLower.includes('pembukuan umkm')) {
+        badgeText = 'ANALISIS KEUANGAN';
+      } else if (nameLower.includes('brand') || nameLower.includes('slogan') || nameLower.includes('branding')) {
+        badgeText = 'BRANDING';
+      } else if (nameLower.includes('linkedin') || nameLower.includes('cv') || nameLower.includes('resume') || nameLower.includes('portofolio') || nameLower.includes('personal branding') || nameLower.includes('resign') || nameLower.includes('interview')) {
+        badgeText = 'KARIR & PERSONAL';
+      } else if (nameLower.includes('surat')) {
+        badgeText = 'SURAT MENURAT';
+      } else if (nameLower.includes('email')) {
+        badgeText = 'EMAIL PROFESIONAL';
+      } else {
+        badgeText = 'UMUM';
+      }
+    } else if (service.category === 'medsos') {
+      if (nameLower.includes('caption instagram') || nameLower.includes('caption tiktok') || nameLower.includes('caption marketplace') || nameLower.includes('bio instagram')) {
+        badgeText = 'SOSMED';
+      } else if (nameLower.includes('copywriting')) {
+        badgeText = 'COPYWRITING';
+      } else if (nameLower.includes('script tiktok') || nameLower.includes('script reels') || nameLower.includes('script youtube') || nameLower.includes('script voice over')) {
+        badgeText = 'SCRIPTWRITING';
+      } else if (nameLower.includes('ide konten') || nameLower.includes('kalender konten') || nameLower.includes('content plan')) {
+        badgeText = 'CONTENT PLANNING';
+      } else if (nameLower.includes('artikel blog') || nameLower.includes('artikel seo')) {
+        badgeText = 'ARTIKEL';
+      } else if (nameLower.includes('youtube') || nameLower.includes('hashtag') || nameLower.includes('viral')) {
+        badgeText = 'YOUTUBE & SEO';
+      } else if (nameLower.includes('chat') || nameLower.includes('admin') || nameLower.includes('broadcast') || nameLower.includes('promo') || nameLower.includes('testimoni')) {
+        badgeText = 'ADMIN & BROADCAST';
+      } else {
+        badgeText = 'SOSMED';
+      }
+    } else if (service.category === 'desain') {
+      if (nameLower.includes('logo')) {
+        badgeText = 'DESAIN LOGO';
+      } else if (nameLower.includes('banner') || nameLower.includes('flyer') || nameLower.includes('pamflet') || nameLower.includes('brosur') || nameLower.includes('spanduk') || nameLower.includes('twibbon')) {
+        badgeText = 'DESAIN PROMOSI';
+      } else if (nameLower.includes('menu')) {
+        badgeText = 'DESAIN MENU';
+      } else if (nameLower.includes('poster')) {
+        badgeText = 'DESAIN POSTER';
+      } else if (nameLower.includes('jadwal piket') || nameLower.includes('struktur kelas') || nameLower.includes('sertifikat kelas') || nameLower.includes('brosur sekolah') || nameLower.includes('feed osis') || nameLower.includes('story instagram sekolah') || nameLower.includes('sampul kliping') || nameLower.includes('lembar catatan estetik') || nameLower.includes('template catatan sekolah') || nameLower.includes('undangan acara sekolah')) {
+        badgeText = 'DESAIN SEKOLAH';
+      } else if (nameLower.includes('sertifikat')) {
+        badgeText = 'DESAIN SERTIFIKAT';
+      } else if (nameLower.includes('undangan')) {
+        badgeText = 'DESAIN UNDANGAN';
+      } else if (nameLower.includes('kartu nama')) {
+        badgeText = 'DESAIN KARTU NAMA';
+      } else if (nameLower.includes('stiker') || nameLower.includes('label') || nameLower.includes('kemasan') || nameLower.includes('packaging')) {
+        badgeText = 'DESAIN KEMASAN';
+      } else if (nameLower.includes('feed instagram') || nameLower.includes('story instagram') || nameLower.includes('carousel') || nameLower.includes('highlight') || nameLower.includes('cover highlight') || nameLower.includes('reels cover') || nameLower.includes('tiktok cover') || nameLower.includes('header') || nameLower.includes('cover toko shopee') || nameLower.includes('cover toko tokopedia') || nameLower.includes('cover toko tiktok shop') || nameLower.includes('dekorasi toko') || nameLower.includes('etalase') || nameLower.includes('frame foto') || nameLower.includes('voucher') || nameLower.includes('shopee') || nameLower.includes('tokopedia')) {
+        badgeText = 'DESAIN SOSMED';
+      } else if (nameLower.includes('thumbnail')) {
+        badgeText = 'DESAIN THUMBNAIL';
+      } else if (nameLower.includes('cover ebook') || nameLower.includes('cover proposal') || nameLower.includes('cover skripsi') || nameLower.includes('cover makalah') || nameLower.includes('cover laporan')) {
+        badgeText = 'DESAIN COVER';
+      } else if (nameLower.includes('pdf') || nameLower.includes('gabung') || nameLower.includes('pisah') || nameLower.includes('kompres') || nameLower.includes('watermark') || nameLower.includes('convert') || nameLower.includes('layout')) {
+        badgeText = 'EDIT DOKUMEN & PDF';
+      } else if (nameLower.includes('kop surat') || nameLower.includes('invoice') || nameLower.includes('kwitansi') || nameLower.includes('form') || nameLower.includes('barcode') || nameLower.includes('qr code') || nameLower.includes('label nama') || nameLower.includes('nomor antrian') || nameLower.includes('kartu member') || nameLower.includes('name tag') || nameLower.includes('thank you card') || nameLower.includes('kartu garansi') || nameLower.includes('kartu perawatan') || nameLower.includes('insert card')) {
+        badgeText = 'DESAIN STATIONERY';
+      } else if (nameLower.includes('event') || nameLower.includes('rundown') || nameLower.includes('acara') || nameLower.includes('mc') || nameLower.includes('sambutan') || nameLower.includes('moderator') || nameLower.includes('tor') || nameLower.includes('timeline') || nameLower.includes('jobdesk') || nameLower.includes('registrasi') || nameLower.includes('zoom') || nameLower.includes('tiket') || nameLower.includes('kupon') || nameLower.includes('wristband') || nameLower.includes('booth') || nameLower.includes('denah') || nameLower.includes('signage') || nameLower.includes('informasi') || nameLower.includes('lpj')) {
+        badgeText = 'DESAIN EVENT';
+      } else if (nameLower.includes('layout makala') || nameLower.includes('layout proposal') || nameLower.includes('layout laporan') || nameLower.includes('modul sekolah') || nameLower.includes('infografis') || nameLower.includes('mind map') || nameLower.includes('timeline') || nameLower.includes('jadwal') || nameLower.includes('flashcard') || nameLower.includes('catatan')) {
+        badgeText = 'DESAIN DOKUMEN';
+      } else if (nameLower.includes('brand guideline') || nameLower.includes('brand board') || nameLower.includes('moodboard') || nameLower.includes('palet warna') || nameLower.includes('tipografi') || nameLower.includes('stationery') || nameLower.includes('rate card') || nameLower.includes('portofolio') || nameLower.includes('profil umkm') || nameLower.includes('branding')) {
+        badgeText = 'DESAIN BRANDING';
+      } else if (nameLower.includes('cv') || nameLower.includes('resume') || nameLower.includes('cover letter') || nameLower.includes('portfolio') || nameLower.includes('personal profile') || nameLower.includes('biodata')) {
+        badgeText = 'DESAIN CV & PORTFOLIO';
+      } else {
+        badgeText = 'DESAIN GRAFIS';
+      }
+    } else if (service.category === 'digital') {
+      if (nameLower.includes('upload')) {
+        badgeText = 'MARKETPLACE';
+      } else {
+        badgeText = 'DIGITAL';
+      }
+    } else if (service.category === 'uiux') {
+      if (nameLower.includes('research') || nameLower.includes('riset') || nameLower.includes('analisis kompetitor') || nameLower.includes('persona') || nameLower.includes('journey map') || nameLower.includes('flow') || nameLower.includes('architecture') || nameLower.includes('sitemap') || nameLower.includes('problem statement') || nameLower.includes('strategy') || nameLower.includes('ux audit')) {
+        badgeText = 'UX RESEARCH';
+      } else if (nameLower.includes('website landing') || nameLower.includes('ui design website landing') || nameLower.includes('landing page')) {
+        badgeText = 'UI LANDING PAGE';
+      } else if (nameLower.includes('website') || nameLower.includes('web') || nameLower.includes('saas') || nameLower.includes('membership')) {
+        badgeText = 'UI WEB DESIGN';
+      } else if (nameLower.includes('mobile') || nameLower.includes('android') || nameLower.includes('ios') || nameLower.includes('aplikasi')) {
+        badgeText = 'UI MOBILE DESIGN';
+      } else if (nameLower.includes('page') || nameLower.includes('login') || nameLower.includes('register') || nameLower.includes('password') || nameLower.includes('home') || nameLower.includes('profile') || nameLower.includes('setting') || nameLower.includes('search') || nameLower.includes('detail') || nameLower.includes('cart') || nameLower.includes('checkout') || nameLower.includes('payment') || nameLower.includes('tracking') || nameLower.includes('notification') || nameLower.includes('dashboard') || nameLower.includes('report') || nameLower.includes('form')) {
+        badgeText = 'UI PAGE DESIGN';
+      } else if (nameLower.includes('redesign')) {
+        badgeText = 'UI/UX REDESIGN';
+      } else if (nameLower.includes('prototype')) {
+        badgeText = 'FIGMA PROTOTYPE';
+      } else if (nameLower.includes('design system')) {
+        badgeText = 'DESIGN SYSTEM';
+      } else {
+        badgeText = 'UI/UX DESIGN';
+      }
+    } else {
+      badgeText = service.category;
+    }
+  }
+
+  return badgeText.toUpperCase();
+};
+
 const ITEMS_PER_PAGE = 16;
 
 export default function LayananPage() {
@@ -880,23 +1110,7 @@ export default function LayananPage() {
             transition={{ duration: 0.3 }}
           >
             {visibleServices.map((service, index) => {
-              const displayBadge = service.badge || (() => {
-                switch (service.category) {
-                  case 'turnitin': return 'Turnitin';
-                  case 'parafrase': return 'Parafrase';
-                  case 'joki-tugas': return 'Tugas';
-                  case 'joki-skripsi': return 'Skripsi';
-                  case 'laporan-akademik': return 'Laporan';
-                  case 'tugas-sekolah': return 'Sekolah';
-                  case 'unlock': return 'Unlock';
-                  case 'umum': return 'Umum';
-                  case 'medsos': return 'Sosmed';
-                  case 'desain': return 'Desain';
-                  case 'digital': return 'Digital';
-                  case 'uiux': return 'UI/UX';
-                  default: return null;
-                }
-              })();
+              const displayBadge = getDisplayBadge(service);
 
               return (
                 <motion.div
