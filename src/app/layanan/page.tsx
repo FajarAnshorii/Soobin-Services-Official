@@ -835,7 +835,7 @@ export default function LayananPage() {
       </section>
 
       {/* Filter & Search Section */}
-      <section className="py-3 sm:py-4 md:py-5 bg-white border-b sticky top-16 md:top-20 z-40">
+      <section className="pt-3 pb-4 sm:pt-4 sm:pb-5 md:py-5 bg-white border-b sticky top-16 md:top-20 z-40">
         <div className="container-custom px-4">
           <div className="relative w-full mb-3 sm:mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -850,7 +850,7 @@ export default function LayananPage() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 justify-start pb-1">
+          <div className="flex flex-wrap gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 justify-start pb-2">
             {categories.map((cat) => (
               <motion.button
                 key={cat.id}
@@ -871,10 +871,10 @@ export default function LayananPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-8 sm:py-12">
+      <section className="pt-10 pb-8 sm:pt-14 sm:pb-12">
         <div className="container-custom px-4">
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4"
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
