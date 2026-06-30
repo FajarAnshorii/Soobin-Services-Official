@@ -21,7 +21,7 @@ const categories = [
   { id: 'joki-tugas', label: 'Joki Tugas', icon: Pen },
   { id: 'joki-skripsi', label: 'Joki Skripsi', icon: GraduationCap },
   { id: 'laporan-akademik', label: 'Laporan Akademik', icon: FileSpreadsheet },
-  { id: 'uji-data', label: 'Uji Data', icon: BarChart },
+  { id: 'uji-data', label: 'Jasa Analisa Data', icon: BarChart },
   { id: 'tugas-sekolah', label: 'Tugas Sekolah', icon: School },
   { id: 'unlock', label: 'Unlock', icon: Unlock },
   { id: 'umum', label: 'Umum', icon: Globe },
