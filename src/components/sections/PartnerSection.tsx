@@ -8,6 +8,9 @@ const row1Partners = [
   { name: 'ZeroGPT', logo: '/logo-zerogpt.png' },
   { name: 'GPTZero', logo: '/logo-gptzero.png' },
   { name: 'SPSS', logo: '/logo-spss.png' },
+  { name: 'PostgreSQL', logo: '/logo-postgresql.png' },
+  { name: 'MariaDB', logo: '/logo-mariadb.png' },
+  { name: 'VS Code', logo: '/logo-vscode.png' },
 ];
 
 const row2Partners = [
@@ -15,11 +18,13 @@ const row2Partners = [
   { name: 'TablePlus', logo: '/logo-tableplus.png' },
   { name: 'Google Colab', logo: '/logo-colab.png' },
   { name: 'Google Scholar', logo: '/logo-scholar.png' },
+  { name: 'Android Studio', logo: '/logo-androidstudio.png' },
+  { name: 'Supabase', logo: '/logo-supabase.png' },
 ];
 
 // Duplicate items to ensure smooth infinite loop
-const duplicatedRow1 = [...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners];
-const duplicatedRow2 = [...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners];
+const duplicatedRow1 = [...row1Partners, ...row1Partners, ...row1Partners, ...row1Partners];
+const duplicatedRow2 = [...row2Partners, ...row2Partners, ...row2Partners, ...row2Partners];
 
 export default function PartnerSection() {
   return (
