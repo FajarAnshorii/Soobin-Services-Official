@@ -11,6 +11,7 @@ interface Message {
   text: string;
   timestamp: string;
   read: boolean;
+  createdAt?: number;
 }
 
 interface ChatSession {
@@ -157,7 +158,12 @@ export default function WhatsAppFloat() {
         }
       });
 
-      mergedMessages.sort((a, b) => a.id.localeCompare(b.id));
+      const getMessageTime = (msg: Message) => {
+        if (msg.createdAt) return msg.createdAt;
+        const match = msg.id.match(/\d+/);
+        return match ? parseInt(match[0], 10) : 0;
+      };
+      mergedMessages.sort((a, b) => getMessageTime(a) - getMessageTime(b));
 
       const updatedSession: ChatSession = {
         id: currentSessionId,
@@ -264,6 +270,7 @@ export default function WhatsAppFloat() {
       text: messageText,
       timestamp: timeString,
       read: false,
+      createdAt: Date.now(),
     };
 
     const text = messageText;

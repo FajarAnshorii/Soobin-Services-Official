@@ -12,6 +12,7 @@ interface Message {
   text: string;
   timestamp: string;
   read: boolean;
+  createdAt?: number;
 }
 
 interface ChatSession {
@@ -201,6 +202,7 @@ export default function AdminPage() {
       text: adminReplyText,
       timestamp: timeString,
       read: true,
+      createdAt: Date.now(),
     };
 
     const text = adminReplyText;
@@ -484,7 +486,16 @@ export default function AdminPage() {
 
                   {/* Messages Feed */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    {selectedSession.messages.map((msg) => {
+                    {[...selectedSession.messages]
+                      .sort((a, b) => {
+                        const getMsgTime = (msg: Message) => {
+                          if (msg.createdAt) return msg.createdAt;
+                          const match = msg.id.match(/\d+/);
+                          return match ? parseInt(match[0], 10) : 0;
+                        };
+                        return getMsgTime(a) - getMsgTime(b);
+                      })
+                      .map((msg) => {
                       const isAdmin = msg.sender === 'admin';
                       return (
                         <div
