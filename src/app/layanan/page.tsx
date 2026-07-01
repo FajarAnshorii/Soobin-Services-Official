@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
+import { useAuth } from '@/context/AuthContext';
 import { motion, useInView } from 'framer-motion';
 import {
   FileCheck, RefreshCw, Pen, Unlock, GraduationCap, Code,
@@ -997,7 +999,22 @@ const getDisplayBadge = (service: any): string | null => {
 
 const ITEMS_PER_PAGE = 16;
 
+function calculateDiscountedPrice(price: string): string {
+  if (price === 'Chat Admin') return 'Chat Admin';
+  return price.replace(/(\d+(?:\.\d+)?)(k)?/g, (match, numStr, k) => {
+    const hasDot = numStr.includes('.');
+    const cleanNumStr = numStr.replace(/\./g, '');
+    const num = parseFloat(cleanNumStr);
+    const discounted = Math.round(num * 0.95);
+    if (hasDot) {
+      return discounted.toLocaleString('id-ID') + (k || '');
+    }
+    return discounted + (k || '');
+  });
+}
+
 export default function LayananPage() {
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -1100,9 +1117,58 @@ export default function LayananPage() {
         </div>
       </section>
 
-      {/* Services Grid */}
       <section className="pt-10 pb-8 sm:pt-14 sm:pb-12">
         <div className="container-custom px-4">
+          {/* Welcome / Member Banner */}
+          <motion.div
+            className="mb-8 overflow-hidden rounded-2xl"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {user ? (
+              <div className="bg-linear-to-r from-primary-900 to-primary-800 text-white p-5 sm:p-6 rounded-2xl relative border border-primary-850 shadow-xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl"></div>
+                <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Member Aktif
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-semibold text-primary-300">Diskon Member 5% Aktif</h4>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold">Selamat Datang, {user.name}!</h3>
+                    <p className="text-gray-300 text-xs mt-1">
+                      Terdaftar dari <span className="font-semibold text-white">{user.university}</span> ({user.prodi}). Potongan harga 5% khusus untuk seluruh Jasa Skripsi telah diterapkan otomatis.
+                    </p>
+                  </div>
+                  <div className="shrink-0 bg-green-500/10 border border-green-500/20 text-green-300 rounded-xl px-4 py-2.5 text-center">
+                    <span className="block text-2xl font-black">5%</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider">Skripsi Disc</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-linear-to-r from-dark-800 to-primary-950 text-white p-5 sm:p-6 rounded-2xl relative border border-white/5 shadow-xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl"></div>
+                <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold">✨ Dapatkan Diskon Member 5% Khusus Jasa Skripsi!</h3>
+                    <p className="text-gray-400 text-xs mt-1">
+                      Daftarkan diri Anda sekarang untuk menikmati potongan harga langsung di setiap pemesanan Jasa Skripsi.
+                    </p>
+                  </div>
+                  <Link
+                    href="/auth"
+                    className="shrink-0 bg-primary-800 hover:bg-primary-750 text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-xl transition-colors shadow-lg shadow-primary-950/20 text-center"
+                  >
+                    Daftar Sekarang
+                  </Link>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
           <motion.div
             className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
             initial={{ opacity: 0 }}
@@ -1111,6 +1177,14 @@ export default function LayananPage() {
           >
             {visibleServices.map((service, index) => {
               const displayBadge = getDisplayBadge(service);
+              const isSkripsi = service.category === 'joki-skripsi';
+              const hasDiscount = !!user && isSkripsi && service.price !== 'Chat Admin';
+
+              // Pre-fill WhatsApp message text
+              const waText = !!user && isSkripsi
+                ? `Halo Kak, saya member SOOBIN (Nama: ${user.name}, Kampus: ${user.university}, Prodi: ${user.prodi}). Mau order Jasa ${service.name} dengan Diskon Member 5%.`
+                : `Halo Kak Mau ${service.name}`;
+              const waLink = `https://wa.me/6287815797525?text=${encodeURIComponent(waText)}`;
 
               return (
                 <motion.div
@@ -1134,12 +1208,37 @@ export default function LayananPage() {
                     </div>
                   </div>
                   <h3 className="font-semibold text-dark-800 text-sm sm:text-base mb-2 group-hover:text-primary-800 transition-colors line-clamp-2">{service.name}</h3>
-                  <p className="text-primary-800 font-bold text-sm sm:text-base mb-3">{service.price}</p>
+                  
+                  {hasDiscount ? (
+                    <div className="mb-3">
+                      <p className="text-gray-400 line-through text-xs mb-0.5">{service.price}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="text-green-600 font-bold text-sm sm:text-base">
+                          {calculateDiscountedPrice(service.price)}
+                        </p>
+                        <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                          DISC 5%
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-3 flex items-center gap-1.5 flex-wrap">
+                      <p className="text-primary-800 font-bold text-sm sm:text-base">
+                        {service.price}
+                      </p>
+                      {!!user && isSkripsi && service.price === 'Chat Admin' && (
+                        <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                          DISC 5%
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <motion.a
-                    href={`https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20${encodeURIComponent(service.name)}`}
+                    href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full text-center bg-primary-800 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm"
+                    className="block w-full text-center bg-primary-800 hover:bg-primary-750 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm"
                     whileTap={{ scale: 0.98 }}
                   >
                     Pesan
