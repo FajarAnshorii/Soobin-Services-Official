@@ -103,18 +103,6 @@ export default function PembuatanWebsitePage() {
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* Left Content */}
             <div className="lg:col-span-7 flex flex-col gap-6 text-left">
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 bg-amber-100/60 border border-amber-200/80 rounded-full px-4 py-1.5 w-fit"
-              >
-                <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
-                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
-                  Jasa Pembuatan Website Premium
-                </span>
-              </motion.div>
-
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
