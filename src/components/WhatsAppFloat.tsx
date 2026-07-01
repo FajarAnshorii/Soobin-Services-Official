@@ -39,20 +39,31 @@ export default function WhatsAppFloat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize or fetch Session ID and Theme
+  // Initialize Theme on mount
   useEffect(() => {
-    let sessId = localStorage.getItem('soobin_chat_session_id');
-    if (!sessId) {
-      sessId = `chat_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-      localStorage.setItem('soobin_chat_session_id', sessId);
-    }
-    setSessionId(sessId);
-
     const savedTheme = localStorage.getItem('soobin_chat_theme') as 'light' | 'dark';
     if (savedTheme) {
       setTheme(savedTheme);
     }
   }, []);
+
+  // Set Session ID dynamically based on auth state (Guest vs specific Member account)
+  useEffect(() => {
+    setMessages([]);
+    setUnreadCount(0);
+
+    if (user) {
+      const memberSessId = `chat_member_${user.email.replace(/[@.]/g, '_')}`;
+      setSessionId(memberSessId);
+    } else {
+      let guestSessId = localStorage.getItem('soobin_chat_guest_session_id');
+      if (!guestSessId) {
+        guestSessId = `chat_guest_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        localStorage.setItem('soobin_chat_guest_session_id', guestSessId);
+      }
+      setSessionId(guestSessId);
+    }
+  }, [user]);
 
   // Sync session with logged-in user profile info
   useEffect(() => {
