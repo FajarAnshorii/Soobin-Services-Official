@@ -17,7 +17,7 @@ function LocalNavbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-28 h-10">
+            <div className="relative w-36 h-12">
               <Image
                 src="/logo-jardev.png"
                 alt="JAR.DEV Logo"
@@ -372,7 +372,7 @@ export default function PembuatanWebsitePage() {
       <footer className="bg-gray-950 text-white py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-6">
           <div className="flex items-center justify-center gap-2">
-            <div className="relative w-28 h-8">
+            <div className="relative w-36 h-10">
               <Image
                 src="/logo-jardev.png"
                 alt="JAR.DEV Logo"
