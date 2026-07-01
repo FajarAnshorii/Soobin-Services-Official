@@ -25,6 +25,8 @@ interface ChatSession {
   messages: Message[];
 }
 
+const BUCKET_URL = 'https://kvdb.io/sb_chats_fajar_official_2026/chats';
+
 export default function WhatsAppFloat() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +38,7 @@ export default function WhatsAppFloat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize or fetch Session ID
+  // Initialize or fetch Session ID and Theme
   useEffect(() => {
     let sessId = localStorage.getItem('soobin_chat_session_id');
     if (!sessId) {
@@ -45,7 +47,6 @@ export default function WhatsAppFloat() {
     }
     setSessionId(sessId);
 
-    // Initialize Theme
     const savedTheme = localStorage.getItem('soobin_chat_theme') as 'light' | 'dark';
     if (savedTheme) {
       setTheme(savedTheme);
@@ -56,43 +57,156 @@ export default function WhatsAppFloat() {
   useEffect(() => {
     if (!sessionId) return;
 
-    const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-    const chats = JSON.parse(chatsStr);
-    let session = chats[sessionId] as ChatSession;
+    const syncProfile = async () => {
+      try {
+        const res = await fetch(BUCKET_URL);
+        let cloudChats: { [id: string]: ChatSession } = {};
+        if (res.ok) {
+          cloudChats = await res.json();
+        }
 
-    if (!session) {
-      session = {
-        id: sessionId,
-        name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
-        email: user ? user.email : '',
-        university: user ? user.university : '',
-        prodi: user ? user.prodi : '',
-        lastUpdated: new Date().toISOString(),
-        unreadCount: 0,
-        userUnreadCount: 0,
-        messages: [],
-      };
-      chats[sessionId] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(chats));
-    } else if (user) {
-      // Update profile info if user logged in
-      session.name = user.name;
-      session.email = user.email;
-      session.university = user.university;
-      session.prodi = user.prodi;
-      chats[sessionId] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(chats));
-    }
+        let session = cloudChats[sessionId] as ChatSession;
 
-    setMessages(session.messages);
-    setUnreadCount(session.userUnreadCount);
+        if (!session) {
+          session = {
+            id: sessionId,
+            name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
+            email: user ? user.email : '',
+            university: user ? user.university : '',
+            prodi: user ? user.prodi : '',
+            lastUpdated: new Date().toISOString(),
+            unreadCount: 0,
+            userUnreadCount: 0,
+            messages: [],
+          };
+          cloudChats[sessionId] = session;
+          
+          await fetch(BUCKET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cloudChats),
+          });
+        } else if (user && (session.name !== user.name || session.email !== user.email)) {
+          session.name = user.name;
+          session.email = user.email;
+          session.university = user.university;
+          session.prodi = user.prodi;
+          cloudChats[sessionId] = session;
+
+          await fetch(BUCKET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cloudChats),
+          });
+        }
+
+        const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
+        const localChats = JSON.parse(localChatsStr);
+        localChats[sessionId] = session;
+        localStorage.setItem('soobin_chats', JSON.stringify(localChats));
+
+        setMessages(session.messages);
+        setUnreadCount(session.userUnreadCount);
+      } catch (e) {
+        console.error('Failed to sync profile with cloud', e);
+      }
+    };
+
+    syncProfile();
   }, [sessionId, user]);
 
-  // Load chat and listen to storage updates (for realtime admin replies)
+  // Cloud sync handler
+  const syncWithCloud = async (currentSessionId: string, currentIsOpen: boolean) => {
+    if (!currentSessionId) return;
+    try {
+      const res = await fetch(BUCKET_URL);
+      if (!res.ok) return;
+      const cloudChats = await res.json();
+
+      const cloudSession = cloudChats[currentSessionId] as ChatSession;
+      if (!cloudSession) return;
+
+      const chatsStr = localStorage.getItem('soobin_chats') || '{}';
+      const localChats = JSON.parse(chatsStr);
+      const localSession = localChats[currentSessionId] as ChatSession;
+
+      let hasChanges = false;
+      let mergedMessages = localSession ? [...localSession.messages] : [];
+
+      // Merge messages from cloud
+      const localMsgIds = new Set(mergedMessages.map(m => m.id));
+      cloudSession.messages.forEach((m) => {
+        if (localMsgIds.has(m.id)) {
+          const existing = mergedMessages.find(x => x.id === m.id);
+          if (existing && existing.read !== m.read) {
+            existing.read = m.read;
+            hasChanges = true;
+          }
+        } else {
+          mergedMessages.push(m);
+          hasChanges = true;
+        }
+      });
+
+      mergedMessages.sort((a, b) => a.id.localeCompare(b.id));
+
+      const updatedSession: ChatSession = {
+        id: currentSessionId,
+        name: cloudSession.name || (user ? user.name : `Guest #${currentSessionId.slice(-4)}`),
+        email: cloudSession.email || (user ? user.email : ''),
+        university: cloudSession.university || (user ? user.university : ''),
+        prodi: cloudSession.prodi || (user ? user.prodi : ''),
+        lastUpdated: cloudSession.lastUpdated || new Date().toISOString(),
+        unreadCount: cloudSession.unreadCount,
+        userUnreadCount: currentIsOpen ? 0 : cloudSession.userUnreadCount,
+        messages: mergedMessages,
+      };
+
+      if (hasChanges || !localSession || localSession.userUnreadCount !== updatedSession.userUnreadCount) {
+        localChats[currentSessionId] = updatedSession;
+        localStorage.setItem('soobin_chats', JSON.stringify(localChats));
+        setMessages(mergedMessages);
+        setUnreadCount(updatedSession.userUnreadCount);
+
+        // Clear user unread count if opened
+        if (currentIsOpen && cloudSession.userUnreadCount > 0) {
+          updatedSession.userUnreadCount = 0;
+          localChats[currentSessionId] = updatedSession;
+          localStorage.setItem('soobin_chats', JSON.stringify(localChats));
+          
+          cloudChats[currentSessionId] = updatedSession;
+          await fetch(BUCKET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cloudChats),
+          });
+        }
+
+        window.dispatchEvent(new Event('soobin_chat_update'));
+      }
+    } catch (e) {
+      console.error('Failed to sync with cloud', e);
+    }
+  };
+
+  // 2-second cloud polling sync loop
   useEffect(() => {
     if (!sessionId) return;
 
-    const loadChat = () => {
+    syncWithCloud(sessionId, isOpen);
+
+    const interval = setInterval(() => {
+      syncWithCloud(sessionId, isOpen);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [sessionId, isOpen]);
+
+  // Local storage same-tab listener
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const handleLocalUpdate = () => {
       try {
         const chatsStr = localStorage.getItem('soobin_chats') || '{}';
         const chats = JSON.parse(chatsStr);
@@ -100,39 +214,22 @@ export default function WhatsAppFloat() {
         if (session) {
           setMessages(session.messages);
           setUnreadCount(isOpen ? 0 : session.userUnreadCount);
-
-          // Clear user unread count if chat is open
-          if (isOpen && session.userUnreadCount > 0) {
-            session.userUnreadCount = 0;
-            chats[sessionId] = session;
-            localStorage.setItem('soobin_chats', JSON.stringify(chats));
-            // Trigger storage event manually for other tabs
-            window.dispatchEvent(new Event('storage'));
-          }
         }
       } catch (e) {
-        console.error('Failed to load chats', e);
+        console.error(e);
       }
     };
 
-    loadChat();
-
-    // Listen to changes in localStorage
-    const handleStorageChange = () => {
-      loadChat();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    // Custom event to handle updates within the same window
-    window.addEventListener('soobin_chat_update', handleStorageChange);
+    window.addEventListener('storage', handleLocalUpdate);
+    window.addEventListener('soobin_chat_update', handleLocalUpdate);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('soobin_chat_update', handleStorageChange);
+      window.removeEventListener('storage', handleLocalUpdate);
+      window.removeEventListener('soobin_chat_update', handleLocalUpdate);
     };
   }, [sessionId, isOpen]);
 
-  // Scroll to bottom when messages update
+  // Auto scroll to bottom
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -145,7 +242,7 @@ export default function WhatsAppFloat() {
     localStorage.setItem('soobin_chat_theme', nextTheme);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageText.trim() || !sessionId) return;
 
@@ -160,83 +257,130 @@ export default function WhatsAppFloat() {
       read: false,
     };
 
-    // Update LocalStorage
-    const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-    const chats = JSON.parse(chatsStr);
-    const session = chats[sessionId] as ChatSession;
+    const text = messageText;
+    setMessageText('');
 
-    if (session) {
+    try {
+      const res = await fetch(BUCKET_URL);
+      let cloudChats: { [id: string]: ChatSession } = {};
+      if (res.ok) {
+        cloudChats = await res.json();
+      }
+
+      let session = cloudChats[sessionId] as ChatSession;
+      if (!session) {
+        session = {
+          id: sessionId,
+          name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
+          email: user ? user.email : '',
+          university: user ? user.university : '',
+          prodi: user ? user.prodi : '',
+          lastUpdated: now.toISOString(),
+          unreadCount: 0,
+          userUnreadCount: 0,
+          messages: [],
+        };
+      }
+
+      if (user) {
+        session.name = user.name;
+        session.email = user.email;
+        session.university = user.university;
+        session.prodi = user.prodi;
+      }
+
       session.messages.push(newMsg);
       session.lastUpdated = now.toISOString();
-      session.unreadCount += 1; // Increment unread count for admin
-      chats[sessionId] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(chats));
-      
-      setMessages([...session.messages]);
-      setMessageText('');
+      session.unreadCount += 1;
 
-      // Dispatch custom event to notify same-tab listeners
+      cloudChats[sessionId] = session;
+
+      await fetch(BUCKET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cloudChats),
+      });
+
+      const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
+      const localChats = JSON.parse(localChatsStr);
+      localChats[sessionId] = session;
+      localStorage.setItem('soobin_chats', JSON.stringify(localChats));
+
+      setMessages([...session.messages]);
       window.dispatchEvent(new Event('soobin_chat_update'));
 
-      // Check if admin is online (if we have admin tab open, it will reply. Else, trigger fallback)
+      // Fallback mock agent response
       const adminOnline = localStorage.getItem('soobin_admin_active') === 'true';
       if (!adminOnline) {
-        // Trigger automated mock response after 3 seconds
         setTimeout(() => {
           triggerMockReply(sessionId);
         }, 3000);
       }
+    } catch (e) {
+      console.error('Failed to send message to cloud', e);
     }
   };
 
-  const triggerMockReply = (currentSessionId: string) => {
-    const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-    const chats = JSON.parse(chatsStr);
-    const session = chats[currentSessionId] as ChatSession;
+  const triggerMockReply = async (currentSessionId: string) => {
+    try {
+      const res = await fetch(BUCKET_URL);
+      if (!res.ok) return;
+      const cloudChats = await res.json();
+      const session = cloudChats[currentSessionId] as ChatSession;
 
-    if (session && session.messages.length > 0) {
-      // Check if last message was from user (don't reply if admin already replied)
-      const lastMsg = session.messages[session.messages.length - 1];
-      if (lastMsg.sender === 'user') {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      if (session && session.messages.length > 0) {
+        const lastMsg = session.messages[session.messages.length - 1];
+        if (lastMsg.sender === 'user') {
+          const now = new Date();
+          const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-        const mockReplies = [
-          "Halo Kak! Terima kasih telah menghubungi Soobin Services. Admin Live siap membantu kebutuhan akademik Anda.",
-          "Ada yang bisa kami bantu hari ini? Kami melayani Cek Turnitin & AI, Jasa Parafrase, Joki Tugas Kuliah/Sekolah, dan Jasa Skripsi.",
-          "Silakan kirimkan detail tugas, deadline, atau pertanyaan Kakak agar bisa langsung kami periksa dan berikan estimasi harga terbaik ya!"
-        ];
+          const mockReplies = [
+            "Halo Kak! Terima kasih telah menghubungi Soobin Services. Admin Live siap membantu kebutuhan akademik Anda.",
+            "Ada yang bisa kami bantu hari ini? Kami melayani Cek Turnitin & AI, Jasa Parafrase, Joki Tugas Kuliah/Sekolah, dan Jasa Skripsi.",
+            "Silakan kirimkan detail tugas, deadline, atau pertanyaan Kakak agar bisa langsung kami periksa dan berikan estimasi harga terbaik ya!"
+          ];
 
-        // Pick reply based on message index
-        const userMsgCount = session.messages.filter(m => m.sender === 'user').length;
-        const replyIndex = Math.min(userMsgCount - 1, mockReplies.length - 1);
-        const replyText = mockReplies[replyIndex];
+          const userMsgCount = session.messages.filter(m => m.sender === 'user').length;
+          const replyIndex = Math.min(userMsgCount - 1, mockReplies.length - 1);
+          const replyText = mockReplies[replyIndex];
 
-        const mockMsg: Message = {
-          id: `msg_mock_${Date.now()}`,
-          sender: 'admin',
-          text: replyText,
-          timestamp: timeString,
-          read: true,
-        };
+          const mockMsg: Message = {
+            id: `msg_mock_${Date.now()}`,
+            sender: 'admin',
+            text: replyText,
+            timestamp: timeString,
+            read: true,
+          };
 
-        session.messages.push(mockMsg);
-        session.lastUpdated = now.toISOString();
-        session.userUnreadCount += 1;
-        chats[currentSessionId] = session;
-        localStorage.setItem('soobin_chats', JSON.stringify(chats));
+          session.messages.push(mockMsg);
+          session.lastUpdated = now.toISOString();
+          session.userUnreadCount += 1;
+          
+          cloudChats[currentSessionId] = session;
+          
+          await fetch(BUCKET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cloudChats),
+          });
 
-        // Update local state if session matches
-        if (currentSessionId === sessionId) {
-          setMessages([...session.messages]);
-          if (!isOpen) {
-            setUnreadCount(prev => prev + 1);
+          const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
+          const localChats = JSON.parse(localChatsStr);
+          localChats[currentSessionId] = session;
+          localStorage.setItem('soobin_chats', JSON.stringify(localChats));
+
+          if (currentSessionId === sessionId) {
+            setMessages([...session.messages]);
+            if (!isOpen) {
+              setUnreadCount(prev => prev + 1);
+            }
           }
-        }
 
-        // Notify same-tab listeners
-        window.dispatchEvent(new Event('soobin_chat_update'));
+          window.dispatchEvent(new Event('soobin_chat_update'));
+        }
       }
+    } catch (e) {
+      console.error('Failed to trigger mock reply', e);
     }
   };
 
@@ -319,7 +463,7 @@ export default function WhatsAppFloat() {
                       className={`flex flex-col max-w-[80%] ${isAdmin ? 'mr-auto items-start' : 'ml-auto items-end'}`}
                     >
                       <div
-                        className={`px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium break-words w-full ${
+                        className={`px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium wrap-break-word w-full ${
                           isAdmin
                             ? theme === 'light'
                               ? 'bg-white border border-gray-100 text-dark-800 rounded-tl-none shadow-sm'

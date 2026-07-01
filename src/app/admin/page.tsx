@@ -26,6 +26,8 @@ interface ChatSession {
   messages: Message[];
 }
 
+const BUCKET_URL = 'https://kvdb.io/sb_chats_fajar_official_2026/chats';
+
 export default function AdminPage() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
@@ -41,18 +43,17 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
-  // 1. Check Auth state on mount
+  // Check Auth state on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
     setIsAdminLoggedIn(isLoggedIn);
   }, []);
 
-  // 2. Set Admin online/offline indicator for client tabs
+  // Set Admin online/offline indicator for client tabs
   useEffect(() => {
     if (isAdminLoggedIn) {
       localStorage.setItem('soobin_admin_active', 'true');
       
-      // Clean up when tab closes or admin logs out
       const handleBeforeUnload = () => {
         localStorage.setItem('soobin_admin_active', 'false');
       };
@@ -90,63 +91,83 @@ export default function AdminPage() {
     }
   };
 
-  // 3. Load chats and sync in realtime
+  // Sync chats with cloud
+  const syncChatsWithCloud = async () => {
+    try {
+      const res = await fetch(BUCKET_URL);
+      if (!res.ok) return;
+      const cloudChats = await res.json();
+
+      setChats(cloudChats);
+      localStorage.setItem('soobin_chats', JSON.stringify(cloudChats));
+
+      // Play sound if there are new unread messages for admin
+      let hasNewMsg = false;
+      Object.keys(cloudChats).forEach((id) => {
+        const oldSession = prevChatsRef.current[id];
+        const newSession = cloudChats[id];
+        if (newSession && (!oldSession || newSession.unreadCount > oldSession.unreadCount)) {
+          hasNewMsg = true;
+        }
+      });
+
+      if (hasNewMsg) {
+        playNotificationSound();
+      }
+
+      prevChatsRef.current = cloudChats;
+    } catch (e) {
+      console.error('Failed to sync chats with cloud', e);
+    }
+  };
+
+  // 2-second cloud sync polling loop
   useEffect(() => {
     if (!isAdminLoggedIn) return;
 
-    const loadChats = () => {
+    syncChatsWithCloud();
+
+    const interval = setInterval(() => {
+      syncChatsWithCloud();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isAdminLoggedIn]);
+
+  // Local storage same-tab listener
+  useEffect(() => {
+    if (!isAdminLoggedIn) return;
+
+    const handleLocalUpdate = () => {
       try {
         const chatsStr = localStorage.getItem('soobin_chats') || '{}';
         const currentChats = JSON.parse(chatsStr);
         setChats(currentChats);
-
-        // Check if any chat has a new message to play sound
-        let hasNewMsg = false;
-        Object.keys(currentChats).forEach((id) => {
-          const oldSession = prevChatsRef.current[id];
-          const newSession = currentChats[id];
-          if (newSession && (!oldSession || newSession.unreadCount > oldSession.unreadCount)) {
-            hasNewMsg = true;
-          }
-        });
-
-        if (hasNewMsg) {
-          playNotificationSound();
-        }
-
-        prevChatsRef.current = currentChats;
       } catch (e) {
-        console.error('Failed to parse chats', e);
+        console.error(e);
       }
     };
 
-    loadChats();
-
-    const handleStorage = () => {
-      loadChats();
-    };
-
-    window.addEventListener('storage', handleStorage);
-    window.addEventListener('soobin_chat_update', handleStorage);
+    window.addEventListener('storage', handleLocalUpdate);
+    window.addEventListener('soobin_chat_update', handleLocalUpdate);
 
     return () => {
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('soobin_chat_update', handleStorage);
+      window.removeEventListener('storage', handleLocalUpdate);
+      window.removeEventListener('soobin_chat_update', handleLocalUpdate);
     };
   }, [isAdminLoggedIn]);
 
-  // 4. Scroll selected chat to bottom
+  // Scroll to bottom when messages list updates
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedSessionId, chats]);
 
-  // 5. Handle admin login
+  // Admin login handler
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Simulated login check
     setTimeout(() => {
       if (email.toLowerCase() === 'admin@soobin.com' && password === 'adminsoobin123') {
         localStorage.setItem('soobin_admin_logged_in', 'true');
@@ -155,10 +176,10 @@ export default function AdminPage() {
         setError('Kredensial admin salah');
       }
       setLoading(false);
-    }, 800);
+    }, 850);
   };
 
-  // 6. Handle logout
+  // Logout handler
   const handleLogout = () => {
     localStorage.setItem('soobin_admin_logged_in', 'false');
     localStorage.setItem('soobin_admin_active', 'false');
@@ -166,8 +187,8 @@ export default function AdminPage() {
     setSelectedSessionId(null);
   };
 
-  // 7. Handle sending admin reply
-  const handleSendReply = (e: React.FormEvent) => {
+  // Send reply handler (fetch-then-write)
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminReplyText.trim() || !selectedSessionId) return;
 
@@ -182,46 +203,75 @@ export default function AdminPage() {
       read: true,
     };
 
-    const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-    const currentChats = JSON.parse(chatsStr);
-    const session = currentChats[selectedSessionId] as ChatSession;
+    const text = adminReplyText;
+    setAdminReplyText('');
 
-    if (session) {
-      session.messages.push(newMsg);
-      session.lastUpdated = now.toISOString();
-      session.unreadCount = 0; // Reset admin unread count since admin is looking
-      session.userUnreadCount += 1; // Increment user unread count for notification badge
-      
-      // Set all user messages in this chat as read
-      session.messages = session.messages.map(m => m.sender === 'user' ? { ...m, read: true } : m);
+    try {
+      // Fetch latest from cloud
+      const res = await fetch(BUCKET_URL);
+      let cloudChats: { [id: string]: ChatSession } = {};
+      if (res.ok) {
+        cloudChats = await res.json();
+      }
 
-      currentChats[selectedSessionId] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(currentChats));
+      const session = cloudChats[selectedSessionId] as ChatSession;
+      if (session) {
+        session.messages.push(newMsg);
+        session.lastUpdated = now.toISOString();
+        session.unreadCount = 0; // Clear admin unread count
+        session.userUnreadCount += 1; // Increment user unread count for badge
+        
+        // Mark all user messages as read
+        session.messages = session.messages.map(m => m.sender === 'user' ? { ...m, read: true } : m);
 
-      setChats(currentChats);
-      setAdminReplyText('');
+        cloudChats[selectedSessionId] = session;
 
-      // Notify other tabs
-      window.dispatchEvent(new Event('soobin_chat_update'));
+        // Post to cloud
+        await fetch(BUCKET_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cloudChats),
+        });
+
+        // Save locally
+        localStorage.setItem('soobin_chats', JSON.stringify(cloudChats));
+        setChats(cloudChats);
+
+        // Notify other tabs
+        window.dispatchEvent(new Event('soobin_chat_update'));
+      }
+    } catch (e) {
+      console.error('Failed to send admin reply', e);
     }
   };
 
-  // 8. Select a session and mark messages as read
-  const handleSelectSession = (id: string) => {
+  // Select a session and mark messages as read
+  const handleSelectSession = async (id: string) => {
     setSelectedSessionId(id);
 
-    const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-    const currentChats = JSON.parse(chatsStr);
-    const session = currentChats[id] as ChatSession;
+    try {
+      const res = await fetch(BUCKET_URL);
+      if (!res.ok) return;
+      const cloudChats = await res.json();
+      const session = cloudChats[id] as ChatSession;
 
-    if (session && session.unreadCount > 0) {
-      session.unreadCount = 0;
-      // Mark all user messages as read
-      session.messages = session.messages.map(m => m.sender === 'user' ? { ...m, read: true } : m);
-      currentChats[id] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(currentChats));
-      setChats(currentChats);
-      window.dispatchEvent(new Event('soobin_chat_update'));
+      if (session && session.unreadCount > 0) {
+        session.unreadCount = 0;
+        session.messages = session.messages.map(m => m.sender === 'user' ? { ...m, read: true } : m);
+        cloudChats[id] = session;
+
+        await fetch(BUCKET_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cloudChats),
+        });
+
+        localStorage.setItem('soobin_chats', JSON.stringify(cloudChats));
+        setChats(cloudChats);
+        window.dispatchEvent(new Event('soobin_chat_update'));
+      }
+    } catch (e) {
+      console.error('Failed to update unread count on selection', e);
     }
   };
 
@@ -296,7 +346,6 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Helpful Credentials Note */}
               <div className="bg-white/5 border border-white/5 rounded-xl p-3 text-[10px] sm:text-xs text-primary-300">
                 <span className="font-semibold block mb-0.5">💡 Tips Pengujian:</span>
                 Masukkan email <span className="font-mono text-white bg-white/10 px-1 py-0.5 rounded">admin@soobin.com</span> dan password <span className="font-mono text-white bg-white/10 px-1 py-0.5 rounded">adminsoobin123</span> untuk masuk.
@@ -438,7 +487,7 @@ export default function AdminPage() {
                           className={`flex flex-col max-w-[70%] ${isAdmin ? 'ml-auto items-end' : 'mr-auto items-start'}`}
                         >
                           <div
-                            className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-medium break-words w-full shadow-md ${
+                            className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-medium wrap-break-word w-full shadow-md ${
                               isAdmin
                                 ? 'bg-primary-800 text-white rounded-tr-none'
                                 : 'bg-white/10 text-gray-100 rounded-tl-none border border-white/5'
