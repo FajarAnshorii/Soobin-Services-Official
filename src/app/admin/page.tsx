@@ -26,7 +26,7 @@ interface ChatSession {
   messages: Message[];
 }
 
-const BUCKET_URL = 'https://kvdb.io/sb_chats_fajar_official_2026/chats';
+const BUCKET_URL = '/api/chats';
 
 export default function AdminPage() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -214,7 +214,12 @@ export default function AdminPage() {
         cloudChats = await res.json();
       }
 
-      const session = cloudChats[selectedSessionId] as ChatSession;
+      let session = cloudChats[selectedSessionId] as ChatSession;
+      if (!session) {
+        // Fallback: restore from admin dashboard's local React state
+        session = chats[selectedSessionId] as ChatSession;
+      }
+
       if (session) {
         session.messages.push(newMsg);
         session.lastUpdated = now.toISOString();

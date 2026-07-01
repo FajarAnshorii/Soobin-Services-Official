@@ -25,7 +25,7 @@ interface ChatSession {
   messages: Message[];
 }
 
-const BUCKET_URL = 'https://kvdb.io/sb_chats_fajar_official_2026/chats';
+const BUCKET_URL = '/api/chats';
 
 export default function WhatsAppFloat() {
   const { user } = useAuth();
@@ -68,17 +68,26 @@ export default function WhatsAppFloat() {
         let session = cloudChats[sessionId] as ChatSession;
 
         if (!session) {
-          session = {
-            id: sessionId,
-            name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
-            email: user ? user.email : '',
-            university: user ? user.university : '',
-            prodi: user ? user.prodi : '',
-            lastUpdated: new Date().toISOString(),
-            unreadCount: 0,
-            userUnreadCount: 0,
-            messages: [],
-          };
+          // Restore from local storage if available to prevent reload clearing issues
+          const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
+          const localChats = JSON.parse(localChatsStr);
+          const localSession = localChats[sessionId] as ChatSession;
+
+          if (localSession && localSession.messages.length > 0) {
+            session = localSession;
+          } else {
+            session = {
+              id: sessionId,
+              name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
+              email: user ? user.email : '',
+              university: user ? user.university : '',
+              prodi: user ? user.prodi : '',
+              lastUpdated: new Date().toISOString(),
+              unreadCount: 0,
+              userUnreadCount: 0,
+              messages: [],
+            };
+          }
           cloudChats[sessionId] = session;
           
           await fetch(BUCKET_URL, {
