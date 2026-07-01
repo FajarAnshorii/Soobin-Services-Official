@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Menu, X, LogOut, ChevronDown, Zap } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -18,7 +20,32 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isNavigatingToWeb, setIsNavigatingToWeb] = useState(false);
   const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleWebClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsNavigatingToWeb(true);
+    setTimeout(() => {
+      router.push('/pembuatan-website');
+      setTimeout(() => {
+        setIsNavigatingToWeb(false);
+      }, 1000);
+    }, 1800);
+  };
+
+  const handleMobileWebClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsOpen(false);
+    setIsNavigatingToWeb(true);
+    setTimeout(() => {
+      router.push('/pembuatan-website');
+      setTimeout(() => {
+        setIsNavigatingToWeb(false);
+      }, 1000);
+    }, 1800);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +89,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/pembuatan-website"
+              onClick={handleWebClick}
               className="firecracker-btn text-xs px-3.5 py-1.5 rounded-full flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold relative"
             >
               <span className="spark spark-1"></span>
@@ -163,7 +191,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/pembuatan-website"
-              onClick={() => setIsOpen(false)}
+              onClick={handleMobileWebClick}
               className="firecracker-btn text-xs px-3 py-2.5 rounded-xl flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold text-center mt-1 relative"
             >
               <span className="spark spark-1"></span>
@@ -216,6 +244,102 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      {/* Lightning Strike Portal Transition Overlay */}
+      <AnimatePresence>
+        {isNavigatingToWeb && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 overflow-hidden"
+          >
+            {/* Background electricity aura */}
+            <div className="absolute w-96 h-96 bg-amber-500/15 rounded-full filter blur-3xl animate-pulse"></div>
+            
+            {/* Golden particle rings */}
+            <motion.div
+              animate={{
+                scale: [0.8, 1.5, 0.8],
+                opacity: [0.2, 0.5, 0.2],
+                rotate: 360
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              className="absolute w-64 h-64 border border-dashed border-amber-400/35 rounded-full pointer-events-none"
+            ></motion.div>
+
+            <motion.div
+              animate={{
+                scale: [1.2, 0.8, 1.2],
+                opacity: [0.1, 0.4, 0.1],
+                rotate: -360
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              className="absolute w-80 h-80 border border-dashed border-amber-300/20 rounded-full pointer-events-none"
+            ></motion.div>
+
+            {/* Pulsing Lightning Bolt Box */}
+            <div className="relative z-10 flex flex-col items-center gap-4">
+              <motion.div
+                animate={{
+                  scale: [1, 1.15, 0.95, 1.1, 1],
+                  y: [0, -3, 2, -1, 0]
+                }}
+                transition={{
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatType: "mirror"
+                }}
+                className="w-20 h-20 bg-amber-400 rounded-2xl flex items-center justify-center shadow-[0_0_50px_15px_rgba(251,191,36,0.5)] border border-amber-300 relative"
+              >
+                <Zap className="w-10 h-10 text-black fill-black filter drop-shadow-[0_2px_8px_rgba(251,191,36,0.8)]" />
+                
+                {/* Spark arcs */}
+                <motion.div
+                  animate={{ opacity: [0, 1, 0], scale: [0.8, 1.4, 0.8] }}
+                  transition={{ duration: 0.3, repeat: Infinity }}
+                  className="absolute inset-0 border-2 border-white rounded-2xl pointer-events-none"
+                ></motion.div>
+              </motion.div>
+
+              {/* Loading text with glowing animation */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center gap-1.5 mt-2"
+              >
+                <h3 className="text-white font-black tracking-widest text-sm sm:text-base uppercase flex items-center gap-1">
+                  <span className="text-amber-400">SOOBIN</span> WEB PORTAL
+                </h3>
+                <p className="text-xs text-amber-300 font-semibold tracking-wider animate-pulse uppercase">
+                  Loading System...
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Screen flash layer (simulating a lightning strike at 1.5s right before push) */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 0, 1, 0]
+              }}
+              transition={{
+                times: [0, 0.8, 0.9, 1],
+                duration: 1.8,
+                repeat: 0
+              }}
+              className="fixed inset-0 bg-white z-[110] pointer-events-none"
+            ></motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
