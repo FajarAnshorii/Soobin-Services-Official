@@ -3,20 +3,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Code, Monitor, Globe, Sparkles, ArrowRight, ShieldCheck, Zap,
   Check, Play, Users, MessageSquare, Star, ArrowUpRight
 } from 'lucide-react';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 
+interface LocalNavbarProps {
+  onExit: (e: React.MouseEvent) => void;
+}
+
 // Local Custom Navbar for the sub-site to make it feel like "shifting to another website"
-function LocalNavbar() {
+function LocalNavbar({ onExit }: LocalNavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-amber-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" onClick={onExit} className="flex items-center gap-2">
             <div className="relative w-36 h-12">
               <Image
                 src="/logo-jardev.png"
@@ -29,7 +34,7 @@ function LocalNavbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            <Link href="/" onClick={onExit} className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Kembali ke SOOBIN Services
             </Link>
             <a href="#services" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
@@ -62,6 +67,19 @@ function LocalNavbar() {
 
 export default function PembuatanWebsitePage() {
   const [activeTab, setActiveTab] = useState('all');
+  const [isExitingToSoobin, setIsExitingToSoobin] = useState(false);
+  const router = useRouter();
+
+  const handleExit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsExitingToSoobin(true);
+    setTimeout(() => {
+      router.push('/');
+      setTimeout(() => {
+        setIsExitingToSoobin(false);
+      }, 1000);
+    }, 1800);
+  };
 
   const services = [
     {
@@ -92,7 +110,7 @@ export default function PembuatanWebsitePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-800 selection:bg-amber-400 selection:text-black pt-20">
-      <LocalNavbar />
+      <LocalNavbar onExit={handleExit} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-linear-to-b from-amber-50/70 via-white to-slate-50 py-20 lg:py-28">
@@ -373,7 +391,7 @@ export default function PembuatanWebsitePage() {
             © {new Date().getFullYear()} JAR.DEV. Hak Cipta Dilindungi Undang-Undang.
           </p>
           <div className="flex items-center justify-center gap-4 text-xs text-gray-400 font-semibold mt-1">
-            <Link href="/" className="hover:text-amber-400 transition-colors">Utama</Link>
+            <Link href="/" onClick={handleExit} className="hover:text-amber-400 transition-colors">Utama</Link>
             <span>•</span>
             <Link href="/layanan" className="hover:text-amber-400 transition-colors">Layanan Lengkap</Link>
             <span>•</span>
@@ -384,6 +402,83 @@ export default function PembuatanWebsitePage() {
 
       {/* Floating Chat Widget */}
       <WhatsAppFloat />
+
+      {/* Exit Door 3D Portal Transition Overlay */}
+      <AnimatePresence>
+        {isExitingToSoobin && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-slate-900"
+            style={{ perspective: "1200px" }}
+          >
+            {/* Exiting Text */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute top-20 flex flex-col items-center gap-2 text-center"
+            >
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest animate-pulse">
+                Exiting JAR.DEV Portal
+              </span>
+              <h3 className="text-white font-extrabold text-lg">Returning to SOOBIN Services...</h3>
+            </motion.div>
+
+            {/* Door Frame Wrapper */}
+            <div className="relative w-48 h-72 border-4 border-amber-400 rounded-t-xl bg-slate-950 shadow-[0_0_40px_rgba(251,191,36,0.2)] overflow-visible flex items-center justify-center">
+              
+              {/* Glowing Portal Light behind the door */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1.1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="absolute inset-0 bg-linear-to-t from-amber-400/90 via-yellow-250 to-white rounded-t-lg shadow-[0_0_80px_20px_rgba(251,191,36,0.6)] flex items-center justify-center"
+              >
+                <Sparkles className="w-8 h-8 text-amber-600 animate-spin" style={{ animationDuration: '4s' }} />
+              </motion.div>
+
+              {/* Exiting Avatar Silhouette passing through */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: [0, 0.7, 0], scale: 1.3 }}
+                transition={{ duration: 1.2, delay: 0.4 }}
+                className="absolute w-12 h-20 bg-slate-900/80 rounded-full blur-xs pointer-events-none"
+              ></motion.div>
+
+              {/* 3D Swings Door */}
+              <motion.div
+                initial={{ rotateY: 0 }}
+                animate={{ rotateY: -115 }}
+                transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1], delay: 0.2 }}
+                style={{ transformOrigin: "left center", backfaceVisibility: "hidden" }}
+                className="absolute inset-0 bg-linear-to-r from-amber-500 via-amber-600 to-amber-700 rounded-t-lg border-l border-amber-300 shadow-2xl flex flex-col items-center justify-center cursor-default"
+              >
+                {/* Door design elements (panels and door handle) */}
+                <div className="absolute right-3 top-1/2 w-4 h-4 rounded-full bg-yellow-300 border border-amber-600 shadow-md flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-800"></div>
+                </div>
+                <div className="w-5/6 h-2/5 border border-amber-450/20 rounded mt-4 flex items-center justify-center bg-amber-800/10"></div>
+                <div className="w-5/6 h-2/5 border border-amber-450/20 rounded mt-4 flex items-center justify-center bg-amber-800/10"></div>
+              </motion.div>
+            </div>
+
+            {/* Camera zoom-in white screen flash right before route push */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 0, 1, 0]
+              }}
+              transition={{
+                times: [0, 0.75, 0.85, 1],
+                duration: 1.8,
+                repeat: 0
+              }}
+              className="fixed inset-0 bg-white z-110 pointer-events-none"
+            ></motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
