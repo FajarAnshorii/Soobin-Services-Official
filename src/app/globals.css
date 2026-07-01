@@ -133,3 +133,74 @@ body {
   mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
 }
+
+/* Sparkling Sheen and Shimmer Effects */
+@keyframes sparkling-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes star-flash {
+  0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
+
+@keyframes sweep-sheen {
+  0% { transform: translateX(-150%) skewX(-25deg); }
+  100% { transform: translateX(150%) skewX(-25deg); }
+}
+
+.sparkle-btn {
+  position: relative;
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #6366f1, #7c3aed);
+  background-size: 300% 300%;
+  color: white !important;
+  font-weight: 700;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.sparkle-btn:hover {
+  animation: sparkling-shimmer 4s ease infinite;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5), 0 0 10px rgba(168, 85, 247, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Sweep Sheen Effect on Hover */
+.sparkle-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-25deg);
+  transition: none;
+}
+
+.sparkle-btn:hover::after {
+  animation: sweep-sheen 1.5s infinite;
+}
+
+/* Sparkling Stars container */
+.sparkle-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 2px white;
+  opacity: 0;
+}
+
+.sparkle-btn:hover .sparkle-star {
+  animation: star-flash 1.2s ease-in-out infinite;
+}

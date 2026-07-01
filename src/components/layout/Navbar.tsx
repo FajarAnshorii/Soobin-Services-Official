@@ -60,6 +60,15 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/layanan?category=pembuatan-website"
+              className="sparkle-btn text-xs px-3.5 py-1.5 rounded-full flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold relative"
+            >
+              <span className="sparkle-star top-1 left-2"></span>
+              <span className="sparkle-star bottom-2 right-3"></span>
+              <span className="sparkle-star top-3 right-1.5"></span>
+              PEMBUATAN WEBSITE
+            </Link>
             <a
               href="https://wa.me/6287815797525"
               target="_blank"
@@ -151,6 +160,16 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/layanan?category=pembuatan-website"
+              onClick={() => setIsOpen(false)}
+              className="sparkle-btn text-xs px-3 py-2.5 rounded-xl flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold text-center mt-1 relative"
+            >
+              <span className="sparkle-star top-1 left-2"></span>
+              <span className="sparkle-star bottom-2 right-3"></span>
+              <span className="sparkle-star top-3 right-1.5"></span>
+              PEMBUATAN WEBSITE
+            </Link>
             <a
               href="https://wa.me/6287815797525"
               target="_blank"
