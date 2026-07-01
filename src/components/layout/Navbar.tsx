@@ -251,7 +251,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 overflow-hidden"
+            className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-slate-950 overflow-hidden"
           >
             {/* Background electricity aura */}
             <div className="absolute w-96 h-96 bg-amber-500/15 rounded-full filter blur-3xl animate-pulse"></div>
@@ -316,7 +316,7 @@ export default function Navbar() {
                 className="flex flex-col items-center gap-1.5 mt-2"
               >
                 <h3 className="text-white font-black tracking-widest text-sm sm:text-base uppercase flex items-center gap-1">
-                  <span className="text-amber-400">SOOBIN</span> WEB PORTAL
+                  <span className="text-amber-400">JAR</span>.DEV PORTAL
                 </h3>
                 <p className="text-xs text-amber-300 font-semibold tracking-wider animate-pulse uppercase">
                   Loading System...
@@ -335,7 +335,7 @@ export default function Navbar() {
                 duration: 1.8,
                 repeat: 0
               }}
-              className="fixed inset-0 bg-white z-[110] pointer-events-none"
+              className="fixed inset-0 bg-white z-110 pointer-events-none"
             ></motion.div>
           </motion.div>
         )}
