@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface User {
   email: string;
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Load session from localStorage on mount
   useEffect(() => {
@@ -108,8 +110,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('soobin_session');
-    setUser(null);
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem('soobin_session');
+      setUser(null);
+      setIsLoggingOut(false);
+    }, 1500);
   };
 
   const forgotPassword = async (email: string, newPassword?: string): Promise<boolean> => {
@@ -134,6 +140,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ user, loading, register, login, logout, forgotPassword }}>
       {children}
+      <AnimatePresence>
+        {isLoggingOut && (
+          <motion.div
+            className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#0d1224]/80 backdrop-blur-md text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="flex flex-col items-center gap-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ delay: 0.05, duration: 0.25 }}
+            >
+              <div className="relative w-14 h-14">
+                <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-t-primary-800 border-r-green-500 animate-spin"></div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-base font-bold tracking-tight text-white">Sedang Keluar...</h3>
+                <p className="text-xs text-gray-400 mt-1 px-4">Menghapus sesi aman Anda dan memulihkan harga normal</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AuthContext.Provider>
   );
 }
