@@ -434,9 +434,7 @@ export default function PembuatanWebsitePage() {
                 animate={{ opacity: 1, scale: 1.1 }}
                 transition={{ delay: 0.3, duration: 0.8 }}
                 className="absolute inset-0 bg-linear-to-t from-amber-400/90 via-yellow-250 to-white rounded-t-lg shadow-[0_0_80px_20px_rgba(251,191,36,0.6)] flex items-center justify-center"
-              >
-                <Sparkles className="w-8 h-8 text-amber-600 animate-spin" style={{ animationDuration: '4s' }} />
-              </motion.div>
+              />
 
               {/* Exiting Avatar Silhouette passing through */}
               <motion.div
