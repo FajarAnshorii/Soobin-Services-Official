@@ -93,6 +93,7 @@ function AnimatedStat({
       decimals,
       suffix,
       decimalSeparator,
+      startOnView: false,
     });
 
     return (

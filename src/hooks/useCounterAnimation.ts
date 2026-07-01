@@ -30,10 +30,11 @@ export function useCounterAnimation({
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const isInView = useInView(ref, { once: true, margin: '0px' });
+  const shouldAnimate = !startOnView || isInView;
 
   useEffect(() => {
-    if (!startOnView || !isInView) return;
+    if (!shouldAnimate) return;
     if (hasAnimated.current) return;
     hasAnimated.current = true;
 
@@ -71,7 +72,7 @@ export function useCounterAnimation({
       clearTimeout(timeout);
       cancelAnimationFrame(animationFrame);
     };
-  }, [isInView, target, duration, delay, startOnView]);
+  }, [shouldAnimate, target, duration, delay]);
 
   const formatted = count.toFixed(decimals);
   const [intPart, decPart] = formatted.split('.');
