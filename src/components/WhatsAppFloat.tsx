@@ -317,79 +317,8 @@ export default function WhatsAppFloat() {
 
       setMessages([...session.messages]);
       window.dispatchEvent(new Event('soobin_chat_update'));
-
-      // Fallback mock agent response
-      const adminOnline = localStorage.getItem('soobin_admin_active') === 'true';
-      if (!adminOnline) {
-        setTimeout(() => {
-          triggerMockReply(sessionId);
-        }, 3000);
-      }
     } catch (e) {
       console.error('Failed to send message to cloud', e);
-    }
-  };
-
-  const triggerMockReply = async (currentSessionId: string) => {
-    try {
-      const res = await fetch(BUCKET_URL);
-      if (!res.ok) return;
-      const cloudChats = await res.json();
-      const session = cloudChats[currentSessionId] as ChatSession;
-
-      if (session && session.messages.length > 0) {
-        const lastMsg = session.messages[session.messages.length - 1];
-        if (lastMsg.sender === 'user') {
-          const now = new Date();
-          const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-          const mockReplies = [
-            "Halo Kak! Terima kasih telah menghubungi Soobin Services. Admin Live siap membantu kebutuhan akademik Anda.",
-            "Ada yang bisa kami bantu hari ini? Kami melayani Cek Turnitin & AI, Jasa Parafrase, Joki Tugas Kuliah/Sekolah, dan Jasa Skripsi.",
-            "Silakan kirimkan detail tugas, deadline, atau pertanyaan Kakak agar bisa langsung kami periksa dan berikan estimasi harga terbaik ya!"
-          ];
-
-          const userMsgCount = session.messages.filter(m => m.sender === 'user').length;
-          const replyIndex = Math.min(userMsgCount - 1, mockReplies.length - 1);
-          const replyText = mockReplies[replyIndex];
-
-          const mockMsg: Message = {
-            id: `msg_mock_${Date.now()}`,
-            sender: 'admin',
-            text: replyText,
-            timestamp: timeString,
-            read: true,
-          };
-
-          session.messages.push(mockMsg);
-          session.lastUpdated = now.toISOString();
-          session.userUnreadCount += 1;
-          
-          cloudChats[currentSessionId] = session;
-          
-          await fetch(BUCKET_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cloudChats),
-          });
-
-          const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
-          const localChats = JSON.parse(localChatsStr);
-          localChats[currentSessionId] = session;
-          localStorage.setItem('soobin_chats', JSON.stringify(localChats));
-
-          if (currentSessionId === sessionId) {
-            setMessages([...session.messages]);
-            if (!isOpen) {
-              setUnreadCount(prev => prev + 1);
-            }
-          }
-
-          window.dispatchEvent(new Event('soobin_chat_update'));
-        }
-      }
-    } catch (e) {
-      console.error('Failed to trigger mock reply', e);
     }
   };
 
