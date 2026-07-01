@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 
-const BUCKET_URL = 'https://kvdb.io/sb_chats_fajar_official_2026/chats';
+const BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/ca2wvC1r_M';
 
 export async function GET() {
   try {
-    const res = await fetch(BUCKET_URL, {
+    const res = await fetch(BIN_URL, {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -25,10 +25,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    const res = await fetch(BUCKET_URL, {
-      method: 'POST',
+    const res = await fetch(BIN_URL, {
+      method: 'PUT',
       headers: {
-        'Content-Type': 'text/plain', // Use plain text to avoid any KVdb preflight issues
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     });
@@ -37,7 +37,8 @@ export async function POST(request: Request) {
       throw new Error(`Cloud returned status ${res.status}`);
     }
 
-    return NextResponse.json({ success: true });
+    const result = await res.json();
+    return NextResponse.json({ success: true, data: result.data });
   } catch (e: any) {
     console.error('API POST chats error:', e);
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
