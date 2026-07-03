@@ -10,6 +10,7 @@ import {
   Check, Play, Users, MessageSquare, Star, ArrowUpRight, LogOut
 } from 'lucide-react';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
+import { useCart } from '@/context/CartContext';
 
 interface LocalNavbarProps {
   onExit: (e: React.MouseEvent) => void;
@@ -75,6 +76,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
 }
 
 export default function PembuatanWebsitePage() {
+  const { placeDirectOrder } = useCart();
   const [activeTab, setActiveTab] = useState('all');
   const [isExitingToSoobin, setIsExitingToSoobin] = useState(false);
   const router = useRouter();
@@ -158,6 +160,7 @@ export default function PembuatanWebsitePage() {
                   href="https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20ingin%20memesan%20jasa%20pembuatan%20website"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => placeDirectOrder("Jasa Website Premium")}
                   className="px-8 py-4 rounded-xl text-base font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-xl shadow-amber-400/20 hover:shadow-amber-400/40 hover:-translate-y-0.5 transition-all duration-300"
                 >
                   Pesan Sekarang
@@ -347,6 +350,7 @@ export default function PembuatanWebsitePage() {
                   href={`https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20dengan%20Jasa%20Website%20paket%20${encodeURIComponent(plan.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => placeDirectOrder(`Website Paket ${plan.title}`)}
                   className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                     plan.popular
                       ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'

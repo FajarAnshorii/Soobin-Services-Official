@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Menu, X, LogOut, ChevronDown, Zap } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, Zap, ShoppingCart, History } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
@@ -22,6 +23,7 @@ export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isNavigatingToWeb, setIsNavigatingToWeb] = useState(false);
   const { user, logout } = useAuth();
+  const { cart } = useCart();
   const router = useRouter();
 
   const handleWebClick = (e: React.MouseEvent) => {
@@ -107,6 +109,22 @@ export default function Navbar() {
               Hubungi Kami
             </a>
 
+            {/* Cart Button */}
+            {user && (
+              <Link
+                href="/member?tab=cart"
+                className="relative p-1.5 text-dark-600 hover:text-primary-800 transition-colors flex items-center justify-center"
+                title="Keranjang Belanja"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {cart.length}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* Auth Dropdown */}
             {user ? (
               <div className="relative">
@@ -124,8 +142,8 @@ export default function Navbar() {
                 {showDropdown && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)}></div>
-                    <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl z-20 p-4">
-                      <div className="flex flex-col gap-1 border-b border-gray-100 pb-3 mb-3">
+                    <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl z-20 p-4 flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 border-b border-gray-100 pb-3 mb-2">
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-bold text-dark-800 truncate">{user.name}</span>
                           <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
@@ -136,12 +154,31 @@ export default function Navbar() {
                         <span className="text-[10px] text-gray-500 font-medium truncate mt-1">{user.university}</span>
                         <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                       </div>
+
+                      <Link
+                        href="/member?tab=history"
+                        onClick={() => setShowDropdown(false)}
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <History className="w-3.5 h-3.5" />
+                        Riwayat Pembelian
+                      </Link>
+
+                      <Link
+                        href="/member?tab=cart"
+                        onClick={() => setShowDropdown(false)}
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <ShoppingCart className="w-3.5 h-3.5" />
+                        Keranjang Belanja
+                      </Link>
+
                       <button
                         onClick={() => {
                           logout();
                           setShowDropdown(false);
                         }}
-                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer mt-1 pt-2 border-t border-gray-100"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         Keluar
@@ -211,7 +248,7 @@ export default function Navbar() {
 
             {user ? (
               <div className="flex flex-col gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100 mt-2">
-                <div className="flex flex-col">
+                <div className="flex flex-col pb-2 border-b border-gray-200">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-dark-800 truncate">{user.name}</span>
                     <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
@@ -221,6 +258,25 @@ export default function Navbar() {
                   <span className="text-[10px] text-gray-500 truncate mt-0.5">{user.university}</span>
                   <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                 </div>
+                
+                <Link
+                  href="/member?tab=history"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 py-1.5 cursor-pointer hover:text-primary-800"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  Riwayat Pembelian
+                </Link>
+
+                <Link
+                  href="/member?tab=cart"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 py-1.5 cursor-pointer hover:text-primary-800"
+                >
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  Keranjang Belanja ({cart.length})
+                </Link>
+
                 <button
                   onClick={() => {
                     logout();

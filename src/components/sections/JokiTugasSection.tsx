@@ -36,7 +36,10 @@ const mainServices = [
   { label: 'Nomor Halaman', price: 'Chat Admin' },
 ];
 
+import { useCart } from '@/context/CartContext';
+
 export default function JokiTugasSection() {
+  const { placeDirectOrder } = useCart();
   return (
     <section id="joki-tugas" className="bg-white section-padding">
       <div className="container-custom">
@@ -145,6 +148,7 @@ export default function JokiTugasSection() {
             href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Joki%20Tugas"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => placeDirectOrder("Joki Tugas")}
             className="inline-flex items-center gap-2 bg-primary-800 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl shadow-lg shadow-primary-800/30 text-sm sm:text-base"
             whileHover={{
               scale: 1.02,

@@ -13,8 +13,9 @@ import {
   FileSpreadsheet, Globe, Star, Filter, Search,
   Target, BookMarked, FlaskConical, Route, ChevronLeft, ChevronRight,
   ClipboardList, BarChart, School, Share2, Image, Monitor, MonitorCheck,
-  ArrowUp
+  ArrowUp, ShoppingCart
 } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Filter },
@@ -1022,6 +1023,7 @@ function calculateDiscountedPrice(price: string): string {
 
 export default function LayananPage() {
   const { user } = useAuth();
+  const { addToCart, placeDirectOrder } = useCart();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -1232,6 +1234,30 @@ export default function LayananPage() {
                         isWebsite ? 'text-white' : 'text-primary-800'
                       }`} />
                     </div>
+
+                    {/* Cart Icon for Member */}
+                    {user && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addToCart({
+                            id: service.id,
+                            name: service.name,
+                            price: service.price,
+                            category: service.category
+                          });
+                        }}
+                        className={`p-2 rounded-lg transition-all cursor-pointer ${
+                          isWebsite
+                            ? 'text-white/85 hover:text-white hover:bg-white/10'
+                            : 'text-gray-400 hover:text-primary-800 hover:bg-primary-800/5'
+                        }`}
+                        title="Tambah ke Keranjang"
+                      >
+                        <ShoppingCart className="w-4.5 h-4.5" />
+                      </button>
+                    )}
                   </div>
                   <h3 className={`font-semibold text-sm sm:text-base mb-2 transition-colors line-clamp-2 ${
                     isWebsite ? 'text-white group-hover:text-purple-200' : 'text-dark-800 group-hover:text-primary-800'
@@ -1268,6 +1294,7 @@ export default function LayananPage() {
                     href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => placeDirectOrder(service.name)}
                     className={`block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm ${
                       isWebsite
                         ? 'bg-white text-purple-700 hover:bg-purple-50 hover:text-purple-800 font-bold'

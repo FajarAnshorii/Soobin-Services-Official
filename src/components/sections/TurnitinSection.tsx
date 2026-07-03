@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { FileCheck, Zap, Shield, Clock } from 'lucide-react';
 
+import { useCart } from '@/context/CartContext';
+
 const plans = [
   { amount: '1x', price: 'Rp 8.000', badge: null },
   { amount: '3x', price: 'Rp 24.000', badge: 'Hemat!' },
@@ -15,6 +17,7 @@ const aiPlans = [
 ];
 
 export default function TurnitinSection() {
+  const { placeDirectOrder } = useCart();
   return (
     <section id="cek-turnitin" className="bg-gray-50 section-padding">
       <div className="container-custom">
@@ -101,6 +104,7 @@ export default function TurnitinSection() {
                   href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Cek%20Turnitin"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => placeDirectOrder(`Cek Turnitin ${plan.amount}`)}
                   className={`mt-4 sm:mt-6 block w-full text-center font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl text-sm sm:text-base ${
                     plan.badge
                       ? 'bg-primary-800 text-white'
@@ -164,6 +168,7 @@ export default function TurnitinSection() {
                   href="https://wa.me/6287815797525?text=Halo%20Kak%20Mau%20Cek%20AI"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => placeDirectOrder(`Cek AI ${plan.amount}`)}
                   className="mt-4 sm:mt-6 block w-full text-center bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl text-sm sm:text-base"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.95 }}
