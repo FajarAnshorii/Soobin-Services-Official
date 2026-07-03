@@ -6,11 +6,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { ArrowLeft, Mail, Lock, User as UserIcon, GraduationCap, School, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function AuthPage() {
   const router = useRouter();
   const { user, register, login, forgotPassword } = useAuth();
+  const { addToast } = useCart();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -47,17 +49,21 @@ export default function AuthPage() {
     clearMessages();
     if (!email || !password) {
       setError('Harap isi semua kolom');
+      addToast('Harap isi semua kolom', 'warning');
       return;
     }
     setLoading(true);
     try {
       await login(email, password);
+      addToast('Login berhasil! Selamat datang kembali.', 'success');
       setSuccess('Login berhasil! Mengalihkan...');
       setTimeout(() => {
         router.push('/layanan');
       }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Login gagal, periksa email dan password Anda');
+      const errMsg = err.message || 'Login gagal, periksa email dan password Anda';
+      setError(errMsg);
+      addToast(errMsg, 'error');
     } finally {
       setLoading(false);
     }
@@ -69,23 +75,28 @@ export default function AuthPage() {
 
     if (!email || !password || !name || !university || !prodi) {
       setError('Harap isi semua kolom');
+      addToast('Harap isi semua kolom', 'warning');
       return;
     }
 
     if (password.length < 6) {
       setError('Password minimal 6 karakter');
+      addToast('Password minimal 6 karakter', 'warning');
       return;
     }
 
     setLoading(true);
     try {
       await register({ email, password, name, university, prodi });
+      addToast('Registrasi berhasil! Selamat bergabung menjadi member.', 'success');
       setSuccess('Registrasi berhasil! Selamat bergabung...');
       setTimeout(() => {
         router.push('/layanan');
       }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Registrasi gagal');
+      const errMsg = err.message || 'Registrasi gagal';
+      setError(errMsg);
+      addToast(errMsg, 'error');
     } finally {
       setLoading(false);
     }
@@ -97,22 +108,26 @@ export default function AuthPage() {
 
     if (!email || !password || !confirmPassword) {
       setError('Harap isi semua kolom');
+      addToast('Harap isi semua kolom', 'warning');
       return;
     }
 
     if (password !== confirmPassword) {
       setError('Konfirmasi password tidak cocok');
+      addToast('Konfirmasi password tidak cocok', 'warning');
       return;
     }
 
     if (password.length < 6) {
       setError('Password minimal 6 karakter');
+      addToast('Password minimal 6 karakter', 'warning');
       return;
     }
 
     setLoading(true);
     try {
       await forgotPassword(email, password);
+      addToast('Password berhasil diubah! Silakan login kembali.', 'success');
       setSuccess('Password berhasil diubah! Silakan login kembali.');
       setTimeout(() => {
         setActiveTab('login');
@@ -120,7 +135,9 @@ export default function AuthPage() {
         setConfirmPassword('');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Gagal menyetel ulang password');
+      const errMsg = err.message || 'Gagal menyetel ulang password';
+      setError(errMsg);
+      addToast(errMsg, 'error');
     } finally {
       setLoading(false);
     }
