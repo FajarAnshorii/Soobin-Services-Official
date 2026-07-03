@@ -866,7 +866,7 @@ body {
 }
 
 /* Apple M2 Chip Component styles */
-.m2-chip-container {
+.m2 {
   position: relative;
   width: 240px;
   height: 240px;
@@ -875,68 +875,67 @@ body {
   align-items: center;
   justify-content: center;
   user-select: none;
-  border-radius: 36px;
-  animation: m2-gradient-shift 5s ease-in-out infinite;
+  animation: gradient-shift 5s ease-in-out infinite;
   background-size: 200% 200%;
+  z-index: 1; /* Stacking context fix: ensures background glow (z-index -1/-2) stays visible above outer section */
 }
 
-.m2-chip-container .m2-chip-logo {
+.m2 .logo {
   display: inline-flex;
   align-items: center;
   vertical-align: baseline;
   user-select: none;
   font-size: 58px;
   color: white;
-  background-image: linear-gradient(to right, #94a3b8, #ffffff);
+  background-image: linear-gradient(to right, #626262, #fff);
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
   font-weight: bold;
 }
 
-.m2-chip-container .m2-chip-logo svg {
+.m2 .logo svg {
   margin-right: -4px;
   width: 58px;
   height: 58px;
 }
 
-.m2-chip-container::before,
-.m2-chip-container::after {
-  --size: 6px;
+.m2::before,
+.m2::after {
+  --size: 10px; /* Enhanced glow size */
   content: "";
   position: absolute;
   top: calc(var(--size) / -2);
   left: calc(var(--size) / -2);
   width: calc(100% + var(--size));
   height: calc(100% + var(--size));
-  border-radius: 40px;
   background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
     radial-gradient(circle at 100% 0, #00a6ff, transparent),
     radial-gradient(circle at 0 100%, #ff0056, transparent),
     radial-gradient(circle at 100% 100%, #6500ff, transparent);
 }
 
-.m2-chip-container::after {
-  --size: 3px;
+.m2::after {
+  --size: 4px;
   z-index: -1;
 }
 
-.m2-chip-container::before {
-  --size: 15px;
+.m2::before {
+  --size: 20px;
   z-index: -2;
   filter: blur(16px);
-  animation: m2-blur-animation 3s ease-in-out alternate infinite;
+  animation: blur-animation 3s ease-in-out alternate infinite;
 }
 
-/* M2 blur and gradient animations */
-@keyframes m2-blur-animation {
+/* Blur and gradient animations */
+@keyframes blur-animation {
   to {
-    filter: blur(18px);
+    filter: blur(28px);
     transform: scale(1.05);
   }
 }
 
-@keyframes m2-gradient-shift {
+@keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
   }
