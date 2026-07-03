@@ -20,7 +20,7 @@ interface LocalNavbarProps {
 
 function LocalNavbar({ onExit }: LocalNavbarProps) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-neutral-900 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-amber-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3">
@@ -28,7 +28,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
             <Link
               href="/"
               onClick={onExit}
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-500 hover:text-amber-600 transition-colors mr-2 border-r border-neutral-800 pr-4"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-500 hover:text-amber-600 transition-colors mr-2 border-r border-gray-200 pr-4"
               title="Kembali ke SOOBIN Services"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -52,10 +52,10 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
             <Link href="/pembuatan-website/layanan" className="text-sm font-bold text-amber-500 transition-colors">
               Layanan
             </Link>
-            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-neutral-300 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Keunggulan
             </Link>
-            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-neutral-300 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Portofolio
             </Link>
           </div>
@@ -316,16 +316,16 @@ export default function LayananPembuatanWebsite() {
   });
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-28 pb-16 font-sans selection:bg-amber-400 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-gray-800 pt-28 pb-16 font-sans selection:bg-amber-400 selection:text-black">
       
       {/* Local Custom Navbar */}
       <LocalNavbar onExit={handleExit} />
 
       {/* Hero Header Section */}
-      <div className="bg-neutral-950/20 text-white py-16 relative overflow-hidden border-b border-neutral-900">
+      <div className="bg-linear-to-b from-amber-50/70 via-white to-slate-50 text-gray-800 py-16 relative overflow-hidden border-b border-amber-105">
         {/* Background Gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(245,158,11,0.06),transparent_60%)]"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl text-amber-400"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(245,158,11,0.08),transparent_60%)]"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.span 
@@ -340,16 +340,16 @@ export default function LayananPembuatanWebsite() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-5xl font-black mt-4 tracking-tight leading-tight text-white"
+            className="text-3xl sm:text-5xl font-black mt-4 tracking-tight leading-tight text-gray-900"
           >
-            Pilihan Layanan Web <span className="text-amber-400">JAR.DEV</span>
+            Pilihan Layanan Web <span className="text-amber-500">JAR.DEV</span>
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-neutral-400 max-w-3xl mx-auto mt-4 text-sm sm:text-base leading-relaxed"
+            className="text-gray-600 max-w-3xl mx-auto mt-4 text-sm sm:text-base leading-relaxed"
           >
             Daftar paket jasa pembuatan website profesional terlengkap di Indonesia. 
             Semua proses dikerjakan langsung menggunakan MacBook Air M2 berkecepatan tinggi dengan jaminan kualitas kode bersih, SEO-friendly, dan gratis konsultasi.
@@ -359,24 +359,24 @@ export default function LayananPembuatanWebsite() {
 
       {/* Filter and Search Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="bg-[#121212] rounded-3xl p-6 shadow-xl border border-neutral-800 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-200/80 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-neutral-500" />
+              <Search className="w-5 h-5 text-gray-400" />
             </span>
             <input
               type="text"
               placeholder="Cari jenis website atau optimasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-3 border border-neutral-750 rounded-2xl bg-neutral-900/60 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm font-semibold"
+              className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-450 focus:border-transparent transition-all text-sm font-semibold"
             />
           </div>
 
           {/* Categories Horizontal Scroller */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-neutral-800">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-gray-200">
             {serviceCategories.map((cat) => {
               const Icon = cat.icon;
               return (
@@ -386,7 +386,7 @@ export default function LayananPembuatanWebsite() {
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
                     activeCategory === cat.id
                       ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20'
-                      : 'bg-neutral-900 text-neutral-400 hover:bg-neutral-800 hover:text-white border border-neutral-800'
+                      : 'bg-gray-55/80 text-gray-600 hover:bg-gray-100 hover:text-gray-800 border border-gray-200/50'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -413,20 +413,20 @@ export default function LayananPembuatanWebsite() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group ${
+                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group bg-white ${
                     isPopular 
-                      ? 'border-amber-400 bg-[#121212] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-400/30'
-                      : 'border-neutral-800 bg-[#121212] hover:border-amber-400/50 shadow-lg'
+                      ? 'border-amber-400 shadow-[0_10px_35px_rgba(245,158,11,0.08)] ring-1 ring-amber-400/20'
+                      : 'border-gray-200 hover:border-amber-400/50 shadow-sm hover:shadow-md'
                   }`}
                 >
                   <div>
                     {/* Header: Icon & Cart Add Button */}
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500">
                           <ServiceIcon className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-bold text-white leading-tight">
+                        <h3 className="text-xl font-bold text-gray-900 leading-tight">
                           {service.name.includes('Website') ? service.name.replace('Website ', '') : service.name}
                         </h3>
                       </div>
@@ -443,7 +443,7 @@ export default function LayananPembuatanWebsite() {
                               category: 'pembuatan-website'
                             });
                           }}
-                          className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-amber-400/20 text-neutral-400 hover:text-amber-400 transition-all cursor-pointer"
+                          className="p-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:bg-amber-50 text-gray-500 hover:text-amber-500 transition-all cursor-pointer"
                           title="Tambah ke Keranjang"
                         >
                           <ShoppingCart className="w-4.5 h-4.5" />
@@ -453,31 +453,31 @@ export default function LayananPembuatanWebsite() {
 
                     {/* Badge */}
                     {service.badge && (
-                      <span className="inline-block mb-4 text-[9px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                      <span className="inline-block mb-4 text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-2.5 py-1 uppercase tracking-wider">
                         {service.badge}
                       </span>
                     )}
 
                     {/* Price Block */}
                     <div className="mt-2">
-                      <span className="text-4xl font-extrabold text-white">{service.price}</span>
-                      <p className="text-xs text-neutral-400 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-4xl font-extrabold text-gray-900">{service.price}</span>
+                      <p className="text-xs text-gray-500 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-amber-500" />
                         <span>Estimasi: {service.deliveryTime}</span>
                       </p>
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm font-semibold text-neutral-200 mt-6 mb-4">
+                    <p className="text-sm font-semibold text-gray-700 mt-6 mb-4">
                       {service.desc}
                     </p>
 
                     {/* Detailed Features List */}
-                    <ul className="flex flex-col gap-3.5 border-t border-neutral-800/80 pt-5 mt-4">
+                    <ul className="flex flex-col gap-3.5 border-t border-gray-100 pt-5 mt-4">
                       {service.features.map((feat, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-300 font-medium">
-                          <div className="w-5 h-5 rounded-md bg-neutral-800/80 flex items-center justify-center text-neutral-400 border border-neutral-700 shrink-0 mt-0.5">
-                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                        <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-600 font-medium">
+                          <div className="w-5 h-5 rounded-md bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100 shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5 text-amber-500" />
                           </div>
                           <span>{feat}</span>
                         </li>
@@ -497,7 +497,7 @@ export default function LayananPembuatanWebsite() {
                         className={`w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                           isPopular
                             ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                            : 'bg-neutral-800 hover:bg-neutral-750 text-white border border-neutral-700'
+                            : 'bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200'
                         }`}
                       >
                         Pesan Sekarang
@@ -512,10 +512,10 @@ export default function LayananPembuatanWebsite() {
 
         {/* Empty State */}
         {filteredServices.length === 0 && (
-          <div className="text-center py-16 bg-[#121212] rounded-3xl shadow-sm border border-neutral-800 mt-8">
-            <Search className="w-12 h-12 text-neutral-600 mx-auto" />
-            <h3 className="text-lg font-bold text-neutral-200 mt-4">Layanan Tidak Ditemukan</h3>
-            <p className="text-neutral-400 text-sm mt-1 max-w-md mx-auto">
+          <div className="text-center py-16 bg-white rounded-3xl shadow-sm border border-gray-200 mt-8">
+            <Search className="w-12 h-12 text-gray-300 mx-auto" />
+            <h3 className="text-lg font-bold text-gray-800 mt-4">Layanan Tidak Ditemukan</h3>
+            <p className="text-gray-500 text-sm mt-1 max-w-md mx-auto">
               Maaf, kata kunci "{searchQuery}" tidak cocok dengan nama atau keterangan layanan kami. Silakan coba pencarian lain.
             </p>
           </div>

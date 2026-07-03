@@ -420,16 +420,16 @@ export default function PembuatanWebsitePage() {
         </div>
       </section>
 
-      <section id="services" className="py-20 bg-[#0a0a0a] border-t border-b border-neutral-900">
+      <section id="services" className="py-20 bg-slate-50 border-t border-b border-gray-250/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-12">
           <div className="flex flex-col gap-4 items-center">
-            <span className="text-xs font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
+            <span className="text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
               Paket Layanan & Harga
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
               Investasi Hemat Untuk Hasil Maksimal
             </h2>
-            <p className="text-neutral-400 max-w-2xl text-sm sm:text-base leading-relaxed">
+            <p className="text-gray-600 max-w-2xl text-sm sm:text-base leading-relaxed">
               Pilih paket pengerjaan website yang paling sesuai dengan target pasar dan kebutuhan bisnis Anda. Seluruh paket sudah termasuk konsultasi penuh gratis.
             </p>
           </div>
@@ -446,21 +446,21 @@ export default function PembuatanWebsitePage() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                     plan.popular
-                      ? 'border-amber-400 bg-[#121212] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-400/30'
-                      : 'border-neutral-800 bg-[#121212] hover:border-amber-400/50 shadow-lg'
+                      ? 'border-amber-400 bg-white shadow-[0_10px_35px_rgba(245,158,11,0.08)] ring-1 ring-amber-400/20'
+                      : 'border-gray-200 bg-white hover:border-amber-400/50 shadow-sm hover:shadow-md'
                   }`}
                 >
                   <div>
                     {/* Top block */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500">
                           <PlanIcon className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-bold text-white">{plan.title.split(' / ')[0]}</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{plan.title.split(' / ')[0]}</h3>
                       </div>
                       {plan.popular && (
-                        <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                        <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-2.5 py-1 uppercase tracking-wider">
                           BEST SELLER
                         </span>
                       )}
@@ -468,23 +468,23 @@ export default function PembuatanWebsitePage() {
 
                     {/* Price Block */}
                     <div className="mt-4">
-                      <span className="text-4xl font-extrabold text-white">{plan.price}</span>
-                      <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed">
+                      <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
+                      <p className="text-xs text-gray-500 mt-1.5 font-medium leading-relaxed">
                         {i === 0 ? 'Estimasi pengerjaan: 2-3 hari kerja' : i === 1 ? 'Estimasi pengerjaan: 4-6 hari kerja' : 'Estimasi pengerjaan: 7-10 hari kerja'}
                       </p>
                     </div>
 
                     {/* Description Header */}
-                    <p className="text-sm font-semibold text-slate-200 mt-6 mb-4">
+                    <p className="text-sm font-semibold text-gray-750 mt-6 mb-4">
                       {plan.desc}
                     </p>
 
                     {/* Features List */}
-                    <ul className="flex flex-col gap-3.5 border-t border-neutral-800/80 pt-5 mt-4">
+                    <ul className="flex flex-col gap-3.5 border-t border-gray-100 pt-5 mt-4">
                       {plan.features.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-300 font-medium">
-                          <div className="w-5 h-5 rounded-md bg-neutral-800/80 flex items-center justify-center text-neutral-400 border border-neutral-700 shrink-0 mt-0.5">
-                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                        <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-600 font-medium">
+                          <div className="w-5 h-5 rounded-md bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100 shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5 text-amber-500" />
                           </div>
                           <span>{feat}</span>
                         </li>
@@ -500,7 +500,7 @@ export default function PembuatanWebsitePage() {
                     className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                       plan.popular
                         ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                        : 'bg-neutral-800 hover:bg-neutral-750 text-white border border-neutral-700'
+                        : 'bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200'
                     }`}
                   >
                     Pesan Paket
