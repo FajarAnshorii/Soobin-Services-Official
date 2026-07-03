@@ -22,7 +22,17 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-amber-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            {/* Yellow Exit Door Icon - visible on all screens in the far left corner */}
+            <Link
+              href="/"
+              onClick={onExit}
+              className="text-amber-500 hover:text-amber-600 transition-colors flex items-center justify-center p-2 rounded-full hover:bg-amber-50"
+              title="Kembali ke SOOBIN Services"
+            >
+              <LogOut className="w-6 h-6 rotate-180" />
+            </Link>
+
             <Link href="/" onClick={onExit} className="flex items-center gap-2">
               <div className="relative w-36 h-12">
                 <Image
@@ -33,16 +43,6 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
                   priority
                 />
               </div>
-            </Link>
-
-            {/* Purple Exit Door Icon - visible on all screens */}
-            <Link
-              href="/"
-              onClick={onExit}
-              className="text-purple-600 hover:text-purple-500 transition-colors flex items-center justify-center p-2 rounded-full hover:bg-purple-50"
-              title="Kembali ke SOOBIN Services"
-            >
-              <LogOut className="w-6 h-6" />
             </Link>
           </div>
 
