@@ -865,27 +865,25 @@ body {
   }
 }
 
-/* Apple M2 Chip Component styles */
+/* From Uiverse.io by Cksunandh */ 
 .m2 {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 20vmin; /* Reduced size */
+  height: 20vmin; /* Reduced size */
   background: linear-gradient(135deg, #1e1e24 10%, #050505 60%);
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
-  animation: gradient-shift 5s ease-in-out infinite;
-  background-size: 200% 200%;
-  z-index: 1; /* Stacking context fix: ensures background glow (z-index -1/-2) stays visible above outer section */
+  animation: gradient-shift 5s ease-in-out infinite; /* Faster animation */
+  background-size: 200% 200%; /* Gradient shift */
 }
 
 .m2 .logo {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
   vertical-align: baseline;
   user-select: none;
-  font-size: 58px;
+  font-size: 5vmin; /* Smaller font size */
   color: white;
   background-image: linear-gradient(to right, #626262, #fff);
   -webkit-text-fill-color: transparent;
@@ -895,14 +893,14 @@ body {
 }
 
 .m2 .logo svg {
-  margin-right: -4px;
-  width: 58px;
-  height: 58px;
+  margin-right: -1vmin;
+  width: 5vmin; /* Smaller SVG size */
+  height: 5vmin; /* Smaller SVG size */
 }
 
 .m2::before,
 .m2::after {
-  --size: 10px; /* Enhanced glow size */
+  --size: 5px; /* Reduced glow size */
   content: "";
   position: absolute;
   top: calc(var(--size) / -2);
@@ -916,25 +914,26 @@ body {
 }
 
 .m2::after {
-  --size: 4px;
+  --size: 2px; /* Reduced inner glow size */
   z-index: -1;
 }
 
 .m2::before {
-  --size: 20px;
+  --size: 10px; /* Reduced outer glow size */
   z-index: -2;
-  filter: blur(16px);
-  animation: blur-animation 3s ease-in-out alternate infinite;
+  filter: blur(2vmin); /* Reduced blur */
+  animation: blur-animation 3s ease-in-out alternate infinite; /* Faster blur animation */
 }
 
-/* Blur and gradient animations */
+/* Faster blur animation */
 @keyframes blur-animation {
   to {
-    filter: blur(28px);
+    filter: blur(3vmin);
     transform: scale(1.05);
   }
 }
 
+/* Faster gradient animation */
 @keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
