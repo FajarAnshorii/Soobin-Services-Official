@@ -880,8 +880,8 @@ body {
 }
 
 .m2 .logo {
-  display: inline-block;
-  vertical-align: baseline;
+  display: inline-flex;
+  align-items: center;
   user-select: none;
   font-size: 5vmin; /* Smaller font size */
   color: white;
@@ -893,7 +893,7 @@ body {
 }
 
 .m2 .logo svg {
-  margin-right: -1vmin;
+  margin-right: 1vmin; /* Positive margin to prevent overlap */
   width: 5vmin; /* Smaller SVG size */
   height: 5vmin; /* Smaller SVG size */
 }
