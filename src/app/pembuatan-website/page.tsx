@@ -353,7 +353,7 @@ export default function PembuatanWebsitePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="relative p-6 bg-slate-900/50 rounded-3xl border border-white/5 flex items-center justify-center min-w-[280px] min-h-[280px]"
+                className="relative p-8 bg-slate-900/50 rounded-3xl border border-white/5 flex items-center justify-center min-w-[340px] min-h-[340px]"
               >
                 <div className="m2-chip-container shadow-2xl">
                   <div className="m2-chip-logo flex items-center justify-center">
