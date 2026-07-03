@@ -342,6 +342,81 @@ export default function PembuatanWebsitePage() {
         </div>
       </section>
 
+      {/* MacBook Air M2 Hardware Transparency Section */}
+      <section className="py-20 bg-slate-950 border-t border-b border-gray-800 text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-12 gap-12 items-center">
+            {/* Left Graphics: M2 Chip Component */}
+            <div className="md:col-span-5 flex justify-center items-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="relative p-6 bg-slate-900/50 rounded-3xl border border-white/5 flex items-center justify-center min-w-[280px] min-h-[280px]"
+              >
+                <div className="m2-chip-container shadow-2xl">
+                  <div className="m2-chip-logo flex items-center justify-center">
+                    {/* Apple Logo SVG */}
+                    <svg className="w-8 h-8 fill-current mr-0.5 text-white" viewBox="0 0 170 170">
+                      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.37.13-9.13-1.9-14.27-6.08-3.48-2.73-7.44-7.55-11.9-14.48-5.1-7.83-9.26-16.73-12.48-26.7-3.23-9.98-4.85-19.59-4.85-28.84 0-14.86 3.69-26.93 11.06-36.22 7.37-9.29 16.58-13.98 27.63-14.07 5.82 0 11.85 1.57 18.06 4.7 6.22 3.14 10.97 4.7 14.28 4.7 3.01 0 7.42-1.45 13.2-4.36 5.79-2.9 11.05-4.4 15.77-4.4 10.63.1 19.34 3.86 26.15 11.27 4.14 4.54 7.24 9.68 9.29 15.42-11.16 6.81-16.65 15.82-16.48 27.03.17 9.07 3.32 16.65 9.47 22.75 6.14 6.09 13.57 9.53 22.28 10.32-2.11 6.18-4.84 12.18-8.18 18.02zM119.22 19.01c0-7.37 2.62-14.03 7.85-20.01 6.27-7.21 13.79-11 22.56-11.36.14 1.15.2 2.11.2 2.87 0 7.09-2.67 13.62-8.02 19.59-5.35 5.97-12.18 9.94-20.48 11.91-.77-2.07-2.11-3.07-2.11-3z"/>
+                    </svg>
+                    <span className="text-3xl font-black text-white">M2</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right Content: Description & Explanation */}
+            <div className="md:col-span-7 flex flex-col gap-6 text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="flex flex-col gap-3"
+              >
+                <span className="text-xs font-bold text-amber-400 bg-amber-400/10 rounded-full px-3.5 py-1 w-fit uppercase tracking-widest border border-amber-400/20">
+                  Dapur Pacu Pengembangan
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                  MacBook Air M2 Sebagai Device Utama
+                </h2>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.25 }}
+                className="flex flex-col gap-4 text-gray-300 text-sm sm:text-base leading-relaxed"
+              >
+                <p>
+                  Sebagai komitmen transparansi dan profesionalitas kepada customer JAR.DEV, semua proses perancangan, pengerjaan kode program, serta optimasi website Anda didevel langsung menggunakan <strong>MacBook Air M2</strong>.
+                </p>
+                <p>
+                  Mengapa saya memilih device MacBook Air dengan chip Apple Silicon M2 ini?
+                </p>
+                <ul className="flex flex-col gap-3 mt-1 text-gray-400">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-amber-400 shrink-0 font-bold mt-0.5">&bull;</span>
+                    <span><strong>Kecepatan Kompilasi Super Cepat:</strong> Dengan 8-core CPU dan GPU handal, proses build proyek Next.js / React, serta pemrosesan aset visual premium Anda berjalan secara instan dan efisien.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-amber-400 shrink-0 font-bold mt-0.5">&bull;</span>
+                    <span><strong>Lingkungan Pengembangan Handal:</strong> UNIX-based environment bawaan macOS menjamin kecocokan 100% saat pengujian server lokal, pembuatan API, dan kelancaran deploy ke staging/production.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-amber-400 shrink-0 font-bold mt-0.5">&bull;</span>
+                    <span><strong>Optimasi & Pengujian Responsif:</strong> Mempermudah pengujian multi-resolusi perangkat (iOS/Android/Desktop) secara real-time langsung melalui simulator macOS, menjamin hasil website 100% responsif dan teruji rapi.</span>
+                  </li>
+                </ul>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing / Packages Section */}
       <section id="services" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-12">

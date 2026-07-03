@@ -864,3 +864,86 @@ body {
     );
   }
 }
+
+/* Apple M2 Chip Component styles */
+.m2-chip-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, #1e1e24 10%, #050505 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  border-radius: 20px;
+  animation: m2-gradient-shift 5s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+.m2-chip-container .m2-chip-logo {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: baseline;
+  user-select: none;
+  font-size: 32px;
+  color: white;
+  background-image: linear-gradient(to right, #94a3b8, #ffffff);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: bold;
+}
+
+.m2-chip-container .m2-chip-logo svg {
+  margin-right: -2px;
+  width: 32px;
+  height: 32px;
+}
+
+.m2-chip-container::before,
+.m2-chip-container::after {
+  --size: 5px;
+  content: "";
+  position: absolute;
+  top: calc(var(--size) / -2);
+  left: calc(var(--size) / -2);
+  width: calc(100% + var(--size));
+  height: calc(100% + var(--size));
+  border-radius: 22px;
+  background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+    radial-gradient(circle at 100% 0, #00a6ff, transparent),
+    radial-gradient(circle at 0 100%, #ff0056, transparent),
+    radial-gradient(circle at 100% 100%, #6500ff, transparent);
+}
+
+.m2-chip-container::after {
+  --size: 2px;
+  z-index: -1;
+}
+
+.m2-chip-container::before {
+  --size: 10px;
+  z-index: -2;
+  filter: blur(12px);
+  animation: m2-blur-animation 3s ease-in-out alternate infinite;
+}
+
+/* M2 blur and gradient animations */
+@keyframes m2-blur-animation {
+  to {
+    filter: blur(18px);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes m2-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
