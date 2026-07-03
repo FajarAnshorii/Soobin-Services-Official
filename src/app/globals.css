@@ -441,3 +441,246 @@ body {
   50% { clip-path: inset(0); }
   100% { clip-path: inset(0 0 0 100%); }
 }
+
+/* Uiverse Card - Smit-Prajapati (Customized for JAR.DEV) */
+.uiverse-parent {
+  width: 290px;
+  height: 300px;
+  perspective: 1000px;
+}
+
+.uiverse-card {
+  height: 100%;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+  transition: all 0.5s ease-in-out;
+  transform-style: preserve-3d;
+  box-shadow: rgba(0, 0, 0, 0.4) 15px 25px 20px -10px, rgba(0, 0, 0, 0.3) 0px 15px 20px -5px;
+}
+
+.uiverse-glass {
+  transform-style: preserve-3d;
+  position: absolute;
+  inset: 8px;
+  border-radius: 55px;
+  border-top-right-radius: 100%;
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.349) 0%, rgba(255, 255, 255, 0.815) 100%);
+  transform: translate3d(0px, 0px, 25px);
+  border-left: 1px solid white;
+  border-bottom: 1px solid white;
+  transition: all 0.5s ease-in-out;
+}
+
+.uiverse-content {
+  padding: 100px 30px 0px 30px;
+  transform: translate3d(0, 0, 26px);
+}
+
+.uiverse-content .uiverse-title {
+  display: block;
+  color: #1e293b;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.uiverse-content .uiverse-text {
+  display: block;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.uiverse-bottom {
+  padding: 10px 12px;
+  transform-style: preserve-3d;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translate3d(0, 0, 26px);
+}
+
+.uiverse-bottom .uiverse-view-more {
+  display: flex;
+  align-items: center;
+  width: 45%;
+  justify-content: flex-end;
+  transition: all 0.2s ease-in-out;
+}
+
+.uiverse-bottom .uiverse-view-more:hover {
+  transform: translate3d(0, 0, 10px);
+}
+
+.uiverse-bottom .uiverse-view-more .uiverse-view-more-button {
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.uiverse-bottom .uiverse-view-more .uiverse-svg {
+  fill: none;
+  stroke: #1e293b;
+  stroke-width: 3px;
+  max-height: 15px;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container {
+  display: flex;
+  gap: 10px;
+  transform-style: preserve-3d;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button {
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1;
+  padding: 6px;
+  background: rgb(255, 255, 255);
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-content: center;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px -2px;
+  cursor: pointer;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:first-child {
+  transition: transform 0.2s ease-in-out 0.4s, box-shadow 0.2s ease-in-out 0.4s;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:nth-child(2) {
+  transition: transform 0.2s ease-in-out 0.6s, box-shadow 0.2s ease-in-out 0.6s;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:nth-child(3) {
+  transition: transform 0.2s ease-in-out 0.8s, box-shadow 0.2s ease-in-out 0.8s;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button .uiverse-svg {
+  width: 16px;
+  height: 16px;
+  fill: #1e293b;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:hover {
+  background: black;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:hover .uiverse-svg {
+  fill: white;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:active {
+  background: #facc15;
+}
+
+.uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button:active .uiverse-svg {
+  fill: black;
+}
+
+.uiverse-logo {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform-style: preserve-3d;
+}
+
+.uiverse-logo .uiverse-circle {
+  display: block;
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  top: 0;
+  right: 0;
+  box-shadow: rgba(100, 100, 111, 0.15) -10px 10px 20px 0px;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  background: rgba(250, 204, 21, 0.15);
+  transition: all 0.5s ease-in-out;
+}
+
+.uiverse-logo .uiverse-circle1 {
+  width: 170px;
+  transform: translate3d(0, 0, 20px);
+  top: 8px;
+  right: 8px;
+}
+
+.uiverse-logo .uiverse-circle2 {
+  width: 140px;
+  transform: translate3d(0, 0, 40px);
+  top: 10px;
+  right: 10px;
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  transition-delay: 0.4s;
+}
+
+.uiverse-logo .uiverse-circle3 {
+  width: 110px;
+  transform: translate3d(0, 0, 60px);
+  top: 17px;
+  right: 17px;
+  transition-delay: 0.8s;
+}
+
+.uiverse-logo .uiverse-circle4 {
+  width: 80px;
+  transform: translate3d(0, 0, 80px);
+  top: 23px;
+  right: 23px;
+  transition-delay: 1.2s;
+}
+
+.uiverse-logo .uiverse-circle5 {
+  width: 50px;
+  transform: translate3d(0, 0, 100px);
+  top: 30px;
+  right: 30px;
+  display: grid;
+  place-content: center;
+  transition-delay: 1.6s;
+  background: #facc15;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 10px;
+}
+
+.uiverse-logo .uiverse-circle5 .uiverse-svg {
+  width: 20px;
+  fill: #000000;
+}
+
+.uiverse-parent:hover .uiverse-card {
+  transform: rotate3d(1, 1, 0, 30deg);
+  box-shadow: rgba(0, 0, 0, 0.45) 25px 45px 30px -20px, rgba(0, 0, 0, 0.35) 0px 25px 35px 0px;
+}
+
+.uiverse-parent:hover .uiverse-card .uiverse-bottom .uiverse-social-buttons-container .uiverse-social-button {
+  transform: translate3d(0, 0, 50px);
+  box-shadow: rgba(0, 0, 0, 0.25) -5px 20px 10px 0px;
+}
+
+.uiverse-parent:hover .uiverse-card .uiverse-logo .uiverse-circle2 {
+  transform: translate3d(0, 0, 60px);
+}
+
+.uiverse-parent:hover .uiverse-card .uiverse-logo .uiverse-circle3 {
+  transform: translate3d(0, 0, 80px);
+}
+
+.uiverse-parent:hover .uiverse-card .uiverse-logo .uiverse-circle4 {
+  transform: translate3d(0, 0, 100px);
+}
+
+.uiverse-parent:hover .uiverse-card .uiverse-logo .uiverse-circle5 {
+  transform: translate3d(0, 0, 120px);
+}
