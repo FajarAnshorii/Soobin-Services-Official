@@ -420,17 +420,16 @@ export default function PembuatanWebsitePage() {
         </div>
       </section>
 
-      {/* Pricing / Packages Section */}
-      <section id="services" className="py-20 bg-[#070c19] border-t border-b border-slate-900">
+      <section id="services" className="py-20 bg-[#0a0a0a] border-t border-b border-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-12">
           <div className="flex flex-col gap-4 items-center">
-            <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
+            <span className="text-xs font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
               Paket Layanan & Harga
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Investasi Hemat Untuk Hasil Maksimal
             </h2>
-            <p className="text-slate-400 max-w-2xl text-sm sm:text-base leading-relaxed">
+            <p className="text-neutral-400 max-w-2xl text-sm sm:text-base leading-relaxed">
               Pilih paket pengerjaan website yang paling sesuai dengan target pasar dan kebutuhan bisnis Anda. Seluruh paket sudah termasuk konsultasi penuh gratis.
             </p>
           </div>
@@ -447,8 +446,8 @@ export default function PembuatanWebsitePage() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                     plan.popular
-                      ? 'border-amber-400 bg-[#0b1329] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-450/30'
-                      : 'border-slate-800 bg-[#0b1329] hover:border-amber-400/50 shadow-lg'
+                      ? 'border-amber-400 bg-[#121212] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-400/30'
+                      : 'border-neutral-800 bg-[#121212] hover:border-amber-400/50 shadow-lg'
                   }`}
                 >
                   <div>
@@ -481,10 +480,10 @@ export default function PembuatanWebsitePage() {
                     </p>
 
                     {/* Features List */}
-                    <ul className="flex flex-col gap-3.5 border-t border-slate-800/80 pt-5 mt-4">
+                    <ul className="flex flex-col gap-3.5 border-t border-neutral-800/80 pt-5 mt-4">
                       {plan.features.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
-                          <div className="w-5 h-5 rounded-md bg-slate-800/80 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0 mt-0.5">
+                        <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-300 font-medium">
+                          <div className="w-5 h-5 rounded-md bg-neutral-800/80 flex items-center justify-center text-neutral-400 border border-neutral-700 shrink-0 mt-0.5">
                             <Check className="w-3.5 h-3.5 text-amber-400" />
                           </div>
                           <span>{feat}</span>
@@ -501,7 +500,7 @@ export default function PembuatanWebsitePage() {
                     className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                       plan.popular
                         ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                        : 'bg-slate-800 hover:bg-slate-750 text-white border border-slate-700'
+                        : 'bg-neutral-800 hover:bg-neutral-750 text-white border border-neutral-700'
                     }`}
                   >
                     Pesan Paket

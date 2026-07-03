@@ -907,10 +907,10 @@ body {
   left: calc(var(--size) / -2);
   width: calc(100% + var(--size));
   height: calc(100% + var(--size));
-  background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
-    radial-gradient(circle at 100% 0, #00a6ff, transparent),
-    radial-gradient(circle at 0 100%, #ff0056, transparent),
-    radial-gradient(circle at 100% 100%, #6500ff, transparent);
+  background: radial-gradient(circle at 0 0, #fbbf24, transparent),
+    radial-gradient(circle at 100% 0, #ffffff, transparent),
+    radial-gradient(circle at 0 100%, #facc15, transparent),
+    radial-gradient(circle at 100% 100%, #ca8a04, transparent);
 }
 
 .m2::after {
