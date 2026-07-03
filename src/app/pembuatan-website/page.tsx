@@ -79,7 +79,14 @@ export default function PembuatanWebsitePage() {
   const { placeDirectOrder } = useCart();
   const [activeTab, setActiveTab] = useState('all');
   const [isExitingToSoobin, setIsExitingToSoobin] = useState(false);
+  const [copied, setCopied] = useState(false);
   const router = useRouter();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText('npx create jar.dev website');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleExit = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -171,6 +178,52 @@ export default function PembuatanWebsitePage() {
                 >
                   Lihat Paket Harga
                 </a>
+              </motion.div>
+
+              {/* Terminal Command Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+                className="mt-2"
+              >
+                <div className="term-card">
+                  <div className="term-wrap">
+                    <div className="term-terminal">
+                      <div className="term-head">
+                        <div className="term-title">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="4 17 10 11 4 5"></polyline>
+                            <line x1="12" y1="19" x2="20" y2="19"></line>
+                          </svg>
+                          <span>bash &mdash; jar.dev</span>
+                        </div>
+                        <button 
+                          onClick={handleCopy}
+                          className="term-copy-toggle" 
+                          title={copied ? "Tersalin!" : "Salin Perintah"}
+                        >
+                          {copied ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                      <div className="term-body">
+                        <div className="term-pre">
+                          <code>$ </code>
+                          <code className="term-cmd" data-cmd="npx create jar.dev website"></code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Stats */}
