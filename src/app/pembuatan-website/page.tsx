@@ -48,15 +48,15 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#services" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website/layanan" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Layanan
-            </a>
-            <a href="#features" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            </Link>
+            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Keunggulan
-            </a>
-            <a href="#portfolio" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            </Link>
+            <Link href="/pembuatan-website#portfolio" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Portofolio
-            </a>
+            </Link>
           </div>
 
           <div>
@@ -586,7 +586,9 @@ export default function PembuatanWebsitePage() {
               <LogOut className="w-4 h-4" />
             </Link>
             <span>•</span>
-            <Link href="/layanan" className="hover:text-amber-400 transition-colors">Layanan Lengkap</Link>
+            <Link href="/pembuatan-website/layanan" className="hover:text-amber-400 transition-colors">Layanan</Link>
+            <span>•</span>
+            <Link href="/pembuatan-website/portofolio" className="hover:text-amber-400 transition-colors">Portofolio</Link>
             <span>•</span>
             <a href="https://wa.me/6287815797525" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">Kontak</a>
           </div>
