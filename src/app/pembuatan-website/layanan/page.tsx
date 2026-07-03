@@ -533,13 +533,13 @@ export default function LayananPembuatanWebsite() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950"
           >
-            {/* Wifi Loader - Purple Version */}
+            {/* Wifi Loader - Golden Yellow Version */}
             <div
               id="wifi-loader"
               className="scale-125"
               style={{
-                ['--front-color' as any]: '#a855f7',
-                ['--back-color' as any]: 'rgba(168, 85, 247, 0.2)'
+                ['--front-color' as any]: '#facc15',
+                ['--back-color' as any]: 'rgba(250, 204, 21, 0.2)'
               }}
             >
               <svg className="circle-outer" viewBox="0 0 86 86">
