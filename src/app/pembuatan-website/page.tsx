@@ -447,21 +447,21 @@ export default function PembuatanWebsitePage() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                     plan.popular
-                      ? 'border-blue-500 bg-[#0b1329] shadow-[0_0_25px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30'
-                      : 'border-slate-800 bg-[#0b1329] hover:border-blue-500/50 shadow-lg'
+                      ? 'border-amber-400 bg-[#0b1329] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-450/30'
+                      : 'border-slate-800 bg-[#0b1329] hover:border-amber-400/50 shadow-lg'
                   }`}
                 >
                   <div>
                     {/* Top block */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
                           <PlanIcon className="w-6 h-6" />
                         </div>
                         <h3 className="text-xl font-bold text-white">{plan.title.split(' / ')[0]}</h3>
                       </div>
                       {plan.popular && (
-                        <span className="text-[9px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                        <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
                           BEST SELLER
                         </span>
                       )}
@@ -485,7 +485,7 @@ export default function PembuatanWebsitePage() {
                       {plan.features.map((feat) => (
                         <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
                           <div className="w-5 h-5 rounded-md bg-slate-800/80 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0 mt-0.5">
-                            <Check className="w-3.5 h-3.5 text-slate-300" />
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
                           </div>
                           <span>{feat}</span>
                         </li>
@@ -500,8 +500,8 @@ export default function PembuatanWebsitePage() {
                     onClick={() => placeDirectOrder(`Website Paket ${plan.title}`)}
                     className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                       plan.popular
-                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'
-                        : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                        ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
+                        : 'bg-slate-800 hover:bg-slate-750 text-white border border-slate-700'
                     }`}
                   >
                     Pesan Paket

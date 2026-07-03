@@ -49,13 +49,13 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/pembuatan-website/layanan" className="text-sm font-bold text-blue-400 transition-colors">
+            <Link href="/pembuatan-website/layanan" className="text-sm font-bold text-amber-500 transition-colors">
               Layanan
             </Link>
-            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-slate-300 hover:text-blue-400 transition-colors">
+            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-slate-300 hover:text-amber-500 transition-colors">
               Keunggulan
             </Link>
-            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-slate-300 hover:text-blue-400 transition-colors">
+            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-slate-300 hover:text-amber-500 transition-colors">
               Portofolio
             </Link>
           </div>
@@ -65,7 +65,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
               href="https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20untuk%20konsultasi%20pembuatan%20website"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/15 hover:shadow-blue-600/30 transform hover:-translate-y-0.5 transition-all duration-300"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/15 hover:shadow-amber-400/30 transform hover:-translate-y-0.5 transition-all duration-300"
             >
               Konsultasi Gratis
               <ArrowRight className="w-4 h-4 ml-1.5" />
@@ -316,7 +316,7 @@ export default function LayananPembuatanWebsite() {
   });
 
   return (
-    <div className="min-h-screen bg-[#070c19] text-white pt-28 pb-16 font-sans selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-[#070c19] text-white pt-28 pb-16 font-sans selection:bg-amber-400 selection:text-black">
       
       {/* Local Custom Navbar */}
       <LocalNavbar onExit={handleExit} />
@@ -325,13 +325,13 @@ export default function LayananPembuatanWebsite() {
       <div className="bg-slate-955/40 text-white py-16 relative overflow-hidden border-b border-slate-900">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1e293b,transparent_60%)]"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.span 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xs font-bold text-blue-400 bg-blue-500/10 rounded-full px-3.5 py-1 uppercase tracking-widest border border-blue-500/20"
+            className="text-xs font-bold text-amber-400 bg-amber-400/10 rounded-full px-3.5 py-1 uppercase tracking-widest border border-amber-400/20"
           >
             Layanan Pembuatan Website & Pengembangan Digital
           </motion.span>
@@ -342,7 +342,7 @@ export default function LayananPembuatanWebsite() {
             transition={{ delay: 0.1 }}
             className="text-3xl sm:text-5xl font-black mt-4 tracking-tight leading-tight text-white"
           >
-            Pilihan Layanan Web <span className="text-blue-500">JAR.DEV</span>
+            Pilihan Layanan Web <span className="text-amber-400">JAR.DEV</span>
           </motion.h1>
           
           <motion.p 
@@ -371,7 +371,7 @@ export default function LayananPembuatanWebsite() {
               placeholder="Cari jenis website atau optimasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-3 border border-slate-700 rounded-2xl bg-slate-900/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-semibold"
+              className="block w-full pl-10 pr-4 py-3 border border-slate-700 rounded-2xl bg-slate-900/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm font-semibold"
             />
           </div>
 
@@ -385,7 +385,7 @@ export default function LayananPembuatanWebsite() {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
                     activeCategory === cat.id
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                      ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20'
                       : 'bg-slate-900/80 text-slate-400 hover:bg-slate-850 hover:text-white border border-slate-800'
                   }`}
                 >
@@ -415,15 +415,15 @@ export default function LayananPembuatanWebsite() {
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group ${
                     isPopular 
-                      ? 'border-blue-500 bg-[#0b1329] shadow-[0_0_25px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30'
-                      : 'border-slate-800 bg-[#0b1329] hover:border-blue-500/50 shadow-lg'
+                      ? 'border-amber-400 bg-[#0b1329] shadow-[0_0_25px_rgba(245,158,11,0.15)] ring-1 ring-amber-450/30'
+                      : 'border-slate-800 bg-[#0b1329] hover:border-amber-400/50 shadow-lg'
                   }`}
                 >
                   <div>
                     {/* Header: Icon & Cart Add Button */}
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
                           <ServiceIcon className="w-6 h-6" />
                         </div>
                         <h3 className="text-xl font-bold text-white leading-tight">
@@ -443,7 +443,7 @@ export default function LayananPembuatanWebsite() {
                               category: 'pembuatan-website'
                             });
                           }}
-                          className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-blue-650 hover:text-white text-slate-400 transition-all cursor-pointer"
+                          className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-amber-400/20 text-slate-400 hover:text-amber-400 transition-all cursor-pointer"
                           title="Tambah ke Keranjang"
                         >
                           <ShoppingCart className="w-4.5 h-4.5" />
@@ -453,7 +453,7 @@ export default function LayananPembuatanWebsite() {
 
                     {/* Badge */}
                     {service.badge && (
-                      <span className="inline-block mb-4 text-[9px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                      <span className="inline-block mb-4 text-[9px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
                         {service.badge}
                       </span>
                     )}
@@ -462,7 +462,7 @@ export default function LayananPembuatanWebsite() {
                     <div className="mt-2">
                       <span className="text-4xl font-extrabold text-white">{service.price}</span>
                       <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-blue-400" />
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
                         <span>Estimasi: {service.deliveryTime}</span>
                       </p>
                     </div>
@@ -477,7 +477,7 @@ export default function LayananPembuatanWebsite() {
                       {service.features.map((feat, i) => (
                         <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
                           <div className="w-5 h-5 rounded-md bg-slate-800/80 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0 mt-0.5">
-                            <Check className="w-3.5 h-3.5 text-slate-300" />
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
                           </div>
                           <span>{feat}</span>
                         </li>
@@ -496,8 +496,8 @@ export default function LayananPembuatanWebsite() {
                         onClick={() => placeDirectOrder(service.name)}
                         className={`w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                           isPopular
-                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'
-                            : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                            ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
+                            : 'bg-slate-800 hover:bg-slate-750 text-white border border-slate-700'
                         }`}
                       >
                         Pesan Sekarang
