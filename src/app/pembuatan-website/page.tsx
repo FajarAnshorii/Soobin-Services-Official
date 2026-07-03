@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Code, Monitor, Globe, Sparkles, ArrowRight, ShieldCheck, Zap,
-  Check, Play, Users, MessageSquare, Star, ArrowUpRight, LogOut, ArrowLeft
+  Check, Play, Users, MessageSquare, Star, ArrowUpRight, LogOut, ArrowLeft, ShoppingCart
 } from 'lucide-react';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { useCart } from '@/context/CartContext';
@@ -421,77 +421,94 @@ export default function PembuatanWebsitePage() {
       </section>
 
       {/* Pricing / Packages Section */}
-      <section id="services" className="py-20 bg-white">
+      <section id="services" className="py-20 bg-[#070c19] border-t border-b border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-12">
           <div className="flex flex-col gap-4 items-center">
-            <span className="text-xs font-bold text-amber-600 bg-amber-100 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
+            <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-3.5 py-1 w-fit uppercase tracking-wider">
               Paket Layanan & Harga
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Investasi Hemat Untuk Hasil Maksimal
             </h2>
-            <p className="text-gray-500 max-w-2xl text-sm sm:text-base leading-relaxed">
+            <p className="text-slate-400 max-w-2xl text-sm sm:text-base leading-relaxed">
               Pilih paket pengerjaan website yang paling sesuai dengan target pasar dan kebutuhan bisnis Anda. Seluruh paket sudah termasuk konsultasi penuh gratis.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-            {services.map((plan, i) => (
-              <motion.div
-                key={plan.title}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
-                  plan.popular
-                    ? 'border-amber-400 shadow-2xl bg-amber-50/20 transform hover:-translate-y-1'
-                    : 'border-gray-200 bg-white hover:border-amber-400/60 transform hover:-translate-y-1'
-                }`}
-              >
-                {plan.popular && (
-                  <span className="absolute -top-3.5 left-8 bg-amber-400 text-black text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider">
-                    {plan.tag}
-                  </span>
-                )}
-                {!plan.popular && (
-                  <span className="absolute -top-3.5 left-8 bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-gray-200">
-                    {plan.tag}
-                  </span>
-                )}
-
-                <div className="flex flex-col gap-5">
-                  <h3 className="text-xl font-bold text-gray-900 mt-2">{plan.title}</h3>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">{plan.desc}</p>
-                  <div className="flex items-baseline gap-1 pt-2">
-                    <span className="text-3xl sm:text-4xl font-black text-gray-900">{plan.price}</span>
-                  </div>
-
-                  <ul className="flex flex-col gap-3.5 border-t border-gray-150 pt-5 mt-2">
-                    {plan.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-600 font-medium">
-                        <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <a
-                  href={`https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20dengan%20Jasa%20Website%20paket%20${encodeURIComponent(plan.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => placeDirectOrder(`Website Paket ${plan.title}`)}
-                  className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
+            {services.map((plan, i) => {
+              const PlanIcon = i === 0 ? Globe : i === 1 ? Monitor : ShoppingCart;
+              return (
+                <motion.div
+                  key={plan.title}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                     plan.popular
-                      ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      ? 'border-blue-500 bg-[#0b1329] shadow-[0_0_25px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30'
+                      : 'border-slate-800 bg-[#0b1329] hover:border-blue-500/50 shadow-lg'
                   }`}
                 >
-                  Pilih Paket
-                </a>
-              </motion.div>
-            ))}
+                  <div>
+                    {/* Top block */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                          <PlanIcon className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white">{plan.title.split(' / ')[0]}</h3>
+                      </div>
+                      {plan.popular && (
+                        <span className="text-[9px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                          BEST SELLER
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Price Block */}
+                    <div className="mt-4">
+                      <span className="text-4xl font-extrabold text-white">{plan.price}</span>
+                      <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed">
+                        {i === 0 ? 'Estimasi pengerjaan: 2-3 hari kerja' : i === 1 ? 'Estimasi pengerjaan: 4-6 hari kerja' : 'Estimasi pengerjaan: 7-10 hari kerja'}
+                      </p>
+                    </div>
+
+                    {/* Description Header */}
+                    <p className="text-sm font-semibold text-slate-200 mt-6 mb-4">
+                      {plan.desc}
+                    </p>
+
+                    {/* Features List */}
+                    <ul className="flex flex-col gap-3.5 border-t border-slate-800/80 pt-5 mt-4">
+                      {plan.features.map((feat) => (
+                        <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
+                          <div className="w-5 h-5 rounded-md bg-slate-800/80 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5 text-slate-300" />
+                          </div>
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20dengan%20Jasa%20Website%20paket%20${encodeURIComponent(plan.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => placeDirectOrder(`Website Paket ${plan.title}`)}
+                    className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
+                      plan.popular
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                        : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                    }`}
+                  >
+                    Pesan Paket
+                  </a>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -20,7 +20,7 @@ interface LocalNavbarProps {
 
 function LocalNavbar({ onExit }: LocalNavbarProps) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-amber-100 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#070c19]/80 backdrop-blur-md border-b border-slate-900 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3">
@@ -28,7 +28,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
             <Link
               href="/"
               onClick={onExit}
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-500 hover:text-amber-600 transition-colors mr-2 border-r border-gray-200 pr-4"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-500 hover:text-amber-600 transition-colors mr-2 border-r border-slate-800 pr-4"
               title="Kembali ke SOOBIN Services"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -49,13 +49,13 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/pembuatan-website/layanan" className="text-sm font-bold text-amber-500 transition-colors">
+            <Link href="/pembuatan-website/layanan" className="text-sm font-bold text-blue-400 transition-colors">
               Layanan
             </Link>
-            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website#features" className="text-sm font-semibold text-slate-300 hover:text-blue-400 transition-colors">
               Keunggulan
             </Link>
-            <Link href="/pembuatan-website#portfolio" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-slate-300 hover:text-blue-400 transition-colors">
               Portofolio
             </Link>
           </div>
@@ -65,7 +65,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
               href="https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20untuk%20konsultasi%20pembuatan%20website"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/15 hover:shadow-amber-400/30 transform hover:-translate-y-0.5 transition-all duration-300"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/15 hover:shadow-blue-600/30 transform hover:-translate-y-0.5 transition-all duration-300"
             >
               Konsultasi Gratis
               <ArrowRight className="w-4 h-4 ml-1.5" />
@@ -96,7 +96,7 @@ const webServices = [
     originalPrice: 'Rp 1.200.000',
     deliveryTime: '2 - 3 Hari Kerja',
     icon: Globe,
-    badge: 'Paling Populer',
+    badge: 'MOST POPULAR',
     desc: 'Website satu halaman super cepat & konversif tinggi untuk mempromosikan produk, jasa, personal branding, atau event khusus Anda.',
     features: [
       'Desain Premium & Responsive (Mobile Friendly)',
@@ -116,7 +116,7 @@ const webServices = [
     originalPrice: 'Rp 2.500.000',
     deliveryTime: '4 - 6 Hari Kerja',
     icon: Monitor,
-    badge: 'Rekomendasi Bisnis',
+    badge: 'REKOMENDASI BISNIS',
     desc: 'Website representatif dan interaktif untuk mengenalkan profile usaha, visi-misi, keunggulan produk/layanan, portofolio, dan kontak resmi bisnis Anda.',
     features: [
       'Hingga 5 Halaman Dinamis (Home, About, Services, Gallery, Contact)',
@@ -136,7 +136,7 @@ const webServices = [
     originalPrice: 'Rp 5.000.000',
     deliveryTime: '7 - 10 Hari Kerja',
     icon: ShoppingCart,
-    badge: 'Toko Digital',
+    badge: 'TOKO DIGITAL',
     desc: 'Website toko online profesional lengkap dengan keranjang belanja, integrasi ongkos kirim otomatis, diskon kupon, dan invoice order otomatis.',
     features: [
       'Katalog Produk Tanpa Batas (Unlimited Products)',
@@ -156,7 +156,7 @@ const webServices = [
     originalPrice: 'Rp 6.000.000',
     deliveryTime: '7 - 12 Hari Kerja',
     icon: BookMarked,
-    badge: 'Adsense Ready',
+    badge: 'ADSENSE READY',
     desc: 'Website portal informasi berita, opini, artikel, atau majalah digital yang dioptimasi untuk trafik tinggi dan Google Adsense.',
     features: [
       'Sistem Multi-Kategori & Tag Berita Rapi',
@@ -176,7 +176,7 @@ const webServices = [
     originalPrice: 'Rp 6.500.000',
     deliveryTime: '7 - 14 Hari Kerja',
     icon: GraduationCap,
-    badge: 'Resmi .SCH.ID',
+    badge: 'RESMI .SCH.ID',
     desc: 'Website resmi sekolah, universitas, atau yayasan bimbingan belajar dengan fitur pengumuman nilai, data guru/siswa, & pendaftaran siswa baru.',
     features: [
       'Profil Sekolah, Visi-Misi, & Struktur Organisasi',
@@ -196,7 +196,7 @@ const webServices = [
     originalPrice: 'Rp 18.000.000',
     deliveryTime: '21 - 30 Hari Kerja',
     icon: Database,
-    badge: 'Sistem Kustom',
+    badge: 'SISTEM KUSTOM',
     desc: 'Sistem aplikasi berbasis web custom untuk kebutuhan spesifik perusahaan Anda seperti Sistem Inventory, ERP, CRM, HRIS, atau Sistem Antrean.',
     features: [
       'Custom Database & Skema Relasional (PostgreSQL/MySQL)',
@@ -216,7 +216,7 @@ const webServices = [
     originalPrice: 'Rp 1.000.000',
     deliveryTime: '2 - 3 Hari Kerja',
     icon: Users,
-    badge: 'Personal Brand',
+    badge: 'PERSONAL BRAND',
     desc: 'Website portofolio interaktif untuk memamerkan resume, riwayat kerja, riwayat edukasi, keahlian, dan hasil karya kreatif Anda untuk melamar kerja/freelance.',
     features: [
       'Desain Minimalis Elegan & Kreatif',
@@ -236,7 +236,7 @@ const webServices = [
     originalPrice: 'Rp 1.800.000',
     deliveryTime: '4 - 7 Hari Kerja',
     icon: RefreshCw,
-    badge: 'Tampilan Baru',
+    badge: 'TAMPILAN BARU',
     desc: 'Ubah tampilan website lama Anda menjadi jauh lebih modern, elegan, responsif, berkecepatan tinggi, dan ramah pengguna (user-friendly).',
     features: [
       'Analisis Komprehensif Desain & Struktur Lama',
@@ -256,7 +256,7 @@ const webServices = [
     originalPrice: 'Rp 1.500.000',
     deliveryTime: '3 - 5 Hari Kerja',
     icon: Zap,
-    badge: 'PageSpeed 90+',
+    badge: 'PAGESPEED 90+',
     desc: 'Optimasi performa kecepatan loading website (Core Web Vitals Google) dan pengaturan SEO On-page agar masuk halaman pertama Google.',
     features: [
       'Skor Google PageSpeed 90+ (Mobile & Desktop)',
@@ -276,7 +276,7 @@ const webServices = [
     originalPrice: 'Rp 600.000',
     deliveryTime: 'Pemeliharaan Rutin Bulanan',
     icon: ShieldCheck,
-    badge: 'Garansi Aman',
+    badge: 'GARANSI AMAN',
     desc: 'Layanan pemeliharaan berkala untuk menjaga website Anda tetap aman dari malware/hacker, backup berkala, dan update konten cepat.',
     features: [
       'Backup Database & File Mingguan',
@@ -316,22 +316,22 @@ export default function LayananPembuatanWebsite() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 pt-28 pb-16 font-sans selection:bg-amber-400 selection:text-black">
+    <div className="min-h-screen bg-[#070c19] text-white pt-28 pb-16 font-sans selection:bg-blue-500 selection:text-white">
       
       {/* Local Custom Navbar */}
       <LocalNavbar onExit={handleExit} />
 
       {/* Hero Header Section */}
-      <div className="bg-slate-900 text-white py-16 relative overflow-hidden">
+      <div className="bg-slate-955/40 text-white py-16 relative overflow-hidden border-b border-slate-900">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1e293b,transparent_60%)]"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.span 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xs font-bold text-amber-400 bg-amber-400/10 rounded-full px-3.5 py-1 uppercase tracking-widest border border-amber-400/20"
+            className="text-xs font-bold text-blue-400 bg-blue-500/10 rounded-full px-3.5 py-1 uppercase tracking-widest border border-blue-500/20"
           >
             Layanan Pembuatan Website & Pengembangan Digital
           </motion.span>
@@ -340,16 +340,16 @@ export default function LayananPembuatanWebsite() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-5xl font-black mt-4 tracking-tight leading-tight"
+            className="text-3xl sm:text-5xl font-black mt-4 tracking-tight leading-tight text-white"
           >
-            Pilihan Layanan Web <span className="text-amber-400">JAR.DEV</span>
+            Pilihan Layanan Web <span className="text-blue-500">JAR.DEV</span>
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-400 max-w-3xl mx-auto mt-4 text-sm sm:text-base leading-relaxed"
+            className="text-slate-400 max-w-3xl mx-auto mt-4 text-sm sm:text-base leading-relaxed"
           >
             Daftar paket jasa pembuatan website profesional terlengkap di Indonesia. 
             Semua proses dikerjakan langsung menggunakan MacBook Air M2 berkecepatan tinggi dengan jaminan kualitas kode bersih, SEO-friendly, dan gratis konsultasi.
@@ -359,24 +359,24 @@ export default function LayananPembuatanWebsite() {
 
       {/* Filter and Search Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-150 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="bg-[#0b1329] rounded-3xl p-6 shadow-xl border border-slate-800 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-gray-400" />
+              <Search className="w-5 h-5 text-slate-500" />
             </span>
             <input
               type="text"
               placeholder="Cari jenis website atau optimasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl bg-slate-50/50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm font-semibold"
+              className="block w-full pl-10 pr-4 py-3 border border-slate-700 rounded-2xl bg-slate-900/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-semibold"
             />
           </div>
 
           {/* Categories Horizontal Scroller */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-gray-200">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-slate-800">
             {serviceCategories.map((cat) => {
               const Icon = cat.icon;
               return (
@@ -385,8 +385,8 @@ export default function LayananPembuatanWebsite() {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
                     activeCategory === cat.id
-                      ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20'
-                      : 'bg-slate-50 text-gray-600 hover:bg-slate-100'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                      : 'bg-slate-900/80 text-slate-400 hover:bg-slate-850 hover:text-white border border-slate-800'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -404,6 +404,7 @@ export default function LayananPembuatanWebsite() {
           <AnimatePresence mode="popLayout">
             {filteredServices.map((service, index) => {
               const ServiceIcon = service.icon;
+              const isPopular = service.badge === 'MOST POPULAR';
               return (
                 <motion.div
                   key={service.id}
@@ -412,20 +413,22 @@ export default function LayananPembuatanWebsite() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="bg-white rounded-3xl p-6 border border-gray-200 flex flex-col justify-between hover:shadow-2xl hover:border-amber-400/50 transition-all duration-300 relative group"
+                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group ${
+                    isPopular 
+                      ? 'border-blue-500 bg-[#0b1329] shadow-[0_0_25px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30'
+                      : 'border-slate-800 bg-[#0b1329] hover:border-blue-500/50 shadow-lg'
+                  }`}
                 >
-                  {/* Badge */}
-                  {service.badge && (
-                    <span className="absolute -top-3.5 left-6 bg-amber-400 text-black text-2xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-                      {service.badge}
-                    </span>
-                  )}
-
                   <div>
                     {/* Header: Icon & Cart Add Button */}
-                    <div className="flex justify-between items-start mb-5">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
-                        <ServiceIcon className="w-6 h-6" />
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                          <ServiceIcon className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white leading-tight">
+                          {service.name.includes('Website') ? service.name.replace('Website ', '') : service.name}
+                        </h3>
                       </div>
                       
                       {/* Cart Icon button for logged-in Member */}
@@ -440,7 +443,7 @@ export default function LayananPembuatanWebsite() {
                               category: 'pembuatan-website'
                             });
                           }}
-                          className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-400/20 text-gray-500 hover:text-amber-600 transition-all cursor-pointer border border-gray-100"
+                          className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-blue-650 hover:text-white text-slate-400 transition-all cursor-pointer"
                           title="Tambah ke Keranjang"
                         >
                           <ShoppingCart className="w-4.5 h-4.5" />
@@ -448,19 +451,34 @@ export default function LayananPembuatanWebsite() {
                       )}
                     </div>
 
-                    {/* Title & Description */}
-                    <h3 className="text-lg font-black text-gray-900 group-hover:text-amber-500 transition-colors line-clamp-2">
-                      {service.name}
-                    </h3>
-                    <p className="text-gray-500 mt-2.5 text-xs sm:text-sm leading-relaxed">
+                    {/* Badge */}
+                    {service.badge && (
+                      <span className="inline-block mb-4 text-[9px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full px-2.5 py-1 uppercase tracking-wider">
+                        {service.badge}
+                      </span>
+                    )}
+
+                    {/* Price Block */}
+                    <div className="mt-2">
+                      <span className="text-4xl font-extrabold text-white">{service.price}</span>
+                      <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-blue-400" />
+                        <span>Estimasi: {service.deliveryTime}</span>
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm font-semibold text-slate-200 mt-6 mb-4">
                       {service.desc}
                     </p>
 
                     {/* Detailed Features List */}
-                    <ul className="mt-5 border-t border-slate-100 pt-4 flex flex-col gap-2.5">
+                    <ul className="flex flex-col gap-3.5 border-t border-slate-800/80 pt-5 mt-4">
                       {service.features.map((feat, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-gray-600 font-medium leading-relaxed">
-                          <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
+                          <div className="w-5 h-5 rounded-md bg-slate-800/80 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5 text-slate-300" />
+                          </div>
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -468,30 +486,20 @@ export default function LayananPembuatanWebsite() {
                   </div>
 
                   {/* Pricing and Action Buttons */}
-                  <div className="mt-8 pt-4 border-t border-slate-100">
-                    <div className="flex items-baseline justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-2xs text-gray-400 font-bold uppercase tracking-wider">Investasi Layanan</span>
-                        <div className="flex items-baseline gap-1.5 mt-0.5">
-                          <span className="text-2xl font-black text-gray-900">{service.price}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 text-2xs font-semibold text-gray-400 bg-slate-50 px-2.5 py-1 rounded-lg">
-                        <Clock className="w-3.5 h-3.5 text-amber-500" />
-                        <span>{service.deliveryTime}</span>
-                      </div>
-                    </div>
-
+                  <div className="mt-8">
                     {/* Action buttons */}
-                    <div className="grid grid-cols-1 gap-2 mt-5">
+                    <div className="grid grid-cols-1 gap-2">
                       <a
                         href={`https://wa.me/6287815797525?text=Halo%20JAR.DEV%2C%20saya%20tertarik%20dengan%20layanan%20${encodeURIComponent(service.name)}%20berharga%20${encodeURIComponent(service.price)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => placeDirectOrder(service.name)}
-                        className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all"
+                        className={`w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
+                          isPopular
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                            : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                        }`}
                       >
-                        <Phone className="w-4 h-4 text-amber-400 fill-amber-400" />
                         Pesan Sekarang
                       </a>
                     </div>
@@ -504,10 +512,10 @@ export default function LayananPembuatanWebsite() {
 
         {/* Empty State */}
         {filteredServices.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-3xl shadow-sm border border-gray-150 mt-8">
-            <Search className="w-12 h-12 text-gray-300 mx-auto" />
-            <h3 className="text-lg font-bold text-gray-700 mt-4">Layanan Tidak Ditemukan</h3>
-            <p className="text-gray-400 text-sm mt-1 max-w-md mx-auto">
+          <div className="text-center py-16 bg-[#0b1329] rounded-3xl shadow-sm border border-slate-800 mt-8">
+            <Search className="w-12 h-12 text-slate-600 mx-auto" />
+            <h3 className="text-lg font-bold text-slate-200 mt-4">Layanan Tidak Ditemukan</h3>
+            <p className="text-slate-400 text-sm mt-1 max-w-md mx-auto">
               Maaf, kata kunci "{searchQuery}" tidak cocok dengan nama atau keterangan layanan kami. Silakan coba pencarian lain.
             </p>
           </div>
