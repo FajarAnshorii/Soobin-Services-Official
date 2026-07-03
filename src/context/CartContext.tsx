@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -81,52 +81,59 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // 5. Social Proof: Simulated Live Order Notifications
+  const seenOrderIds = useRef<Set<string>>(new Set());
+
+  // Real-time synchronization of order notifications across visitors
   useEffect(() => {
-    const names = [
-      'Ahmad', 'Siti', 'Budi', 'Fajar', 'Rian', 'Dewi', 'Indah', 'Aditya', 
-      'Putri', 'Aris', 'Dian', 'Roni', 'Mega', 'Taufik', 'Lusi', 'Hendra', 
-      'Novi', 'Reza', 'Wulan', 'Diki', 'Siska', 'Gilang', 'Yuni', 'Randi'
-    ];
-    
-    const servicesList = [
-      'Cek Turnitin (Lolos)', 'Cek AI Detector', 'Parafrase Jurnal', 'Parafrase Skripsi',
-      'Joki Tugas Pemrograman', 'Joki Tugas Excel', 'Review Jurnal Bahasa Inggris',
-      'Translate Grammar & Proofread', 'Pembuatan PPT Tugas', 'Daftar Pustaka Otomatis',
-      'Website Landing Page (JAR.DEV)', 'Website Company Profile (JAR.DEV)', 'Olah Data SPSS',
-      'Unlock Chegg', 'Unlock Scribd', 'Unlock CourseHero', 'Tugas Uji Statistika'
-    ];
+    let isFirstLoad = true;
 
-    const showRandomOrder = () => {
-      // Don't show if window is not focused to be resource-friendly and avoid disturbance
-      if (document.hidden) return;
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch('/api/orders');
+        if (!res.ok) return;
+        const orders = await res.json();
+        if (!Array.isArray(orders)) return;
 
-      const isGuest = Math.random() > 0.4;
-      const service = servicesList[Math.floor(Math.random() * servicesList.length)];
-      
-      if (isGuest) {
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
-        addToast(`Guest #${randomNum} telah memesan jasa ${service}`, 'success');
-      } else {
-        const name = names[Math.floor(Math.random() * names.length)];
-        addToast(`User ${name} telah memesan jasa ${service}`, 'success');
+        if (isFirstLoad) {
+          // On first load, populate seen orders so we don't spam the user with historical logs
+          orders.forEach((order: any) => {
+            if (order && order.id) {
+              seenOrderIds.current.add(order.id);
+            }
+          });
+          isFirstLoad = false;
+          return;
+        }
+
+        // Check for new orders
+        // Filter out orders older than 5 minutes to avoid showing very old orders if bin resets
+        const now = Date.now();
+        const newOrders = orders.filter((order: any) => {
+          return order && order.id && !seenOrderIds.current.has(order.id) && (now - order.timestamp < 300000);
+        });
+
+        // Trigger toast for new orders (newest first, so reverse to show in chronological order if multiple)
+        newOrders.reverse().forEach((order: any) => {
+          seenOrderIds.current.add(order.id);
+          addToast(order.message, 'success');
+        });
+      } catch (err) {
+        console.error('Failed to fetch real-time orders', err);
       }
     };
 
-    // Show first random notification after 15 seconds
-    const initialDelay = setTimeout(() => {
-      showRandomOrder();
-    }, 15000);
+    // Initial fetch
+    fetchOrders();
 
-    // Set interval for subsequent notifications (every 30 to 60 seconds)
+    // Poll every 8 seconds
     const interval = setInterval(() => {
-      showRandomOrder();
-    }, Math.floor(30000 + Math.random() * 30000));
+      // Don't poll if window is hidden
+      if (!document.hidden) {
+        fetchOrders();
+      }
+    }, 8000);
 
-    return () => {
-      clearTimeout(initialDelay);
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   // 3. Save cart to localStorage
@@ -214,6 +221,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       status: 'Sedang Diproses'
     };
 
+    const messages: string[] = [];
+
     if (user) {
       const updatedHistory = [newOrder, ...orderHistory];
       setOrderHistory(updatedHistory);
@@ -221,14 +230,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       // Trigger user order notification
       items.forEach((item) => {
-        addToast(`User ${user.name} telah memesan jasa ${item.name}`, 'success');
+        const msg = `User ${user.name} telah memesan jasa ${item.name}`;
+        messages.push(msg);
+        addToast(msg, 'success');
       });
     } else {
       // Guest ordering
       items.forEach((item) => {
-        addToast(`Guest #${guestId} telah memesan jasa ${item.name}`, 'success');
+        const msg = `Guest #${guestId} telah memesan jasa ${item.name}`;
+        messages.push(msg);
+        addToast(msg, 'success');
       });
     }
+
+    // Sync to other users in real-time
+    messages.forEach(async (msg) => {
+      const orderId = Math.random().toString(36).substring(2, 9);
+      seenOrderIds.current.add(orderId); // Register locally so we don't display it to ourselves
+      try {
+        await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: orderId, message: msg, timestamp: Date.now() })
+        });
+      } catch (err) {
+        console.error('Failed to sync order', err);
+      }
+    });
   };
 
   const placeDirectOrder = (serviceName: string) => {
@@ -238,6 +266,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       price: 'WhatsApp Order',
       category: 'Direct'
     };
+
+    const msg = user
+      ? `User ${user.name} telah memesan jasa ${serviceName}`
+      : `Guest #${guestId} telah memesan jasa ${serviceName}`;
 
     // If logged in, add to order history
     if (user) {
@@ -258,11 +290,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const updatedHistory = [newOrder, ...orderHistory];
       setOrderHistory(updatedHistory);
       saveHistoryToStorage(updatedHistory);
-
-      addToast(`User ${user.name} telah memesan jasa ${serviceName}`, 'success');
-    } else {
-      addToast(`Guest #${guestId} telah memesan jasa ${serviceName}`, 'success');
     }
+
+    addToast(msg, 'success');
+
+    // Sync to other users in real-time
+    const orderId = Math.random().toString(36).substring(2, 9);
+    seenOrderIds.current.add(orderId); // Register locally
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, message: msg, timestamp: Date.now() })
+    }).catch((err) => console.error('Failed to sync direct order', err));
   };
 
   return (
