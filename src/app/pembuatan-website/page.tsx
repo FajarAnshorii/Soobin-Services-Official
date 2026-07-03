@@ -428,15 +428,29 @@ export default function PembuatanWebsitePage() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950"
           >
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: [0.5, 1.1, 1], opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-purple-600 flex items-center justify-center"
+            {/* Wifi Loader - Purple Version */}
+            <div
+              id="wifi-loader"
+              className="scale-125"
+              style={{
+                ['--front-color' as any]: '#a855f7',
+                ['--back-color' as any]: 'rgba(168, 85, 247, 0.2)'
+              }}
             >
-              <LogOut className="w-24 h-24 stroke-[1.5] animate-pulse" />
-            </motion.div>
+              <svg className="circle-outer" viewBox="0 0 86 86">
+                <circle className="back" cx="43" cy="43" r="40"></circle>
+                <circle className="front" cx="43" cy="43" r="40"></circle>
+              </svg>
+              <svg className="circle-middle" viewBox="0 0 60 60">
+                <circle className="back" cx="30" cy="30" r="27"></circle>
+                <circle className="front" cx="30" cy="30" r="27"></circle>
+              </svg>
+              <svg className="circle-inner" viewBox="0 0 34 34">
+                <circle className="back" cx="17" cy="17" r="14"></circle>
+                <circle className="front" cx="17" cy="17" r="14"></circle>
+              </svg>
+              <div className="text" data-text="SOOBIN SERVICES"></div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
