@@ -253,75 +253,21 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-slate-950 overflow-hidden"
           >
-            {/* Background electricity aura */}
-            <div className="absolute w-96 h-96 bg-amber-500/15 rounded-full filter blur-3xl animate-pulse"></div>
-            
-            {/* Golden particle rings */}
-            <motion.div
-              animate={{
-                scale: [0.8, 1.5, 0.8],
-                opacity: [0.2, 0.5, 0.2],
-                rotate: 360
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              className="absolute w-64 h-64 border border-dashed border-amber-400/35 rounded-full pointer-events-none"
-            ></motion.div>
-
-            <motion.div
-              animate={{
-                scale: [1.2, 0.8, 1.2],
-                opacity: [0.1, 0.4, 0.1],
-                rotate: -360
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              className="absolute w-80 h-80 border border-dashed border-amber-300/20 rounded-full pointer-events-none"
-            ></motion.div>
-
-            {/* Pulsing Lightning Bolt Box */}
-            <div className="relative z-10 flex flex-col items-center gap-4">
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 0.95, 1.1, 1],
-                  y: [0, -3, 2, -1, 0]
-                }}
-                transition={{
-                  duration: 0.5,
-                  repeat: Infinity,
-                  repeatType: "mirror"
-                }}
-                className="w-20 h-20 bg-amber-400 rounded-2xl flex items-center justify-center shadow-[0_0_50px_15px_rgba(251,191,36,0.5)] border border-amber-300 relative"
-              >
-                <Zap className="w-10 h-10 text-black fill-black filter drop-shadow-[0_2px_8px_rgba(251,191,36,0.8)]" />
-                
-                {/* Spark arcs */}
-                <motion.div
-                  animate={{ opacity: [0, 1, 0], scale: [0.8, 1.4, 0.8] }}
-                  transition={{ duration: 0.3, repeat: Infinity }}
-                  className="absolute inset-0 border-2 border-white rounded-2xl pointer-events-none"
-                ></motion.div>
-              </motion.div>
-
-              {/* Loading text with glowing animation */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center gap-1.5 mt-2"
-              >
-                <h3 className="text-white font-black tracking-widest text-sm sm:text-base uppercase flex items-center gap-1">
-                  <span className="text-amber-400">JAR</span>.DEV PORTAL
-                </h3>
-                <p className="text-xs text-amber-300 font-semibold tracking-wider animate-pulse uppercase">
-                  Loading System...
-                </p>
-              </motion.div>
+            {/* Wifi Loader */}
+            <div id="wifi-loader" className="scale-125">
+              <svg className="circle-outer" viewBox="0 0 86 86">
+                <circle className="back" cx="43" cy="43" r="40"></circle>
+                <circle className="front" cx="43" cy="43" r="40"></circle>
+              </svg>
+              <svg className="circle-middle" viewBox="0 0 60 60">
+                <circle className="back" cx="30" cy="30" r="27"></circle>
+                <circle className="front" cx="30" cy="30" r="27"></circle>
+              </svg>
+              <svg className="circle-inner" viewBox="0 0 34 34">
+                <circle className="back" cx="17" cy="17" r="14"></circle>
+                <circle className="front" cx="17" cy="17" r="14"></circle>
+              </svg>
+              <div className="text" data-text="JAR.DEV PORTAL"></div>
             </div>
 
             {/* Screen flash layer (simulating a lightning strike at 1.5s right before push) */}
