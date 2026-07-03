@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Code, Monitor, Globe, Sparkles, ArrowRight, ShieldCheck, Zap,
-  Check, Play, Users, MessageSquare, Star, ArrowUpRight, LogOut
+  Check, Play, Users, MessageSquare, Star, ArrowUpRight, LogOut, ArrowLeft
 } from 'lucide-react';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { useCart } from '@/context/CartContext';
@@ -22,15 +22,16 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-amber-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-2">
-            {/* Yellow Exit Door Icon - visible on all screens in the far left corner */}
+          <div className="flex items-center gap-3">
+            {/* Standard Yellow Back Button with Divider */}
             <Link
               href="/"
               onClick={onExit}
-              className="text-amber-500 hover:text-amber-600 transition-colors flex items-center justify-center p-2 rounded-full hover:bg-amber-50"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-500 hover:text-amber-600 transition-colors mr-2 border-r border-gray-200 pr-4"
               title="Kembali ke SOOBIN Services"
             >
-              <LogOut className="w-6 h-6 rotate-180" />
+              <ArrowLeft className="w-4 h-4" />
+              <span>Kembali</span>
             </Link>
 
             <Link href="/" onClick={onExit} className="flex items-center gap-2">
