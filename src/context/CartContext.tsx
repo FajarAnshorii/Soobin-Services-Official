@@ -81,6 +81,54 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+  // 5. Social Proof: Simulated Live Order Notifications
+  useEffect(() => {
+    const names = [
+      'Ahmad', 'Siti', 'Budi', 'Fajar', 'Rian', 'Dewi', 'Indah', 'Aditya', 
+      'Putri', 'Aris', 'Dian', 'Roni', 'Mega', 'Taufik', 'Lusi', 'Hendra', 
+      'Novi', 'Reza', 'Wulan', 'Diki', 'Siska', 'Gilang', 'Yuni', 'Randi'
+    ];
+    
+    const servicesList = [
+      'Cek Turnitin (Lolos)', 'Cek AI Detector', 'Parafrase Jurnal', 'Parafrase Skripsi',
+      'Joki Tugas Pemrograman', 'Joki Tugas Excel', 'Review Jurnal Bahasa Inggris',
+      'Translate Grammar & Proofread', 'Pembuatan PPT Tugas', 'Daftar Pustaka Otomatis',
+      'Website Landing Page (JAR.DEV)', 'Website Company Profile (JAR.DEV)', 'Olah Data SPSS',
+      'Unlock Chegg', 'Unlock Scribd', 'Unlock CourseHero', 'Tugas Uji Statistika'
+    ];
+
+    const showRandomOrder = () => {
+      // Don't show if window is not focused to be resource-friendly and avoid disturbance
+      if (document.hidden) return;
+
+      const isGuest = Math.random() > 0.4;
+      const service = servicesList[Math.floor(Math.random() * servicesList.length)];
+      
+      if (isGuest) {
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        addToast(`Guest #${randomNum} telah memesan jasa ${service}`, 'success');
+      } else {
+        const name = names[Math.floor(Math.random() * names.length)];
+        addToast(`User ${name} telah memesan jasa ${service}`, 'success');
+      }
+    };
+
+    // Show first random notification after 15 seconds
+    const initialDelay = setTimeout(() => {
+      showRandomOrder();
+    }, 15000);
+
+    // Set interval for subsequent notifications (every 30 to 60 seconds)
+    const interval = setInterval(() => {
+      showRandomOrder();
+    }, Math.floor(30000 + Math.random() * 30000));
+
+    return () => {
+      clearTimeout(initialDelay);
+      clearInterval(interval);
+    };
+  }, []);
+
   // 3. Save cart to localStorage
   const saveCartToStorage = (newCart: CartItem[]) => {
     if (user) {
