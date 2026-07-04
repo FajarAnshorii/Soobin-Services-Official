@@ -102,9 +102,9 @@ export default function PembuatanWebsitePage() {
 
   const services = [
     {
-      title: 'Landing Page / Portofolio',
+      title: 'Landing Page (Single Page)',
       desc: 'Satu halaman interaktif berkecepatan tinggi untuk portofolio pribadi, rilis produk, atau promosi event Anda.',
-      price: 'Rp 450.000',
+      price: 'Rp 650.000',
       features: ['1 Halaman Premium', 'Responsive Mobile-Friendly', 'SEO Optimization Basic', 'Integrasi WhatsApp Chat', 'Gratis Domain .my.id (1 Thn)'],
       popular: false,
       tag: 'Starter'
@@ -112,7 +112,7 @@ export default function PembuatanWebsitePage() {
     {
       title: 'Website Company Profile',
       desc: 'Meningkatkan kredibilitas bisnis Anda dengan website profil profesional multi-halaman berestetika modern.',
-      price: 'Rp 950.000',
+      price: 'Rp 1.450.000',
       features: ['Hingga 5 Halaman Utama', 'Desain Custom Premium', 'Panel Admin Mudah (CMS)', 'SEO Setup Lengkap', 'Gratis Domain .com (1 Thn)', 'Gratis Hosting Server (1 Thn)'],
       popular: true,
       tag: 'Best Seller'
@@ -120,7 +120,7 @@ export default function PembuatanWebsitePage() {
     {
       title: 'Website E-Commerce / Toko Online',
       desc: 'Website penjualan otomatis terintegrasi sistem pembayaran (payment gateway) dan kalkulator ongkir otomatis.',
-      price: 'Rp 1.500.000',
+      price: 'Rp 2.950.000',
       features: ['Halaman Produk & Kategori Unlimited', 'Keranjang Belanja Pintar', 'Integrasi Payment Gateway (Midtrans)', 'Kalkulasi Ongkir Realtime', 'Panel Kelola Pesanan & Stok', 'Gratis Domain & Hosting (1 Thn)'],
       popular: false,
       tag: 'Professional'
