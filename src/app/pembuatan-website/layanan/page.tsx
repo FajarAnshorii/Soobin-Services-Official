@@ -1,17 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Globe, Monitor, ShoppingCart, BookMarked, GraduationCap,
-  Database, Users, RefreshCw, Zap, ShieldCheck, ArrowRight,
-  ArrowLeft, Search, Filter, Check, Clock, Phone, Code
-} from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import {
+  Globe, Monitor, ShoppingCart, BookMarked, GraduationCap, Database, Users, RefreshCw, Zap, ShieldCheck,
+  Search, Filter, Code, ArrowLeft, Plus, Minus, Trash2, Clock, Check, ExternalLink, ChevronRight
+} from 'lucide-react';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 
 interface LocalNavbarProps {
@@ -67,8 +66,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/15 hover:shadow-amber-400/30 transform hover:-translate-y-0.5 transition-all duration-300"
             >
-              Konsultasi Gratis
-              <ArrowRight className="w-4 h-4 ml-1.5" />
+              <span>Konsultasi Gratis</span>
             </a>
           </div>
         </div>
@@ -109,22 +107,22 @@ const webServices = [
     ]
   },
   {
-    id: 302,
+    id: 328,
     category: 'web-umum',
-    subCategory: 'company-profile',
-    name: 'Website Company Profile Profesional',
-    price: 'Rp 1.450.000',
-    originalPrice: 'Rp 2.000.000',
-    deliveryTime: '4 - 6 Hari Kerja',
-    icon: Monitor,
-    badge: 'REKOMENDASI BISNIS',
-    desc: 'Website representatif dan interaktif untuk mengenalkan profile usaha, visi-misi, keunggulan produk/layanan, portofolio, dan kontak resmi bisnis Anda.',
+    subCategory: 'landing-umkm',
+    name: 'Website Landing Page Profil Usaha Dagang (UMKM)',
+    price: 'Rp 590.000',
+    originalPrice: 'Rp 850.000',
+    deliveryTime: '2 - 3 Hari Kerja',
+    icon: Globe,
+    badge: 'KHUSUS UMKM',
+    desc: 'Landing page minimalis namun modern untuk memperkenalkan usaha dagang, toko kelontong, kafe, atau waralaba UMKM Anda agar mudah ditemukan di Google.',
     features: [
-      'Hingga 5 Halaman Dinamis (Home, About, Services, Gallery, Contact)',
-      'Custom Layout Mewah & Elegan',
-      'Integrasi Google Maps Lokasi & Hubungi WhatsApp',
-      'Optimasi Kecepatan & Responsif Mobile',
-      'Sistem Artikel Blog / Berita Usaha',
+      '1 Halaman Utama Informatif & Responsif',
+      'Daftar Menu Makanan/Katalog Produk Sederhana',
+      'Tombol WhatsApp Hubungi Penjual & Google Maps',
+      'Optimasi SEO Lokal (Google My Business Integration Guide)',
+      'Integrasi Ulasan / Testimoni Pelanggan',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -145,6 +143,46 @@ const webServices = [
       'Galeri Portofolio Hasil Karya Terstruktur',
       'Form Kontak Langsung Masuk ke Email/WhatsApp',
       'Integrasi Link Sosial Media',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 302,
+    category: 'web-umum',
+    subCategory: 'company-profile',
+    name: 'Website Company Profile Profesional',
+    price: 'Rp 1.450.000',
+    originalPrice: 'Rp 2.000.000',
+    deliveryTime: '4 - 6 Hari Kerja',
+    icon: Monitor,
+    badge: 'REKOMENDASI BISNIS',
+    desc: 'Website representatif dan interaktif untuk mengenalkan profile usaha, visi-misi, keunggulan produk/layanan, portofolio, dan kontak resmi bisnis Anda.',
+    features: [
+      'Hingga 5 Halaman Dinamis (Home, About, Services, Gallery, Contact)',
+      'Custom Layout Mewah & Elegan',
+      'Integrasi Google Maps Lokasi & Hubungi WhatsApp',
+      'Optimasi Kecepatan & Responsif Mobile',
+      'Sistem Artikel Blog / Berita Usaha',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 329,
+    category: 'web-umum',
+    subCategory: 'portfolio-studio',
+    name: 'Website Booking Layanan & Portfolio Kreatif (Studio/Agency)',
+    price: 'Rp 1.650.000',
+    originalPrice: 'Rp 2.400.000',
+    deliveryTime: '4 - 7 Hari Kerja',
+    icon: Monitor,
+    badge: 'STUDIO & AGENCY',
+    desc: 'Website elegan khusus untuk studio kreatif, agensi pemasaran, fotografer, atau penyedia jasa profesional dengan galeri karya & booking online.',
+    features: [
+      'Custom Halaman Portfolio / Hasil Karya Filterable',
+      'Sistem Pemilihan Layanan & Pengaturan Slot Booking',
+      'Halaman Profil Tim & Keahlian Masing-Masing',
+      'Testimoni Slider & Integrasi Sosial Media Feed',
+      'Optimasi Mobile & Kecepatan Akses Tinggi',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -251,22 +289,42 @@ const webServices = [
     ]
   },
   {
-    id: 311,
+    id: 320,
     category: 'web-pendidikan',
-    subCategory: 'e-learning',
-    name: 'Website E-Learning & LMS (Learning System)',
-    price: 'Rp 4.950.000',
-    originalPrice: 'Rp 7.000.000',
-    deliveryTime: '10 - 20 Hari Kerja',
+    subCategory: 'pesantren-yayasan',
+    name: 'Website Portal Pondok Pesantren / Yayasan',
+    price: 'Rp 2.200.000',
+    originalPrice: 'Rp 3.200.000',
+    deliveryTime: '6 - 10 Hari Kerja',
     icon: GraduationCap,
-    badge: 'KELAS ONLINE',
-    desc: 'Platform pembelajaran online lengkap dengan fitur upload materi video/pdf, kuis interaktif, pengerjaan tugas, dan manajemen nilai siswa.',
+    badge: 'PORTAL YAYASAN',
+    desc: 'Website khusus pondok pesantren, panti asuhan, atau yayasan keagamaan/sosial dengan fitur donasi online dan info kegiatan.',
     features: [
-      'Sistem Manajemen Kelas & Kursus Unlimited',
-      'Upload Materi Video, PDF, & File Pendukung',
-      'Kuis Pilihan Ganda & Tugas dengan Nilai Otomatis',
-      'Dashboard Guru, Siswa, & Administrator',
-      'Sertifikat Kelulusan Otomatis setelah Kelas Selesai',
+      'Profil Lengkap, Visi-Misi, & Sejarah Yayasan',
+      'Formulir Pendaftaran Santri Baru / Donatur',
+      'Integrasi Donasi Online (Transfer Bank / Midtrans)',
+      'Laporan Transparansi Dana Masuk & Keluar',
+      'Galeri Dokumentasi Kegiatan & Pengumuman',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 330,
+    category: 'web-pendidikan',
+    subCategory: 'pondok-tahfidz',
+    name: 'Website Profil Pondok Tahfidz & Donasi Al-Qur\'an',
+    price: 'Rp 1.850.000',
+    originalPrice: 'Rp 2.600.000',
+    deliveryTime: '5 - 8 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'TAHFIDZ & DONASI',
+    desc: 'Website profil pondok tahfidz Qur\'an atau rumah yatim dengan fitur donasi program pembangunan, beras santri, atau sedekah online.',
+    features: [
+      'Halaman Program Pembinaan & Kegiatan Harian',
+      'Fitur Laporan Perkembangan Hafalan Santri',
+      'Formulir Pendaftaran Program Tahfidz/Donasi',
+      'Integrasi Pembayaran Donasi via Transfer/QRIS',
+      'Laporan Penggunaan Dana Donasi Transparan',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -291,26 +349,6 @@ const webServices = [
     ]
   },
   {
-    id: 320,
-    category: 'web-pendidikan',
-    subCategory: 'pesantren-yayasan',
-    name: 'Website Portal Pondok Pesantren / Yayasan',
-    price: 'Rp 2.200.000',
-    originalPrice: 'Rp 3.200.000',
-    deliveryTime: '6 - 10 Hari Kerja',
-    icon: GraduationCap,
-    badge: 'PORTAL YAYASAN',
-    desc: 'Website khusus pondok pesantren, panti asuhan, atau yayasan keagamaan/sosial dengan fitur donasi online dan info kegiatan.',
-    features: [
-      'Profil Lengkap, Visi-Misi, & Sejarah Yayasan',
-      'Formulir Pendaftaran Santri Baru / Donatur',
-      'Integrasi Donasi Online (Transfer Bank / Midtrans)',
-      'Laporan Transparansi Dana Masuk & Keluar',
-      'Galeri Dokumentasi Kegiatan & Pengumuman',
-      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
-    ]
-  },
-  {
     id: 321,
     category: 'web-pendidikan',
     subCategory: 'perpustakaan-digital',
@@ -327,6 +365,26 @@ const webServices = [
       'Sistem Peminjaman & Pengembalian Buku Anggota',
       'Hitung Denda Otomatis Terlambat Pengembalian',
       'Dashboard Statistik Peminjaman Buku Terpopuler',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 311,
+    category: 'web-pendidikan',
+    subCategory: 'e-learning',
+    name: 'Website E-Learning & LMS (Learning System)',
+    price: 'Rp 4.950.000',
+    originalPrice: 'Rp 7.000.000',
+    deliveryTime: '10 - 20 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'KELAS ONLINE',
+    desc: 'Platform pembelajaran online lengkap dengan fitur upload materi video/pdf, kuis interaktif, pengerjaan tugas, dan manajemen nilai siswa.',
+    features: [
+      'Sistem Manajemen Kelas & Kursus Unlimited',
+      'Upload Materi Video, PDF, & File Pendukung',
+      'Kuis Pilihan Ganda & Tugas dengan Nilai Otomatis',
+      'Dashboard Guru, Siswa, & Administrator',
+      'Sertifikat Kelulusan Otomatis setelah Kelas Selesai',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -353,22 +411,22 @@ const webServices = [
     ]
   },
   {
-    id: 313,
+    id: 322,
     category: 'web-media',
-    subCategory: 'forum',
-    name: 'Website Forum Komunitas & Diskusi',
-    price: 'Rp 3.200.000',
-    originalPrice: 'Rp 4.500.000',
-    deliveryTime: '7 - 14 Hari Kerja',
+    subCategory: 'blog-personal',
+    name: 'Website Blog Personal / Portfolio Penulis',
+    price: 'Rp 690.000',
+    originalPrice: 'Rp 990.000',
+    deliveryTime: '2 - 4 Hari Kerja',
     icon: BookMarked,
-    badge: 'KOMUNITAS DIGITAL',
-    desc: 'Platform website forum diskusi seperti Kaskus atau Reddit untuk wadah komunikasi anggota komunitas Anda.',
+    badge: 'BLOG CREATOR',
+    desc: 'Website blog personal minimalis modern bagi influencer, penulis, kolumnis, atau pehobi yang ingin membagikan artikel secara profesional.',
     features: [
-      'Sistem Registrasi Anggota & Profil Pengguna Custom',
-      'Pembuatan Thread Diskusi, Kategori, & Sistem Tagging',
-      'Fitur Upvote/Downvote, Reply, & Komentar Real-time',
-      'Sistem Moderasi Anggota & Penalti/Banned',
-      'Notifikasi Email / Web Push untuk Diskusi Aktif',
+      'Desain Blog Estetis berfokus pada Keterbacaan Teks',
+      'Kategori Artikel, Tagging, & Kolom Pencarian',
+      'Integrasi Newsletter (Mailchimp / Substack)',
+      'Fitur Share Otomatis ke Sosial Media',
+      'SEO Friendly & Adsense Ready Template',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -393,22 +451,22 @@ const webServices = [
     ]
   },
   {
-    id: 322,
+    id: 331,
     category: 'web-media',
-    subCategory: 'blog-personal',
-    name: 'Website Blog Personal / Portfolio Penulis',
-    price: 'Rp 690.000',
-    originalPrice: 'Rp 990.000',
-    deliveryTime: '2 - 4 Hari Kerja',
+    subCategory: 'komunitas-hobi',
+    name: 'Website Portal Komunitas Hobi / Fanspage',
+    price: 'Rp 1.350.000',
+    originalPrice: 'Rp 1.950.000',
+    deliveryTime: '4 - 6 Hari Kerja',
     icon: BookMarked,
-    badge: 'BLOG CREATOR',
-    desc: 'Website blog personal minimalis modern bagi influencer, penulis, kolumnis, atau pehobi yang ingin membagikan artikel secara profesional.',
+    badge: 'HOBI & KOMUNITAS',
+    desc: 'Website khusus wadah informasi komunitas hobi seperti otomotif, game, olahraga, fotografi, atau kesenian untuk berbagi tips & artikel.',
     features: [
-      'Desain Blog Estetis berfokus pada Keterbacaan Teks',
-      'Kategori Artikel, Tagging, & Kolom Pencarian',
-      'Integrasi Newsletter (Mailchimp / Substack)',
-      'Fitur Share Otomatis ke Sosial Media',
-      'SEO Friendly & Adsense Ready Template',
+      'Sistem Artikel Blog dengan Multi-Kategori Hobi',
+      'Galeri Foto & Video Hasil Kegiatan Komunitas',
+      'Formulir Pendaftaran Anggota Baru',
+      'Kalender Jadwal Kumpul/Event Komunitas Mendatang',
+      'Integrasi Sosial Media Komunitas (Instagram & YouTube)',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -432,28 +490,28 @@ const webServices = [
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
-
-  // --- E-COMMERCE & BISNIS ---
   {
-    id: 303,
-    category: 'e-commerce',
-    subCategory: 'ecommerce',
-    name: 'Website Toko Online (E-Commerce)',
-    price: 'Rp 2.950.000',
-    originalPrice: 'Rp 4.000.000',
-    deliveryTime: '7 - 10 Hari Kerja',
-    icon: ShoppingCart,
-    badge: 'TOKO DIGITAL',
-    desc: 'Website toko online profesional lengkap dengan keranjang belanja, integrasi ongkos kirim otomatis, diskon kupon, dan invoice order otomatis.',
+    id: 313,
+    category: 'web-media',
+    subCategory: 'forum',
+    name: 'Website Forum Komunitas & Diskusi',
+    price: 'Rp 3.200.000',
+    originalPrice: 'Rp 4.500.000',
+    deliveryTime: '7 - 14 Hari Kerja',
+    icon: BookMarked,
+    badge: 'KOMUNITAS DIGITAL',
+    desc: 'Platform website forum diskusi seperti Kaskus atau Reddit untuk wadah komunikasi anggota komunitas Anda.',
     features: [
-      'Katalog Produk Tanpa Batas (Unlimited Products)',
-      'Keranjang Belanja & Form Checkout Rapi',
-      'Hitung Ongkir Otomatis (Integrasi RajaOngkir seluruh kurir)',
-      'Integrasi Metode Pembayaran (WhatsApp Pay / Midtrans Gateway)',
-      'Dashboard Admin Kelola Orderan & Stok Produk',
-      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
+      'Sistem Registrasi Anggota & Profil Pengguna Custom',
+      'Pembuatan Thread Diskusi, Kategori, & Sistem Tagging',
+      'Fitur Upvote/Downvote, Reply, & Komentar Real-time',
+      'Sistem Moderasi Anggota & Penalti/Banned',
+      'Notifikasi Email / Web Push untuk Diskusi Aktif',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
+
+  // --- E-COMMERCE & BISNIS ---
   {
     id: 315,
     category: 'e-commerce',
@@ -464,7 +522,7 @@ const webServices = [
     deliveryTime: '2 - 4 Hari Kerja',
     icon: ShoppingCart,
     badge: 'KONVERSI TINGGI',
-    desc: 'Landing page dengan fokus tinggi pada konversi penjualan satu produk unggulan Anda, lengkap dengan checkout WhatsApp.',
+    desc: 'Landing page dengan fokus tinggi pada konversi penjualan satu product unggulan Anda, lengkap dengan checkout WhatsApp.',
     features: [
       'Desain Psikologi Penjualan (AIDA framework)',
       'Section Manfaat Produk, Galeri, & Detail Spesifikasi',
@@ -472,6 +530,26 @@ const webServices = [
       'Tombol Call-to-Action (CTA) Mengambang',
       'Integrasi WhatsApp Order Form & Pixel Tracking',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 332,
+    category: 'e-commerce',
+    subCategory: 'digital-product',
+    name: 'Website E-Commerce Produk Digital (SaaS / E-Book)',
+    price: 'Rp 1.950.000',
+    originalPrice: 'Rp 2.800.000',
+    deliveryTime: '4 - 7 Hari Kerja',
+    icon: ShoppingCart,
+    badge: 'PRODUK DIGITAL',
+    desc: 'Website toko online khusus menjual produk digital seperti e-book, lisensi software, template desain, atau aset digital dengan download instan.',
+    features: [
+      'Katalog Downloadable Products dengan Link Unduh Aman',
+      'Integrasi Sistem Pembayaran Otomatis (Midtrans/QRIS)',
+      'Pengiriman Tautan Download Otomatis via Email setelah Sukses',
+      'Sistem Proteksi Link Download dari Pembajakan',
+      'Dashboard Riwayat Pembelian & Profil Pembeli',
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
     ]
   },
   {
@@ -495,26 +573,6 @@ const webServices = [
     ]
   },
   {
-    id: 324,
-    category: 'e-commerce',
-    subCategory: 'multivendor',
-    name: 'Website E-Commerce Multi-Vendor (Marketplace)',
-    price: 'Rp 8.500.000',
-    originalPrice: 'Rp 12.000.000',
-    deliveryTime: '15 - 25 Hari Kerja',
-    icon: ShoppingCart,
-    badge: 'MULTI-VENDOR',
-    desc: 'Platform marketplace seperti Tokopedia atau Shopee skala mikro, di mana vendor lain dapat mendaftar dan menjual produk mereka.',
-    features: [
-      'Dashboard Khusus Penjual (Vendor Panel) & Pembeli',
-      'Sistem Bagi Hasil & Komisi Platform Otomatis',
-      'Hitung Ongkir Otomatis Multi-Alamat Vendor',
-      'Sistem Penarikan Dana (Withdrawal) Vendor',
-      'Fitur Chat Penjual-Pembeli & Ulasan Produk',
-      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
-    ]
-  },
-  {
     id: 325,
     category: 'e-commerce',
     subCategory: 'realestate-developer',
@@ -532,6 +590,46 @@ const webServices = [
       'Form Booking Survei Lokasi Terkoneksi WhatsApp',
       'Filter Pencarian Harga, Tipe, & Lokasi Properti',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 303,
+    category: 'e-commerce',
+    subCategory: 'ecommerce',
+    name: 'Website Toko Online (E-Commerce)',
+    price: 'Rp 2.950.000',
+    originalPrice: 'Rp 4.000.000',
+    deliveryTime: '7 - 10 Hari Kerja',
+    icon: ShoppingCart,
+    badge: 'TOKO DIGITAL',
+    desc: 'Website toko online profesional lengkap dengan keranjang belanja, integrasi ongkos kirim otomatis, diskon kupon, dan invoice order otomatis.',
+    features: [
+      'Katalog Produk Tanpa Batas (Unlimited Products)',
+      'Keranjang Belanja & Form Checkout Rapi',
+      'Hitung Ongkir Otomatis (Integrasi RajaOngkir seluruh kurir)',
+      'Integrasi Metode Pembayaran (WhatsApp Pay / Midtrans Gateway)',
+      'Dashboard Admin Kelola Orderan & Stok Produk',
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
+    ]
+  },
+  {
+    id: 324,
+    category: 'e-commerce',
+    subCategory: 'multivendor',
+    name: 'Website E-Commerce Multi-Vendor (Marketplace)',
+    price: 'Rp 8.500.000',
+    originalPrice: 'Rp 12.000.000',
+    deliveryTime: '15 - 25 Hari Kerja',
+    icon: ShoppingCart,
+    badge: 'MULTI-VENDOR',
+    desc: 'Platform marketplace seperti Tokopedia atau Shopee skala mikro, di mana vendor lain dapat mendaftar dan menjual produk mereka.',
+    features: [
+      'Dashboard Khusus Penjual (Vendor Panel) & Pembeli',
+      'Sistem Bagi Hasil & Komisi Platform Otomatis',
+      'Hitung Ongkir Otomatis Multi-Alamat Vendor',
+      'Sistem Penarikan Dana (Withdrawal) Vendor',
+      'Fitur Chat Penjual-Pembeli & Ulasan Produk',
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
     ]
   },
 
@@ -594,25 +692,6 @@ const webServices = [
       'Konfigurasi Name Server & DNS Records',
       'Pemasangan SSL Gratis (Let\'s Encrypt)',
       'Pengujian Hasil Migrasi Kompatibilitas Versi PHP'
-    ]
-  },
-  {
-    id: 326,
-    category: 'maintenance',
-    subCategory: 'malware-removal',
-    name: 'Jasa Pembersihan Malware / Perbaikan Hack',
-    price: 'Rp 850.000',
-    originalPrice: 'Rp 1.500.000',
-    deliveryTime: '1 - 2 Hari Kerja',
-    icon: ShieldCheck,
-    badge: 'PEMBERSIHAN VIRUS',
-    desc: 'Layanan darurat untuk membersihkan malware, virus, redirect spam, atau mengembalikan website WordPress Anda yang terkena hack.',
-    features: [
-      'Scanning & Pembersihan File Terinfeksi',
-      'Penutupan Celah Keamanan (Backdoor Protection)',
-      'Update Core, Theme, & Plugin yang Rentan',
-      'Penghapusan Blacklist Google / Google Warning',
-      'Setup Backup Otomatis & Firewall Tambahan'
     ]
   },
   {
@@ -845,7 +924,7 @@ export default function LayananPembuatanWebsite() {
                         className={`w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
                           isPopular
                             ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                            : 'bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200'
+                            : 'bg-gray-55 hover:bg-gray-100 text-gray-800 border border-gray-200'
                         }`}
                       >
                         Pesan Sekarang
@@ -879,7 +958,7 @@ export default function LayananPembuatanWebsite() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950"
+            className="fixed inset-0 z-100 flex items-center justify-center bg-slate-955"
           >
             {/* Wifi Loader - Golden Yellow Version */}
             <div
