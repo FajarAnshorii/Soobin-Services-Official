@@ -102,9 +102,9 @@ const webServices = [
       'Desain Premium & Responsive (Mobile Friendly)',
       '1 Halaman Utama Lengkap + Kontak WA',
       'Integrasi Formulir Pemesanan',
-      'Free Domain .my.id (1 Tahun)',
+      'Integrasi Link Sosial Media & WhatsApp Chat',
       'Optimasi SEO Dasar & Kecepatan Google PageSpeed',
-      'Free Hosting Cepat & Sertifikat SSL Aman'
+      'Setup Hosting Cepat & Sertifikat SSL Aman'
     ]
   },
   {
@@ -122,9 +122,9 @@ const webServices = [
       'Hingga 5 Halaman Dinamis (Home, About, Services, Gallery, Contact)',
       'Custom Layout Mewah & Elegan',
       'Integrasi Google Maps Lokasi & Hubungi WhatsApp',
-      'Free Domain .com (1 Tahun)',
+      'Optimasi Kecepatan & Responsif Mobile',
       'Sistem Artikel Blog / Berita Usaha',
-      'Free Hosting Premium & Sertifikat SSL Aman'
+      'Setup Hosting Premium & Sertifikat SSL Aman'
     ]
   },
   {
@@ -144,7 +144,7 @@ const webServices = [
       'Hitung Ongkir Otomatis (Integrasi RajaOngkir seluruh kurir)',
       'Integrasi Metode Pembayaran (WhatsApp Pay / Midtrans Gateway)',
       'Dashboard Admin Kelola Orderan & Stok Produk',
-      'Free Domain .com & Cloud Hosting Premium'
+      'Setup Cloud Hosting & Sertifikat SSL Aman'
     ]
   },
   {
@@ -152,8 +152,8 @@ const webServices = [
     category: 'development',
     subCategory: 'portal-berita',
     name: 'Website Portal Berita / Media Informasi',
-    price: 'Rp 3.450.000',
-    originalPrice: 'Rp 4.800.000',
+    price: 'Rp 2.500.000',
+    originalPrice: 'Rp 3.500.000',
     deliveryTime: '7 - 12 Hari Kerja',
     icon: BookMarked,
     badge: 'ADSENSE READY',
@@ -164,7 +164,7 @@ const webServices = [
       'Kolom Penempatan Iklan Strategis (Adsense ready)',
       'Fitur Newsletter & Berlangganan Email',
       'Optimasi SEO AMP Page & Kecepatan Akses',
-      'Free Domain .com & Cloud Hosting Premium'
+      'Setup Cloud Hosting & Sertifikat SSL Aman'
     ]
   },
   {
@@ -172,8 +172,8 @@ const webServices = [
     category: 'development',
     subCategory: 'edukasi',
     name: 'Website Portal Sekolah / Lembaga Pendidikan',
-    price: 'Rp 3.950.000',
-    originalPrice: 'Rp 5.500.000',
+    price: 'Rp 2.500.000',
+    originalPrice: 'Rp 3.500.000',
     deliveryTime: '7 - 14 Hari Kerja',
     icon: GraduationCap,
     badge: 'RESMI .SCH.ID',
@@ -182,9 +182,9 @@ const webServices = [
       'Profil Sekolah, Visi-Misi, & Struktur Organisasi',
       'PPDB Online (Penerimaan Peserta Didik Baru)',
       'Galeri Prestasi, Pengumuman, & Kegiatan Sekolah',
-      'Free Domain Resmi .sch.id / .ac.id (1 Tahun)',
+      'Optimasi SEO & Kecepatan Website',
       'Data Guru, Staff, & Fasilitas Pendidikan',
-      'Hosting Premium Khusus Pendidikan'
+      'Setup Hosting & Sertifikat SSL Aman'
     ]
   },
   {
@@ -204,7 +204,7 @@ const webServices = [
       'Fitur Laporan Penjualan/Stok & Export PDF/Excel',
       'Arsitektur Next.js / NestJS Modern & Aman',
       'PWA (Progressive Web App) Bisa Install di HP',
-      'Cloud Server Dedicated (Vercel/AWS/DigitalOcean)'
+      'Setup Cloud Server & Deployment Aman'
     ]
   },
   {
@@ -223,8 +223,8 @@ const webServices = [
       'Interactive Resume & CV Downloadable',
       'Galeri Portofolio Hasil Karya Terstruktur',
       'Form Kontak Langsung Masuk ke Email/WhatsApp',
-      'Free Domain .my.id (1 Tahun)',
-      'Hosting Super Cepat & Ringan'
+      'Integrasi Link Sosial Media',
+      'Setup Hosting & Sertifikat SSL Aman'
     ]
   },
   {
