@@ -840,7 +840,7 @@ export default function LayananPembuatanWebsite() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group bg-white ${
+                  className={`h-full relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 group bg-white ${
                     isPopular 
                       ? 'border-amber-400 shadow-[0_10px_35px_rgba(245,158,11,0.08)] ring-1 ring-amber-400/20'
                       : 'border-gray-200 hover:border-amber-400/50 shadow-sm hover:shadow-md'
@@ -888,7 +888,7 @@ export default function LayananPembuatanWebsite() {
                     {/* Price Block */}
                     <div className="mt-2">
                       <span className="text-4xl font-extrabold text-gray-900">{service.price}</span>
-                      <p className="text-xs text-gray-500 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
+                      <p className="text-xs text-gray-505 mt-1.5 font-medium leading-relaxed flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-amber-500" />
                         <span>Estimasi: {service.deliveryTime}</span>
                       </p>
@@ -921,11 +921,7 @@ export default function LayananPembuatanWebsite() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => placeDirectOrder(service.name)}
-                        className={`w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
-                          isPopular
-                            ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                            : 'bg-gray-55 hover:bg-gray-100 text-gray-800 border border-gray-200'
-                        }`}
+                        className="w-full py-3.5 rounded-2xl text-center text-sm font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20 hover:-translate-y-0.5 transition-all duration-300 block"
                       >
                         Pesan Sekarang
                       </a>

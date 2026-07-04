@@ -444,7 +444,7 @@ export default function PembuatanWebsitePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
+                  className={`h-full relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                     plan.popular
                       ? 'border-amber-400 bg-white shadow-[0_10px_35px_rgba(245,158,11,0.08)] ring-1 ring-amber-400/20'
                       : 'border-gray-200 bg-white hover:border-amber-400/50 shadow-sm hover:shadow-md'
@@ -469,7 +469,7 @@ export default function PembuatanWebsitePage() {
                     {/* Price Block */}
                     <div className="mt-4">
                       <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
-                      <p className="text-xs text-gray-500 mt-1.5 font-medium leading-relaxed">
+                      <p className="text-xs text-gray-505 mt-1.5 font-medium leading-relaxed">
                         {i === 0 ? 'Estimasi pengerjaan: 2-3 hari kerja' : i === 1 ? 'Estimasi pengerjaan: 4-6 hari kerja' : 'Estimasi pengerjaan: 7-10 hari kerja'}
                       </p>
                     </div>
@@ -497,11 +497,7 @@ export default function PembuatanWebsitePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => placeDirectOrder(`Website Paket ${plan.title}`)}
-                    className={`mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all duration-300 block ${
-                      plan.popular
-                        ? 'bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20'
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200'
-                    }`}
+                    className="mt-8 w-full py-3.5 rounded-2xl text-center text-sm font-bold bg-amber-400 hover:bg-amber-350 text-black shadow-lg shadow-amber-400/20 hover:-translate-y-0.5 transition-all duration-300 block"
                   >
                     Pesan Paket
                   </a>
