@@ -79,17 +79,18 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
 
 const serviceCategories = [
   { id: 'all', label: 'Semua Layanan', icon: Filter },
-  { id: 'development', label: 'Web Development', icon: Code },
-  { id: 'design-profile', label: 'Company Profile & Personal', icon: Users },
-  { id: 'e-commerce', label: 'E-Commerce / Toko Online', icon: ShoppingCart },
-  { id: 'optimization-seo', label: 'Optimasi & SEO', icon: Zap },
-  { id: 'maintenance', label: 'Pemeliharaan / Bug Fix', icon: ShieldCheck }
+  { id: 'web-umum', label: 'Jasa Web Umum', icon: Globe },
+  { id: 'web-pendidikan', label: 'Web Pendidikan', icon: GraduationCap },
+  { id: 'web-media', label: 'Web Media & Informasi', icon: BookMarked },
+  { id: 'e-commerce', label: 'E-Commerce & Bisnis', icon: ShoppingCart },
+  { id: 'maintenance', label: 'Optimasi & Pemeliharaan', icon: ShieldCheck }
 ];
 
 const webServices = [
+  // --- JASA WEB UMUM ---
   {
     id: 301,
-    category: 'development',
+    category: 'web-umum',
     subCategory: 'landing-page',
     name: 'Website Landing Page (Single Page)',
     price: 'Rp 650.000',
@@ -109,7 +110,7 @@ const webServices = [
   },
   {
     id: 302,
-    category: 'design-profile',
+    category: 'web-umum',
     subCategory: 'company-profile',
     name: 'Website Company Profile Profesional',
     price: 'Rp 1.450.000',
@@ -127,6 +128,192 @@ const webServices = [
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
+  {
+    id: 307,
+    category: 'web-umum',
+    subCategory: 'personal',
+    name: 'Website Portofolio Pribadi (Personal Brand)',
+    price: 'Rp 550.000',
+    originalPrice: 'Rp 800.000',
+    deliveryTime: '2 - 3 Hari Kerja',
+    icon: Users,
+    badge: 'PERSONAL BRAND',
+    desc: 'Website portofolio interaktif untuk memamerkan resume, riwayat kerja, riwayat edukasi, keahlian, dan hasil karya kreatif Anda untuk melamar kerja/freelance.',
+    features: [
+      'Desain Minimalis Elegan & Kreatif',
+      'Interactive Resume & CV Downloadable',
+      'Galeri Portofolio Hasil Karya Terstruktur',
+      'Form Kontak Langsung Masuk ke Email/WhatsApp',
+      'Integrasi Link Sosial Media',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 308,
+    category: 'web-umum',
+    subCategory: 'redesign',
+    name: 'Jasa Redesain / Upgrade Website Lama',
+    price: 'Rp 950.000',
+    originalPrice: 'Rp 1.400.000',
+    deliveryTime: '4 - 7 Hari Kerja',
+    icon: RefreshCw,
+    badge: 'TAMPILAN BARU',
+    desc: 'Ubah tampilan website lama Anda menjadi jauh lebih modern, elegan, responsif, berkecepatan tinggi, dan ramah pengguna (user-friendly).',
+    features: [
+      'Analisis Komprehensif Desain & Struktur Lama',
+      'Redesain UI/UX Modern & Khas Brand Anda',
+      'Peningkatan Kecepatan Load Drastis',
+      'Migrasi Data & Aset Lama Tanpa Takut Hilang',
+      'Optimasi SEO On-Page Ulang',
+      'Penyesuaian Skema Warna Premium'
+    ]
+  },
+  {
+    id: 306,
+    category: 'web-umum',
+    subCategory: 'custom-app',
+    name: 'Website Custom Web App (SaaS / Sistem Informasi)',
+    price: 'Rp 9.950.000',
+    originalPrice: 'Rp 14.500.000',
+    deliveryTime: '21 - 30 Hari Kerja',
+    icon: Database,
+    badge: 'SISTEM KUSTOM',
+    desc: 'Sistem aplikasi berbasis web custom untuk kebutuhan spesifik perusahaan Anda seperti Sistem Inventory, ERP, CRM, HRIS, atau Sistem Antrean.',
+    features: [
+      'Custom Database & Skema Relasional (PostgreSQL/MySQL)',
+      'Sistem Multi-User dengan Hak Akses (RBAC)',
+      'Fitur Laporan Penjualan/Stok & Export PDF/Excel',
+      'Arsitektur Next.js / NestJS Modern & Aman',
+      'PWA (Progressive Web App) Bisa Install di HP',
+      'Setup & Deploy (Belum termasuk cloud server dedicated)'
+    ]
+  },
+
+  // --- WEB PENDIDIKAN ---
+  {
+    id: 305,
+    category: 'web-pendidikan',
+    subCategory: 'edukasi',
+    name: 'Website Portal Sekolah / Lembaga Pendidikan',
+    price: 'Rp 2.500.000',
+    originalPrice: 'Rp 3.500.000',
+    deliveryTime: '7 - 14 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'PORTAL PENDIDIKAN',
+    desc: 'Website resmi sekolah, universitas, atau yayasan bimbingan belajar dengan fitur pengumuman nilai, data guru/siswa, & pendaftaran siswa baru.',
+    features: [
+      'Profil Sekolah, Visi-Misi, & Struktur Organisasi',
+      'PPDB Online (Penerimaan Peserta Didik Baru)',
+      'Galeri Prestasi, Pengumuman, & Kegiatan Sekolah',
+      'Optimasi SEO & Kecepatan Website',
+      'Data Guru, Staff, & Fasilitas Pendidikan',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 311,
+    category: 'web-pendidikan',
+    subCategory: 'e-learning',
+    name: 'Website E-Learning & LMS (Learning System)',
+    price: 'Rp 4.950.000',
+    originalPrice: 'Rp 7.000.000',
+    deliveryTime: '10 - 20 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'KELAS ONLINE',
+    desc: 'Platform pembelajaran online lengkap dengan fitur upload materi video/pdf, kuis interaktif, pengerjaan tugas, dan manajemen nilai siswa.',
+    features: [
+      'Sistem Manajemen Kelas & Kursus Unlimited',
+      'Upload Materi Video, PDF, & File Pendukung',
+      'Kuis Pilihan Ganda & Tugas dengan Nilai Otomatis',
+      'Dashboard Guru, Siswa, & Administrator',
+      'Sertifikat Kelulusan Otomatis setelah Kelas Selesai',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 312,
+    category: 'web-pendidikan',
+    subCategory: 'bimbel',
+    name: 'Website Bimbel & Kursus Private',
+    price: 'Rp 1.950.000',
+    originalPrice: 'Rp 2.800.000',
+    deliveryTime: '5 - 10 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'BIMBEL DIGITAL',
+    desc: 'Website promosi lembaga bimbingan belajar atau kursus privat lengkap dengan jadwal kelas dan form pendaftaran.',
+    features: [
+      'Profil Mentor/Tentor & Pilihan Paket Belajar',
+      'Jadwal Kelas & Form Booking Slot Jadwal Belajar',
+      'Integrasi Kontak Pengajar Langsung ke WhatsApp',
+      'Galeri Testimoni Siswa & Galeri Foto Kegiatan',
+      'Optimasi Landing Page Konversi Pendaftaran Tinggi',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+
+  // --- WEB MEDIA & INFORMASI ---
+  {
+    id: 304,
+    category: 'web-media',
+    subCategory: 'portal-berita',
+    name: 'Website Portal Berita / Media Informasi',
+    price: 'Rp 2.500.000',
+    originalPrice: 'Rp 3.500.000',
+    deliveryTime: '7 - 12 Hari Kerja',
+    icon: BookMarked,
+    badge: 'MEDIA INFORMASI',
+    desc: 'Website portal informasi berita, opini, artikel, atau majalah digital yang dioptimasi untuk trafik tinggi dan Google Adsense.',
+    features: [
+      'Sistem Multi-Kategori & Tag Berita Rapi',
+      'Fitur Penulis/Kontributor Multi-User',
+      'Kolom Penempatan Iklan Strategis (Adsense ready)',
+      'Fitur Newsletter & Berlangganan Email',
+      'Optimasi SEO AMP Page & Kecepatan Akses',
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
+    ]
+  },
+  {
+    id: 313,
+    category: 'web-media',
+    subCategory: 'forum',
+    name: 'Website Forum Komunitas & Diskusi',
+    price: 'Rp 3.200.000',
+    originalPrice: 'Rp 4.500.000',
+    deliveryTime: '7 - 14 Hari Kerja',
+    icon: BookMarked,
+    badge: 'KOMUNITAS DIGITAL',
+    desc: 'Platform website forum diskusi seperti Kaskus atau Reddit untuk wadah komunikasi anggota komunitas Anda.',
+    features: [
+      'Sistem Registrasi Anggota & Profil Pengguna Custom',
+      'Pembuatan Thread Diskusi, Kategori, & Sistem Tagging',
+      'Fitur Upvote/Downvote, Reply, & Komentar Real-time',
+      'Sistem Moderasi Anggota & Penalti/Banned',
+      'Notifikasi Email / Web Push untuk Diskusi Aktif',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 314,
+    category: 'web-media',
+    subCategory: 'event',
+    name: 'Website Landing Page Event & Registrasi',
+    price: 'Rp 850.000',
+    originalPrice: 'Rp 1.300.000',
+    deliveryTime: '3 - 5 Hari Kerja',
+    icon: Globe,
+    badge: 'EVENT ONLINE',
+    desc: 'Halaman informasi khusus event, webinar, seminar, atau konser lengkap dengan tiket digital dan form registrasi online.',
+    features: [
+      'Informasi Jadwal, Rundown, & Pembicara/Guest Star',
+      'Formulir Pendaftaran & Pengiriman Tiket ke Email/WA',
+      'Integrasi Sistem Scan QR Code Tiket Masuk',
+      'Hitung Mundur Acara (Countdown Timer) Dinamis',
+      'Optimasi Landing Page Konversi Kehadiran',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+
+  // --- E-COMMERCE & BISNIS ---
   {
     id: 303,
     category: 'e-commerce',
@@ -148,108 +335,50 @@ const webServices = [
     ]
   },
   {
-    id: 304,
-    category: 'development',
-    subCategory: 'portal-berita',
-    name: 'Website Portal Berita / Media Informasi',
-    price: 'Rp 2.500.000',
-    originalPrice: 'Rp 3.500.000',
-    deliveryTime: '7 - 12 Hari Kerja',
-    icon: BookMarked,
-    badge: 'MEDIA INFORMASI',
-    desc: 'Website portal informasi berita, opini, artikel, atau majalah digital yang dioptimasi untuk trafik tinggi dan Google Adsense.',
+    id: 315,
+    category: 'e-commerce',
+    subCategory: 'landing-produk',
+    name: 'Website Landing Page Produk (Sales Page)',
+    price: 'Rp 790.000',
+    originalPrice: 'Rp 1.200.000',
+    deliveryTime: '2 - 4 Hari Kerja',
+    icon: ShoppingCart,
+    badge: 'KONVERSI TINGGI',
+    desc: 'Landing page dengan fokus tinggi pada konversi penjualan satu produk unggulan Anda, lengkap dengan checkout WhatsApp.',
     features: [
-      'Sistem Multi-Kategori & Tag Berita Rapi',
-      'Fitur Penulis/Kontributor Multi-User',
-      'Kolom Penempatan Iklan Strategis (Adsense ready)',
-      'Fitur Newsletter & Berlangganan Email',
-      'Optimasi SEO AMP Page & Kecepatan Akses',
-      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
-    ]
-  },
-  {
-    id: 305,
-    category: 'development',
-    subCategory: 'edukasi',
-    name: 'Website Portal Sekolah / Lembaga Pendidikan',
-    price: 'Rp 2.500.000',
-    originalPrice: 'Rp 3.500.000',
-    deliveryTime: '7 - 14 Hari Kerja',
-    icon: GraduationCap,
-    badge: 'PORTAL PENDIDIKAN',
-    desc: 'Website resmi sekolah, universitas, atau yayasan bimbingan belajar dengan fitur pengumuman nilai, data guru/siswa, & pendaftaran siswa baru.',
-    features: [
-      'Profil Sekolah, Visi-Misi, & Struktur Organisasi',
-      'PPDB Online (Penerimaan Peserta Didik Baru)',
-      'Galeri Prestasi, Pengumuman, & Kegiatan Sekolah',
-      'Optimasi SEO & Kecepatan Website',
-      'Data Guru, Staff, & Fasilitas Pendidikan',
+      'Desain Psikologi Penjualan (AIDA framework)',
+      'Section Manfaat Produk, Galeri, & Detail Spesifikasi',
+      'Fitur Testimoni Pembeli & F.A.Q Section',
+      'Tombol Call-to-Action (CTA) Mengambang',
+      'Integrasi WhatsApp Order Form & Pixel Tracking',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
-    id: 306,
-    category: 'development',
-    subCategory: 'custom-app',
-    name: 'Website Custom Web App (SaaS / Sistem Informasi)',
-    price: 'Rp 9.950.000',
-    originalPrice: 'Rp 14.500.000',
-    deliveryTime: '21 - 30 Hari Kerja',
-    icon: Database,
-    badge: 'SISTEM KUSTOM',
-    desc: 'Sistem aplikasi berbasis web custom untuk kebutuhan spesifik perusahaan Anda seperti Sistem Inventory, ERP, CRM, HRIS, atau Sistem Antrean.',
+    id: 316,
+    category: 'e-commerce',
+    subCategory: 'booking-system',
+    name: 'Website Sistem Booking & Reservasi',
+    price: 'Rp 2.200.000',
+    originalPrice: 'Rp 3.000.000',
+    deliveryTime: '5 - 9 Hari Kerja',
+    icon: Monitor,
+    badge: 'SYSTEM BOOKING',
+    desc: 'Website pemesanan jasa, reservasi meja restoran, klinik kecantikan, hotel, atau penyewaan kendaraan online.',
     features: [
-      'Custom Database & Skema Relasional (PostgreSQL/MySQL)',
-      'Sistem Multi-User dengan Hak Akses (RBAC)',
-      'Fitur Laporan Penjualan/Stok & Export PDF/Excel',
-      'Arsitektur Next.js / NestJS Modern & Aman',
-      'PWA (Progressive Web App) Bisa Install di HP',
-      'Setup & Deploy (Belum termasuk cloud server dedicated)'
-    ]
-  },
-  {
-    id: 307,
-    category: 'design-profile',
-    subCategory: 'personal',
-    name: 'Website Portofolio Pribadi (Personal Brand)',
-    price: 'Rp 550.000',
-    originalPrice: 'Rp 800.000',
-    deliveryTime: '2 - 3 Hari Kerja',
-    icon: Users,
-    badge: 'PERSONAL BRAND',
-    desc: 'Website portofolio interaktif untuk memamerkan resume, riwayat kerja, riwayat edukasi, keahlian, dan hasil karya kreatif Anda untuk melamar kerja/freelance.',
-    features: [
-      'Desain Minimalis Elegan & Kreatif',
-      'Interactive Resume & CV Downloadable',
-      'Galeri Portofolio Hasil Karya Terstruktur',
-      'Form Kontak Langsung Masuk ke Email/WhatsApp',
-      'Integrasi Link Sosial Media',
+      'Kalender Pemilihan Tanggal & Jam Reservasi',
+      'Sistem Manajemen Kuota/Ketersediaan Otomatis',
+      'Pembayaran DP atau Full Terintegrasi',
+      'Pengiriman Konfirmasi Reservasi Otomatis via WA/Email',
+      'Dashboard Kelola Jadwal Booking & Customer',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
-  {
-    id: 308,
-    category: 'design-profile',
-    subCategory: 'redesign',
-    name: 'Jasa Redesain / Upgrade Website Lama',
-    price: 'Rp 950.000',
-    originalPrice: 'Rp 1.400.000',
-    deliveryTime: '4 - 7 Hari Kerja',
-    icon: RefreshCw,
-    badge: 'TAMPILAN BARU',
-    desc: 'Ubah tampilan website lama Anda menjadi jauh lebih modern, elegan, responsif, berkecepatan tinggi, dan ramah pengguna (user-friendly).',
-    features: [
-      'Analisis Komprehensif Desain & Struktur Lama',
-      'Redesain UI/UX Modern & Khas Brand Anda',
-      'Peningkatan Kecepatan Load Drastis',
-      'Migrasi Data & Aset Lama Tanpa Takut Hilang',
-      'Optimasi SEO On-Page Ulang',
-      'Penyesuaian Skema Warna Premium'
-    ]
-  },
+
+  // --- OPTIMASI & PEMELIHARAAN ---
   {
     id: 309,
-    category: 'optimization-seo',
+    category: 'maintenance',
     subCategory: 'seo-optimization',
     name: 'Jasa Optimasi Kecepatan & SEO Website',
     price: 'Rp 750.000',
@@ -285,6 +414,26 @@ const webServices = [
       'Penyelesaian Masalah Bug/Error Secara Cepat',
       'Bantuan Update/Edit Konten Ringan (5x / Bulan)',
       'Laporan Bulanan Performa Website'
+    ]
+  },
+  {
+    id: 317,
+    category: 'maintenance',
+    subCategory: 'migrasi-vps',
+    name: 'Jasa Migrasi Server & Setup VPS',
+    price: 'Rp 600.000',
+    originalPrice: 'Rp 950.000',
+    deliveryTime: '1 - 3 Hari Kerja',
+    icon: Database,
+    badge: 'MIGRASI AMAN',
+    desc: 'Layanan pemindahan data website dari hosting lama ke hosting baru atau setup server VPS dedicated untuk performa tinggi.',
+    features: [
+      'Migrasi File Website & Database Tanpa Downtime',
+      'Setup Server VPS (Ubuntu/CentOS) dengan Panel Kontrol',
+      'Optimasi Caching Server & Keamanan Firewalls',
+      'Konfigurasi Name Server & DNS Records',
+      'Pemasangan SSL Gratis (Let\'s Encrypt)',
+      'Pengujian Hasil Migrasi Kompatibilitas Versi PHP'
     ]
   }
 ];
