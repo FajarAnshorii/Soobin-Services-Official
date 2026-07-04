@@ -104,7 +104,7 @@ const webServices = [
       'Integrasi Formulir Pemesanan',
       'Integrasi Link Sosial Media & WhatsApp Chat',
       'Optimasi SEO Dasar & Kecepatan Google PageSpeed',
-      'Setup Hosting Cepat & Sertifikat SSL Aman'
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
@@ -124,7 +124,7 @@ const webServices = [
       'Integrasi Google Maps Lokasi & Hubungi WhatsApp',
       'Optimasi Kecepatan & Responsif Mobile',
       'Sistem Artikel Blog / Berita Usaha',
-      'Setup Hosting Premium & Sertifikat SSL Aman'
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
@@ -144,7 +144,7 @@ const webServices = [
       'Hitung Ongkir Otomatis (Integrasi RajaOngkir seluruh kurir)',
       'Integrasi Metode Pembayaran (WhatsApp Pay / Midtrans Gateway)',
       'Dashboard Admin Kelola Orderan & Stok Produk',
-      'Setup Cloud Hosting & Sertifikat SSL Aman'
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
     ]
   },
   {
@@ -164,7 +164,7 @@ const webServices = [
       'Kolom Penempatan Iklan Strategis (Adsense ready)',
       'Fitur Newsletter & Berlangganan Email',
       'Optimasi SEO AMP Page & Kecepatan Akses',
-      'Setup Cloud Hosting & Sertifikat SSL Aman'
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
     ]
   },
   {
@@ -184,7 +184,7 @@ const webServices = [
       'Galeri Prestasi, Pengumuman, & Kegiatan Sekolah',
       'Optimasi SEO & Kecepatan Website',
       'Data Guru, Staff, & Fasilitas Pendidikan',
-      'Setup Hosting & Sertifikat SSL Aman'
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
@@ -204,7 +204,7 @@ const webServices = [
       'Fitur Laporan Penjualan/Stok & Export PDF/Excel',
       'Arsitektur Next.js / NestJS Modern & Aman',
       'PWA (Progressive Web App) Bisa Install di HP',
-      'Setup Cloud Server & Deployment Aman'
+      'Setup & Deploy (Belum termasuk cloud server dedicated)'
     ]
   },
   {
@@ -224,7 +224,7 @@ const webServices = [
       'Galeri Portofolio Hasil Karya Terstruktur',
       'Form Kontak Langsung Masuk ke Email/WhatsApp',
       'Integrasi Link Sosial Media',
-      'Setup Hosting & Sertifikat SSL Aman'
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
@@ -353,6 +353,7 @@ export default function LayananPembuatanWebsite() {
           >
             Daftar paket jasa pembuatan website profesional terlengkap di Indonesia. 
             Semua proses dikerjakan langsung menggunakan MacBook Air M2 berkecepatan tinggi dengan jaminan kualitas kode bersih, SEO-friendly, dan gratis konsultasi.
+            <span className="block mt-2 font-bold text-amber-600 text-xs sm:text-sm">*Catatan: Semua harga di bawah belum termasuk biaya sewa domain, hosting, atau cloud (disediakan oleh klien).</span>
           </motion.p>
         </div>
       </div>
