@@ -149,6 +149,26 @@ const webServices = [
     ]
   },
   {
+    id: 318,
+    category: 'web-umum',
+    subCategory: 'sales-funnel',
+    name: 'Website Landing Page Sales Funnel (Multi-Step)',
+    price: 'Rp 950.000',
+    originalPrice: 'Rp 1.400.000',
+    deliveryTime: '3 - 5 Hari Kerja',
+    icon: Globe,
+    badge: 'FUNNEL SALES',
+    desc: 'Sistem landing page multi-step terstruktur (Landing Page -> Checkout Page -> Thank You Page) untuk mengoptimalkan penjualan produk digital/fisik Anda.',
+    features: [
+      'Multi-Step Pages (Sales, Checkout, Thank You)',
+      'Order Bump & Upsell/Downsell Setup',
+      'Integrasi Formulir Data Customer & WhatsApp',
+      'Pixel Tracking (Facebook, Google, TikTok)',
+      'Optimasi Copywriting Menjual',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
     id: 308,
     category: 'web-umum',
     subCategory: 'redesign',
@@ -166,6 +186,26 @@ const webServices = [
       'Migrasi Data & Aset Lama Tanpa Takut Hilang',
       'Optimasi SEO On-Page Ulang',
       'Penyesuaian Skema Warna Premium'
+    ]
+  },
+  {
+    id: 319,
+    category: 'web-umum',
+    subCategory: 'job-board',
+    name: 'Website Portal Lowongan Kerja (Job Board)',
+    price: 'Rp 2.900.000',
+    originalPrice: 'Rp 4.000.000',
+    deliveryTime: '7 - 12 Hari Kerja',
+    icon: Users,
+    badge: 'LOWONGAN KERJA',
+    desc: 'Portal website lowongan kerja untuk mempertemukan perusahaan yang mencari pekerja dengan para pencari kerja (job seekers).',
+    features: [
+      'Sistem Registrasi Perusahaan & Pencari Kerja',
+      'Dashboard Pasang Lowongan & Unggah CV/Resume',
+      'Fitur Filter Pencarian Kerja Berdasarkan Lokasi & Gaji',
+      'Sistem Bookmark Lowongan & Kirim Lamaran Instant',
+      'Dashboard Admin untuk Kurasi & Approval Postingan',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
   {
@@ -250,6 +290,46 @@ const webServices = [
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
+  {
+    id: 320,
+    category: 'web-pendidikan',
+    subCategory: 'pesantren-yayasan',
+    name: 'Website Portal Pondok Pesantren / Yayasan',
+    price: 'Rp 2.200.000',
+    originalPrice: 'Rp 3.200.000',
+    deliveryTime: '6 - 10 Hari Kerja',
+    icon: GraduationCap,
+    badge: 'PORTAL YAYASAN',
+    desc: 'Website khusus pondok pesantren, panti asuhan, atau yayasan keagamaan/sosial dengan fitur donasi online dan info kegiatan.',
+    features: [
+      'Profil Lengkap, Visi-Misi, & Sejarah Yayasan',
+      'Formulir Pendaftaran Santri Baru / Donatur',
+      'Integrasi Donasi Online (Transfer Bank / Midtrans)',
+      'Laporan Transparansi Dana Masuk & Keluar',
+      'Galeri Dokumentasi Kegiatan & Pengumuman',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 321,
+    category: 'web-pendidikan',
+    subCategory: 'perpustakaan-digital',
+    name: 'Website Perpustakaan Digital (Digital Library)',
+    price: 'Rp 2.750.000',
+    originalPrice: 'Rp 3.800.000',
+    deliveryTime: '7 - 12 Hari Kerja',
+    icon: BookMarked,
+    badge: 'PERPUSTAKAAN',
+    desc: 'Website katalog buku perpustakaan sekolah/lembaga lengkap dengan sistem peminjaman, pencarian buku, dan denda keterlambatan.',
+    features: [
+      'Katalog Buku Lengkap dengan Kategori & Penulis',
+      'Sistem Cari Buku & Cek Ketersediaan Stok Fisik',
+      'Sistem Peminjaman & Pengembalian Buku Anggota',
+      'Hitung Denda Otomatis Terlambat Pengembalian',
+      'Dashboard Statistik Peminjaman Buku Terpopuler',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
 
   // --- WEB MEDIA & INFORMASI ---
   {
@@ -309,6 +389,46 @@ const webServices = [
       'Integrasi Sistem Scan QR Code Tiket Masuk',
       'Hitung Mundur Acara (Countdown Timer) Dinamis',
       'Optimasi Landing Page Konversi Kehadiran',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 322,
+    category: 'web-media',
+    subCategory: 'blog-personal',
+    name: 'Website Blog Personal / Portfolio Penulis',
+    price: 'Rp 690.000',
+    originalPrice: 'Rp 990.000',
+    deliveryTime: '2 - 4 Hari Kerja',
+    icon: BookMarked,
+    badge: 'BLOG CREATOR',
+    desc: 'Website blog personal minimalis modern bagi influencer, penulis, kolumnis, atau pehobi yang ingin membagikan artikel secara profesional.',
+    features: [
+      'Desain Blog Estetis berfokus pada Keterbacaan Teks',
+      'Kategori Artikel, Tagging, & Kolom Pencarian',
+      'Integrasi Newsletter (Mailchimp / Substack)',
+      'Fitur Share Otomatis ke Sosial Media',
+      'SEO Friendly & Adsense Ready Template',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
+  {
+    id: 323,
+    category: 'web-media',
+    subCategory: 'directory-listing',
+    name: 'Website Directory / Yellow Pages Lokal',
+    price: 'Rp 2.450.000',
+    originalPrice: 'Rp 3.500.000',
+    deliveryTime: '6 - 10 Hari Kerja',
+    icon: Globe,
+    badge: 'DIREKTORI BISNIS',
+    desc: 'Website direktori listing bisnis lokal, tempat wisata, kuliner, atau ulasan jasa terdekat di kota Anda.',
+    features: [
+      'Sistem Pengajuan Listing Tempat / Bisnis Baru',
+      'Peta Lokasi Google Maps Terintegrasi',
+      'Fitur Rating & Review Pengunjung',
+      'Filter Cari Berdasarkan Kategori & Jarak',
+      'Form Kontak Owner Tempat via WhatsApp',
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
@@ -374,6 +494,46 @@ const webServices = [
       'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
     ]
   },
+  {
+    id: 324,
+    category: 'e-commerce',
+    subCategory: 'multivendor',
+    name: 'Website E-Commerce Multi-Vendor (Marketplace)',
+    price: 'Rp 8.500.000',
+    originalPrice: 'Rp 12.000.000',
+    deliveryTime: '15 - 25 Hari Kerja',
+    icon: ShoppingCart,
+    badge: 'MULTI-VENDOR',
+    desc: 'Platform marketplace seperti Tokopedia atau Shopee skala mikro, di mana vendor lain dapat mendaftar dan menjual produk mereka.',
+    features: [
+      'Dashboard Khusus Penjual (Vendor Panel) & Pembeli',
+      'Sistem Bagi Hasil & Komisi Platform Otomatis',
+      'Hitung Ongkir Otomatis Multi-Alamat Vendor',
+      'Sistem Penarikan Dana (Withdrawal) Vendor',
+      'Fitur Chat Penjual-Pembeli & Ulasan Produk',
+      'Setup & Deploy ke Cloud (Belum termasuk cloud hosting/domain)'
+    ]
+  },
+  {
+    id: 325,
+    category: 'e-commerce',
+    subCategory: 'realestate-developer',
+    name: 'Website Developer / Real Estate Properti',
+    price: 'Rp 2.800.000',
+    originalPrice: 'Rp 4.000.000',
+    deliveryTime: '6 - 10 Hari Kerja',
+    icon: Monitor,
+    badge: 'PROPERTY PRO',
+    desc: 'Website katalog properti, perumahan, atau apartemen untuk developer real estate dan agen properti independen.',
+    features: [
+      'Listing Properti Aktif dengan Kategori Jual/Sewa',
+      'Spesifikasi Properti Lengkap (Kamar Tidur, Luas Tanah, dll)',
+      'Galeri Foto/Video Properti & 3D Virtual Tour Link',
+      'Form Booking Survei Lokasi Terkoneksi WhatsApp',
+      'Filter Pencarian Harga, Tipe, & Lokasi Properti',
+      'Setup & Deploy ke Hosting (Belum termasuk hosting/domain)'
+    ]
+  },
 
   // --- OPTIMASI & PEMELIHARAAN ---
   {
@@ -434,6 +594,44 @@ const webServices = [
       'Konfigurasi Name Server & DNS Records',
       'Pemasangan SSL Gratis (Let\'s Encrypt)',
       'Pengujian Hasil Migrasi Kompatibilitas Versi PHP'
+    ]
+  },
+  {
+    id: 326,
+    category: 'maintenance',
+    subCategory: 'malware-removal',
+    name: 'Jasa Pembersihan Malware / Perbaikan Hack',
+    price: 'Rp 850.000',
+    originalPrice: 'Rp 1.500.000',
+    deliveryTime: '1 - 2 Hari Kerja',
+    icon: ShieldCheck,
+    badge: 'PEMBERSIHAN VIRUS',
+    desc: 'Layanan darurat untuk membersihkan malware, virus, redirect spam, atau mengembalikan website WordPress Anda yang terkena hack.',
+    features: [
+      'Scanning & Pembersihan File Terinfeksi',
+      'Penutupan Celah Keamanan (Backdoor Protection)',
+      'Update Core, Theme, & Plugin yang Rentan',
+      'Penghapusan Blacklist Google / Google Warning',
+      'Setup Backup Otomatis & Firewall Tambahan'
+    ]
+  },
+  {
+    id: 327,
+    category: 'maintenance',
+    subCategory: 'payment-integration',
+    name: 'Jasa Integrasi Payment Gateway',
+    price: 'Rp 700.000',
+    originalPrice: 'Rp 1.200.000',
+    deliveryTime: '2 - 4 Hari Kerja',
+    icon: Zap,
+    badge: 'PAYMENT GATEWAY',
+    desc: 'Integrasi gerbang pembayaran otomatis ke website Anda agar bisa menerima bayaran via e-wallet, QRIS, transfer bank, dan kartu kredit.',
+    features: [
+      'Pemasangan API Midtrans, Xendit, atau Doku',
+      'Konfigurasi Callback / Notification Payment',
+      'Pengujian Transaksi Sandbox & Live Mode',
+      'Setup Invoice Otomatis Pasca Pembayaran Sukses',
+      'Keamanan Enkripsi Transaksi SSL'
     ]
   }
 ];
