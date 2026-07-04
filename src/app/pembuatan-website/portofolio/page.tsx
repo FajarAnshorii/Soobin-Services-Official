@@ -148,6 +148,151 @@ export default function PortofolioPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-800 pt-28 pb-16 font-sans selection:bg-amber-400 selection:text-black">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .card_container {
+          --X: 0deg;
+          --Y: 0deg;
+          --Z: 0deg;
+          --angleX: 15deg;
+          --angleY: 20deg;
+          cursor: pointer;
+          position: relative;
+          width: 17rem;
+          height: 12rem;
+          perspective: 1000px;
+        }
+        .card_hover {
+          position: absolute;
+          z-index: 10;
+          top: 0;
+          left: 0;
+          display: flex;
+          flex-wrap: wrap;
+          width: 100%;
+          height: 100%;
+        }
+        .card_hover .part {
+          width: 20%;
+          height: calc(100% / 3);
+          background-color: transparent;
+        }
+        .card_container:has(.part-1:hover) {
+          --X: var(--angleX);
+          --Y: calc(var(--angleY) * -1);
+        }
+        .card_container:has(.part-2:hover) {
+          --X: var(--angleX);
+          --Y: calc((var(--angleY) / 2) * -1);
+        }
+        .card_container:has(.part-3:hover) {
+          --X: var(--angleX);
+        }
+        .card_container:has(.part-4:hover) {
+          --X: var(--angleX);
+          --Y: calc(var(--angleY) / 2);
+        }
+        .card_container:has(.part-5:hover) {
+          --X: var(--angleX);
+          --Y: var(--angleY);
+        }
+        .card_container:has(.part-6:hover) {
+          --Y: calc(var(--angleY) * -1);
+        }
+        .card_container:has(.part-7:hover) {
+          --Y: calc((var(--angleY) / 2) * -1);
+        }
+        .card_container:has(.part-9:hover) {
+          --Y: calc(var(--angleY) / 2);
+        }
+        .card_container:has(.part-10:hover) {
+          --Y: var(--angleY);
+        }
+        .card_container:has(.part-11:hover) {
+          --X: calc(var(--angleX) * -1);
+          --Y: calc(var(--angleY) * -1);
+        }
+        .card_container:has(.part-12:hover) {
+          --X: calc(var(--angleX) * -1);
+          --Y: calc((var(--angleY) / 2) * -1);
+        }
+        .card_container:has(.part-13:hover) {
+          --X: calc(var(--angleX) * -1);
+        }
+        .card_container:has(.part-14:hover) {
+          --X: calc(var(--angleX) * -1);
+          --Y: calc(var(--angleY) / 2);
+        }
+        .card_container:has(.part-15:hover) {
+          --X: calc(var(--angleX) * -1);
+          --Y: var(--angleY);
+        }
+        .card {
+          --light: #d9d9d9;
+          --dark: #1f1f1f;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          padding: 1.5rem;
+          width: 100%;
+          height: 100%;
+          background-color: #facc15;
+          background-image: linear-gradient(
+            135deg,
+            #fef08a 0%,
+            #facc15 50%,
+            #eab308 100%
+          );
+          border: 1px solid rgba(234, 179, 8, 0.3);
+          border-radius: 1.5rem;
+          transform-origin: center;
+          transform: rotateX(var(--X)) rotateY(var(--Y)) rotateZ(var(--Z));
+          transition: transform 0.3s ease-in-out;
+          box-shadow: 0 10px 30px rgba(234, 179, 8, 0.15);
+        }
+        .say-hi {
+          position: relative;
+          width: 100%;
+          height: 2rem;
+          background-color: transparent;
+        }
+        .icon_say-hi {
+          position: absolute;
+          bottom: 0;
+          left: -0.5rem;
+          width: 3rem;
+          opacity: 0;
+          transform-origin: 60% 90%;
+          transform: translate(-15deg);
+          filter: drop-shadow(0 0 0.5rem rgba(0,0,0,0.1));
+          transition: all 0.2s ease-in-out;
+        }
+        .card_container:hover .card .icon_say-hi {
+          width: 3.5rem;
+          opacity: 1;
+          animation: say-hi 0.35s linear infinite alternate;
+        }
+        @keyframes say-hi {
+          to {
+            transform: rotate(25deg);
+          }
+        }
+        .card_title {
+          overflow: clip;
+          width: 100%;
+          font-size: 1.2rem;
+          font-weight: 800;
+          color: var(--dark);
+          text-transform: capitalize;
+          text-wrap: nowrap;
+          text-overflow: ellipsis;
+        }
+        .card_paragraph {
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: #4b5563;
+        }
+      ` }} />
       
       {/* Local Navbar */}
       <LocalNavbar onExit={handleExit} />
@@ -187,8 +332,85 @@ export default function PortofolioPage() {
         </div>
       </div>
 
-      {/* Portfolio Grid */}
+      {/* About Me Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-md border border-gray-200/80 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-amber-100/30 rounded-full blur-3xl pointer-events-none"></div>
+          
+          {/* Left Side: About Me text content */}
+          <div className="flex-1 relative z-10">
+            <span className="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-3.5 py-1 uppercase tracking-widest">
+              Tentang Saya
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold mt-4 text-gray-900 tracking-tight">
+              Muhammad Fajar Anshori
+            </h2>
+            <p className="text-sm font-semibold text-amber-500 mt-1 uppercase tracking-wider">
+              S1 Sistem Informasi • Universitas Trunojoyo Madura
+            </p>
+            
+            {/* The required capitalized paragraph */}
+            <p className="text-gray-700 mt-6 text-base sm:text-lg leading-relaxed font-bold">
+              Nama Saya Muhammad Fajar Anshori, Saya Alumni Universitas Trunojoyo Madura Dan Mengambil Program Studi S1 Sistem Informasi, Saya Unggul Di Bidang Pengembangan Website, Front End Developer, Back End Developer, Dan UI/UX.
+            </p>
+            
+            {/* Action buttons */}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <a
+                href="https://wa.me/6287815797525?text=Halo%20Fajar%2C%20saya%20ingin%20bekerja%20sama%20membuat%20website"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-350 text-black font-bold text-sm shadow-md shadow-amber-400/10 hover:shadow-amber-400/20 transform hover:-translate-y-0.5 transition-all duration-305 cursor-pointer"
+              >
+                Hubungi Saya
+              </a>
+              <a
+                href="#projects"
+                className="px-6 py-3 rounded-2xl bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200 font-bold text-sm transition-all duration-300 cursor-pointer"
+              >
+                Lihat Portofolio
+              </a>
+            </div>
+          </div>
+
+          {/* Right Side: Interactive 3D Card component */}
+          <div className="w-full md:w-auto flex justify-center shrink-0">
+            <div className="card_container">
+              <div className="card_hover">
+                <div className="part part-1"></div>
+                <div className="part part-2"></div>
+                <div className="part part-3"></div>
+                <div className="part part-4"></div>
+                <div className="part part-5"></div>
+                <div className="part part-6"></div>
+                <div className="part part-7"></div>
+                <div className="part part-8"></div>
+                <div className="part part-9"></div>
+                <div className="part part-10"></div>
+                <div className="part part-11"></div>
+                <div className="part part-12"></div>
+                <div className="part part-13"></div>
+                <div className="part part-14"></div>
+                <div className="part part-15"></div>
+              </div>
+              <div className="card">
+                <div className="say-hi">
+                  <span className="icon_say-hi text-3xl">👋</span>
+                </div>
+                <div className="card_title font-black text-gray-950">M. Fajar Anshori</div>
+                <div className="card_paragraph font-bold text-gray-800">S1 Sistem Informasi</div>
+                <div className="card_paragraph font-semibold text-gray-700">UTM Alumni</div>
+                <div className="text-[10px] mt-4 font-bold text-amber-950 bg-amber-950/10 rounded-lg px-2.5 py-1 border border-amber-950/20 text-center uppercase tracking-wide">
+                  Web Developer
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Portfolio Grid */}
+      <div id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {portfolioProjects.map((project, i) => {
             const ProjectIcon = project.icon;

@@ -54,7 +54,7 @@ function LocalNavbar({ onExit }: LocalNavbarProps) {
             <Link href="/pembuatan-website#features" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
               Keunggulan
             </Link>
-            <Link href="/pembuatan-website#portfolio" className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition-colors">
+            <Link href="/pembuatan-website/portofolio" className="text-sm font-semibold text-gray-650 hover:text-amber-500 transition-colors">
               Portofolio
             </Link>
           </div>
