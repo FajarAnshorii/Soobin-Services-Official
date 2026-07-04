@@ -156,7 +156,7 @@ const webServices = [
     originalPrice: 'Rp 3.500.000',
     deliveryTime: '7 - 12 Hari Kerja',
     icon: BookMarked,
-    badge: 'ADSENSE READY',
+    badge: 'MEDIA INFORMASI',
     desc: 'Website portal informasi berita, opini, artikel, atau majalah digital yang dioptimasi untuk trafik tinggi dan Google Adsense.',
     features: [
       'Sistem Multi-Kategori & Tag Berita Rapi',
@@ -176,7 +176,7 @@ const webServices = [
     originalPrice: 'Rp 3.500.000',
     deliveryTime: '7 - 14 Hari Kerja',
     icon: GraduationCap,
-    badge: 'RESMI .SCH.ID',
+    badge: 'PORTAL PENDIDIKAN',
     desc: 'Website resmi sekolah, universitas, atau yayasan bimbingan belajar dengan fitur pengumuman nilai, data guru/siswa, & pendaftaran siswa baru.',
     features: [
       'Profil Sekolah, Visi-Misi, & Struktur Organisasi',
