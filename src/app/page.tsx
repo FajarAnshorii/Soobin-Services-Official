@@ -13,32 +13,32 @@ import SkripsiSection from '@/components/sections/SkripsiSection';
 import UnlockDokumenSection from '@/components/sections/UnlockDokumenSection';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 
-export const metadata: Metadata = {
-  title: 'SOOBIN Services | Turnitin, Parafrase & Joki Tugas Termurah',
-  description:
-    'Solusi terpercaya untuk kebutuhan akademik Anda. Cek Turnitin, Parafrase Dokumen, Joki Tugas, Joki Skripsi, dan Unlock Dokumen dengan harga termurah di pasaran. Trusted 20K+ Customer!',
-  keywords: [
-    'joki tugas',
-    'cek turnitin',
-    'parafrase',
-    'joki skripsi',
-    'unlock dokumen',
-    'joki tugas termurah',
-    'soobin services',
-  ],
-  authors: [{ name: 'Soobin Services' }],
-  openGraph: {
-    title: 'SOOBIN Services | Turnitin & Parafrase Termurah',
-    description:
-      'Jasa joki tugas, cek turnitin, parafrase, dan unlock dokumen termurah dengan 20K+ customer puas!',
-    type: 'website',
-    locale: 'id_ID',
-  },
-};
-
 export default function Home() {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Soobin Services",
+    "url": "https://soobinservices.com",
+    "logo": "https://soobinservices.com/logo.png",
+    "sameAs": [
+      "https://www.instagram.com/soobinservices.id/",
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": ["Indonesian"],
+    },
+  };
+
   return (
     <main className="min-h-screen">
+      {/* Structured Data (JSON-LD) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationSchema),
+        }}
+      />
       <Navbar />
       <Hero />
       <PartnerSection />

@@ -4,10 +4,70 @@ import { CartProvider } from '@/context/CartContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SOOBIN Services | Turnitin, Parafrase & Joki Tugas Termurah',
-  description: 'Solusi terpercaya untuk kebutuhan akademik Anda',
+  metadataBase: new URL("https://soobinservices.com"),
+
+  title: {
+    default: "Soobin Services | Layanan Akademik, Desain dan Administrasi",
+    template: "%s | Soobin Services",
+  },
+
+  description:
+    "Soobin Services menyediakan layanan pendampingan akademik, parafrase, desain PowerPoint, pengolahan data, formatting dokumen, dan administrasi.",
+
+  keywords: [
+    "Soobin Services",
+    "jasa parafrase",
+    "jasa desain PPT",
+    "jasa pengolahan data",
+    "jasa formatting skripsi",
+    "layanan akademik",
+  ],
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "/",
+    siteName: "Soobin Services",
+    title: "Soobin Services | Layanan Akademik, Desain dan Administrasi",
+    description:
+      "Layanan pendampingan akademik, parafrase, presentasi, pengolahan data, dan administrasi.",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Soobin Services",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Soobin Services",
+    description:
+      "Layanan akademik, desain, pengolahan data, dan administrasi.",
+    images: ["/logo.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+
   icons: {
-    icon: '/favicon.png',
+    icon: "/favicon.png",
+    apple: "/logo.png",
   },
 };
 
