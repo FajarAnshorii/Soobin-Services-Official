@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'SOOBIN Services | Turnitin, Parafrase & Joki Tugas Termurah',
   description: 'Solusi terpercaya untuk kebutuhan akademik Anda',
   icons: {
-    icon: '/favicon.svg',
+    icon: '/favicon.png',
   },
 };
 
