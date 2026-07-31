@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
 const MEMBERS_BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/SoobinMembersList';
 
@@ -15,6 +16,29 @@ const DEFAULT_MEMBERS = [
 
 export async function GET() {
   try {
+    // 1. Try fetching from Supabase Table
+    const { data: supaMembers, error } = await supabase
+      .from('members')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (!error && Array.isArray(supaMembers) && supaMembers.length > 0) {
+      const formatted = supaMembers.map((m: any, idx: number) => {
+        const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
+        return {
+          id: `MBR-${String(idx + 1).padStart(4, '0')}`,
+          name: m.name,
+          email: m.email,
+          university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Indonesia',
+          prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
+          createdAt: m.created_at || m.createdAt || new Date().toISOString(),
+        };
+      });
+
+      return NextResponse.json(formatted);
+    }
+
+    // 2. Fallback to High-Availability Cloud Database
     const res = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
     let data: any[] = [];
     if (res.ok) {
@@ -28,7 +52,6 @@ export async function GET() {
       data = DEFAULT_MEMBERS;
     }
 
-    // Ensure member data aligns with official website profile (e.g. Filda Felissa -> Universitas Trunojoyo Madura, Ekonomi Syariah)
     const formatted = data.map((m: any, idx: number) => {
       const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
       return {
@@ -38,13 +61,6 @@ export async function GET() {
         prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
       };
     });
-
-    // Update cloud store async with corrected data
-    fetch(MEMBERS_BIN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formatted),
-    }).catch(console.error);
 
     return NextResponse.json(formatted);
   } catch (error) {
@@ -56,7 +72,27 @@ export async function POST(request: Request) {
   try {
     const newMember = await request.json();
 
-    // Fetch existing members
+    if (!newMember || !newMember.email) {
+      return NextResponse.json({ error: 'Invalid member data' }, { status: 400 });
+    }
+
+    const isFilda = newMember.email.toLowerCase() === 'fildafelissa01@gmail.com';
+    const memberPayload = {
+      name: newMember.name,
+      email: newMember.email.toLowerCase(),
+      university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Indonesia',
+      prodi: isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1',
+      created_at: newMember.createdAt || new Date().toISOString(),
+    };
+
+    // 1. Save to Supabase Cloud Database
+    try {
+      await supabase.from('members').upsert(memberPayload, { onConflict: 'email' });
+    } catch (e) {
+      console.error('Supabase save member error', e);
+    }
+
+    // 2. Save to High-Availability Cloud Database Sync
     let currentMembers: any[] = [];
     try {
       const getRes = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
@@ -68,11 +104,6 @@ export async function POST(request: Request) {
       currentMembers = DEFAULT_MEMBERS;
     }
 
-    if (currentMembers.length === 0) {
-      currentMembers = DEFAULT_MEMBERS;
-    }
-
-    // Merge uniquely by email
     const memberMap = new Map<string, any>();
     currentMembers.forEach((m) => {
       if (m && m.email) {
@@ -85,19 +116,7 @@ export async function POST(request: Request) {
       }
     });
 
-    if (newMember && newMember.email) {
-      const isFilda = newMember.email.toLowerCase() === 'fildafelissa01@gmail.com';
-      const nextIndex = memberMap.size + 1;
-
-      memberMap.set(newMember.email.toLowerCase(), {
-        id: `MBR-${String(nextIndex).padStart(4, '0')}`,
-        name: newMember.name,
-        email: newMember.email.toLowerCase(),
-        university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Indonesia',
-        prodi: isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1',
-        createdAt: newMember.createdAt || new Date().toISOString(),
-      });
-    }
+    memberMap.set(newMember.email.toLowerCase(), memberPayload);
 
     const updatedList = Array.from(memberMap.values()).map((m: any, idx: number) => ({
       ...m,
