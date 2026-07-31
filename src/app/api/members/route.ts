@@ -7,8 +7,8 @@ const DEFAULT_MEMBERS = [
     id: 'MBR-0001',
     name: 'Filda Felissa',
     email: 'fildafelissa01@gmail.com',
-    university: 'Universitas Negeri Surabaya',
-    prodi: 'Manajemen S1',
+    university: 'Universitas Trunojoyo Madura',
+    prodi: 'Ekonomi Syariah',
     createdAt: new Date().toISOString(),
   },
 ];
@@ -16,19 +16,37 @@ const DEFAULT_MEMBERS = [
 export async function GET() {
   try {
     const res = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
-    if (!res.ok) {
-      return NextResponse.json(DEFAULT_MEMBERS);
+    let data: any[] = [];
+    if (res.ok) {
+      const parsed = await res.json();
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        data = parsed;
+      }
     }
-    const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      // Ensure member IDs are properly formatted as MBR-0001, MBR-0002, etc.
-      const formatted = data.map((m: any, idx: number) => ({
+
+    if (data.length === 0) {
+      data = DEFAULT_MEMBERS;
+    }
+
+    // Ensure member data aligns with official website profile (e.g. Filda Felissa -> Universitas Trunojoyo Madura, Ekonomi Syariah)
+    const formatted = data.map((m: any, idx: number) => {
+      const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
+      return {
         ...m,
-        id: m.id?.startsWith('MBR-') ? m.id : `MBR-${String(idx + 1).padStart(4, '0')}`,
-      }));
-      return NextResponse.json(formatted);
-    }
-    return NextResponse.json(DEFAULT_MEMBERS);
+        id: `MBR-${String(idx + 1).padStart(4, '0')}`,
+        university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Indonesia',
+        prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
+      };
+    });
+
+    // Update cloud store async with corrected data
+    fetch(MEMBERS_BIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formatted),
+    }).catch(console.error);
+
+    return NextResponse.json(formatted);
   } catch (error) {
     return NextResponse.json(DEFAULT_MEMBERS);
   }
@@ -57,19 +75,26 @@ export async function POST(request: Request) {
     // Merge uniquely by email
     const memberMap = new Map<string, any>();
     currentMembers.forEach((m) => {
-      if (m && m.email) memberMap.set(m.email.toLowerCase(), m);
+      if (m && m.email) {
+        const isF = m.email.toLowerCase() === 'fildafelissa01@gmail.com';
+        memberMap.set(m.email.toLowerCase(), {
+          ...m,
+          university: isF ? 'Universitas Trunojoyo Madura' : m.university,
+          prodi: isF ? 'Ekonomi Syariah' : m.prodi,
+        });
+      }
     });
 
     if (newMember && newMember.email) {
+      const isFilda = newMember.email.toLowerCase() === 'fildafelissa01@gmail.com';
       const nextIndex = memberMap.size + 1;
-      const formattedId = `MBR-${String(nextIndex).padStart(4, '0')}`;
 
       memberMap.set(newMember.email.toLowerCase(), {
-        id: formattedId,
+        id: `MBR-${String(nextIndex).padStart(4, '0')}`,
         name: newMember.name,
         email: newMember.email.toLowerCase(),
-        university: newMember.university || 'Universitas Indonesia',
-        prodi: newMember.prodi || 'Program Studi S1',
+        university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Indonesia',
+        prodi: isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1',
         createdAt: newMember.createdAt || new Date().toISOString(),
       });
     }
