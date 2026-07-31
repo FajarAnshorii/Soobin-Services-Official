@@ -12,11 +12,19 @@ const DEFAULT_MEMBERS = [
     prodi: 'Ekonomi Syariah',
     createdAt: new Date().toISOString(),
   },
+  {
+    id: 'MBR-0002',
+    name: 'Dzikri Amirul Ashari',
+    email: 'dzikriamirulash1@gmail.com',
+    university: 'Universitas Trunojoyo Madura',
+    prodi: 'S1 Sistem Informasi',
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 export async function GET() {
   try {
-    // 1. Fetch from Supabase PostgreSQL Database using Service Role Client
+    // 1. Fetch directly from Supabase PostgreSQL Database using Service Role Client
     const { data: supaMembers, error } = await supabaseAdmin
       .from('members')
       .select('*')
