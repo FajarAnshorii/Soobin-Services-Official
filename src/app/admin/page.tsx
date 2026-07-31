@@ -543,35 +543,35 @@ export default function AdminPage() {
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
   return (
-    <div className="min-h-screen bg-dark-950 text-dark-100 flex flex-col">
+    <div className="min-h-screen bg-dark-950 text-dark-100 flex flex-col w-full font-sans antialiased">
       {/* Top Navbar */}
-      <header className="bg-dark-900 border-b border-dark-800 px-6 py-3 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-dark-900/90 backdrop-blur-md border-b border-dark-800 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary-800/30 border border-primary-800/60 rounded-xl flex items-center justify-center text-primary-400">
+          <div className="w-10 h-10 bg-primary-800/30 border border-primary-800/60 rounded-xl flex items-center justify-center text-primary-400 shrink-0">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-bold text-sm text-white leading-none">Dasbor Admin SOOBIN</h1>
-            <span className="text-[10px] text-green-400 flex items-center gap-1 font-semibold mt-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Status Online
+            <h1 className="font-bold text-base text-white leading-none">Dasbor Admin SOOBIN</h1>
+            <span className="text-[11px] text-green-400 flex items-center gap-1.5 font-semibold mt-1">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /> Status Online
             </span>
           </div>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center bg-dark-800 p-1 rounded-xl border border-dark-700">
+        <div className="flex items-center flex-wrap gap-1.5 bg-dark-950/80 p-1.5 rounded-2xl border border-dark-800">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'chat'
-                ? 'bg-primary-800 text-white shadow-sm'
-                : 'text-dark-300 hover:text-white'
+                ? 'bg-primary-800 text-white shadow-md'
+                : 'text-dark-300 hover:text-white hover:bg-dark-800'
             }`}
           >
-            <MessageSquare className="w-3.5 h-3.5" />
+            <MessageSquare className="w-4 h-4" />
             <span>Live Chat</span>
             {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0) > 0 && (
-              <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-black">
+              <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
                 {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0)}
               </span>
             )}
@@ -579,16 +579,16 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'orders'
-                ? 'bg-amber-500 text-dark-950 font-black shadow-sm'
-                : 'text-dark-300 hover:text-white'
+                ? 'bg-amber-500 text-dark-950 font-black shadow-md'
+                : 'text-dark-300 hover:text-white hover:bg-dark-800'
             }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
+            <ShoppingBag className="w-4 h-4" />
             <span>Pesanan & Pembayaran</span>
             {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length > 0 && (
-              <span className="bg-amber-400 text-dark-950 text-[9px] px-1.5 py-0.2 rounded-full font-black">
+              <span className="bg-amber-400 text-dark-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">
                 {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length}
               </span>
             )}
@@ -596,44 +596,44 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('members')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'members'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-dark-300 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-dark-300 hover:text-white hover:bg-dark-800'
             }`}
           >
-            <Users className="w-3.5 h-3.5" />
+            <Users className="w-4 h-4" />
             <span>Data Member ({members.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('revenue')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'revenue'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-dark-300 hover:text-white'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'text-dark-300 hover:text-white hover:bg-dark-800'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5" />
+            <DollarSign className="w-4 h-4" />
             <span>Pendapatan</span>
           </button>
 
           <button
             onClick={() => setActiveTab('services')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'services'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-dark-300 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'text-dark-300 hover:text-white hover:bg-dark-800'
             }`}
           >
-            <Edit3 className="w-3.5 h-3.5" />
+            <Edit3 className="w-4 h-4" />
             <span>Kelola Layanan</span>
           </button>
         </div>
 
         <button
           onClick={handleLogout}
-          className="text-xs font-bold text-red-400 hover:text-red-300 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer"
+          className="text-xs font-bold text-red-400 hover:text-red-300 flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-red-500/10 transition-colors cursor-pointer border border-red-500/20"
         >
           <LogOut className="w-4 h-4" />
           <span>Keluar</span>
@@ -641,7 +641,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Admin Workspace */}
-      <main className="flex-1 flex overflow-hidden p-6 max-w-7xl mx-auto w-full gap-6">
+      <main className="flex-1 flex overflow-hidden p-4 sm:p-6 w-full max-w-[1600px] mx-auto gap-6">
         {activeTab === 'chat' && (
           <div className="flex-1 flex gap-6 w-full overflow-hidden">
             {/* Sidebar Chat Sessions */}
