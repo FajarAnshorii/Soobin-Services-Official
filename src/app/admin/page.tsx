@@ -116,12 +116,12 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
-  // Set body background to clean dark slate #0f172a on mount
+  // Set body background to clean LIGHT slate #f8fafc on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
     setIsAdminLoggedIn(isLoggedIn);
 
-    document.body.style.backgroundColor = '#0f172a';
+    document.body.style.backgroundColor = '#f8fafc';
     return () => {
       document.body.style.backgroundColor = '';
     };
@@ -500,32 +500,33 @@ export default function AdminPage() {
 
   const unreadChatsCount = Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
+  // LOGIN SCREEN - ULTRA CLEAN BRIGHT LIGHT THEME
   if (!isAdminLoggedIn) {
     return (
-      <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f1f5f9] text-slate-900 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#1e293b] border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-md w-full"
+          className="bg-white border border-slate-200 p-8 rounded-3xl shadow-xl max-w-md w-full"
         >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-slate-700/60 border border-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
-              <Shield className="w-8 h-8 text-blue-400" />
+            <div className="w-16 h-16 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 shadow-sm">
+              <Shield className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-black text-white tracking-wide">SOOBIN Admin Portal</h1>
-            <p className="text-xs text-slate-300 mt-1">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">SOOBIN Admin Portal</h1>
+            <p className="text-xs text-slate-600 font-semibold mt-1.5">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-semibold text-center flex items-center justify-center gap-2">
-              <CircleAlert className="w-4 h-4" />
+            <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold text-center flex items-center justify-center gap-2">
+              <CircleAlert className="w-4 h-4 text-red-600" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-200 mb-1.5">Email Admin</label>
+              <label className="block text-xs font-extrabold text-slate-800 mb-1.5">Email Admin</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
@@ -534,13 +535,13 @@ export default function AdminPage() {
                   placeholder="admin@soobin.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white transition-colors"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-200 mb-1.5">Password Admin</label>
+              <label className="block text-xs font-extrabold text-slate-800 mb-1.5">Password Admin</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
@@ -549,7 +550,7 @@ export default function AdminPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white transition-colors"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
                 />
               </div>
             </div>
@@ -557,14 +558,14 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white hover:bg-slate-100 text-slate-950 font-black py-3 rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
             >
               {loading ? 'Memverifikasi...' : 'Masuk Dasbor Admin'}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-700 text-center">
-            <Link href="/" className="text-xs text-slate-300 hover:text-white transition-colors font-medium">
+          <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+            <Link href="/" className="text-xs text-slate-600 hover:text-blue-600 transition-colors font-bold">
               ← Kembali ke Website Utama
             </Link>
           </div>
@@ -575,32 +576,33 @@ export default function AdminPage() {
 
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
+  // MAIN DASHBOARD - BRIGHT CLEAN WHITE & SLATE THEME (LIGHT MODE)
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 flex w-full font-sans antialiased" style={{ backgroundColor: '#0f172a' }}>
-      {/* LEFT VERTICAL SIDEBAR NAVIGATION (SaaS Style) */}
-      <aside className="w-64 bg-[#1e293b] border-r border-slate-700 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex w-full font-sans antialiased" style={{ backgroundColor: '#f8fafc' }}>
+      {/* LEFT VERTICAL SIDEBAR NAVIGATION (Modern SaaS Light Theme) */}
+      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30 shadow-xs">
         <div>
           {/* Brand Header */}
-          <div className="p-5 border-b border-slate-700 flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Shield className="w-5 h-5 text-blue-400" />
+          <div className="p-5 border-b border-slate-200 flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md">
+              <Shield className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-black text-sm text-white tracking-wide leading-none">SOOBIN</h1>
-              <p className="text-[10px] text-slate-300 font-bold mt-1 uppercase tracking-wider">Services Admin</p>
+              <h1 className="font-black text-base text-slate-900 tracking-tight leading-none">SOOBIN</h1>
+              <p className="text-[10px] text-blue-600 font-extrabold mt-1 uppercase tracking-wider">Services Admin</p>
             </div>
           </div>
 
           {/* Nav Items */}
           <nav className="p-3 space-y-1.5">
-            <p className="text-[10px] font-extrabold text-slate-400 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
+            <p className="text-[10px] font-black text-slate-400 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
 
             <button
               onClick={() => setActiveTab('overview')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'overview'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -613,8 +615,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('chat')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'chat'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -632,8 +634,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('orders')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'orders'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -641,7 +643,7 @@ export default function AdminPage() {
                 <span>Pesanan & Pembayaran</span>
               </div>
               {pendingOrdersCount > 0 && (
-                <span className="bg-amber-400 text-slate-950 text-[10px] px-2 py-0.5 rounded-full font-black">
+                <span className="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
                   {pendingOrdersCount}
                 </span>
               )}
@@ -651,15 +653,15 @@ export default function AdminPage() {
               onClick={() => setActiveTab('members')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'members'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Users className="w-4 h-4" />
                 <span>Data Member</span>
               </div>
-              <span className="bg-slate-700 text-slate-200 text-[10px] px-2 py-0.5 rounded-full font-bold">
+              <span className="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
                 {members.length}
               </span>
             </button>
@@ -668,8 +670,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('revenue')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'revenue'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -682,8 +684,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('services')}
               className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'services'
-                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
+                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -695,22 +697,22 @@ export default function AdminPage() {
         </div>
 
         {/* Footer Admin Profile */}
-        <div className="p-3 border-t border-slate-700 bg-[#1e293b] space-y-2">
-          <div className="p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl flex items-center justify-between">
+        <div className="p-3 border-t border-slate-200 bg-slate-50 space-y-2">
+          <div className="p-2.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-xs shrink-0">
                 AD
               </div>
               <div className="truncate">
-                <p className="text-xs font-bold text-white truncate">Administrator</p>
-                <p className="text-[10px] text-slate-300 truncate">admin@soobin.com</p>
+                <p className="text-xs font-black text-slate-900 truncate">Administrator</p>
+                <p className="text-[10px] text-slate-500 font-bold truncate">admin@soobin.com</p>
               </div>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full text-xs font-bold text-red-400 hover:text-red-300 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors cursor-pointer border border-red-500/20"
+            className="w-full text-xs font-extrabold text-red-600 hover:text-red-700 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 transition-colors cursor-pointer border border-red-200"
           >
             <LogOut className="w-4 h-4" />
             <span>Keluar Sesi</span>
@@ -721,7 +723,7 @@ export default function AdminPage() {
       {/* RIGHT MAIN CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* TOP HEADER BAR */}
-        <header className="bg-[#1e293b] border-b border-slate-700 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-sm">
+        <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
           {/* Global Search Bar */}
           <div className="relative max-w-md w-full">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -730,14 +732,14 @@ export default function AdminPage() {
               placeholder="Cari pesanan, nama member, atau layanan..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white transition-colors"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
             />
           </div>
 
           {/* Quick Actions & Realtime Status */}
           <div className="flex items-center gap-4">
-            <span className="text-xs text-emerald-400 flex items-center gap-2 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs text-emerald-700 flex items-center gap-2 font-bold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               Sistem Online Realtime (WIB)
             </span>
 
@@ -748,7 +750,7 @@ export default function AdminPage() {
                 syncChatsWithCloud();
               }}
               disabled={ordersLoading}
-              className="p-2 rounded-xl bg-[#0f172a] hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-colors cursor-pointer"
               title="Refresh Data Realtime"
             >
               <RefreshCw className={`w-4 h-4 ${ordersLoading ? 'animate-spin' : ''}`} />
@@ -763,67 +765,67 @@ export default function AdminPage() {
             <div className="space-y-6">
               {/* TOP KPI STAT CARDS GRID */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between text-emerald-400">
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Total Pendapatan</span>
-                    <DollarSign className="w-5 h-5 bg-emerald-500/10 p-1 rounded-lg" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-emerald-600">
+                    <span className="text-xs font-black uppercase tracking-wider">Total Pendapatan</span>
+                    <DollarSign className="w-5 h-5 bg-emerald-50 p-1 rounded-lg border border-emerald-200" />
                   </div>
-                  <p className="text-2xl font-black text-white">
+                  <p className="text-2xl font-black text-slate-900">
                     Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-300 font-medium flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> Terverifikasi dari Lunas
+                  <p className="text-[11px] text-slate-600 font-bold flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> Terverifikasi dari Lunas
                   </p>
                 </div>
 
-                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between text-blue-400">
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Total Member</span>
-                    <Users className="w-5 h-5 bg-blue-500/10 p-1 rounded-lg" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-blue-600">
+                    <span className="text-xs font-black uppercase tracking-wider">Total Member</span>
+                    <Users className="w-5 h-5 bg-blue-50 p-1 rounded-lg border border-blue-200" />
                   </div>
-                  <p className="text-2xl font-black text-white">{members.length} Member</p>
-                  <p className="text-[11px] text-slate-300 font-medium">Format MBR-0001 dst.</p>
+                  <p className="text-2xl font-black text-slate-900">{members.length} Member</p>
+                  <p className="text-[11px] text-slate-600 font-bold">Format MBR-0001 dst.</p>
                 </div>
 
-                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between text-amber-400">
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Pesanan Menunggu</span>
-                    <ShoppingBag className="w-5 h-5 bg-amber-500/10 p-1 rounded-lg" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-amber-600">
+                    <span className="text-xs font-black uppercase tracking-wider">Pesanan Menunggu</span>
+                    <ShoppingBag className="w-5 h-5 bg-amber-50 p-1 rounded-lg border border-amber-200" />
                   </div>
-                  <p className="text-2xl font-black text-white">{pendingOrdersCount} Pesanan</p>
-                  <p className="text-[11px] text-slate-300 font-medium">Perlu Cek Verifikasi Admin</p>
+                  <p className="text-2xl font-black text-slate-900">{pendingOrdersCount} Pesanan</p>
+                  <p className="text-[11px] text-slate-600 font-bold">Perlu Cek Verifikasi Admin</p>
                 </div>
 
-                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between text-purple-400">
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Chat Sesi Aktif</span>
-                    <MessageSquare className="w-5 h-5 bg-purple-500/10 p-1 rounded-lg" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-purple-600">
+                    <span className="text-xs font-black uppercase tracking-wider">Chat Sesi Aktif</span>
+                    <MessageSquare className="w-5 h-5 bg-purple-50 p-1 rounded-lg border border-purple-200" />
                   </div>
-                  <p className="text-2xl font-black text-white">{Object.keys(chats).length} Sesi</p>
-                  <p className="text-[11px] text-slate-300 font-medium">{unreadChatsCount} Belum Dibaca</p>
+                  <p className="text-2xl font-black text-slate-900">{Object.keys(chats).length} Sesi</p>
+                  <p className="text-[11px] text-slate-600 font-bold">{unreadChatsCount} Belum Dibaca</p>
                 </div>
               </div>
 
               {/* RECENT ACTIVITY & RECENT ORDERS SPLIT */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Recent Orders Table Overview */}
-                <div className="lg:col-span-2 bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-4 shadow-sm">
-                  <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                    <h2 className="font-bold text-sm text-white flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-amber-400" />
+                <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-amber-600" />
                       Pesanan Terbaru Masuk
                     </h2>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                      className="text-xs font-extrabold text-blue-600 hover:text-blue-700"
                     >
                       Lihat Semua →
                     </button>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-slate-200">
-                      <thead className="bg-[#0f172a] text-slate-300 font-extrabold text-[10px] uppercase border-b border-slate-700">
+                    <table className="w-full text-left text-xs text-slate-800">
+                      <thead className="bg-slate-100 text-slate-700 font-black text-[10px] uppercase border-b border-slate-200">
                         <tr>
                           <th className="p-3">ID Order</th>
                           <th className="p-3">Nama Pelanggan</th>
@@ -832,19 +834,19 @@ export default function AdminPage() {
                           <th className="p-3">Status</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
+                      <tbody className="divide-y divide-slate-200 bg-white">
                         {orders.slice(0, 5).map((o) => (
-                          <tr key={o.id} className="hover:bg-slate-700/50">
-                            <td className="p-3 font-mono text-amber-400 font-bold">{o.id}</td>
-                            <td className="p-3 font-bold text-white">{o.customerName}</td>
-                            <td className="p-3 text-slate-200">{o.serviceName}</td>
-                            <td className="p-3 font-bold text-emerald-400">{o.price}</td>
+                          <tr key={o.id} className="hover:bg-slate-50">
+                            <td className="p-3 font-mono text-amber-700 font-black">{o.id}</td>
+                            <td className="p-3 font-bold text-slate-900">{o.customerName}</td>
+                            <td className="p-3 text-slate-700 font-medium">{o.serviceName}</td>
+                            <td className="p-3 font-black text-emerald-600">{o.price}</td>
                             <td className="p-3">
                               <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
                                   o.paymentStatus?.toLowerCase().includes('lunas')
-                                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                    : 'bg-amber-100 text-amber-800 border border-amber-300'
                                 }`}
                               >
                                 {o.paymentStatus}
@@ -858,15 +860,15 @@ export default function AdminPage() {
                 </div>
 
                 {/* Registered Members Widget */}
-                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-4 shadow-sm">
-                  <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                    <h2 className="font-bold text-sm text-white flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-400" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
                       Member Terdaftar Terbaru
                     </h2>
                     <button
                       onClick={() => setActiveTab('members')}
-                      className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                      className="text-xs font-extrabold text-blue-600 hover:text-blue-700"
                     >
                       Kelola →
                     </button>
@@ -874,12 +876,12 @@ export default function AdminPage() {
 
                   <div className="space-y-3">
                     {members.slice(0, 4).map((m) => (
-                      <div key={m.id} className="p-3 bg-[#0f172a] border border-slate-700 rounded-xl flex items-center justify-between">
+                      <div key={m.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                         <div>
-                          <p className="font-bold text-xs text-white">{m.name}</p>
-                          <p className="text-[10px] text-slate-300 font-medium">{m.email}</p>
+                          <p className="font-bold text-xs text-slate-900">{m.name}</p>
+                          <p className="text-[10px] text-slate-600 font-bold">{m.email}</p>
                         </div>
-                        <span className="text-[10px] font-mono font-extrabold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                        <span className="text-[10px] font-mono font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-200">
                           {m.id}
                         </span>
                       </div>
@@ -894,17 +896,17 @@ export default function AdminPage() {
           {activeTab === 'chat' && (
             <div className="flex gap-6 h-[calc(100vh-140px)] overflow-hidden">
               {/* Sidebar Chat Sessions */}
-              <div className="w-80 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-sm">
-                <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-[#1e293b]">
-                  <h2 className="font-extrabold text-xs text-white uppercase tracking-wider">Antrean Percakapan</h2>
-                  <span className="text-[10px] bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-full font-bold">
+              <div className="w-80 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs">
+                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                  <h2 className="font-black text-xs text-slate-900 uppercase tracking-wider">Antrean Percakapan</h2>
+                  <span className="text-[10px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold">
                     {Object.keys(chats).length} User
                   </span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto divide-y divide-slate-700/50">
+                <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
                   {Object.keys(chats).length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-300 font-semibold">
+                    <div className="p-8 text-center text-xs text-slate-600 font-bold">
                       Belum ada percakapan masuk dari pengguna.
                     </div>
                   ) : (
@@ -914,23 +916,23 @@ export default function AdminPage() {
                         onClick={() => handleSelectSession(session.id)}
                         className={`w-full p-4 text-left transition-colors flex items-start gap-3 cursor-pointer ${
                           selectedSessionId === session.id
-                            ? 'bg-slate-700/70 border-l-4 border-white'
-                            : 'hover:bg-slate-700/40'
+                            ? 'bg-blue-50 border-l-4 border-blue-600'
+                            : 'hover:bg-slate-50'
                         }`}
                       >
-                        <div className="w-9 h-9 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow-xs">
                           {session.name?.[0]?.toUpperCase() || 'U'}
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
-                            <h3 className="font-bold text-xs text-white truncate">{session.name}</h3>
-                            <span className="text-[9px] text-slate-300 font-medium">{session.lastUpdated}</span>
+                            <h3 className="font-bold text-xs text-slate-900 truncate">{session.name}</h3>
+                            <span className="text-[9px] text-slate-500 font-bold">{session.lastUpdated}</span>
                           </div>
-                          <p className="text-[11px] text-slate-300 truncate font-medium">
+                          <p className="text-[11px] text-slate-600 truncate font-semibold">
                             {session.university} • {session.prodi}
                           </p>
-                          <p className="text-[10px] text-slate-400 truncate mt-1">
+                          <p className="text-[10px] text-slate-500 truncate mt-1 font-medium">
                             {session.messages?.[session.messages.length - 1]?.text || 'Belum ada pesan'}
                           </p>
                         </div>
@@ -947,31 +949,31 @@ export default function AdminPage() {
               </div>
 
               {/* Chat Room Area */}
-              <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-sm">
+              <div className="flex-1 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shadow-xs">
                 {selectedSession ? (
                   <>
                     {/* Session Header */}
-                    <div className="p-4 border-b border-slate-700 bg-[#1e293b] flex items-center justify-between">
+                    <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                       <div>
-                        <h2 className="font-bold text-sm text-white">{selectedSession.name}</h2>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-300 mt-0.5 font-medium">
+                        <h2 className="font-black text-sm text-slate-900">{selectedSession.name}</h2>
+                        <div className="flex items-center gap-3 text-[11px] text-slate-600 mt-0.5 font-bold">
                           <span className="flex items-center gap-1">
-                            <Mail className="w-3.5 h-3.5 text-slate-400" /> {selectedSession.email}
+                            <Mail className="w-3.5 h-3.5 text-blue-600" /> {selectedSession.email}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            <School className="w-3.5 h-3.5 text-slate-400" /> {selectedSession.university}
+                            <School className="w-3.5 h-3.5 text-blue-600" /> {selectedSession.university}
                           </span>
                         </div>
                       </div>
 
-                      <span className="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-full font-bold">
                         Session Active
                       </span>
                     </div>
 
                     {/* Messages Stream */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0f172a]/60">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
                       {selectedSession.messages.map((msg) => (
                         <div
                           key={msg.id}
@@ -980,14 +982,14 @@ export default function AdminPage() {
                           <div
                             className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
                               msg.sender === 'admin'
-                                ? 'bg-blue-600 text-white rounded-tr-none shadow-sm'
-                                : 'bg-slate-700 text-white border border-slate-600 rounded-tl-none'
+                                ? 'bg-blue-600 text-white rounded-tr-none shadow-xs font-medium'
+                                : 'bg-white text-slate-900 border border-slate-200 rounded-tl-none font-medium shadow-xs'
                             }`}
                           >
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                             <span
-                              className={`block text-[9px] mt-1 text-right ${
-                                msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-300'
+                              className={`block text-[9px] mt-1 text-right font-bold ${
+                                msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-500'
                               }`}
                             >
                               {msg.timestamp}
@@ -999,17 +1001,17 @@ export default function AdminPage() {
                     </div>
 
                     {/* Reply Input Box */}
-                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-700 bg-[#1e293b] flex gap-2">
+                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-200 bg-white flex gap-2">
                       <input
                         type="text"
                         placeholder="Tulis balasan untuk pengguna..."
                         value={adminReplyText}
                         onChange={(e) => setAdminReplyText(e.target.value)}
-                        className="flex-1 bg-[#0f172a] border border-slate-600 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white"
+                        className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white"
                       />
                       <button
                         type="submit"
-                        className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>Kirim</span>
@@ -1018,11 +1020,11 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                    <div className="w-16 h-16 bg-slate-700/50 border border-slate-600 rounded-2xl flex items-center justify-center text-white mb-4">
-                      <Headphones className="w-8 h-8 text-blue-400" />
+                    <div className="w-16 h-16 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-center text-blue-600 mb-4 shadow-xs">
+                      <Headphones className="w-8 h-8" />
                     </div>
-                    <p className="font-bold text-base text-white">Pilih Percakapan Pelanggan</p>
-                    <p className="text-xs text-slate-300 mt-1 max-w-xs leading-relaxed font-medium">
+                    <p className="font-black text-base text-slate-900">Pilih Percakapan Pelanggan</p>
+                    <p className="text-xs text-slate-600 mt-1 max-w-xs leading-relaxed font-bold">
                       Klik salah satu antrean percakapan di sebelah kiri untuk membalas pesan live chat.
                     </p>
                   </div>
@@ -1033,14 +1035,14 @@ export default function AdminPage() {
 
           {/* TAB 2: ORDERS & PAYMENTS */}
           {activeTab === 'orders' && (
-            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h2 className="font-bold text-base text-white flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5 text-amber-400" />
+                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5 text-amber-600" />
                     Daftar Pesanan & Pembayaran QRIS / Transfer
                   </h2>
-                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
                     Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
                   </p>
                 </div>
@@ -1048,7 +1050,7 @@ export default function AdminPage() {
                 <button
                   onClick={syncOrdersWithCloud}
                   disabled={ordersLoading}
-                  className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? 'animate-spin' : ''}`} />
                   <span>Refresh Pesanan</span>
@@ -1056,10 +1058,10 @@ export default function AdminPage() {
               </div>
 
               {filteredOrders.length === 0 ? (
-                <div className="p-12 text-center text-slate-300 bg-[#0f172a]/60 rounded-2xl border border-slate-700">
-                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-400" />
-                  <p className="font-bold text-base text-white">Belum Ada Pesanan Masuk</p>
-                  <p className="text-xs text-slate-300 mt-1 font-medium">
+                <div className="p-12 text-center text-slate-600 bg-slate-50 rounded-2xl border border-slate-200">
+                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-600" />
+                  <p className="font-black text-base text-slate-900">Belum Ada Pesanan Masuk</p>
+                  <p className="text-xs text-slate-600 mt-1 font-bold">
                     Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
                   </p>
                 </div>
@@ -1072,21 +1074,21 @@ export default function AdminPage() {
                     return (
                       <div
                         key={order.id}
-                        className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 hover:border-slate-600 transition-colors space-y-4 shadow-sm"
+                        className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-colors space-y-4 shadow-xs"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 text-white flex items-center justify-center font-black text-xs">
+                            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
                               ORD
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-sm text-white">{order.customerName}</h3>
-                                <span className="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono border border-slate-600 font-bold">
+                                <h3 className="font-black text-sm text-slate-900">{order.customerName}</h3>
+                                <span className="text-[10px] bg-slate-200 text-slate-900 px-2 py-0.5 rounded font-mono border border-slate-300 font-bold">
                                   {order.id}
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-300 font-medium">{order.customerEmail}</p>
+                              <p className="text-xs text-slate-600 font-bold">{order.customerEmail}</p>
                             </div>
                           </div>
 
@@ -1095,10 +1097,10 @@ export default function AdminPage() {
                             <span
                               className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
                                 isLunas
-                                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                                   : isCancel
-                                  ? 'bg-red-500/15 text-red-300 border border-red-500/40'
-                                  : 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
+                                  ? 'bg-red-100 text-red-800 border border-red-300'
+                                  : 'bg-amber-100 text-amber-800 border border-amber-300'
                               }`}
                             >
                               {order.paymentStatus}
@@ -1108,23 +1110,23 @@ export default function AdminPage() {
 
                         {/* Main Details Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                          <div className="bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-1">
-                            <p className="text-slate-300 font-semibold">Jasa Layanan:</p>
-                            <p className="font-bold text-white text-sm">{order.serviceName}</p>
-                            <p className="text-emerald-400 font-extrabold">{order.price}</p>
-                            <p className="text-slate-300 text-[11px] pt-1 font-medium">
-                              Metode: <span className="text-white font-bold">{order.paymentMethod}</span>
+                          <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1 shadow-xs">
+                            <p className="text-slate-600 font-bold">Jasa Layanan:</p>
+                            <p className="font-black text-slate-900 text-sm">{order.serviceName}</p>
+                            <p className="text-emerald-700 font-black">{order.price}</p>
+                            <p className="text-slate-600 text-[11px] pt-1 font-bold">
+                              Metode: <span className="text-slate-900 font-black">{order.paymentMethod}</span>
                             </p>
                           </div>
 
-                          <div className="md:col-span-2 bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-2">
-                            <p className="text-slate-300 font-semibold">Detail Formulir Kustom:</p>
+                          <div className="md:col-span-2 bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 shadow-xs">
+                            <p className="text-slate-600 font-bold">Detail Formulir Kustom:</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                               {order.customFields &&
                                 Object.entries(order.customFields).map(([k, v]) => (
-                                  <div key={k} className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-700">
-                                    <span className="text-slate-300 block font-bold">{k}:</span>
-                                    <span className="text-white font-medium break-words">{v}</span>
+                                  <div key={k} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span className="text-slate-700 block font-black">{k}:</span>
+                                    <span className="text-slate-900 font-bold break-words">{v}</span>
                                   </div>
                                 ))}
                             </div>
@@ -1138,7 +1140,7 @@ export default function AdminPage() {
                             {order.proofImage && (
                               <button
                                 onClick={() => setSelectedProofImage(order.proofImage || null)}
-                                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                                className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
                                 <span>Lihat Bukti Bayar (Screenshot)</span>
@@ -1149,7 +1151,7 @@ export default function AdminPage() {
                             {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
                               <button
                                 onClick={() => handleDownloadFile(order)}
-                                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
                               >
                                 <Download className="w-4 h-4" />
                                 <span>Unduh Dokumen File</span>
@@ -1161,7 +1163,7 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                              className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              className="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                             >
                               <XCircle className="w-4 h-4" />
                               <span>Batalkan</span>
@@ -1169,7 +1171,7 @@ export default function AdminPage() {
 
                             <button
                               onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-md"
+                              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
                             >
                               <CheckCircle className="w-4 h-4" />
                               <span>Verifikasi Lunas</span>
@@ -1186,14 +1188,14 @@ export default function AdminPage() {
 
           {/* TAB 3: DATA MEMBER (50 per page, MBR-0001 format) */}
           {activeTab === 'members' && (
-            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h2 className="font-bold text-base text-white flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-400" />
+                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-600" />
                     Daftar Member Terdaftar
                   </h2>
-                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
                     Total {filteredMembers.length} member terdaftar. Menampilkan 50 member per halaman.
                   </p>
                 </div>
@@ -1203,17 +1205,17 @@ export default function AdminPage() {
                   <button
                     onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                     disabled={memberPage === 1}
-                    className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="text-xs font-bold text-white px-2">
+                  <span className="text-xs font-black text-slate-900 px-2">
                     Halaman {memberPage} dari {totalPages}
                   </span>
                   <button
                     onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                     disabled={memberPage === totalPages}
-                    className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1221,9 +1223,9 @@ export default function AdminPage() {
               </div>
 
               {/* Members Table */}
-              <div className="overflow-x-auto border border-slate-700 rounded-2xl">
-                <table className="w-full text-left text-xs text-slate-200">
-                  <thead className="bg-[#0f172a] text-slate-300 font-extrabold uppercase tracking-wider text-[10px] border-b border-slate-700">
+              <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+                <table className="w-full text-left text-xs text-slate-900">
+                  <thead className="bg-slate-100 text-slate-700 font-black uppercase tracking-wider text-[10px] border-b border-slate-200">
                     <tr>
                       <th className="p-3.5">Kode ID Member</th>
                       <th className="p-3.5">Nama Lengkap</th>
@@ -1232,14 +1234,14 @@ export default function AdminPage() {
                       <th className="p-3.5">Program Studi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
+                  <tbody className="divide-y divide-slate-200 bg-white">
                     {currentMembers.map((mbr, idx) => (
-                      <tr key={mbr.id || idx} className="hover:bg-slate-700/50 transition-colors">
-                        <td className="p-3.5 font-mono text-blue-400 font-extrabold">{mbr.id}</td>
-                        <td className="p-3.5 font-bold text-white">{mbr.name}</td>
-                        <td className="p-3.5 text-slate-300 font-medium">{mbr.email}</td>
-                        <td className="p-3.5 text-slate-300 font-medium">{mbr.university || '-'}</td>
-                        <td className="p-3.5 text-slate-300 font-medium">{mbr.prodi || '-'}</td>
+                      <tr key={mbr.id || idx} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3.5 font-mono text-blue-700 font-black">{mbr.id}</td>
+                        <td className="p-3.5 font-bold text-slate-900">{mbr.name}</td>
+                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.email}</td>
+                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.university || '-'}</td>
+                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.prodi || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1248,21 +1250,21 @@ export default function AdminPage() {
 
               {/* Bottom Pagination */}
               <div className="flex items-center justify-between pt-2">
-                <p className="text-xs text-slate-300 font-medium">
+                <p className="text-xs text-slate-600 font-bold">
                   Menampilkan {indexOfFirstMember + 1} - {Math.min(indexOfLastMember, filteredMembers.length)} dari {filteredMembers.length} Member
                 </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                     disabled={memberPage === 1}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     Sebelumnya
                   </button>
                   <button
                     onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                     disabled={memberPage === totalPages}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     Selanjutnya
                   </button>
@@ -1273,21 +1275,21 @@ export default function AdminPage() {
 
           {/* TAB 4: REVENUE & EXCEL REPORT */}
           {activeTab === 'revenue' && (
-            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h2 className="font-bold text-base text-white flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-emerald-600" />
                     Dasbor Pendapatan & Export Laporan Excel
                   </h2>
-                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
                     Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
                   </p>
                 </div>
 
                 <button
                   onClick={handleExportExcel}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md transition-colors"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
                   <span>Export Laporan Excel (.csv)</span>
@@ -1296,38 +1298,38 @@ export default function AdminPage() {
 
               {/* Total Revenue Stat Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
-                  <p className="text-3xl font-black text-white">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-emerald-700 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
+                  <p className="text-3xl font-black text-slate-900">
                     Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-300 font-medium">Otomatis dihitung dari order status Lunas</p>
+                  <p className="text-[11px] text-slate-600 font-bold">Otomatis dihitung dari order status Lunas</p>
                 </div>
 
-                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
-                  <p className="text-3xl font-black text-white">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-amber-700 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
+                  <p className="text-3xl font-black text-slate-900">
                     {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
                   </p>
-                  <p className="text-[11px] text-slate-300 font-medium">Siap diproses oleh tim admin</p>
+                  <p className="text-[11px] text-slate-600 font-bold">Siap diproses oleh tim admin</p>
                 </div>
 
-                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">Waktu Sistem Realtime</p>
-                  <p className="text-base font-bold text-white">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-blue-700 uppercase tracking-wider">Waktu Sistem Realtime</p>
+                  <p className="text-base font-bold text-slate-900">
                     {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                   </p>
-                  <p className="text-[11px] text-slate-300 font-medium">Zona Waktu: Asia/Jakarta (WIB)</p>
+                  <p className="text-[11px] text-slate-600 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
                 </div>
               </div>
 
               {/* Itemized Table */}
-              <div className="border border-slate-700 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-[#0f172a] border-b border-slate-700 font-bold text-xs text-white">
+              <div className="border border-slate-200 rounded-2xl overflow-hidden">
+                <div className="p-4 bg-slate-100 border-b border-slate-200 font-black text-xs text-slate-900">
                   Rincian Transaksi Pendapatan Masuk
                 </div>
-                <table className="w-full text-left text-xs text-slate-200">
-                  <thead className="bg-[#1e293b] text-slate-300 font-bold text-[10px] uppercase border-b border-slate-700">
+                <table className="w-full text-left text-xs text-slate-900">
+                  <thead className="bg-white text-slate-700 font-black text-[10px] uppercase border-b border-slate-200">
                     <tr>
                       <th className="p-3.5">ID Order</th>
                       <th className="p-3.5">Pelanggan</th>
@@ -1336,16 +1338,16 @@ export default function AdminPage() {
                       <th className="p-3.5">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-700 bg-[#0f172a]">
+                  <tbody className="divide-y divide-slate-200 bg-white">
                     {orders
                       .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
                       .map((o) => (
-                        <tr key={o.id} className="hover:bg-slate-800/60">
-                          <td className="p-3.5 font-mono text-amber-400 font-bold">{o.id}</td>
-                          <td className="p-3.5 font-bold text-white">{o.customerName}</td>
-                          <td className="p-3.5 text-slate-200 font-medium">{o.serviceName}</td>
-                          <td className="p-3.5 font-bold text-emerald-400">{o.price}</td>
-                          <td className="p-3.5 font-bold text-emerald-400">Terverifikasi Lunas</td>
+                        <tr key={o.id} className="hover:bg-slate-50">
+                          <td className="p-3.5 font-mono text-amber-700 font-black">{o.id}</td>
+                          <td className="p-3.5 font-bold text-slate-900">{o.customerName}</td>
+                          <td className="p-3.5 text-slate-700 font-semibold">{o.serviceName}</td>
+                          <td className="p-3.5 font-black text-emerald-700">{o.price}</td>
+                          <td className="p-3.5 font-black text-emerald-700">Terverifikasi Lunas</td>
                         </tr>
                       ))}
                   </tbody>
@@ -1356,20 +1358,20 @@ export default function AdminPage() {
 
           {/* TAB 5: SERVICE CMS */}
           {activeTab === 'services' && (
-            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h2 className="font-bold text-base text-white flex items-center gap-2">
-                    <Edit3 className="w-5 h-5 text-white" />
+                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
+                    <Edit3 className="w-5 h-5 text-blue-600" />
                     Kelola Layanan & Harga (CMS Realtime)
                   </h2>
-                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
                     Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
                   </p>
                 </div>
 
                 {saveSuccessMsg && (
-                  <span className="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl animate-fade-in">
+                  <span className="text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-3.5 py-1.5 rounded-xl animate-fade-in">
                     {saveSuccessMsg}
                   </span>
                 )}
@@ -1382,50 +1384,50 @@ export default function AdminPage() {
                   return (
                     <div
                       key={srv.id}
-                      className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 space-y-3 relative group hover:border-slate-500 transition-colors shadow-sm"
+                      className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3 relative group hover:border-slate-300 transition-colors shadow-xs"
                     >
                       {isEditing ? (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Nama Layanan</label>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Nama Layanan</label>
                             <input
                               type="text"
                               value={editForm.name || srv.name}
                               onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Harga Layanan</label>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Harga Layanan</label>
                             <input
                               type="text"
                               value={editForm.price || srv.price}
                               onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Deskripsi Singkat</label>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
                             <textarea
                               rows={2}
                               value={editForm.description || srv.description}
                               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
                             />
                           </div>
 
                           <div className="flex justify-end gap-2 pt-2">
                             <button
                               onClick={() => setEditingServiceId(null)}
-                              className="px-3.5 py-1.5 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600"
+                              className="px-3.5 py-1.5 rounded-lg bg-slate-200 text-slate-800 text-xs font-bold hover:bg-slate-300"
                             >
                               Batal
                             </button>
                             <button
                               onClick={() => handleSaveCmsService(srv.id)}
-                              className="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
+                              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer shadow-xs"
                             >
                               <Save className="w-3.5 h-3.5" />
                               <span>Simpan CMS</span>
@@ -1436,29 +1438,29 @@ export default function AdminPage() {
                         <>
                           <div className="flex items-start justify-between">
                             <div>
-                              <span className="text-[9px] font-mono text-slate-200 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold uppercase">
+                              <span className="text-[9px] font-mono text-slate-800 bg-slate-200 border border-slate-300 px-2 py-0.5 rounded font-bold uppercase">
                                 {srv.category}
                               </span>
-                              <h3 className="font-bold text-base text-white mt-1.5">{srv.name}</h3>
+                              <h3 className="font-black text-base text-slate-900 mt-1.5">{srv.name}</h3>
                             </div>
                             <button
                               onClick={() => {
                                 setEditingServiceId(srv.id);
                                 setEditForm({ name: srv.name, price: srv.price, description: srv.description, badge: srv.badge });
                               }}
-                              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
+                              className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 transition-colors cursor-pointer shadow-xs"
                               title="Edit Layanan"
                             >
                               <Edit3 className="w-4 h-4" />
                             </button>
                           </div>
 
-                          <p className="text-xs text-slate-300 leading-relaxed font-medium">{srv.description}</p>
+                          <p className="text-xs text-slate-700 leading-relaxed font-semibold">{srv.description}</p>
 
-                          <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-                            <span className="text-sm font-black text-amber-400">{srv.price}</span>
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                            <span className="text-sm font-black text-emerald-700">{srv.price}</span>
                             {srv.badge && (
-                              <span className="text-[9px] font-black bg-slate-200 text-slate-950 px-2.5 py-0.5 rounded uppercase">
+                              <span className="text-[9px] font-black bg-blue-600 text-white px-2.5 py-0.5 rounded uppercase">
                                 {srv.badge}
                               </span>
                             )}
@@ -1477,27 +1479,27 @@ export default function AdminPage() {
       {/* Proof Screenshot Image Viewer Modal */}
       <AnimatePresence>
         {selectedProofImage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-[#1e293b] border border-slate-700 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4 shadow-2xl"
+              className="bg-white border border-slate-200 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4 shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                  <QrCode className="w-4 h-4 text-amber-400" />
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                  <QrCode className="w-4 h-4 text-amber-600" />
                   Inspeksi Bukti Pembayaran QRIS (Screenshot)
                 </h3>
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  className="p-1 text-slate-500 hover:text-slate-900 rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-slate-700 bg-black flex items-center justify-center p-2">
+              <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center p-2">
                 <img
                   src={selectedProofImage}
                   alt="Bukti Transfer QRIS"
@@ -1508,7 +1510,7 @@ export default function AdminPage() {
               <div className="flex justify-end pt-2">
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 font-bold text-xs cursor-pointer"
                 >
                   Tutup Pratonton
                 </button>
