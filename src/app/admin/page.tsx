@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Mail, Lock, LogOut, MessageSquare, Shield, User as UserIcon,
-  School, GraduationCap, Send, Clock, CircleAlert, Headphones,
-  ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, CreditCard,
-  Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight, FileText
+  Mail, Lock, LogOut, MessageSquare, Shield,
+  School, Send, CircleAlert, Headphones,
+  ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode,
+  Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 interface Message {
@@ -70,7 +69,6 @@ interface ServiceConfig {
 const BUCKET_URL = '/api/chats';
 const ORDERS_URL = '/api/orders';
 
-// Initial fallback services list for CMS
 const DEFAULT_SERVICES: ServiceConfig[] = [
   { id: 101, category: 'turnitin', name: 'Cek Turnitin Standard', price: 'Rp 8.000', description: 'Hasil instant, sertakan filter bibliography & quotes.', badge: 'POPULER' },
   { id: 102, category: 'turnitin', name: 'Cek Turnitin 3x Paket', price: 'Rp 20.000', description: 'Paket hemat 3x pengecekan dengan laporan lengkap.', badge: 'BEST DEAL' },
@@ -116,12 +114,12 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
-  // Check Auth state & set body dark background on mount
+  // Check Auth state & set body dark slate background on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
     setIsAdminLoggedIn(isLoggedIn);
 
-    document.body.style.backgroundColor = '#0b0f19';
+    document.body.style.backgroundColor = '#0f172a';
     return () => {
       document.body.style.backgroundColor = '';
     };
@@ -131,7 +129,6 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAdminLoggedIn) {
       localStorage.setItem('soobin_admin_active', 'true');
-      
       const handleBeforeUnload = () => {
         localStorage.setItem('soobin_admin_active', 'false');
       };
@@ -144,56 +141,33 @@ export default function AdminPage() {
     }
   }, [isAdminLoggedIn]);
 
-  // Load Members & CMS Services on mount
-  useEffect(() => {
-    // Load Members from registered users
-    const loadedMembers = JSON.parse(localStorage.getItem('soobin_registered_members') || '[]');
-    if (loadedMembers.length === 0) {
-      // Fallback demo members if empty
-      const demoMembers: MemberUser[] = Array.from({ length: 65 }).map((_, i) => ({
-        id: `MBR-${1000 + i}`,
-        name: i % 2 === 0 ? `Filda Felissa ${i + 1}` : `Bintang Prasetyo ${i + 1}`,
-        email: `user${i + 1}@gmail.com`,
-        university: i % 3 === 0 ? 'Universitas Gadjah Mada' : i % 2 === 0 ? 'Universitas Indonesia' : 'Universitas Brawijaya',
-        prodi: i % 2 === 0 ? 'Manajemen S1' : 'Teknik Informatika S1',
-        createdAt: new Date(Date.now() - i * 86400000).toISOString()
-      }));
-      setMembers(demoMembers);
-      localStorage.setItem('soobin_registered_members', JSON.stringify(demoMembers));
-    } else {
-      setMembers(loadedMembers);
+  // Sync Members with cloud API
+  const syncMembersWithCloud = async () => {
+    try {
+      const res = await fetch('/api/members');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const formatted = data.map((m: any, idx: number) => ({
+            ...m,
+            id: `MBR-${String(idx + 1).padStart(4, '0')}`,
+          }));
+          setMembers(formatted);
+          localStorage.setItem('soobin_registered_members', JSON.stringify(formatted));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to sync members', e);
     }
+  };
 
-    // Load Services CMS config
+  // Sync services config
+  useEffect(() => {
     const savedServices = JSON.parse(localStorage.getItem('soobin_cms_services') || 'null');
     if (savedServices) {
       setCmsServices(savedServices);
     }
   }, []);
-
-  // Web Audio API notification sound
-  const playNotificationSound = () => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
-      
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
-    } catch (e) {
-      console.log('Audio playback prevented');
-    }
-  };
 
   // Sync chats with cloud
   const syncChatsWithCloud = async () => {
@@ -220,7 +194,7 @@ export default function AdminPage() {
 
       prevChatsRef.current = cloudChats;
     } catch (e) {
-      console.error('Failed to sync chats with cloud', e);
+      console.error('Failed to sync chats', e);
     }
   };
 
@@ -229,7 +203,6 @@ export default function AdminPage() {
     setOrdersLoading(true);
     try {
       const localOrders = JSON.parse(localStorage.getItem('soobin_all_orders') || '[]');
-      
       let cloudOrders: OrderItem[] = [];
       const res = await fetch(ORDERS_URL);
       if (res.ok) {
@@ -239,7 +212,6 @@ export default function AdminPage() {
         }
       }
 
-      // Unique merge by order ID
       const orderMap = new Map<string, OrderItem>();
       [...cloudOrders, ...localOrders].forEach((item) => {
         if (item && item.id) {
@@ -257,22 +229,6 @@ export default function AdminPage() {
       console.error('Failed to sync orders', e);
     } finally {
       setOrdersLoading(false);
-    }
-  };
-
-  // Sync members with cloud
-  const syncMembersWithCloud = async () => {
-    try {
-      const res = await fetch('/api/members');
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setMembers(data);
-          localStorage.setItem('soobin_registered_members', JSON.stringify(data));
-        }
-      }
-    } catch (e) {
-      console.error('Failed to sync members', e);
     }
   };
 
@@ -322,7 +278,25 @@ export default function AdminPage() {
     localStorage.setItem('soobin_admin_active', 'false');
   };
 
-  // Send admin message
+  // Sound notification
+  const playNotificationSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    } catch (e) {}
+  };
+
+  // Send admin reply
   const handleSendAdminReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSessionId || !adminReplyText.trim()) return;
@@ -366,7 +340,6 @@ export default function AdminPage() {
     }
   };
 
-  // Select chat session
   const handleSelectSession = (id: string) => {
     setSelectedSessionId(id);
     if (chats[id] && chats[id].unreadCount > 0) {
@@ -403,13 +376,12 @@ export default function AdminPage() {
     }
   };
 
-  // Download File attachment helper (Guaranteed Direct Download)
+  // Guaranteed direct document download
   const handleDownloadFile = (order: OrderItem) => {
     let fileUrl = order.uploadedFileData;
     let fileName = order.uploadedFileName || `Dokumen_${order.id}.docx`;
 
     if (!fileUrl) {
-      // Fallback: create instant downloadable document blob with order instructions
       let content = `DOKUMEN PESANAN SOOBIN SERVICES\n`;
       content += `ID Order: ${order.id}\n`;
       content += `Nama Pelanggan: ${order.customerName} (${order.customerEmail})\n`;
@@ -433,7 +405,7 @@ export default function AdminPage() {
     document.body.removeChild(a);
   };
 
-  // Calculate Total Verified Revenue
+  // Calculate Verified Revenue
   const calculateTotalRevenue = () => {
     return orders
       .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas') || o.paymentStatus?.toLowerCase().includes('terverifikasi'))
@@ -443,7 +415,7 @@ export default function AdminPage() {
       }, 0);
   };
 
-  // Export Monthly Revenue Report to Excel (.csv format with WIB timestamp)
+  // Export Monthly Revenue Report to Excel (.csv with WIB timestamp)
   const handleExportExcel = () => {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = {
@@ -480,13 +452,12 @@ export default function AdminPage() {
     document.body.removeChild(link);
   };
 
-  // CMS Service edit submit
+  // Save Service CMS
   const handleSaveCmsService = (id: number) => {
     const updated = cmsServices.map((s) => (s.id === id ? { ...s, ...editForm } : s));
     setCmsServices(updated);
     localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
 
-    // Save to Cloud API as well
     fetch('/api/services', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -498,7 +469,7 @@ export default function AdminPage() {
     setTimeout(() => setSaveSuccessMsg(''), 4000);
   };
 
-  // Pagination logic for Members
+  // Pagination for Members
   const indexOfLastMember = memberPage * membersPerPage;
   const indexOfFirstMember = indexOfLastMember - membersPerPage;
   const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
@@ -506,24 +477,22 @@ export default function AdminPage() {
 
   if (!isAdminLoggedIn) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(30,58,138,0.2)_0%,transparent_70%)] pointer-events-none" />
-
+      <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-dark-800 border border-dark-700 p-8 rounded-3xl shadow-2xl max-w-md w-full relative z-10"
+          className="bg-[#1e293b] border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-md w-full"
         >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary-800/20 border border-primary-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary-400">
+            <div className="w-16 h-16 bg-slate-700/60 border border-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
               <Shield className="w-8 h-8" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-wide">SOOBIN Admin Portal</h1>
-            <p className="text-xs text-dark-300 mt-1">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
+            <p className="text-xs text-slate-300 mt-1">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold text-center flex items-center justify-center gap-2">
+            <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-semibold text-center flex items-center justify-center gap-2">
               <CircleAlert className="w-4 h-4" />
               <span>{error}</span>
             </div>
@@ -531,31 +500,31 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-dark-200 mb-1.5">Email Admin</label>
+              <label className="block text-xs font-bold text-slate-200 mb-1.5">Email Admin</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-dark-400 absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="email"
                   required
                   placeholder="admin@soobin.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-900 border border-dark-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-dark-500 focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-dark-200 mb-1.5">Password Admin</label>
+              <label className="block text-xs font-bold text-slate-200 mb-1.5">Password Admin</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-dark-400 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-dark-900 border border-dark-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-dark-500 focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white transition-colors"
                 />
               </div>
             </div>
@@ -563,14 +532,14 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-800 hover:bg-primary-750 text-white font-bold py-3 rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
+              className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
             >
               {loading ? 'Memverifikasi...' : 'Masuk Dasbor Admin'}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-dark-700 text-center">
-            <Link href="/" className="text-xs text-dark-400 hover:text-white transition-colors">
+          <div className="mt-6 pt-6 border-t border-slate-700 text-center">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white transition-colors">
               ← Kembali ke Website Utama
             </Link>
           </div>
@@ -582,32 +551,32 @@ export default function AdminPage() {
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-dark-100 flex flex-col w-full font-sans antialiased" style={{ backgroundColor: '#0b0f19' }}>
+    <div className="min-h-screen bg-[#0f172a] text-slate-100 flex flex-col w-full font-sans antialiased" style={{ backgroundColor: '#0f172a' }}>
       {/* Top Navbar */}
-      <header className="bg-dark-900/90 backdrop-blur-md border-b border-dark-800 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
+      <header className="bg-[#1e293b] border-b border-slate-700 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-800/30 border border-primary-800/60 rounded-xl flex items-center justify-center text-primary-400 shrink-0">
+          <div className="w-10 h-10 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center text-white shrink-0">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-bold text-base text-white leading-none">Dasbor Admin SOOBIN</h1>
-            <span className="text-[11px] text-green-400 flex items-center gap-1.5 font-semibold mt-1">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /> Status Online
+            <h1 className="font-extrabold text-base text-white leading-none tracking-wide">Dasbor Admin SOOBIN</h1>
+            <span className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-semibold mt-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Status Online
             </span>
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center flex-wrap gap-2 bg-dark-950/90 p-2 rounded-2xl border border-dark-700 shadow-inner">
+        {/* Tab Switcher - Professional Black & White / Slate Styling */}
+        <div className="flex items-center flex-wrap gap-2 bg-[#0f172a] p-1.5 rounded-xl border border-slate-700">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'chat'
-                ? 'bg-primary-800 text-white border-primary-500 shadow-md scale-105'
-                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
+                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <MessageSquare className="w-4 h-4 text-blue-400" />
+            <MessageSquare className="w-4 h-4" />
             <span>Live Chat</span>
             {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0) > 0 && (
               <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
@@ -618,16 +587,16 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'orders'
-                ? 'bg-amber-500 text-dark-950 font-black border-amber-300 shadow-md scale-105'
-                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
+                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <ShoppingBag className="w-4 h-4 text-amber-400" />
+            <ShoppingBag className="w-4 h-4" />
             <span>Pesanan & Pembayaran</span>
             {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length > 0 && (
-              <span className="bg-amber-400 text-dark-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">
+              <span className="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">
                 {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length}
               </span>
             )}
@@ -635,37 +604,37 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('members')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'members'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-md scale-105'
-                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
+                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <Users className="w-4 h-4 text-blue-400" />
+            <Users className="w-4 h-4" />
             <span>Data Member ({members.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('revenue')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'revenue'
-                ? 'bg-emerald-600 text-white border-emerald-400 shadow-md scale-105'
-                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
+                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <DollarSign className="w-4 h-4" />
             <span>Pendapatan</span>
           </button>
 
           <button
             onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'services'
-                ? 'bg-purple-600 text-white border-purple-400 shadow-md scale-105'
-                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
+                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <Edit3 className="w-4 h-4 text-purple-400" />
+            <Edit3 className="w-4 h-4" />
             <span>Kelola Layanan</span>
           </button>
         </div>
@@ -681,20 +650,21 @@ export default function AdminPage() {
 
       {/* Main Admin Workspace */}
       <main className="flex-1 flex overflow-hidden p-4 sm:p-6 w-full max-w-[1600px] mx-auto gap-6">
+        {/* Tab 1: Live Chat */}
         {activeTab === 'chat' && (
           <div className="flex-1 flex gap-6 w-full overflow-hidden">
             {/* Sidebar Chat Sessions */}
-            <div className="w-80 bg-dark-900 border border-dark-800 rounded-2xl flex flex-col overflow-hidden shrink-0">
-              <div className="p-4 border-b border-dark-800 flex items-center justify-between">
-                <h2 className="font-bold text-xs text-white uppercase tracking-wider">Antrean Percakapan</h2>
-                <span className="text-[10px] bg-primary-800/20 text-primary-400 px-2 py-0.5 rounded-full font-bold">
+            <div className="w-80 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-sm">
+              <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-[#1e293b]">
+                <h2 className="font-extrabold text-xs text-white uppercase tracking-wider">Antrean Percakapan</h2>
+                <span className="text-[10px] bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-full font-bold">
                   {Object.keys(chats).length} User
                 </span>
               </div>
 
-              <div className="flex-1 overflow-y-auto divide-y divide-dark-800/50">
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-700/50">
                 {Object.keys(chats).length === 0 ? (
-                  <div className="p-8 text-center text-xs text-dark-400">
+                  <div className="p-8 text-center text-xs text-slate-300 font-semibold">
                     Belum ada percakapan masuk dari pengguna.
                   </div>
                 ) : (
@@ -704,23 +674,23 @@ export default function AdminPage() {
                       onClick={() => handleSelectSession(session.id)}
                       className={`w-full p-4 text-left transition-colors flex items-start gap-3 cursor-pointer ${
                         selectedSessionId === session.id
-                          ? 'bg-primary-800/10 border-l-4 border-primary-500'
-                          : 'hover:bg-dark-850'
+                          ? 'bg-slate-700/70 border-l-4 border-white'
+                          : 'hover:bg-slate-700/40'
                       }`}
                     >
-                      <div className="w-9 h-9 rounded-full bg-dark-700 border border-dark-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
                         {session.name?.[0]?.toUpperCase() || 'U'}
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
                           <h3 className="font-bold text-xs text-white truncate">{session.name}</h3>
-                          <span className="text-[9px] text-dark-400">{session.lastUpdated}</span>
+                          <span className="text-[9px] text-slate-300 font-medium">{session.lastUpdated}</span>
                         </div>
-                        <p className="text-[11px] text-dark-300 truncate">
+                        <p className="text-[11px] text-slate-300 truncate">
                           {session.university} • {session.prodi}
                         </p>
-                        <p className="text-[10px] text-dark-400 truncate mt-1">
+                        <p className="text-[10px] text-slate-400 truncate mt-1">
                           {session.messages?.[session.messages.length - 1]?.text || 'Belum ada pesan'}
                         </p>
                       </div>
@@ -737,31 +707,31 @@ export default function AdminPage() {
             </div>
 
             {/* Chat Room Area */}
-            <div className="flex-1 bg-dark-900 border border-dark-800 rounded-2xl flex flex-col overflow-hidden">
+            <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-sm">
               {selectedSession ? (
                 <>
                   {/* Session Header */}
-                  <div className="p-4 border-b border-dark-800 bg-dark-850 flex items-center justify-between">
+                  <div className="p-4 border-b border-slate-700 bg-[#1e293b] flex items-center justify-between">
                     <div>
                       <h2 className="font-bold text-sm text-white">{selectedSession.name}</h2>
-                      <div className="flex items-center gap-3 text-[11px] text-dark-300 mt-0.5">
+                      <div className="flex items-center gap-3 text-[11px] text-slate-300 mt-0.5 font-medium">
                         <span className="flex items-center gap-1">
-                          <Mail className="w-3 h-3" /> {selectedSession.email}
+                          <Mail className="w-3 h-3 text-slate-400" /> {selectedSession.email}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <School className="w-3 h-3" /> {selectedSession.university}
+                          <School className="w-3 h-3 text-slate-400" /> {selectedSession.university}
                         </span>
                       </div>
                     </div>
 
-                    <span className="text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-1 rounded-full font-bold">
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
                       Session Active
                     </span>
                   </div>
 
                   {/* Messages Stream */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-dark-950/50">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0f172a]/60">
                     {selectedSession.messages.map((msg) => (
                       <div
                         key={msg.id}
@@ -770,14 +740,14 @@ export default function AdminPage() {
                         <div
                           className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
                             msg.sender === 'admin'
-                              ? 'bg-primary-800 text-white rounded-tr-none'
-                              : 'bg-dark-800 text-dark-100 border border-dark-700 rounded-tl-none'
+                              ? 'bg-blue-600 text-white rounded-tr-none shadow-sm'
+                              : 'bg-slate-700 text-white border border-slate-600 rounded-tl-none'
                           }`}
                         >
                           <p className="whitespace-pre-wrap">{msg.text}</p>
                           <span
                             className={`block text-[9px] mt-1 text-right ${
-                              msg.sender === 'admin' ? 'text-primary-200' : 'text-dark-400'
+                              msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-300'
                             }`}
                           >
                             {msg.timestamp}
@@ -789,17 +759,17 @@ export default function AdminPage() {
                   </div>
 
                   {/* Reply Input Box */}
-                  <form onSubmit={handleSendAdminReply} className="p-3 border-t border-dark-800 bg-dark-900 flex gap-2">
+                  <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-700 bg-[#1e293b] flex gap-2">
                     <input
                       type="text"
                       placeholder="Tulis balasan untuk pengguna..."
                       value={adminReplyText}
                       onChange={(e) => setAdminReplyText(e.target.value)}
-                      className="flex-1 bg-dark-800 border border-dark-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-dark-400 focus:outline-none focus:border-primary-500"
+                      className="flex-1 bg-[#0f172a] border border-slate-600 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white"
                     />
                     <button
                       type="submit"
-                      className="bg-primary-800 hover:bg-primary-750 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-lg"
+                      className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Kirim</span>
@@ -807,10 +777,12 @@ export default function AdminPage() {
                   </form>
                 </>
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-dark-400">
-                  <Headphones className="w-12 h-12 mb-3 text-dark-600" />
-                  <p className="font-bold text-sm text-dark-300">Pilih Percakapan Pelanggan</p>
-                  <p className="text-xs text-dark-500 mt-1 max-w-xs">
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                  <div className="w-16 h-16 bg-slate-700/50 border border-slate-600 rounded-2xl flex items-center justify-center text-white mb-4">
+                    <Headphones className="w-8 h-8" />
+                  </div>
+                  <p className="font-bold text-base text-white">Pilih Percakapan Pelanggan</p>
+                  <p className="text-xs text-slate-300 mt-1 max-w-xs leading-relaxed font-medium">
                     Klik salah satu antrean percakapan di sebelah kiri untuk membalas pesan live chat.
                   </p>
                 </div>
@@ -821,22 +793,22 @@ export default function AdminPage() {
 
         {/* Tab 2: Orders & Payments */}
         {activeTab === 'orders' && (
-          <div className="flex-1 bg-dark-900 border border-dark-800 rounded-2xl p-6 overflow-y-auto space-y-6">
-            <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
               <div>
                 <h2 className="font-bold text-base text-white flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5 text-amber-400" />
                   Daftar Pesanan & Pembayaran QRIS / Transfer
                 </h2>
-                <p className="text-xs text-dark-400 mt-0.5">
-                  Pantau bukti transfer screenshot QRIS, download file tugas ter-upload, dan verifikasi status lunas.
+                <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
                 </p>
               </div>
 
               <button
                 onClick={syncOrdersWithCloud}
                 disabled={ordersLoading}
-                className="px-3.5 py-2 rounded-xl bg-dark-800 hover:bg-dark-700 text-dark-200 border border-dark-700 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
+                className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? 'animate-spin' : ''}`} />
                 <span>Refresh Pesanan</span>
@@ -844,10 +816,10 @@ export default function AdminPage() {
             </div>
 
             {orders.length === 0 ? (
-              <div className="p-12 text-center text-dark-400 bg-dark-950/50 rounded-2xl border border-dark-800">
-                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-dark-600" />
-                <p className="font-bold text-sm text-dark-300">Belum Ada Pesanan Masuk</p>
-                <p className="text-xs text-dark-500 mt-1">
+              <div className="p-12 text-center text-slate-300 bg-[#0f172a]/60 rounded-2xl border border-slate-700">
+                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-400" />
+                <p className="font-bold text-base text-white">Belum Ada Pesanan Masuk</p>
+                <p className="text-xs text-slate-300 mt-1 font-medium">
                   Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
                 </p>
               </div>
@@ -860,21 +832,21 @@ export default function AdminPage() {
                   return (
                     <div
                       key={order.id}
-                      className="bg-dark-950 border border-dark-800 rounded-2xl p-5 hover:border-dark-700 transition-colors space-y-4"
+                      className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 hover:border-slate-600 transition-colors space-y-4 shadow-sm"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-dark-800/80 pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-black text-xs">
+                          <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 text-white flex items-center justify-center font-black text-xs">
                             ORD
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
                               <h3 className="font-bold text-sm text-white">{order.customerName}</h3>
-                              <span className="text-[10px] bg-dark-800 text-dark-300 px-2 py-0.5 rounded font-mono">
+                              <span className="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono border border-slate-600 font-bold">
                                 {order.id}
                               </span>
                             </div>
-                            <p className="text-xs text-dark-400">{order.customerEmail}</p>
+                            <p className="text-xs text-slate-300 font-medium">{order.customerEmail}</p>
                           </div>
                         </div>
 
@@ -883,10 +855,10 @@ export default function AdminPage() {
                           <span
                             className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
                               isLunas
-                                ? 'bg-green-500/15 text-green-400 border border-green-500/30'
+                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40'
                                 : isCancel
-                                ? 'bg-red-500/15 text-red-400 border border-red-500/30'
-                                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                ? 'bg-red-500/15 text-red-300 border border-red-500/40'
+                                : 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
                             }`}
                           >
                             {order.paymentStatus}
@@ -896,20 +868,22 @@ export default function AdminPage() {
 
                       {/* Main Details Grid */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                        <div className="bg-dark-900 p-3.5 rounded-xl border border-dark-800 space-y-1">
-                          <p className="text-dark-400 font-semibold">Jasa Layanan:</p>
+                        <div className="bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-1">
+                          <p className="text-slate-300 font-semibold">Jasa Layanan:</p>
                           <p className="font-bold text-white text-sm">{order.serviceName}</p>
-                          <p className="text-green-400 font-bold">{order.price}</p>
-                          <p className="text-dark-400 text-[11px] pt-1">Metode: <span className="text-white font-semibold">{order.paymentMethod}</span></p>
+                          <p className="text-emerald-400 font-extrabold">{order.price}</p>
+                          <p className="text-slate-300 text-[11px] pt-1 font-medium">
+                            Metode: <span className="text-white font-bold">{order.paymentMethod}</span>
+                          </p>
                         </div>
 
-                        <div className="md:col-span-2 bg-dark-900 p-3.5 rounded-xl border border-dark-800 space-y-2">
-                          <p className="text-dark-400 font-semibold">Detail Formulir Kustom:</p>
+                        <div className="md:col-span-2 bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-2">
+                          <p className="text-slate-300 font-semibold">Detail Formulir Kustom:</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                             {order.customFields &&
                               Object.entries(order.customFields).map(([k, v]) => (
-                                <div key={k} className="bg-dark-950 p-2 rounded-lg border border-dark-800">
-                                  <span className="text-dark-400 block font-bold">{k}:</span>
+                                <div key={k} className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-700">
+                                  <span className="text-slate-300 block font-bold">{k}:</span>
                                   <span className="text-white font-medium break-words">{v}</span>
                                 </div>
                               ))}
@@ -924,18 +898,18 @@ export default function AdminPage() {
                           {order.proofImage && (
                             <button
                               onClick={() => setSelectedProofImage(order.proofImage || null)}
-                              className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                             >
                               <Eye className="w-4 h-4" />
                               <span>Lihat Bukti Bayar (Screenshot)</span>
                             </button>
                           )}
 
-                          {/* File Download Button */}
+                          {/* File Download Button (Always Downloadable Direct) */}
                           {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
                             <button
                               onClick={() => handleDownloadFile(order)}
-                              className="px-3.5 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
                             >
                               <Download className="w-4 h-4" />
                               <span>Unduh Dokumen File</span>
@@ -947,7 +921,7 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                            className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                            className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                           >
                             <XCircle className="w-4 h-4" />
                             <span>Batalkan</span>
@@ -955,7 +929,7 @@ export default function AdminPage() {
 
                           <button
                             onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                            className="px-3.5 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-dark-950 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-md"
+                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-md"
                           >
                             <CheckCircle className="w-4 h-4" />
                             <span>Verifikasi Lunas</span>
@@ -970,16 +944,16 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Tab 3: Data Member (50 items per page pagination) */}
+        {/* Tab 3: Data Member (50 items per page, starting MBR-0001) */}
         {activeTab === 'members' && (
-          <div className="flex-1 bg-dark-900 border border-dark-800 rounded-2xl p-6 overflow-y-auto space-y-6">
-            <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
               <div>
                 <h2 className="font-bold text-base text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-400" />
                   Daftar Member Terdaftar
                 </h2>
-                <p className="text-xs text-dark-400 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5 font-medium">
                   Total {members.length} member terdaftar pada platform SOOBIN Services. Menampilkan 50 member per halaman.
                 </p>
               </div>
@@ -989,7 +963,7 @@ export default function AdminPage() {
                 <button
                   onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                   disabled={memberPage === 1}
-                  className="p-2 rounded-xl bg-dark-800 border border-dark-700 text-dark-200 disabled:opacity-40 hover:bg-dark-700 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -999,7 +973,7 @@ export default function AdminPage() {
                 <button
                   onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                   disabled={memberPage === totalPages}
-                  className="p-2 rounded-xl bg-dark-800 border border-dark-700 text-dark-200 disabled:opacity-40 hover:bg-dark-700 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -1007,25 +981,25 @@ export default function AdminPage() {
             </div>
 
             {/* Members Table */}
-            <div className="overflow-x-auto border border-dark-800 rounded-2xl">
-              <table className="w-full text-left text-xs text-dark-200">
-                <thead className="bg-dark-950 text-dark-400 font-bold uppercase tracking-wider text-[10px] border-b border-dark-800">
+            <div className="overflow-x-auto border border-slate-700 rounded-2xl">
+              <table className="w-full text-left text-xs text-slate-200">
+                <thead className="bg-[#0f172a] text-slate-300 font-extrabold uppercase tracking-wider text-[10px] border-b border-slate-700">
                   <tr>
-                    <th className="p-3.5">ID Member</th>
+                    <th className="p-3.5">Kode ID Member</th>
                     <th className="p-3.5">Nama Lengkap</th>
                     <th className="p-3.5">Email</th>
                     <th className="p-3.5">Kampus / Universitas</th>
                     <th className="p-3.5">Program Studi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-800/60 bg-dark-900">
-                  {currentMembers.map((mbr) => (
-                    <tr key={mbr.id} className="hover:bg-dark-850/60 transition-colors">
-                      <td className="p-3.5 font-mono text-primary-400 font-bold">{mbr.id}</td>
+                <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
+                  {currentMembers.map((mbr, idx) => (
+                    <tr key={mbr.id || idx} className="hover:bg-slate-700/50 transition-colors">
+                      <td className="p-3.5 font-mono text-blue-400 font-extrabold">{mbr.id}</td>
                       <td className="p-3.5 font-bold text-white">{mbr.name}</td>
-                      <td className="p-3.5 text-dark-300">{mbr.email}</td>
-                      <td className="p-3.5 text-dark-300">{mbr.university || '-'}</td>
-                      <td className="p-3.5 text-dark-300">{mbr.prodi || '-'}</td>
+                      <td className="p-3.5 text-slate-300 font-medium">{mbr.email}</td>
+                      <td className="p-3.5 text-slate-300 font-medium">{mbr.university || '-'}</td>
+                      <td className="p-3.5 text-slate-300 font-medium">{mbr.prodi || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1034,21 +1008,21 @@ export default function AdminPage() {
 
             {/* Bottom Pagination */}
             <div className="flex items-center justify-between pt-2">
-              <p className="text-xs text-dark-400">
+              <p className="text-xs text-slate-300 font-medium">
                 Menampilkan {indexOfFirstMember + 1} - {Math.min(indexOfLastMember, members.length)} dari {members.length} Member
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                   disabled={memberPage === 1}
-                  className="px-3 py-1.5 rounded-xl bg-dark-800 border border-dark-700 text-xs font-bold text-white disabled:opacity-40 hover:bg-dark-700 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
                 >
                   Sebelumnya
                 </button>
                 <button
                   onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                   disabled={memberPage === totalPages}
-                  className="px-3 py-1.5 rounded-xl bg-dark-800 border border-dark-700 text-xs font-bold text-white disabled:opacity-40 hover:bg-dark-700 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
                 >
                   Selanjutnya
                 </button>
@@ -1059,79 +1033,79 @@ export default function AdminPage() {
 
         {/* Tab 4: Pendapatan & Export Excel */}
         {activeTab === 'revenue' && (
-          <div className="flex-1 bg-dark-900 border border-dark-800 rounded-2xl p-6 overflow-y-auto space-y-6">
-            <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
               <div>
                 <h2 className="font-bold text-base text-white flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-400" />
                   Dasbor Pendapatan & Export Laporan Excel
                 </h2>
-                <p className="text-xs text-dark-400 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5 font-medium">
                   Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
                 </p>
               </div>
 
               <button
                 onClick={handleExportExcel}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md transition-colors"
               >
                 <FileSpreadsheet className="w-4 h-4" />
                 <span>Export Laporan Excel (.csv)</span>
               </button>
             </div>
 
-            {/* Total Revenue Stat Card */}
+            {/* Total Revenue Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-emerald-900/40 to-dark-900 border border-emerald-500/30 rounded-2xl p-6 space-y-2">
+              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
                 <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
                 <p className="text-3xl font-black text-white">
                   Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                 </p>
-                <p className="text-[11px] text-emerald-300/80">Otomatis dihitung dari order status Lunas</p>
+                <p className="text-[11px] text-slate-300 font-medium">Otomatis dihitung dari order status Lunas</p>
               </div>
 
-              <div className="bg-dark-950 border border-dark-800 rounded-2xl p-6 space-y-2">
+              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
                 <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
                 <p className="text-3xl font-black text-white">
                   {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
                 </p>
-                <p className="text-[11px] text-dark-400">Siap diproses oleh tim admin</p>
+                <p className="text-[11px] text-slate-300 font-medium">Siap diproses oleh tim admin</p>
               </div>
 
-              <div className="bg-dark-950 border border-dark-800 rounded-2xl p-6 space-y-2">
+              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
                 <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">Waktu Sistem Realtime</p>
                 <p className="text-base font-bold text-white">
                   {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                 </p>
-                <p className="text-[11px] text-dark-400">Zona Waktu: Asia/Jakarta (WIB)</p>
+                <p className="text-[11px] text-slate-300 font-medium">Zona Waktu: Asia/Jakarta (WIB)</p>
               </div>
             </div>
 
             {/* Itemized Table */}
-            <div className="border border-dark-800 rounded-2xl overflow-hidden">
-              <div className="p-4 bg-dark-950 border-b border-dark-800 font-bold text-xs text-white">
+            <div className="border border-slate-700 rounded-2xl overflow-hidden">
+              <div className="p-4 bg-[#0f172a] border-b border-slate-700 font-bold text-xs text-white">
                 Rincian Transaksi Pendapatan Masuk
               </div>
-              <table className="w-full text-left text-xs text-dark-200">
-                <thead className="bg-dark-900 text-dark-400 font-bold text-[10px] uppercase border-b border-dark-800">
+              <table className="w-full text-left text-xs text-slate-200">
+                <thead className="bg-[#1e293b] text-slate-300 font-bold text-[10px] uppercase border-b border-slate-700">
                   <tr>
-                    <th className="p-3">ID Order</th>
-                    <th className="p-3">Pelanggan</th>
-                    <th className="p-3">Layanan</th>
-                    <th className="p-3">Harga</th>
-                    <th className="p-3">Status</th>
+                    <th className="p-3.5">ID Order</th>
+                    <th className="p-3.5">Pelanggan</th>
+                    <th className="p-3.5">Layanan</th>
+                    <th className="p-3.5">Harga</th>
+                    <th className="p-3.5">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-800 bg-dark-950">
+                <tbody className="divide-y divide-slate-700 bg-[#0f172a]">
                   {orders
                     .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
                     .map((o) => (
-                      <tr key={o.id} className="hover:bg-dark-900">
-                        <td className="p-3 font-mono text-amber-400 font-bold">{o.id}</td>
-                        <td className="p-3 font-bold text-white">{o.customerName}</td>
-                        <td className="p-3">{o.serviceName}</td>
-                        <td className="p-3 font-bold text-green-400">{o.price}</td>
-                        <td className="p-3 font-bold text-green-400">Terverifikasi Lunas</td>
+                      <tr key={o.id} className="hover:bg-slate-800/60">
+                        <td className="p-3.5 font-mono text-amber-400 font-bold">{o.id}</td>
+                        <td className="p-3.5 font-bold text-white">{o.customerName}</td>
+                        <td className="p-3.5 text-slate-200 font-medium">{o.serviceName}</td>
+                        <td className="p-3.5 font-bold text-emerald-400">{o.price}</td>
+                        <td className="p-3.5 font-bold text-emerald-400">Terverifikasi Lunas</td>
                       </tr>
                     ))}
                 </tbody>
@@ -1140,22 +1114,22 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Tab 5: Kelola Layanan (Realtime Service CMS) */}
+        {/* Tab 5: Kelola Layanan (Realtime Service CMS - Professional Black/White) */}
         {activeTab === 'services' && (
-          <div className="flex-1 bg-dark-900 border border-dark-800 rounded-2xl p-6 overflow-y-auto space-y-6">
-            <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
               <div>
                 <h2 className="font-bold text-base text-white flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-purple-400" />
+                  <Edit3 className="w-5 h-5 text-white" />
                   Kelola Layanan & Harga (CMS Realtime)
                 </h2>
-                <p className="text-xs text-dark-400 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5 font-medium">
                   Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
                 </p>
               </div>
 
               {saveSuccessMsg && (
-                <span className="text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-xl animate-fade-in">
+                <span className="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl animate-fade-in">
                   {saveSuccessMsg}
                 </span>
               )}
@@ -1168,50 +1142,50 @@ export default function AdminPage() {
                 return (
                   <div
                     key={srv.id}
-                    className="bg-dark-950 border border-dark-800 rounded-2xl p-5 space-y-3 relative group hover:border-purple-500/40 transition-colors"
+                    className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 space-y-3 relative group hover:border-slate-500 transition-colors shadow-sm"
                   >
                     {isEditing ? (
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-[11px] font-bold text-dark-400 mb-1">Nama Layanan</label>
+                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Nama Layanan</label>
                           <input
                             type="text"
                             value={editForm.name || srv.name}
                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                            className="w-full bg-dark-900 border border-dark-700 rounded-xl px-3 py-2 text-xs text-white"
+                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold text-dark-400 mb-1">Harga Layanan</label>
+                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Harga Layanan</label>
                           <input
                             type="text"
                             value={editForm.price || srv.price}
                             onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                            className="w-full bg-dark-900 border border-dark-700 rounded-xl px-3 py-2 text-xs text-white"
+                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold text-dark-400 mb-1">Deskripsi Singkat</label>
+                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Deskripsi Singkat</label>
                           <textarea
                             rows={2}
                             value={editForm.description || srv.description}
                             onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                            className="w-full bg-dark-900 border border-dark-700 rounded-xl px-3 py-2 text-xs text-white"
+                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
                           />
                         </div>
 
                         <div className="flex justify-end gap-2 pt-2">
                           <button
                             onClick={() => setEditingServiceId(null)}
-                            className="px-3 py-1.5 rounded-lg bg-dark-800 text-dark-300 text-xs font-bold"
+                            className="px-3.5 py-1.5 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600"
                           >
                             Batal
                           </button>
                           <button
                             onClick={() => handleSaveCmsService(srv.id)}
-                            className="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1 cursor-pointer"
+                            className="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
                           >
                             <Save className="w-3.5 h-3.5" />
                             <span>Simpan CMS</span>
@@ -1222,29 +1196,29 @@ export default function AdminPage() {
                       <>
                         <div className="flex items-start justify-between">
                           <div>
-                            <span className="text-[9px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded font-bold uppercase">
+                            <span className="text-[9px] font-mono text-slate-200 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold uppercase">
                               {srv.category}
                             </span>
-                            <h3 className="font-bold text-sm text-white mt-1">{srv.name}</h3>
+                            <h3 className="font-bold text-base text-white mt-1.5">{srv.name}</h3>
                           </div>
                           <button
                             onClick={() => {
                               setEditingServiceId(srv.id);
                               setEditForm({ name: srv.name, price: srv.price, description: srv.description, badge: srv.badge });
                             }}
-                            className="p-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-purple-400 border border-purple-500/30 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
                             title="Edit Layanan"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
                         </div>
 
-                        <p className="text-xs text-dark-300">{srv.description}</p>
+                        <p className="text-xs text-slate-300 leading-relaxed font-medium">{srv.description}</p>
 
-                        <div className="flex items-center justify-between pt-2 border-t border-dark-800/80">
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
                           <span className="text-sm font-black text-amber-400">{srv.price}</span>
                           {srv.badge && (
-                            <span className="text-[9px] font-black bg-amber-400 text-dark-950 px-2 py-0.5 rounded uppercase">
+                            <span className="text-[9px] font-black bg-slate-200 text-slate-950 px-2.5 py-0.5 rounded uppercase">
                               {srv.badge}
                             </span>
                           )}
@@ -1267,22 +1241,22 @@ export default function AdminPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-dark-900 border border-dark-700 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4"
+              className="bg-[#1e293b] border border-slate-700 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4 shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-dark-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
                 <h3 className="font-bold text-sm text-white flex items-center gap-2">
                   <QrCode className="w-4 h-4 text-amber-400" />
                   Inspeksi Bukti Pembayaran QRIS (Screenshot)
                 </h3>
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="p-1 text-dark-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-dark-800 bg-black flex items-center justify-center p-2">
+              <div className="rounded-2xl overflow-hidden border border-slate-700 bg-black flex items-center justify-center p-2">
                 <img
                   src={selectedProofImage}
                   alt="Bukti Transfer QRIS"
@@ -1293,7 +1267,7 @@ export default function AdminPage() {
               <div className="flex justify-end pt-2">
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="px-5 py-2 rounded-xl bg-dark-800 hover:bg-dark-700 text-white font-bold text-xs cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer"
                 >
                   Tutup Pratonton
                 </button>

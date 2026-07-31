@@ -4,7 +4,7 @@ const MEMBERS_BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/SoobinMembersL
 
 const DEFAULT_MEMBERS = [
   {
-    id: 'MBR-1001',
+    id: 'MBR-0001',
     name: 'Filda Felissa',
     email: 'fildafelissa01@gmail.com',
     university: 'Universitas Negeri Surabaya',
@@ -21,7 +21,12 @@ export async function GET() {
     }
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
-      return NextResponse.json(data);
+      // Ensure member IDs are properly formatted as MBR-0001, MBR-0002, etc.
+      const formatted = data.map((m: any, idx: number) => ({
+        ...m,
+        id: m.id?.startsWith('MBR-') ? m.id : `MBR-${String(idx + 1).padStart(4, '0')}`,
+      }));
+      return NextResponse.json(formatted);
     }
     return NextResponse.json(DEFAULT_MEMBERS);
   } catch (error) {
@@ -56,8 +61,11 @@ export async function POST(request: Request) {
     });
 
     if (newMember && newMember.email) {
+      const nextIndex = memberMap.size + 1;
+      const formattedId = `MBR-${String(nextIndex).padStart(4, '0')}`;
+
       memberMap.set(newMember.email.toLowerCase(), {
-        id: newMember.id || `MBR-${Date.now().toString().slice(-4)}`,
+        id: formattedId,
         name: newMember.name,
         email: newMember.email.toLowerCase(),
         university: newMember.university || 'Universitas Indonesia',
@@ -66,7 +74,10 @@ export async function POST(request: Request) {
       });
     }
 
-    const updatedList = Array.from(memberMap.values());
+    const updatedList = Array.from(memberMap.values()).map((m: any, idx: number) => ({
+      ...m,
+      id: `MBR-${String(idx + 1).padStart(4, '0')}`,
+    }));
 
     await fetch(MEMBERS_BIN_URL, {
       method: 'POST',
