@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, CreditCard, QrCode, FileText, Send, CheckCircle2, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  X, Lock, CreditCard, QrCode, FileText, Send, CheckCircle2, Info,
+  UploadCloud, Paperclip, Trash2, CheckCircle, File
+} from 'lucide-react';
 import QrisPaymentModal from './QrisPaymentModal';
 import { useAuth } from '@/context/AuthContext';
 
@@ -21,16 +24,103 @@ interface OrderModalProps {
   service: ServiceItem | null;
 }
 
+// Reusable File Upload Card (Matching Dribbble Reference)
+function FileUploadCard({
+  label,
+  required = false,
+  value,
+  onChange,
+}: {
+  label: string;
+  required?: boolean;
+  value?: { name: string; size: string } | null;
+  onChange: (fileInfo: { name: string; size: string } | null) => void;
+}) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Convert bytes to KB/MB
+    let sizeStr = '';
+    if (file.size > 1024 * 1024) {
+      sizeStr = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+    } else {
+      sizeStr = `${(file.size / 1024).toFixed(0)} KB`;
+    }
+
+    onChange({ name: file.name, size: sizeStr });
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-bold text-dark-800">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+
+      <div className="bg-gray-50/80 border-2 border-dashed border-gray-300 hover:border-primary-800 rounded-2xl p-5 transition-all text-center relative group">
+        <input
+          type="file"
+          required={required && !value}
+          onChange={handleFileChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+        />
+
+        {value ? (
+          <div className="flex items-center justify-between bg-white border border-green-200 rounded-xl p-3 shadow-xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-lg bg-green-50 text-green-700 flex items-center justify-center shrink-0">
+                <File className="w-5 h-5" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs font-bold text-dark-800 truncate">{value.name}</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">{value.size} • Ter-upload</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(null);
+              }}
+              className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors cursor-pointer z-20"
+              title="Hapus File"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-2 space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-center text-primary-800 group-hover:scale-105 transition-transform">
+              <UploadCloud className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-dark-800">Upload Dokumen / File Tugas</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Drag & drop atau klik browse dari perangkat</p>
+            </div>
+            <span className="inline-block bg-white border border-gray-300 text-dark-700 font-semibold text-[11px] px-3.5 py-1.5 rounded-lg shadow-2xs group-hover:border-primary-800 group-hover:text-primary-800 transition-colors">
+              Browse File
+            </span>
+            <p className="text-[9px] text-gray-400">Mendukung Word, PDF, PPT, ZIP, RAR, TXT, Gambar (Maks 25MB)</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function OrderModal({ isOpen, onClose, service }: OrderModalProps) {
   const { user } = useAuth();
-  
+
   // Base Form
   const [customerName, setCustomerName] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'transfer' | 'qris'>('transfer');
-  
+
   // Custom Fields per category
   const [formData, setFormData] = useState<Record<string, string>>({});
-  
+
+  // File upload state for Card Upload File
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; size: string } | null>(null);
+
   // Sub-modal state for QRIS
   const [showQrisModal, setShowQrisModal] = useState(false);
   const [createdOrderData, setCreatedOrderData] = useState<any>(null);
@@ -46,6 +136,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       }
       setPaymentMethod('transfer');
       setFormData({});
+      setUploadedFile(null);
     }
   }, [isOpen, user]);
 
@@ -73,6 +164,11 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
     setLoading(true);
 
+    const mergedFormData = { ...formData };
+    if (uploadedFile) {
+      mergedFormData['File Ter-upload'] = `${uploadedFile.name} (${uploadedFile.size})`;
+    }
+
     const orderId = `ORD-${Date.now()}`;
     const orderPayload = {
       id: orderId,
@@ -84,7 +180,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       price: service.price,
       paymentMethod: paymentMethod === 'qris' ? 'QRIS' : 'Transfer Bank / E-Wallet',
       paymentStatus: paymentMethod === 'qris' ? 'Lunas (Menunggu Konfirmasi Admin)' : 'Menunggu Transfer',
-      customFields: formData,
+      customFields: mergedFormData,
       createdAt: new Date().toISOString(),
     };
 
@@ -96,7 +192,6 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       // Transfer Flow -> Save to Cloud API & redirect to WA
       await saveOrderToCloud(orderPayload);
 
-      // Build WA text
       let detailsText = `*DETAIL PESANAN BARU*\n`;
       detailsText += `🆔 ID Order: ${orderPayload.id}\n`;
       detailsText += `👤 Nama: ${customerName}\n`;
@@ -105,9 +200,9 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       detailsText += `💳 Metode Pembayaran: Transfer Bank / E-Wallet\n`;
       detailsText += `STATUS: Menunggu Transfer (Check Admin)\n\n`;
 
-      if (Object.keys(formData).length > 0) {
+      if (Object.keys(mergedFormData).length > 0) {
         detailsText += `*DETAIL FORMULIR LAYANAN:*\n`;
-        Object.entries(formData).forEach(([k, v]) => {
+        Object.entries(mergedFormData).forEach(([k, v]) => {
           if (v) detailsText += `• ${k}: ${v}\n`;
         });
       }
@@ -125,15 +220,20 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
   const handleQrisPaymentSuccess = async (proofBase64: string) => {
     if (!createdOrderData) return;
 
+    const mergedFormData = { ...formData };
+    if (uploadedFile) {
+      mergedFormData['File Ter-upload'] = `${uploadedFile.name} (${uploadedFile.size})`;
+    }
+
     const finalOrder = {
       ...createdOrderData,
+      customFields: mergedFormData,
       paymentStatus: 'LUNAS (Cek Admin)',
       proofImage: proofBase64,
     };
 
     await saveOrderToCloud(finalOrder);
 
-    // Build WA Text with LUNAS status
     let detailsText = `*DETAIL PESANAN (PEMBAYARAN QRIS LUNAS)*\n`;
     detailsText += `🆔 ID Order: ${finalOrder.id}\n`;
     detailsText += `👤 Nama Pemesan: ${customerName}\n`;
@@ -142,9 +242,9 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
     detailsText += `💳 Metode Pembayaran: QRIS (Scan Barcode)\n`;
     detailsText += `✅ *STATUS PEMBAYARAN: QRIS - LUNAS*\n\n`;
 
-    if (Object.keys(formData).length > 0) {
+    if (Object.keys(mergedFormData).length > 0) {
       detailsText += `*DETAIL FORMULIR PESANAN:*\n`;
-      Object.entries(formData).forEach(([k, v]) => {
+      Object.entries(mergedFormData).forEach(([k, v]) => {
         if (v) detailsText += `• ${k}: ${v}\n`;
       });
       detailsText += `\n`;
@@ -166,19 +266,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
     if (cat === 'turnitin') {
       return (
         <>
-          <div>
-            <label className="block text-xs font-bold text-dark-800 mb-1">
-              Link Dokumen / File (Google Drive / DropBox) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="https://drive.google.com/..."
-              value={formData['Link File/Dokumen'] || ''}
-              onChange={(e) => handleInputChange('Link File/Dokumen', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-dark-800 focus:outline-none focus:border-primary-800 focus:bg-white"
-            />
-          </div>
+          <FileUploadCard
+            label="Upload Dokumen / File Tugas"
+            required={true}
+            value={uploadedFile}
+            onChange={setUploadedFile}
+          />
           <div>
             <label className="block text-xs font-bold text-dark-800 mb-1">Catatan Tambahan</label>
             <textarea
@@ -222,19 +315,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               />
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-dark-800 mb-1">
-              Link Dokumen Skripsi / File <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="https://drive.google.com/..."
-              value={formData['Link File'] || ''}
-              onChange={(e) => handleInputChange('Link File', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-dark-800 focus:outline-none focus:border-primary-800 focus:bg-white"
-            />
-          </div>
+          <FileUploadCard
+            label="Upload Dokumen Skripsi / File Dokumen"
+            required={true}
+            value={uploadedFile}
+            onChange={setUploadedFile}
+          />
         </>
       );
     }
@@ -267,6 +353,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               />
             </div>
           </div>
+          <FileUploadCard
+            label="Upload File Soal / Lampiran Tugas (Opsional)"
+            required={false}
+            value={uploadedFile}
+            onChange={setUploadedFile}
+          />
           <div>
             <label className="block text-xs font-bold text-dark-800 mb-1">
               Topik / Detail Instruksi Tugas <span className="text-red-500">*</span>
@@ -315,6 +407,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               />
             </div>
           </div>
+          <FileUploadCard
+            label="Upload Mentahan Data / Kuesioner (Opsional)"
+            required={false}
+            value={uploadedFile}
+            onChange={setUploadedFile}
+          />
           <div>
             <label className="block text-xs font-bold text-dark-800 mb-1">
               Judul Penelitian / Variabel <span className="text-red-500">*</span>
@@ -357,6 +455,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               />
             </div>
           </div>
+          <FileUploadCard
+            label="Upload Pedoman Kampus / File Skripsi (Opsional)"
+            required={false}
+            value={uploadedFile}
+            onChange={setUploadedFile}
+          />
           <div>
             <label className="block text-xs font-bold text-dark-800 mb-1">
               Judul Skripsi / Penelitian <span className="text-red-500">*</span>
@@ -377,6 +481,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
     // Default Fallback Form
     return (
       <>
+        <FileUploadCard
+          label="Upload File Dokumen (Opsional)"
+          required={false}
+          value={uploadedFile}
+          onChange={setUploadedFile}
+        />
         <div>
           <label className="block text-xs font-bold text-dark-800 mb-1">
             Deskripsi Kebutuhan Pesanan <span className="text-red-500">*</span>
