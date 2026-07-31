@@ -158,6 +158,11 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
     }
   };
 
+  const isChatAdminPrice =
+    service.price?.toLowerCase().includes('chat') ||
+    service.price?.toLowerCase().includes('tanya') ||
+    service.price?.toLowerCase().includes('admin');
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName.trim()) return;
@@ -178,11 +183,46 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       serviceName: service.name,
       category: service.category,
       price: service.price,
-      paymentMethod: paymentMethod === 'qris' ? 'QRIS' : 'Transfer Bank / E-Wallet',
-      paymentStatus: paymentMethod === 'qris' ? 'Lunas (Menunggu Konfirmasi Admin)' : 'Menunggu Transfer',
+      paymentMethod: isChatAdminPrice
+        ? 'Diskusi Admin (Custom Price)'
+        : paymentMethod === 'qris'
+        ? 'QRIS'
+        : 'Transfer Bank / E-Wallet',
+      paymentStatus: isChatAdminPrice
+        ? 'Konsultasi Harga Admin'
+        : paymentMethod === 'qris'
+        ? 'Lunas (Menunggu Konfirmasi Admin)'
+        : 'Menunggu Transfer',
       customFields: mergedFormData,
       createdAt: new Date().toISOString(),
     };
+
+    if (isChatAdminPrice) {
+      await saveOrderToCloud(orderPayload);
+
+      let detailsText = `*KONSULTASI & DISKUSI HARGA LAYANAN*\n`;
+      detailsText += `🆔 ID Order: ${orderPayload.id}\n`;
+      detailsText += `👤 Nama Pemesan: ${customerName}\n`;
+      detailsText += `📌 Jenis Jasa: ${service.name}\n`;
+      detailsText += `💰 Total Harga: Chat Admin (Diskusi Kebutuhan)\n\n`;
+
+      if (Object.keys(mergedFormData).length > 0) {
+        detailsText += `*DETAIL FORMULIR KEBUTUHAN:*\n`;
+        Object.entries(mergedFormData).forEach(([k, v]) => {
+          if (v) detailsText += `• ${k}: ${v}\n`;
+        });
+        detailsText += `\n`;
+      }
+
+      detailsText += `Halo Admin Soobin Services, saya ingin berkonsultasi mengenai estimasi harga & alur pengerjaan untuk layanan di atas. Mohon info selanjutnya, terima kasih!`;
+
+      const waUrl = `https://wa.me/6287815797525?text=${encodeURIComponent(detailsText)}`;
+      window.open(waUrl, '_blank');
+
+      setLoading(false);
+      onClose();
+      return;
+    }
 
     if (paymentMethod === 'qris') {
       setCreatedOrderData(orderPayload);
@@ -576,53 +616,64 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
             {/* Dynamic Category Fields */}
             {renderCategoryFields()}
 
-            {/* Payment Method Selector */}
-            <div className="pt-2 border-t border-gray-100 space-y-2">
-              <label className="block text-xs font-bold text-dark-800">
-                Pilih Metode Pembayaran <span className="text-red-500">*</span>
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {/* Transfer Bank Option */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('transfer')}
-                  className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer ${
-                    paymentMethod === 'transfer'
-                      ? 'border-primary-800 bg-primary-800/5 text-primary-900 font-bold shadow-sm'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50'
-                  }`}
-                >
-                  <CreditCard className={`w-5 h-5 ${paymentMethod === 'transfer' ? 'text-primary-800' : 'text-gray-400'}`} />
-                  <span className="text-xs">Transfer Bank / E-Wallet</span>
-                  <span className="text-[9px] text-gray-400 font-normal">Konfirmasi via Admin</span>
-                </button>
+            {/* Payment Method Selector (Only for fixed-price services) */}
+            {!isChatAdminPrice ? (
+              <>
+                <div className="pt-2 border-t border-gray-100 space-y-2">
+                  <label className="block text-xs font-bold text-dark-800">
+                    Pilih Metode Pembayaran <span className="text-red-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Transfer Bank Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('transfer')}
+                      className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer ${
+                        paymentMethod === 'transfer'
+                          ? 'border-primary-800 bg-primary-800/5 text-primary-900 font-bold shadow-sm'
+                          : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50'
+                      }`}
+                    >
+                      <CreditCard className={`w-5 h-5 ${paymentMethod === 'transfer' ? 'text-primary-800' : 'text-gray-400'}`} />
+                      <span className="text-xs">Transfer Bank / E-Wallet</span>
+                      <span className="text-[9px] text-gray-400 font-normal">Konfirmasi via Admin</span>
+                    </button>
 
-                {/* QRIS Option */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('qris')}
-                  className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer ${
-                    paymentMethod === 'qris'
-                      ? 'border-amber-500 bg-amber-50 text-amber-900 font-bold shadow-sm'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50'
-                  }`}
-                >
-                  <QrCode className={`w-5 h-5 ${paymentMethod === 'qris' ? 'text-amber-600' : 'text-gray-400'}`} />
-                  <span className="text-xs">QRIS (Scan Barcode)</span>
-                  <span className="text-[9px] text-amber-600 font-bold">Timer 5 Menit & Instant</span>
-                </button>
+                    {/* QRIS Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('qris')}
+                      className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer ${
+                        paymentMethod === 'qris'
+                          ? 'border-amber-500 bg-amber-50 text-amber-900 font-bold shadow-sm'
+                          : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50'
+                      }`}
+                    >
+                      <QrCode className={`w-5 h-5 ${paymentMethod === 'qris' ? 'text-amber-600' : 'text-gray-400'}`} />
+                      <span className="text-xs">QRIS (Scan Barcode)</span>
+                      <span className="text-[9px] text-amber-600 font-bold">Timer 5 Menit & Instant</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Info note */}
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-2.5 flex items-center gap-2 text-[11px] text-blue-800">
+                  <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>
+                    {paymentMethod === 'qris'
+                      ? 'Pembayaran QRIS dilengkapi timer 5 menit dan form upload bukti transfer.'
+                      : 'Pesanan akan diproses oleh Admin via WhatsApp setelah form dikirimkan.'}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2 text-xs text-amber-900">
+                <Info className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
+                <span>
+                  Layanan ini memerlukan estimasi harga kustom. Silakan lengkapi form di atas dan klik tombol di bawah untuk berdiskusi & negosiasi harga langsung dengan Admin via WhatsApp.
+                </span>
               </div>
-            </div>
-
-            {/* Info note */}
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-2.5 flex items-center gap-2 text-[11px] text-blue-800">
-              <Info className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>
-                {paymentMethod === 'qris'
-                  ? 'Pembayaran QRIS dilengkapi timer 5 menit dan form upload bukti transfer.'
-                  : 'Pesanan akan diproses oleh Admin via WhatsApp setelah form dikirimkan.'}
-              </span>
-            </div>
+            )}
 
             {/* Submit Button */}
             <button
@@ -635,7 +686,13 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>{paymentMethod === 'qris' ? 'Lanjut Pembayaran QRIS' : 'Kirim Pesanan via WhatsApp'}</span>
+                  <span>
+                    {isChatAdminPrice
+                      ? 'Konsultasi & Tanya Harga via Admin'
+                      : paymentMethod === 'qris'
+                      ? 'Lanjut Pembayaran QRIS'
+                      : 'Kirim Pesanan via WhatsApp'}
+                  </span>
                 </>
               )}
             </button>
