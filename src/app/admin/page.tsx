@@ -116,10 +116,15 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
-  // Check Auth state on mount
+  // Check Auth state & set body dark background on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
     setIsAdminLoggedIn(isLoggedIn);
+
+    document.body.style.backgroundColor = '#0b0f19';
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
   }, []);
 
   // Set Admin online/offline indicator for client tabs
@@ -577,7 +582,7 @@ export default function AdminPage() {
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
   return (
-    <div className="min-h-screen bg-dark-950 text-dark-100 flex flex-col w-full font-sans antialiased">
+    <div className="min-h-screen bg-[#0b0f19] text-dark-100 flex flex-col w-full font-sans antialiased" style={{ backgroundColor: '#0b0f19' }}>
       {/* Top Navbar */}
       <header className="bg-dark-900/90 backdrop-blur-md border-b border-dark-800 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
         <div className="flex items-center gap-3">
