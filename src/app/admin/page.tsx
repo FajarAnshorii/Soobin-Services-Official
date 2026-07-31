@@ -500,57 +500,57 @@ export default function AdminPage() {
 
   const unreadChatsCount = Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
-  // LOGIN SCREEN - ULTRA CLEAN BRIGHT LIGHT THEME
+  // LOGIN SCREEN - ALL TEXT BLACK MONOCHROME
   if (!isAdminLoggedIn) {
     return (
       <div className="min-h-screen bg-[#f1f5f9] text-slate-900 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white border border-slate-200 p-8 rounded-3xl shadow-xl max-w-md w-full"
+          className="bg-white border border-slate-300 p-8 rounded-3xl shadow-xl max-w-md w-full"
         >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 shadow-sm">
+            <div className="w-16 h-16 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-sm">
               <Shield className="w-8 h-8" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">SOOBIN Admin Portal</h1>
-            <p className="text-xs text-slate-600 font-semibold mt-1.5">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
+            <p className="text-xs text-slate-800 font-bold mt-1.5">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold text-center flex items-center justify-center gap-2">
-              <CircleAlert className="w-4 h-4 text-red-600" />
+            <div className="mb-6 p-3 rounded-xl bg-slate-100 border border-slate-400 text-slate-900 text-xs font-black text-center flex items-center justify-center gap-2">
+              <CircleAlert className="w-4 h-4 text-slate-900" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-extrabold text-slate-800 mb-1.5">Email Admin</label>
+              <label className="block text-xs font-black text-slate-900 mb-1.5">Email Admin</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-slate-900 absolute left-3.5 top-3" />
                 <input
                   type="email"
                   required
                   placeholder="admin@soobin.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+                  className="w-full bg-slate-50 border border-slate-400 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-800 mb-1.5">Password Admin</label>
+              <label className="block text-xs font-black text-slate-900 mb-1.5">Password Admin</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-900 absolute left-3.5 top-3" />
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+                  className="w-full bg-slate-50 border border-slate-400 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
                 />
               </div>
             </div>
@@ -558,14 +558,14 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
+              className="w-full bg-slate-900 hover:bg-black text-white font-black py-3.5 rounded-xl shadow-md transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
             >
               {loading ? 'Memverifikasi...' : 'Masuk Dasbor Admin'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-200 text-center">
-            <Link href="/" className="text-xs text-slate-600 hover:text-blue-600 transition-colors font-bold">
+            <Link href="/" className="text-xs text-slate-900 hover:text-black transition-colors font-black">
               ← Kembali ke Website Utama
             </Link>
           </div>
@@ -576,55 +576,55 @@ export default function AdminPage() {
 
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
-  // MAIN DASHBOARD - BRIGHT CLEAN WHITE & SLATE THEME (LIGHT MODE)
+  // MAIN DASHBOARD - ALL TEXT BLACK MONOCHROME UI (LIGHT THEME)
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex w-full font-sans antialiased" style={{ backgroundColor: '#f8fafc' }}>
-      {/* LEFT VERTICAL SIDEBAR NAVIGATION (Modern SaaS Light Theme) */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30 shadow-xs">
+      {/* LEFT VERTICAL SIDEBAR NAVIGATION */}
+      <aside className="w-64 bg-white border-r border-slate-300 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30 shadow-xs">
         <div>
           {/* Brand Header */}
-          <div className="p-5 border-b border-slate-200 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md">
-              <Shield className="w-5 h-5" />
+          <div className="p-5 border-b border-slate-300 flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="font-black text-base text-slate-900 tracking-tight leading-none">SOOBIN</h1>
-              <p className="text-[10px] text-blue-600 font-extrabold mt-1 uppercase tracking-wider">Services Admin</p>
+              <p className="text-[10px] text-slate-900 font-black mt-1 uppercase tracking-wider">Services Admin</p>
             </div>
           </div>
 
-          {/* Nav Items */}
+          {/* Nav Items - ALL BLACK TEXT */}
           <nav className="p-3 space-y-1.5">
-            <p className="text-[10px] font-black text-slate-400 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
+            <p className="text-[10px] font-black text-slate-900 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
 
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'overview'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <LayoutDashboard className="w-4 h-4" />
+                <LayoutDashboard className="w-4 h-4 text-slate-900" />
                 <span>Overview Dasbor</span>
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('chat')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'chat'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <MessageSquare className="w-4 h-4" />
+                <MessageSquare className="w-4 h-4 text-slate-900" />
                 <span>Live Chat</span>
               </div>
               {unreadChatsCount > 0 && (
-                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                <span className="bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
                   {unreadChatsCount}
                 </span>
               )}
@@ -632,18 +632,18 @@ export default function AdminPage() {
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'orders'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-4 h-4 text-slate-900" />
                 <span>Pesanan & Pembayaran</span>
               </div>
               {pendingOrdersCount > 0 && (
-                <span className="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                <span className="bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
                   {pendingOrdersCount}
                 </span>
               )}
@@ -651,45 +651,45 @@ export default function AdminPage() {
 
             <button
               onClick={() => setActiveTab('members')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'members'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Users className="w-4 h-4" />
+                <Users className="w-4 h-4 text-slate-900" />
                 <span>Data Member</span>
               </div>
-              <span className="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
+              <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
                 {members.length}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('revenue')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'revenue'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <DollarSign className="w-4 h-4" />
+                <DollarSign className="w-4 h-4 text-slate-900" />
                 <span>Pendapatan & Export</span>
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('services')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
                 activeTab === 'services'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-md font-extrabold'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-transparent hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="w-4 h-4 text-slate-900" />
                 <span>Kelola Layanan (CMS)</span>
               </div>
             </button>
@@ -697,24 +697,24 @@ export default function AdminPage() {
         </div>
 
         {/* Footer Admin Profile */}
-        <div className="p-3 border-t border-slate-200 bg-slate-50 space-y-2">
-          <div className="p-2.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-xs">
+        <div className="p-3 border-t border-slate-300 bg-slate-50 space-y-2">
+          <div className="p-2.5 bg-white border border-slate-300 rounded-xl flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-xs shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-slate-900 text-white font-black flex items-center justify-center text-xs shrink-0">
                 AD
               </div>
               <div className="truncate">
                 <p className="text-xs font-black text-slate-900 truncate">Administrator</p>
-                <p className="text-[10px] text-slate-500 font-bold truncate">admin@soobin.com</p>
+                <p className="text-[10px] text-slate-900 font-bold truncate">admin@soobin.com</p>
               </div>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full text-xs font-extrabold text-red-600 hover:text-red-700 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 transition-colors cursor-pointer border border-red-200"
+            className="w-full text-xs font-black text-slate-900 hover:text-black flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-300"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 text-slate-900" />
             <span>Keluar Sesi</span>
           </button>
         </div>
@@ -723,23 +723,23 @@ export default function AdminPage() {
       {/* RIGHT MAIN CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* TOP HEADER BAR */}
-        <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
+        <header className="bg-white border-b border-slate-300 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
           {/* Global Search Bar */}
           <div className="relative max-w-md w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-slate-900 absolute left-3.5 top-3" />
             <input
               type="text"
               placeholder="Cari pesanan, nama member, atau layanan..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
             />
           </div>
 
           {/* Quick Actions & Realtime Status */}
           <div className="flex items-center gap-4">
-            <span className="text-xs text-emerald-700 flex items-center gap-2 font-bold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs text-slate-900 flex items-center gap-2 font-black bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-900 animate-pulse" />
               Sistem Online Realtime (WIB)
             </span>
 
@@ -750,10 +750,10 @@ export default function AdminPage() {
                 syncChatsWithCloud();
               }}
               disabled={ordersLoading}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 transition-colors cursor-pointer"
               title="Refresh Data Realtime"
             >
-              <RefreshCw className={`w-4 h-4 ${ordersLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-slate-900 ${ordersLoading ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </header>
@@ -763,69 +763,69 @@ export default function AdminPage() {
           {/* OVERVIEW TAB */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* TOP KPI STAT CARDS GRID */}
+              {/* TOP KPI STAT CARDS GRID - ALL TEXT BLACK */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
-                  <div className="flex items-center justify-between text-emerald-600">
-                    <span className="text-xs font-black uppercase tracking-wider">Total Pendapatan</span>
-                    <DollarSign className="w-5 h-5 bg-emerald-50 p-1 rounded-lg border border-emerald-200" />
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-slate-900">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Total Pendapatan</span>
+                    <DollarSign className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">
                     Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-600 font-bold flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> Terverifikasi dari Lunas
+                  <p className="text-[11px] text-slate-900 font-extrabold flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-slate-900" /> Terverifikasi dari Lunas
                   </p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
-                  <div className="flex items-center justify-between text-blue-600">
-                    <span className="text-xs font-black uppercase tracking-wider">Total Member</span>
-                    <Users className="w-5 h-5 bg-blue-50 p-1 rounded-lg border border-blue-200" />
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-slate-900">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Total Member</span>
+                    <Users className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{members.length} Member</p>
-                  <p className="text-[11px] text-slate-600 font-bold">Format MBR-0001 dst.</p>
+                  <p className="text-[11px] text-slate-900 font-extrabold">Format MBR-0001 dst.</p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
-                  <div className="flex items-center justify-between text-amber-600">
-                    <span className="text-xs font-black uppercase tracking-wider">Pesanan Menunggu</span>
-                    <ShoppingBag className="w-5 h-5 bg-amber-50 p-1 rounded-lg border border-amber-200" />
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-slate-900">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Pesanan Menunggu</span>
+                    <ShoppingBag className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{pendingOrdersCount} Pesanan</p>
-                  <p className="text-[11px] text-slate-600 font-bold">Perlu Cek Verifikasi Admin</p>
+                  <p className="text-[11px] text-slate-900 font-extrabold">Perlu Cek Verifikasi Admin</p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
-                  <div className="flex items-center justify-between text-purple-600">
-                    <span className="text-xs font-black uppercase tracking-wider">Chat Sesi Aktif</span>
-                    <MessageSquare className="w-5 h-5 bg-purple-50 p-1 rounded-lg border border-purple-200" />
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-slate-900">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Chat Sesi Aktif</span>
+                    <MessageSquare className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{Object.keys(chats).length} Sesi</p>
-                  <p className="text-[11px] text-slate-600 font-bold">{unreadChatsCount} Belum Dibaca</p>
+                  <p className="text-[11px] text-slate-900 font-extrabold">{unreadChatsCount} Belum Dibaca</p>
                 </div>
               </div>
 
               {/* RECENT ACTIVITY & RECENT ORDERS SPLIT */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Recent Orders Table Overview */}
-                <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs">
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="lg:col-span-2 bg-white border border-slate-300 rounded-2xl p-5 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-slate-300 pb-3">
                     <h2 className="font-black text-sm text-slate-900 flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-amber-600" />
+                      <ShoppingBag className="w-4 h-4 text-slate-900" />
                       Pesanan Terbaru Masuk
                     </h2>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-extrabold text-blue-600 hover:text-blue-700"
+                      className="text-xs font-black text-slate-900 hover:text-black underline"
                     >
                       Lihat Semua →
                     </button>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-slate-800">
-                      <thead className="bg-slate-100 text-slate-700 font-black text-[10px] uppercase border-b border-slate-200">
+                    <table className="w-full text-left text-xs text-slate-900">
+                      <thead className="bg-slate-100 text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
                         <tr>
                           <th className="p-3">ID Order</th>
                           <th className="p-3">Nama Pelanggan</th>
@@ -837,16 +837,16 @@ export default function AdminPage() {
                       <tbody className="divide-y divide-slate-200 bg-white">
                         {orders.slice(0, 5).map((o) => (
                           <tr key={o.id} className="hover:bg-slate-50">
-                            <td className="p-3 font-mono text-amber-700 font-black">{o.id}</td>
-                            <td className="p-3 font-bold text-slate-900">{o.customerName}</td>
-                            <td className="p-3 text-slate-700 font-medium">{o.serviceName}</td>
-                            <td className="p-3 font-black text-emerald-600">{o.price}</td>
+                            <td className="p-3 font-mono text-slate-900 font-black">{o.id}</td>
+                            <td className="p-3 font-black text-slate-900">{o.customerName}</td>
+                            <td className="p-3 text-slate-900 font-bold">{o.serviceName}</td>
+                            <td className="p-3 font-black text-slate-900">{o.price}</td>
                             <td className="p-3">
                               <span
                                 className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
                                   o.paymentStatus?.toLowerCase().includes('lunas')
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                    : 'bg-amber-100 text-amber-800 border border-amber-300'
+                                    ? 'bg-slate-900 text-white border border-slate-900'
+                                    : 'bg-slate-200 text-slate-900 border border-slate-400'
                                 }`}
                               >
                                 {o.paymentStatus}
@@ -860,15 +860,15 @@ export default function AdminPage() {
                 </div>
 
                 {/* Registered Members Widget */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs">
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-slate-300 pb-3">
                     <h2 className="font-black text-sm text-slate-900 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-slate-900" />
                       Member Terdaftar Terbaru
                     </h2>
                     <button
                       onClick={() => setActiveTab('members')}
-                      className="text-xs font-extrabold text-blue-600 hover:text-blue-700"
+                      className="text-xs font-black text-slate-900 hover:text-black underline"
                     >
                       Kelola →
                     </button>
@@ -876,12 +876,12 @@ export default function AdminPage() {
 
                   <div className="space-y-3">
                     {members.slice(0, 4).map((m) => (
-                      <div key={m.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                      <div key={m.id} className="p-3 bg-slate-50 border border-slate-300 rounded-xl flex items-center justify-between">
                         <div>
-                          <p className="font-bold text-xs text-slate-900">{m.name}</p>
-                          <p className="text-[10px] text-slate-600 font-bold">{m.email}</p>
+                          <p className="font-black text-xs text-slate-900">{m.name}</p>
+                          <p className="text-[10px] text-slate-900 font-bold">{m.email}</p>
                         </div>
-                        <span className="text-[10px] font-mono font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-200">
+                        <span className="text-[10px] font-mono font-black text-slate-900 bg-slate-200 px-2 py-0.5 rounded border border-slate-400">
                           {m.id}
                         </span>
                       </div>
@@ -896,17 +896,17 @@ export default function AdminPage() {
           {activeTab === 'chat' && (
             <div className="flex gap-6 h-[calc(100vh-140px)] overflow-hidden">
               {/* Sidebar Chat Sessions */}
-              <div className="w-80 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs">
-                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="w-80 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs">
+                <div className="p-4 border-b border-slate-300 flex items-center justify-between bg-slate-50">
                   <h2 className="font-black text-xs text-slate-900 uppercase tracking-wider">Antrean Percakapan</h2>
-                  <span className="text-[10px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] bg-slate-200 text-slate-900 px-2.5 py-0.5 rounded-full font-black border border-slate-400">
                     {Object.keys(chats).length} User
                   </span>
                 </div>
 
                 <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
                   {Object.keys(chats).length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-600 font-bold">
+                    <div className="p-8 text-center text-xs text-slate-900 font-black">
                       Belum ada percakapan masuk dari pengguna.
                     </div>
                   ) : (
@@ -916,29 +916,29 @@ export default function AdminPage() {
                         onClick={() => handleSelectSession(session.id)}
                         className={`w-full p-4 text-left transition-colors flex items-start gap-3 cursor-pointer ${
                           selectedSessionId === session.id
-                            ? 'bg-blue-50 border-l-4 border-blue-600'
+                            ? 'bg-slate-100 border-l-4 border-slate-900'
                             : 'hover:bg-slate-50'
                         }`}
                       >
-                        <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow-xs">
+                        <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-xs shrink-0 shadow-xs">
                           {session.name?.[0]?.toUpperCase() || 'U'}
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
-                            <h3 className="font-bold text-xs text-slate-900 truncate">{session.name}</h3>
-                            <span className="text-[9px] text-slate-500 font-bold">{session.lastUpdated}</span>
+                            <h3 className="font-black text-xs text-slate-900 truncate">{session.name}</h3>
+                            <span className="text-[9px] text-slate-900 font-bold">{session.lastUpdated}</span>
                           </div>
-                          <p className="text-[11px] text-slate-600 truncate font-semibold">
+                          <p className="text-[11px] text-slate-900 truncate font-extrabold">
                             {session.university} • {session.prodi}
                           </p>
-                          <p className="text-[10px] text-slate-500 truncate mt-1 font-medium">
+                          <p className="text-[10px] text-slate-900 truncate mt-1 font-bold">
                             {session.messages?.[session.messages.length - 1]?.text || 'Belum ada pesan'}
                           </p>
                         </div>
 
                         {session.unreadCount > 0 && (
-                          <span className="w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shrink-0">
+                          <span className="w-4 h-4 bg-slate-900 text-white rounded-full text-[9px] font-black flex items-center justify-center shrink-0">
                             {session.unreadCount}
                           </span>
                         )}
@@ -949,25 +949,25 @@ export default function AdminPage() {
               </div>
 
               {/* Chat Room Area */}
-              <div className="flex-1 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shadow-xs">
+              <div className="flex-1 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shadow-xs">
                 {selectedSession ? (
                   <>
                     {/* Session Header */}
-                    <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div className="p-4 border-b border-slate-300 bg-slate-50 flex items-center justify-between">
                       <div>
                         <h2 className="font-black text-sm text-slate-900">{selectedSession.name}</h2>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-600 mt-0.5 font-bold">
+                        <div className="flex items-center gap-3 text-[11px] text-slate-900 mt-0.5 font-bold">
                           <span className="flex items-center gap-1">
-                            <Mail className="w-3.5 h-3.5 text-blue-600" /> {selectedSession.email}
+                            <Mail className="w-3.5 h-3.5 text-slate-900" /> {selectedSession.email}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            <School className="w-3.5 h-3.5 text-blue-600" /> {selectedSession.university}
+                            <School className="w-3.5 h-3.5 text-slate-900" /> {selectedSession.university}
                           </span>
                         </div>
                       </div>
 
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-full font-bold">
+                      <span className="text-[10px] bg-slate-200 text-slate-900 border border-slate-400 px-2.5 py-1 rounded-full font-black">
                         Session Active
                       </span>
                     </div>
@@ -980,16 +980,16 @@ export default function AdminPage() {
                           className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
+                            className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed font-bold ${
                               msg.sender === 'admin'
-                                ? 'bg-blue-600 text-white rounded-tr-none shadow-xs font-medium'
-                                : 'bg-white text-slate-900 border border-slate-200 rounded-tl-none font-medium shadow-xs'
+                                ? 'bg-slate-900 text-white rounded-tr-none shadow-xs'
+                                : 'bg-white text-slate-900 border border-slate-300 rounded-tl-none shadow-xs'
                             }`}
                           >
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                             <span
-                              className={`block text-[9px] mt-1 text-right font-bold ${
-                                msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-500'
+                              className={`block text-[9px] mt-1 text-right font-black ${
+                                msg.sender === 'admin' ? 'text-slate-300' : 'text-slate-900'
                               }`}
                             >
                               {msg.timestamp}
@@ -1001,17 +1001,17 @@ export default function AdminPage() {
                     </div>
 
                     {/* Reply Input Box */}
-                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-200 bg-white flex gap-2">
+                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-300 bg-white flex gap-2">
                       <input
                         type="text"
                         placeholder="Tulis balasan untuk pengguna..."
                         value={adminReplyText}
                         onChange={(e) => setAdminReplyText(e.target.value)}
-                        className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-semibold placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white"
+                        className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white"
                       />
                       <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="bg-slate-900 hover:bg-black text-white font-black px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>Kirim</span>
@@ -1020,11 +1020,11 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                    <div className="w-16 h-16 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-center text-blue-600 mb-4 shadow-xs">
-                      <Headphones className="w-8 h-8" />
+                    <div className="w-16 h-16 bg-slate-100 border border-slate-300 rounded-2xl flex items-center justify-center text-slate-900 mb-4 shadow-xs">
+                      <Headphones className="w-8 h-8 text-slate-900" />
                     </div>
                     <p className="font-black text-base text-slate-900">Pilih Percakapan Pelanggan</p>
-                    <p className="text-xs text-slate-600 mt-1 max-w-xs leading-relaxed font-bold">
+                    <p className="text-xs text-slate-900 mt-1 max-w-xs leading-relaxed font-bold">
                       Klik salah satu antrean percakapan di sebelah kiri untuk membalas pesan live chat.
                     </p>
                   </div>
@@ -1035,14 +1035,14 @@ export default function AdminPage() {
 
           {/* TAB 2: ORDERS & PAYMENTS */}
           {activeTab === 'orders' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5 text-amber-600" />
+                    <ShoppingBag className="w-5 h-5 text-slate-900" />
                     Daftar Pesanan & Pembayaran QRIS / Transfer
                   </h2>
-                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
+                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
                     Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
                   </p>
                 </div>
@@ -1050,18 +1050,18 @@ export default function AdminPage() {
                 <button
                   onClick={syncOrdersWithCloud}
                   disabled={ordersLoading}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center gap-2 cursor-pointer transition-colors"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 text-slate-900 ${ordersLoading ? 'animate-spin' : ''}`} />
                   <span>Refresh Pesanan</span>
                 </button>
               </div>
 
               {filteredOrders.length === 0 ? (
-                <div className="p-12 text-center text-slate-600 bg-slate-50 rounded-2xl border border-slate-200">
-                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-600" />
+                <div className="p-12 text-center text-slate-900 bg-slate-50 rounded-2xl border border-slate-300">
+                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-slate-900" />
                   <p className="font-black text-base text-slate-900">Belum Ada Pesanan Masuk</p>
-                  <p className="text-xs text-slate-600 mt-1 font-bold">
+                  <p className="text-xs text-slate-900 mt-1 font-bold">
                     Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
                   </p>
                 </div>
@@ -1074,21 +1074,21 @@ export default function AdminPage() {
                     return (
                       <div
                         key={order.id}
-                        className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-colors space-y-4 shadow-xs"
+                        className="bg-slate-50 border border-slate-300 rounded-2xl p-5 hover:border-slate-400 transition-colors space-y-4 shadow-xs"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-300 pb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs shadow-xs">
                               ORD
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
                                 <h3 className="font-black text-sm text-slate-900">{order.customerName}</h3>
-                                <span className="text-[10px] bg-slate-200 text-slate-900 px-2 py-0.5 rounded font-mono border border-slate-300 font-bold">
+                                <span className="text-[10px] bg-slate-200 text-slate-900 px-2 py-0.5 rounded font-mono border border-slate-400 font-black">
                                   {order.id}
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-600 font-bold">{order.customerEmail}</p>
+                              <p className="text-xs text-slate-900 font-bold">{order.customerEmail}</p>
                             </div>
                           </div>
 
@@ -1097,10 +1097,10 @@ export default function AdminPage() {
                             <span
                               className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
                                 isLunas
-                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                  ? 'bg-slate-900 text-white border border-slate-900'
                                   : isCancel
-                                  ? 'bg-red-100 text-red-800 border border-red-300'
-                                  : 'bg-amber-100 text-amber-800 border border-amber-300'
+                                  ? 'bg-slate-200 text-slate-900 border border-slate-400'
+                                  : 'bg-slate-200 text-slate-900 border border-slate-400'
                               }`}
                             >
                               {order.paymentStatus}
@@ -1110,22 +1110,22 @@ export default function AdminPage() {
 
                         {/* Main Details Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                          <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1 shadow-xs">
-                            <p className="text-slate-600 font-bold">Jasa Layanan:</p>
+                          <div className="bg-white p-3.5 rounded-xl border border-slate-300 space-y-1 shadow-xs">
+                            <p className="text-slate-900 font-bold">Jasa Layanan:</p>
                             <p className="font-black text-slate-900 text-sm">{order.serviceName}</p>
-                            <p className="text-emerald-700 font-black">{order.price}</p>
-                            <p className="text-slate-600 text-[11px] pt-1 font-bold">
+                            <p className="text-slate-900 font-black">{order.price}</p>
+                            <p className="text-slate-900 text-[11px] pt-1 font-bold">
                               Metode: <span className="text-slate-900 font-black">{order.paymentMethod}</span>
                             </p>
                           </div>
 
-                          <div className="md:col-span-2 bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 shadow-xs">
-                            <p className="text-slate-600 font-bold">Detail Formulir Kustom:</p>
+                          <div className="md:col-span-2 bg-white p-3.5 rounded-xl border border-slate-300 space-y-2 shadow-xs">
+                            <p className="text-slate-900 font-bold">Detail Formulir Kustom:</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                               {order.customFields &&
                                 Object.entries(order.customFields).map(([k, v]) => (
-                                  <div key={k} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                                    <span className="text-slate-700 block font-black">{k}:</span>
+                                  <div key={k} className="bg-slate-50 p-2.5 rounded-lg border border-slate-300">
+                                    <span className="text-slate-900 block font-black">{k}:</span>
                                     <span className="text-slate-900 font-bold break-words">{v}</span>
                                   </div>
                                 ))}
@@ -1140,9 +1140,9 @@ export default function AdminPage() {
                             {order.proofImage && (
                               <button
                                 onClick={() => setSelectedProofImage(order.proofImage || null)}
-                                className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                                className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors"
                               >
-                                <Eye className="w-4 h-4" />
+                                <Eye className="w-4 h-4 text-slate-900" />
                                 <span>Lihat Bukti Bayar (Screenshot)</span>
                               </button>
                             )}
@@ -1151,7 +1151,7 @@ export default function AdminPage() {
                             {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
                               <button
                                 onClick={() => handleDownloadFile(order)}
-                                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+                                className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
                               >
                                 <Download className="w-4 h-4" />
                                 <span>Unduh Dokumen File</span>
@@ -1163,15 +1163,15 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                              className="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors"
                             >
-                              <XCircle className="w-4 h-4" />
+                              <XCircle className="w-4 h-4 text-slate-900" />
                               <span>Batalkan</span>
                             </button>
 
                             <button
                               onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
                             >
                               <CheckCircle className="w-4 h-4" />
                               <span>Verifikasi Lunas</span>
@@ -1188,14 +1188,14 @@ export default function AdminPage() {
 
           {/* TAB 3: DATA MEMBER (50 per page, MBR-0001 format) */}
           {activeTab === 'members' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-slate-900" />
                     Daftar Member Terdaftar
                   </h2>
-                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
+                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
                     Total {filteredMembers.length} member terdaftar. Menampilkan 50 member per halaman.
                   </p>
                 </div>
@@ -1205,7 +1205,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                     disabled={memberPage === 1}
-                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer font-black"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -1215,7 +1215,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                     disabled={memberPage === totalPages}
-                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer font-black"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1223,9 +1223,9 @@ export default function AdminPage() {
               </div>
 
               {/* Members Table */}
-              <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+              <div className="overflow-x-auto border border-slate-300 rounded-2xl">
                 <table className="w-full text-left text-xs text-slate-900">
-                  <thead className="bg-slate-100 text-slate-700 font-black uppercase tracking-wider text-[10px] border-b border-slate-200">
+                  <thead className="bg-slate-100 text-slate-900 font-black uppercase tracking-wider text-[10px] border-b border-slate-300">
                     <tr>
                       <th className="p-3.5">Kode ID Member</th>
                       <th className="p-3.5">Nama Lengkap</th>
@@ -1237,11 +1237,11 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-slate-200 bg-white">
                     {currentMembers.map((mbr, idx) => (
                       <tr key={mbr.id || idx} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-3.5 font-mono text-blue-700 font-black">{mbr.id}</td>
-                        <td className="p-3.5 font-bold text-slate-900">{mbr.name}</td>
-                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.email}</td>
-                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.university || '-'}</td>
-                        <td className="p-3.5 text-slate-700 font-semibold">{mbr.prodi || '-'}</td>
+                        <td className="p-3.5 font-mono text-slate-900 font-black">{mbr.id}</td>
+                        <td className="p-3.5 font-black text-slate-900">{mbr.name}</td>
+                        <td className="p-3.5 text-slate-900 font-bold">{mbr.email}</td>
+                        <td className="p-3.5 text-slate-900 font-bold">{mbr.university || '-'}</td>
+                        <td className="p-3.5 text-slate-900 font-bold">{mbr.prodi || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1250,21 +1250,21 @@ export default function AdminPage() {
 
               {/* Bottom Pagination */}
               <div className="flex items-center justify-between pt-2">
-                <p className="text-xs text-slate-600 font-bold">
+                <p className="text-xs text-slate-900 font-bold">
                   Menampilkan {indexOfFirstMember + 1} - {Math.min(indexOfLastMember, filteredMembers.length)} dari {filteredMembers.length} Member
                 </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
                     disabled={memberPage === 1}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-black text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     Sebelumnya
                   </button>
                   <button
                     onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
                     disabled={memberPage === totalPages}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-black text-slate-900 disabled:opacity-40 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     Selanjutnya
                   </button>
@@ -1275,61 +1275,61 @@ export default function AdminPage() {
 
           {/* TAB 4: REVENUE & EXCEL REPORT */}
           {activeTab === 'revenue' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                    <DollarSign className="w-5 h-5 text-slate-900" />
                     Dasbor Pendapatan & Export Laporan Excel
                   </h2>
-                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
+                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
                     Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
                   </p>
                 </div>
 
                 <button
                   onClick={handleExportExcel}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
                 >
-                  <FileSpreadsheet className="w-4 h-4" />
+                  <FileSpreadsheet className="w-4 h-4 text-white" />
                   <span>Export Laporan Excel (.csv)</span>
                 </button>
               </div>
 
               {/* Total Revenue Stat Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-emerald-700 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
                   <p className="text-3xl font-black text-slate-900">
                     Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-600 font-bold">Otomatis dihitung dari order status Lunas</p>
+                  <p className="text-[11px] text-slate-900 font-bold">Otomatis dihitung dari order status Lunas</p>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-amber-700 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
                   <p className="text-3xl font-black text-slate-900">
                     {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
                   </p>
-                  <p className="text-[11px] text-slate-600 font-bold">Siap diproses oleh tim admin</p>
+                  <p className="text-[11px] text-slate-900 font-bold">Siap diproses oleh tim admin</p>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-blue-700 uppercase tracking-wider">Waktu Sistem Realtime</p>
-                  <p className="text-base font-bold text-slate-900">
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Waktu Sistem Realtime</p>
+                  <p className="text-base font-black text-slate-900">
                     {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                   </p>
-                  <p className="text-[11px] text-slate-600 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
+                  <p className="text-[11px] text-slate-900 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
                 </div>
               </div>
 
               {/* Itemized Table */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-slate-100 border-b border-slate-200 font-black text-xs text-slate-900">
+              <div className="border border-slate-300 rounded-2xl overflow-hidden">
+                <div className="p-4 bg-slate-100 border-b border-slate-300 font-black text-xs text-slate-900">
                   Rincian Transaksi Pendapatan Masuk
                 </div>
                 <table className="w-full text-left text-xs text-slate-900">
-                  <thead className="bg-white text-slate-700 font-black text-[10px] uppercase border-b border-slate-200">
+                  <thead className="bg-white text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
                     <tr>
                       <th className="p-3.5">ID Order</th>
                       <th className="p-3.5">Pelanggan</th>
@@ -1343,11 +1343,11 @@ export default function AdminPage() {
                       .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
                       .map((o) => (
                         <tr key={o.id} className="hover:bg-slate-50">
-                          <td className="p-3.5 font-mono text-amber-700 font-black">{o.id}</td>
-                          <td className="p-3.5 font-bold text-slate-900">{o.customerName}</td>
-                          <td className="p-3.5 text-slate-700 font-semibold">{o.serviceName}</td>
-                          <td className="p-3.5 font-black text-emerald-700">{o.price}</td>
-                          <td className="p-3.5 font-black text-emerald-700">Terverifikasi Lunas</td>
+                          <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
+                          <td className="p-3.5 font-black text-slate-900">{o.customerName}</td>
+                          <td className="p-3.5 text-slate-900 font-bold">{o.serviceName}</td>
+                          <td className="p-3.5 font-black text-slate-900">{o.price}</td>
+                          <td className="p-3.5 font-black text-slate-900">Terverifikasi Lunas</td>
                         </tr>
                       ))}
                   </tbody>
@@ -1358,20 +1358,20 @@ export default function AdminPage() {
 
           {/* TAB 5: SERVICE CMS */}
           {activeTab === 'services' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <Edit3 className="w-5 h-5 text-blue-600" />
+                    <Edit3 className="w-5 h-5 text-slate-900" />
                     Kelola Layanan & Harga (CMS Realtime)
                   </h2>
-                  <p className="text-xs text-slate-600 mt-0.5 font-bold">
+                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
                     Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
                   </p>
                 </div>
 
                 {saveSuccessMsg && (
-                  <span className="text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-3.5 py-1.5 rounded-xl animate-fade-in">
+                  <span className="text-xs font-black bg-slate-900 text-white border border-slate-900 px-3.5 py-1.5 rounded-xl animate-fade-in">
                     {saveSuccessMsg}
                   </span>
                 )}
@@ -1384,50 +1384,50 @@ export default function AdminPage() {
                   return (
                     <div
                       key={srv.id}
-                      className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3 relative group hover:border-slate-300 transition-colors shadow-xs"
+                      className="bg-slate-50 border border-slate-300 rounded-2xl p-5 space-y-3 relative group hover:border-slate-400 transition-colors shadow-xs"
                     >
                       {isEditing ? (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Nama Layanan</label>
+                            <label className="block text-[11px] font-black text-slate-900 mb-1">Nama Layanan</label>
                             <input
                               type="text"
                               value={editForm.name || srv.name}
                               onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Harga Layanan</label>
+                            <label className="block text-[11px] font-black text-slate-900 mb-1">Harga Layanan</label>
                             <input
                               type="text"
                               value={editForm.price || srv.price}
                               onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+                            <label className="block text-[11px] font-black text-slate-300 mb-1">Deskripsi Singkat</label>
                             <textarea
                               rows={2}
                               value={editForm.description || srv.description}
                               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
                             />
                           </div>
 
                           <div className="flex justify-end gap-2 pt-2">
                             <button
                               onClick={() => setEditingServiceId(null)}
-                              className="px-3.5 py-1.5 rounded-lg bg-slate-200 text-slate-800 text-xs font-bold hover:bg-slate-300"
+                              className="px-3.5 py-1.5 rounded-lg bg-slate-200 text-slate-900 text-xs font-black hover:bg-slate-300"
                             >
                               Batal
                             </button>
                             <button
                               onClick={() => handleSaveCmsService(srv.id)}
-                              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+                              className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1 cursor-pointer shadow-xs"
                             >
                               <Save className="w-3.5 h-3.5" />
                               <span>Simpan CMS</span>
@@ -1438,7 +1438,7 @@ export default function AdminPage() {
                         <>
                           <div className="flex items-start justify-between">
                             <div>
-                              <span className="text-[9px] font-mono text-slate-800 bg-slate-200 border border-slate-300 px-2 py-0.5 rounded font-bold uppercase">
+                              <span className="text-[9px] font-mono text-slate-900 bg-slate-200 border border-slate-400 px-2 py-0.5 rounded font-black uppercase">
                                 {srv.category}
                               </span>
                               <h3 className="font-black text-base text-slate-900 mt-1.5">{srv.name}</h3>
@@ -1451,16 +1451,16 @@ export default function AdminPage() {
                               className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 transition-colors cursor-pointer shadow-xs"
                               title="Edit Layanan"
                             >
-                              <Edit3 className="w-4 h-4" />
+                              <Edit3 className="w-4 h-4 text-slate-900" />
                             </button>
                           </div>
 
-                          <p className="text-xs text-slate-700 leading-relaxed font-semibold">{srv.description}</p>
+                          <p className="text-xs text-slate-900 leading-relaxed font-bold">{srv.description}</p>
 
-                          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
-                            <span className="text-sm font-black text-emerald-700">{srv.price}</span>
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-300">
+                            <span className="text-sm font-black text-slate-900">{srv.price}</span>
                             {srv.badge && (
-                              <span className="text-[9px] font-black bg-blue-600 text-white px-2.5 py-0.5 rounded uppercase">
+                              <span className="text-[9px] font-black bg-slate-900 text-white px-2.5 py-0.5 rounded uppercase">
                                 {srv.badge}
                               </span>
                             )}
@@ -1484,22 +1484,22 @@ export default function AdminPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white border border-slate-200 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4 shadow-2xl"
+              className="bg-white border border-slate-300 rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto relative space-y-4 shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-300 pb-3">
                 <h3 className="font-black text-sm text-slate-900 flex items-center gap-2">
-                  <QrCode className="w-4 h-4 text-amber-600" />
+                  <QrCode className="w-4 h-4 text-slate-900" />
                   Inspeksi Bukti Pembayaran QRIS (Screenshot)
                 </h3>
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="p-1 text-slate-500 hover:text-slate-900 rounded-lg transition-colors cursor-pointer"
+                  className="p-1 text-slate-900 hover:text-black rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center p-2">
+              <div className="rounded-2xl overflow-hidden border border-slate-300 bg-slate-100 flex items-center justify-center p-2">
                 <img
                   src={selectedProofImage}
                   alt="Bukti Transfer QRIS"
@@ -1510,7 +1510,7 @@ export default function AdminPage() {
               <div className="flex justify-end pt-2">
                 <button
                   onClick={() => setSelectedProofImage(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 font-bold text-xs cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-black text-xs cursor-pointer"
                 >
                   Tutup Pratonton
                 </button>
