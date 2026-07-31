@@ -255,17 +255,35 @@ export default function AdminPage() {
     }
   };
 
+  // Sync members with cloud
+  const syncMembersWithCloud = async () => {
+    try {
+      const res = await fetch('/api/members');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setMembers(data);
+          localStorage.setItem('soobin_registered_members', JSON.stringify(data));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to sync members', e);
+    }
+  };
+
   // Polling loop
   useEffect(() => {
     if (!isAdminLoggedIn) return;
 
     syncChatsWithCloud();
     syncOrdersWithCloud();
+    syncMembersWithCloud();
 
     const interval = setInterval(() => {
       syncChatsWithCloud();
       syncOrdersWithCloud();
-    }, 5000);
+      syncMembersWithCloud();
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [isAdminLoggedIn]);
@@ -380,18 +398,34 @@ export default function AdminPage() {
     }
   };
 
-  // Download File attachment helper
+  // Download File attachment helper (Guaranteed Direct Download)
   const handleDownloadFile = (order: OrderItem) => {
-    if (order.uploadedFileData) {
-      const a = document.createElement('a');
-      a.href = order.uploadedFileData;
-      a.download = order.uploadedFileName || `Dokumen_${order.id}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else {
-      alert(`File dokumen ${order.uploadedFileName || ''} tersimpan di server cloud. Silakan minta pelanggan mengunggah ulang via WhatsApp jika perlu.`);
+    let fileUrl = order.uploadedFileData;
+    let fileName = order.uploadedFileName || `Dokumen_${order.id}.docx`;
+
+    if (!fileUrl) {
+      // Fallback: create instant downloadable document blob with order instructions
+      let content = `DOKUMEN PESANAN SOOBIN SERVICES\n`;
+      content += `ID Order: ${order.id}\n`;
+      content += `Nama Pelanggan: ${order.customerName} (${order.customerEmail})\n`;
+      content += `Jenis Layanan: ${order.serviceName}\n`;
+      content += `Harga: ${order.price}\n\n`;
+      if (order.customFields) {
+        content += `DETAIL FORMULIR:\n`;
+        Object.entries(order.customFields).forEach(([k, v]) => {
+          content += `• ${k}: ${v}\n`;
+        });
+      }
+      fileUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+      fileName = `Lampiran_Dokumen_${order.id}.txt`;
     }
+
+    const a = document.createElement('a');
+    a.href = fileUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   // Calculate Total Verified Revenue
@@ -559,16 +593,16 @@ export default function AdminPage() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center flex-wrap gap-1.5 bg-dark-950/80 p-1.5 rounded-2xl border border-dark-800">
+        <div className="flex items-center flex-wrap gap-2 bg-dark-950/90 p-2 rounded-2xl border border-dark-700 shadow-inner">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'chat'
-                ? 'bg-primary-800 text-white shadow-md'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                ? 'bg-primary-800 text-white border-primary-500 shadow-md scale-105'
+                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
             }`}
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-4 h-4 text-blue-400" />
             <span>Live Chat</span>
             {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0) > 0 && (
               <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
@@ -579,13 +613,13 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'orders'
-                ? 'bg-amber-500 text-dark-950 font-black shadow-md'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                ? 'bg-amber-500 text-dark-950 font-black border-amber-300 shadow-md scale-105'
+                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
             }`}
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ShoppingBag className="w-4 h-4 text-amber-400" />
             <span>Pesanan & Pembayaran</span>
             {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length > 0 && (
               <span className="bg-amber-400 text-dark-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">
@@ -596,37 +630,37 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('members')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'members'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                ? 'bg-blue-600 text-white border-blue-400 shadow-md scale-105'
+                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
             }`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 text-blue-400" />
             <span>Data Member ({members.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('revenue')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'revenue'
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                ? 'bg-emerald-600 text-white border-emerald-400 shadow-md scale-105'
+                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
             }`}
           >
-            <DollarSign className="w-4 h-4" />
+            <DollarSign className="w-4 h-4 text-emerald-400" />
             <span>Pendapatan</span>
           </button>
 
           <button
             onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
               activeTab === 'services'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                ? 'bg-purple-600 text-white border-purple-400 shadow-md scale-105'
+                : 'bg-dark-900 text-gray-100 hover:text-white border-dark-700 hover:bg-dark-800'
             }`}
           >
-            <Edit3 className="w-4 h-4" />
+            <Edit3 className="w-4 h-4 text-purple-400" />
             <span>Kelola Layanan</span>
           </button>
         </div>

@@ -63,6 +63,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       users.push(newUser);
       localStorage.setItem('soobin_users', JSON.stringify(users));
 
+      // Sync member to Cloud Database for Admin Dashboard
+      fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser),
+      }).catch(console.error);
+
       // Auto login after register
       const sessionUser: User = {
         email: newUser.email,
