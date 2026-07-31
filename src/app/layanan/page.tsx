@@ -32,7 +32,6 @@ const categories = [
   { id: 'desain', label: 'Desain Grafis', icon: Image },
   { id: 'digital', label: 'Digital & Online', icon: Monitor },
   { id: 'uiux', label: 'UI/UX Design', icon: MonitorCheck },
-  { id: 'pembuatan-website', label: 'Pembuatan Website', icon: Code },
 ];
 
 const services = [
@@ -767,12 +766,6 @@ const services = [
   { id: 551, category: 'uiux', name: 'Paket Redesign Website', price: 'Start 500k', icon: MonitorCheck, badge: null },
   { id: 552, category: 'uiux', name: 'Paket UX Audit + Report', price: 'Start 500k', icon: MonitorCheck, badge: null },
   { id: 553, category: 'uiux', name: 'Paket Design System Basic', price: 'Start 750k', icon: MonitorCheck, badge: null },
-  // ─── Pembuatan Website ───
-  { id: 601, category: 'pembuatan-website', name: 'Landing Page / Portofolio', price: 'Rp 450.000', icon: Code, badge: 'Popular' },
-  { id: 602, category: 'pembuatan-website', name: 'Website Company Profile', price: 'Rp 950.000', icon: Globe, badge: 'Exclusive' },
-  { id: 603, category: 'pembuatan-website', name: 'Website E-Commerce / Toko Online', price: 'Rp 1.500.000', icon: Database, badge: 'Premium' },
-  { id: 604, category: 'pembuatan-website', name: 'Web Application Custom', price: 'Chat Admin', icon: Monitor, badge: 'Enterprise' },
-  { id: 605, category: 'pembuatan-website', name: 'Sistem Informasi Akademik / Kantor', price: 'Chat Admin', icon: FileSpreadsheet, badge: 'Custom' },
 ];
 
 const getDisplayBadge = (service: any): string | null => {
@@ -1195,44 +1188,25 @@ export default function LayananPage() {
                 : `Halo Kak Mau ${service.name}`;
               const waLink = `https://wa.me/6287815797525?text=${encodeURIComponent(waText)}`;
 
-              const isWebsite = service.category === 'pembuatan-website';
-
               return (
                 <motion.div
                   key={service.id}
                   className={`group relative rounded-xl p-4 sm:p-5 lg:p-6 border transition-all duration-500 ${
-                    isWebsite
-                      ? 'sparkle-btn text-white border-purple-400/20'
-                      : displayBadge ? 'border-primary-800 shadow-md bg-white' : 'border-gray-200 hover:border-primary-800 bg-white'
+                    displayBadge ? 'border-primary-800 shadow-md bg-white' : 'border-gray-200 hover:border-primary-800 bg-white'
                   }`}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  whileHover={
-                    isWebsite
-                      ? { y: -4, boxShadow: "0 12px 24px rgba(124, 58, 237, 0.35)" }
-                      : { y: -4, boxShadow: "0 12px 24px rgba(26, 35, 126, 0.15)" }
-                  }
+                  whileHover={{ y: -4, boxShadow: "0 12px 24px rgba(26, 35, 126, 0.15)" }}
                 >
-                  {isWebsite && (
-                    <>
-                      <span className="sparkle-star top-2 left-3"></span>
-                      <span className="sparkle-star bottom-4 right-5"></span>
-                      <span className="sparkle-star top-8 right-2"></span>
-                    </>
-                  )}
                   {displayBadge && (
                     <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full z-10">
                       {displayBadge}
                     </span>
                   )}
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${
-                      isWebsite ? 'bg-white/20' : 'bg-primary-800/10'
-                    }`}>
-                      <service.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                        isWebsite ? 'text-white' : 'text-primary-800'
-                      }`} />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-primary-800/10">
+                      <service.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary-800" />
                     </div>
 
                     {/* Cart Icon for Member */}
@@ -1248,20 +1222,16 @@ export default function LayananPage() {
                             category: service.category
                           });
                         }}
-                        className={`p-2 rounded-lg transition-all cursor-pointer ${
-                          isWebsite
-                            ? 'text-white/85 hover:text-white hover:bg-white/10'
-                            : 'text-gray-400 hover:text-primary-800 hover:bg-primary-800/5'
-                        }`}
+                        className="p-2 rounded-lg transition-all cursor-pointer text-gray-400 hover:text-primary-800 hover:bg-primary-800/5"
                         title="Tambah ke Keranjang"
                       >
                         <ShoppingCart className="w-4.5 h-4.5" />
                       </button>
                     )}
                   </div>
-                  <h3 className={`font-semibold text-sm sm:text-base mb-2 transition-colors line-clamp-2 ${
-                    isWebsite ? 'text-white group-hover:text-purple-200' : 'text-dark-800 group-hover:text-primary-800'
-                  }`}>{service.name}</h3>
+                  <h3 className="font-semibold text-sm sm:text-base mb-2 transition-colors line-clamp-2 text-dark-800 group-hover:text-primary-800">
+                    {service.name}
+                  </h3>
                   
                   {hasDiscount ? (
                     <div className="mb-3">
@@ -1277,9 +1247,7 @@ export default function LayananPage() {
                     </div>
                   ) : (
                     <div className="mb-3 flex items-center gap-1.5 flex-wrap">
-                      <p className={`font-bold text-sm sm:text-base ${
-                        isWebsite ? 'text-purple-100' : 'text-primary-800'
-                      }`}>
+                      <p className="font-bold text-sm sm:text-base text-primary-800">
                         {service.price}
                       </p>
                       {!!user && isSkripsi && service.price === 'Chat Admin' && (
@@ -1295,11 +1263,7 @@ export default function LayananPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => placeDirectOrder(service.name)}
-                    className={`block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm ${
-                      isWebsite
-                        ? 'bg-white text-purple-700 hover:bg-purple-50 hover:text-purple-800 font-bold'
-                        : 'bg-primary-800 hover:bg-primary-750 text-white'
-                    }`}
+                    className="block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm bg-primary-800 hover:bg-primary-750 text-white"
                     whileTap={{ scale: 0.98 }}
                   >
                     Pesan

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Menu, X, LogOut, ChevronDown, Zap, ShoppingCart, History } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -21,33 +21,9 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isNavigatingToWeb, setIsNavigatingToWeb] = useState(false);
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const router = useRouter();
-
-  const handleWebClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsNavigatingToWeb(true);
-    setTimeout(() => {
-      router.push('/pembuatan-website');
-      setTimeout(() => {
-        setIsNavigatingToWeb(false);
-      }, 1000);
-    }, 1800);
-  };
-
-  const handleMobileWebClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsOpen(false);
-    setIsNavigatingToWeb(true);
-    setTimeout(() => {
-      router.push('/pembuatan-website');
-      setTimeout(() => {
-        setIsNavigatingToWeb(false);
-      }, 1000);
-    }, 1800);
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,17 +65,6 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/pembuatan-website"
-              onClick={handleWebClick}
-              className="firecracker-btn text-xs px-3.5 py-1.5 rounded-full flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold relative"
-            >
-              <span className="spark spark-1"></span>
-              <span className="spark spark-2"></span>
-              <span className="spark spark-3"></span>
-              <span className="spark spark-4"></span>
-              PEMBUATAN WEBSITE
-            </Link>
             <a
               href="https://wa.me/6287815797525"
               target="_blank"
@@ -226,17 +191,6 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/pembuatan-website"
-              onClick={handleMobileWebClick}
-              className="firecracker-btn text-xs px-3 py-2.5 rounded-xl flex items-center justify-center gap-1 cursor-pointer tracking-wide uppercase font-bold text-center mt-1 relative"
-            >
-              <span className="spark spark-1"></span>
-              <span className="spark spark-2"></span>
-              <span className="spark spark-3"></span>
-              <span className="spark spark-4"></span>
-              PEMBUATAN WEBSITE
-            </Link>
             <a
               href="https://wa.me/6287815797525"
               target="_blank"
@@ -300,48 +254,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {/* Lightning Strike Portal Transition Overlay */}
-      <AnimatePresence>
-        {isNavigatingToWeb && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-slate-950 overflow-hidden"
-          >
-            {/* Wifi Loader */}
-            <div id="wifi-loader" className="scale-125">
-              <svg className="circle-outer" viewBox="0 0 86 86">
-                <circle className="back" cx="43" cy="43" r="40"></circle>
-                <circle className="front" cx="43" cy="43" r="40"></circle>
-              </svg>
-              <svg className="circle-middle" viewBox="0 0 60 60">
-                <circle className="back" cx="30" cy="30" r="27"></circle>
-                <circle className="front" cx="30" cy="30" r="27"></circle>
-              </svg>
-              <svg className="circle-inner" viewBox="0 0 34 34">
-                <circle className="back" cx="17" cy="17" r="14"></circle>
-                <circle className="front" cx="17" cy="17" r="14"></circle>
-              </svg>
-              <div className="text" data-text="JAR.DEV PORTAL"></div>
-            </div>
-
-            {/* Screen flash layer (simulating a lightning strike at 1.5s right before push) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: [0, 0, 1, 0]
-              }}
-              transition={{
-                times: [0, 0.8, 0.9, 1],
-                duration: 1.8,
-                repeat: 0
-              }}
-              className="fixed inset-0 bg-white z-110 pointer-events-none"
-            ></motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </nav>
   );
 }

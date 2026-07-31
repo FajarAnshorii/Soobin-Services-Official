@@ -59,23 +59,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/pembuatan-website`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/pembuatan-website/layanan`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/pembuatan-website/portofolio`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
   ];
 }
