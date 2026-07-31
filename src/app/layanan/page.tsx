@@ -1024,8 +1024,31 @@ export default function LayananPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<any>(null);
+  const [servicesList, setServicesList] = useState(services);
 
-  const filteredServices = services.filter((service) => {
+  useEffect(() => {
+    fetch('/api/services')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const mapped = data.services.map((ds: any) => {
+            const defaultItem = services.find((s) => s.id === ds.id);
+            return {
+              id: ds.id,
+              category: ds.category || defaultItem?.category || 'umum',
+              name: ds.name || defaultItem?.name,
+              price: ds.price || defaultItem?.price,
+              badge: ds.badge !== undefined ? ds.badge : defaultItem?.badge,
+              icon: defaultItem?.icon || Globe,
+            };
+          });
+          setServicesList(mapped);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const filteredServices = servicesList.filter((service) => {
     const matchesCategory = activeCategory === 'all' || service.category === activeCategory;
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
