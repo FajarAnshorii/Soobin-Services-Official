@@ -149,16 +149,35 @@ export default function AdminPage() {
     }
   };
 
-  // Sync orders with cloud
+  // Sync orders with cloud + local fallback
   const syncOrdersWithCloud = async () => {
     setOrdersLoading(true);
     try {
+      const localOrders = JSON.parse(localStorage.getItem('soobin_all_orders') || '[]');
+      
+      let cloudOrders: OrderItem[] = [];
       const res = await fetch(ORDERS_URL);
-      if (!res.ok) return;
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setOrders(data);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          cloudOrders = data;
+        }
       }
+
+      // Unique merge by order ID
+      const orderMap = new Map<string, OrderItem>();
+      [...cloudOrders, ...localOrders].forEach((item) => {
+        if (item && item.id) {
+          orderMap.set(item.id, item);
+        }
+      });
+
+      const merged = Array.from(orderMap.values()).sort(
+        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+
+      setOrders(merged);
+      localStorage.setItem('soobin_all_orders', JSON.stringify(merged));
     } catch (e) {
       console.error('Failed to sync orders', e);
     } finally {

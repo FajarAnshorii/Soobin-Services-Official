@@ -1261,7 +1261,15 @@ export default function LayananPage() {
                   )}
 
                   <motion.button
-                    onClick={() => setSelectedServiceForModal(service)}
+                    onClick={() => {
+                      if (!user) {
+                        placeDirectOrder(service.name);
+                        const waText = `Halo Admin SOOBIN Services, saya ingin memesan layanan:\n📌 *${service.name}*\n💰 *Harga: ${service.price}*\n\nMohon info mengenai alur pemesanan selanjutnya. Terima kasih!`;
+                        window.open(`https://wa.me/6287815797525?text=${encodeURIComponent(waText)}`, '_blank');
+                      } else {
+                        setSelectedServiceForModal(service);
+                      }
+                    }}
                     className="block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm bg-primary-800 hover:bg-primary-750 text-white cursor-pointer"
                     whileTap={{ scale: 0.98 }}
                   >

@@ -148,6 +148,11 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
   const saveOrderToCloud = async (orderPayload: any) => {
     try {
+      // Save locally to localStorage so it appears in admin immediately
+      const currentLocal = JSON.parse(localStorage.getItem('soobin_all_orders') || '[]');
+      const updatedLocal = [orderPayload, ...currentLocal.filter((o: any) => o.id !== orderPayload.id)].slice(0, 50);
+      localStorage.setItem('soobin_all_orders', JSON.stringify(updatedLocal));
+
       await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
