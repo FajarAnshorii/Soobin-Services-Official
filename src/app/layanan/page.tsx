@@ -16,6 +16,7 @@ import {
   ArrowUp, ShoppingCart
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import OrderModal from '@/components/modals/OrderModal';
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Filter },
@@ -1022,6 +1023,7 @@ export default function LayananPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [selectedServiceForModal, setSelectedServiceForModal] = useState<any>(null);
 
   const filteredServices = services.filter((service) => {
     const matchesCategory = activeCategory === 'all' || service.category === activeCategory;
@@ -1258,16 +1260,13 @@ export default function LayananPage() {
                     </div>
                   )}
 
-                  <motion.a
-                    href={waLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => placeDirectOrder(service.name)}
-                    className="block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm bg-primary-800 hover:bg-primary-750 text-white"
+                  <motion.button
+                    onClick={() => setSelectedServiceForModal(service)}
+                    className="block w-full text-center font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-300 text-sm bg-primary-800 hover:bg-primary-750 text-white cursor-pointer"
                     whileTap={{ scale: 0.98 }}
                   >
                     Pesan
-                  </motion.a>
+                  </motion.button>
                 </motion.div>
               );
             })}
@@ -1359,6 +1358,11 @@ export default function LayananPage() {
 
       <Footer />
       <WhatsAppFloat />
+      <OrderModal
+        isOpen={!!selectedServiceForModal}
+        onClose={() => setSelectedServiceForModal(null)}
+        service={selectedServiceForModal}
+      />
     </main>
   );
 }

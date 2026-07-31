@@ -57,3 +57,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const updatedOrders = await request.json();
+
+    const putRes = await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Array.isArray(updatedOrders) ? updatedOrders : []),
+    });
+
+    if (!putRes.ok) {
+      throw new Error(`Cloud returned status ${putRes.status}`);
+    }
+
+    return NextResponse.json({ success: true, data: updatedOrders });
+  } catch (e: any) {
+    console.error('API PUT orders error:', e);
+    return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
+  }
+}
