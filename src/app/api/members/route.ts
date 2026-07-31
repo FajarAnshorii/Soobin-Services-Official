@@ -29,7 +29,7 @@ export async function GET() {
           id: `MBR-${String(idx + 1).padStart(4, '0')}`,
           name: m.name,
           email: m.email,
-          university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Indonesia',
+          university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Trunojoyo Madura',
           prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
           createdAt: m.created_at || m.createdAt || new Date().toISOString(),
         };
@@ -38,7 +38,7 @@ export async function GET() {
       return NextResponse.json(formatted);
     }
 
-    // 2. High-Availability Fallback
+    // 2. High-Availability Fallback Store
     const res = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
     let data: any[] = [];
     if (res.ok) {
@@ -57,7 +57,7 @@ export async function GET() {
       return {
         ...m,
         id: `MBR-${String(idx + 1).padStart(4, '0')}`,
-        university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Indonesia',
+        university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Trunojoyo Madura',
         prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
       };
     });
@@ -78,9 +78,10 @@ export async function POST(request: Request) {
 
     const isFilda = newMember.email.toLowerCase() === 'fildafelissa01@gmail.com';
     const memberPayload = {
+      id: `MBR-${String(Date.now()).slice(-4)}`,
       name: newMember.name,
       email: newMember.email.toLowerCase(),
-      university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Indonesia',
+      university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Trunojoyo Madura',
       prodi: isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1',
       created_at: newMember.createdAt || new Date().toISOString(),
     };
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
       console.error('Supabase save member error', e);
     }
 
-    // 2. Sync to High-Availability Store
+    // 2. Sync to High-Availability Cloud Bin Store
     let currentMembers: any[] = [];
     try {
       const getRes = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });

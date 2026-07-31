@@ -21,17 +21,35 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper to auto-sync user profile to Supabase via /api/members
+const syncMemberToSupabase = (userData: User) => {
+  if (!userData || !userData.email) return;
+  fetch('/api/members', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: userData.name,
+      email: userData.email,
+      university: userData.university,
+      prodi: userData.prodi,
+      createdAt: new Date().toISOString(),
+    }),
+  }).catch(console.error);
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Load session from localStorage on mount
+  // Load session from localStorage on mount & sync to Supabase Cloud Database
   useEffect(() => {
     try {
       const savedSession = localStorage.getItem('soobin_session');
       if (savedSession) {
-        setUser(JSON.parse(savedSession));
+        const parsed = JSON.parse(savedSession);
+        setUser(parsed);
+        syncMemberToSupabase(parsed);
       }
     } catch (e) {
       console.error('Failed to load session', e);
@@ -63,12 +81,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       users.push(newUser);
       localStorage.setItem('soobin_users', JSON.stringify(users));
 
-      // Sync member to Cloud Database for Admin Dashboard
-      fetch('/api/members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser),
-      }).catch(console.error);
+      // Realtime Sync member to Supabase Cloud Database
+      syncMemberToSupabase(newUser);
 
       // Auto login after register
       const sessionUser: User = {
@@ -109,6 +123,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
       setUser(sessionUser);
+
+      // Realtime Sync member to Supabase Cloud Database on login
+      syncMemberToSupabase(sessionUser);
       return true;
     } catch (err: any) {
       console.error('Login error:', err);
@@ -150,27 +167,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <AnimatePresence>
         {isLoggingOut && (
           <motion.div
-            className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#0d1224]/80 backdrop-blur-md text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-md text-white"
           >
             <motion.div
-              className="flex flex-col items-center gap-4"
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ delay: 0.05, duration: 0.25 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl text-slate-900 shadow-2xl max-w-sm w-full text-center"
             >
-              <div className="relative w-14 h-14">
-                <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
-                <div className="absolute inset-0 rounded-full border-4 border-t-primary-800 border-r-green-500 animate-spin"></div>
-              </div>
-              <div className="text-center">
-                <h3 className="text-base font-bold tracking-tight text-white">Sedang Keluar...</h3>
-                <p className="text-xs text-gray-400 mt-1 px-4">Menghapus sesi aman Anda dan memulihkan harga normal</p>
-              </div>
+              <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              <h3 className="text-xl font-bold text-slate-900">Keluar dari Sesi...</h3>
+              <p className="text-sm text-slate-900">Terima kasih telah menggunakan SOOBIN Services!</p>
             </motion.div>
           </motion.div>
         )}
@@ -181,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
