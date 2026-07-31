@@ -7,7 +7,8 @@ import {
   Mail, Lock, LogOut, MessageSquare, Shield,
   School, Send, CircleAlert, Headphones,
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode,
-  Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight
+  Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
+  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText
 } from 'lucide-react';
 
 interface Message {
@@ -87,8 +88,9 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Tab state
-  const [activeTab, setActiveTab] = useState<'chat' | 'orders' | 'members' | 'revenue' | 'services'>('chat');
+  // Tab & Search state
+  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'orders' | 'members' | 'revenue' | 'services'>('overview');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Chat states
   const [chats, setChats] = useState<{ [id: string]: ChatSession }>({});
@@ -114,7 +116,7 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
-  // Check Auth state & set body dark slate background on mount
+  // Set body background to clean dark slate #0f172a on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
     setIsAdminLoggedIn(isLoggedIn);
@@ -125,7 +127,7 @@ export default function AdminPage() {
     };
   }, []);
 
-  // Set Admin online/offline indicator for client tabs
+  // Admin Active Status Flag
   useEffect(() => {
     if (isAdminLoggedIn) {
       localStorage.setItem('soobin_admin_active', 'true');
@@ -141,7 +143,7 @@ export default function AdminPage() {
     }
   }, [isAdminLoggedIn]);
 
-  // Sync Members with cloud API
+  // Sync Members API
   const syncMembersWithCloud = async () => {
     try {
       const res = await fetch('/api/members');
@@ -161,7 +163,7 @@ export default function AdminPage() {
     }
   };
 
-  // Sync services config
+  // Sync Services CMS
   useEffect(() => {
     const savedServices = JSON.parse(localStorage.getItem('soobin_cms_services') || 'null');
     if (savedServices) {
@@ -169,7 +171,7 @@ export default function AdminPage() {
     }
   }, []);
 
-  // Sync chats with cloud
+  // Sync Chats API
   const syncChatsWithCloud = async () => {
     try {
       const res = await fetch(BUCKET_URL);
@@ -198,7 +200,7 @@ export default function AdminPage() {
     }
   };
 
-  // Sync orders with cloud + local fallback
+  // Sync Orders API
   const syncOrdersWithCloud = async () => {
     setOrdersLoading(true);
     try {
@@ -249,7 +251,7 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, [isAdminLoggedIn]);
 
-  // Auto scroll chat
+  // Auto scroll chat stream
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedSessionId, chats]);
@@ -278,7 +280,7 @@ export default function AdminPage() {
     localStorage.setItem('soobin_admin_active', 'false');
   };
 
-  // Sound notification
+  // Audio tone
   const playNotificationSound = () => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -359,7 +361,7 @@ export default function AdminPage() {
     }
   };
 
-  // Order status verifier
+  // Update order status
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     const updated = orders.map((o) => (o.id === orderId ? { ...o, paymentStatus: newStatus } : o));
     setOrders(updated);
@@ -376,7 +378,7 @@ export default function AdminPage() {
     }
   };
 
-  // Guaranteed direct document download
+  // Direct document download
   const handleDownloadFile = (order: OrderItem) => {
     let fileUrl = order.uploadedFileData;
     let fileName = order.uploadedFileName || `Dokumen_${order.id}.docx`;
@@ -405,7 +407,7 @@ export default function AdminPage() {
     document.body.removeChild(a);
   };
 
-  // Calculate Verified Revenue
+  // Total Verified Revenue calculation
   const calculateTotalRevenue = () => {
     return orders
       .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas') || o.paymentStatus?.toLowerCase().includes('terverifikasi'))
@@ -415,7 +417,7 @@ export default function AdminPage() {
       }, 0);
   };
 
-  // Export Monthly Revenue Report to Excel (.csv with WIB timestamp)
+  // Export Excel CSV
   const handleExportExcel = () => {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = {
@@ -469,11 +471,34 @@ export default function AdminPage() {
     setTimeout(() => setSaveSuccessMsg(''), 4000);
   };
 
+  // Filtered lists based on search query
+  const filteredOrders = orders.filter(
+    (o) =>
+      o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      o.customerEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      o.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredMembers = members.filter(
+    (m) =>
+      m.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (m.university && m.university.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   // Pagination for Members
   const indexOfLastMember = memberPage * membersPerPage;
   const indexOfFirstMember = indexOfLastMember - membersPerPage;
-  const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
-  const totalPages = Math.ceil(members.length / membersPerPage) || 1;
+  const currentMembers = filteredMembers.slice(indexOfFirstMember, indexOfLastMember);
+  const totalPages = Math.ceil(filteredMembers.length / membersPerPage) || 1;
+
+  const pendingOrdersCount = orders.filter(
+    (o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')
+  ).length;
+
+  const unreadChatsCount = Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
   if (!isAdminLoggedIn) {
     return (
@@ -485,9 +510,9 @@ export default function AdminPage() {
         >
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-slate-700/60 border border-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
-              <Shield className="w-8 h-8" />
+              <Shield className="w-8 h-8 text-blue-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-wide">SOOBIN Admin Portal</h1>
+            <h1 className="text-2xl font-black text-white tracking-wide">SOOBIN Admin Portal</h1>
             <p className="text-xs text-slate-300 mt-1">Masuk untuk mengelola Live Chat & Verifikasi Pesanan</p>
           </div>
 
@@ -532,14 +557,14 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
+              className="w-full bg-white hover:bg-slate-100 text-slate-950 font-black py-3 rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2 cursor-pointer mt-6"
             >
               {loading ? 'Memverifikasi...' : 'Masuk Dasbor Admin'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-700 text-center">
-            <Link href="/" className="text-xs text-slate-400 hover:text-white transition-colors">
+            <Link href="/" className="text-xs text-slate-300 hover:text-white transition-colors font-medium">
               ← Kembali ke Website Utama
             </Link>
           </div>
@@ -551,687 +576,903 @@ export default function AdminPage() {
   const selectedSession = selectedSessionId ? chats[selectedSessionId] : null;
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 flex flex-col w-full font-sans antialiased" style={{ backgroundColor: '#0f172a' }}>
-      {/* Top Navbar */}
-      <header className="bg-[#1e293b] border-b border-slate-700 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center text-white shrink-0">
-            <Shield className="w-5 h-5" />
+    <div className="min-h-screen bg-[#0f172a] text-slate-100 flex w-full font-sans antialiased" style={{ backgroundColor: '#0f172a' }}>
+      {/* LEFT VERTICAL SIDEBAR NAVIGATION (SaaS Style) */}
+      <aside className="w-64 bg-[#1e293b] border-r border-slate-700 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30">
+        <div>
+          {/* Brand Header */}
+          <div className="p-5 border-b border-slate-700 flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Shield className="w-5 h-5 text-blue-400" />
+            </div>
+            <div>
+              <h1 className="font-black text-sm text-white tracking-wide leading-none">SOOBIN</h1>
+              <p className="text-[10px] text-slate-300 font-bold mt-1 uppercase tracking-wider">Services Admin</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-extrabold text-base text-white leading-none tracking-wide">Dasbor Admin SOOBIN</h1>
-            <span className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-semibold mt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Status Online
-            </span>
-          </div>
-        </div>
 
-        {/* Tab Switcher - Professional Black & White / Slate Styling */}
-        <div className="flex items-center flex-wrap gap-2 bg-[#0f172a] p-1.5 rounded-xl border border-slate-700">
-          <button
-            onClick={() => setActiveTab('chat')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
-              activeTab === 'chat'
-                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Live Chat</span>
-            {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0) > 0 && (
-              <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
-                {Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0)}
-              </span>
-            )}
-          </button>
+          {/* Nav Items */}
+          <nav className="p-3 space-y-1.5">
+            <p className="text-[10px] font-extrabold text-slate-400 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
 
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
-              activeTab === 'orders'
-                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>Pesanan & Pembayaran</span>
-            {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length > 0 && (
-              <span className="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">
-                {orders.filter((o) => o.paymentStatus?.includes('Cek Admin') || o.paymentStatus?.includes('Menunggu')).length}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('members')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
-              activeTab === 'members'
-                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Data Member ({members.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('revenue')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
-              activeTab === 'revenue'
-                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <DollarSign className="w-4 h-4" />
-            <span>Pendapatan</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
-              activeTab === 'services'
-                ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
-                : 'bg-[#1e293b] text-slate-200 hover:text-white border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <Edit3 className="w-4 h-4" />
-            <span>Kelola Layanan</span>
-          </button>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="text-xs font-bold text-red-400 hover:text-red-300 flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-red-500/10 transition-colors cursor-pointer border border-red-500/20"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Keluar</span>
-        </button>
-      </header>
-
-      {/* Main Admin Workspace */}
-      <main className="flex-1 flex overflow-hidden p-4 sm:p-6 w-full max-w-[1600px] mx-auto gap-6">
-        {/* Tab 1: Live Chat */}
-        {activeTab === 'chat' && (
-          <div className="flex-1 flex gap-6 w-full overflow-hidden">
-            {/* Sidebar Chat Sessions */}
-            <div className="w-80 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-sm">
-              <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-[#1e293b]">
-                <h2 className="font-extrabold text-xs text-white uppercase tracking-wider">Antrean Percakapan</h2>
-                <span className="text-[10px] bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-full font-bold">
-                  {Object.keys(chats).length} User
-                </span>
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'overview'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Overview Dasbor</span>
               </div>
+            </button>
 
-              <div className="flex-1 overflow-y-auto divide-y divide-slate-700/50">
-                {Object.keys(chats).length === 0 ? (
-                  <div className="p-8 text-center text-xs text-slate-300 font-semibold">
-                    Belum ada percakapan masuk dari pengguna.
-                  </div>
-                ) : (
-                  Object.values(chats).map((session) => (
-                    <button
-                      key={session.id}
-                      onClick={() => handleSelectSession(session.id)}
-                      className={`w-full p-4 text-left transition-colors flex items-start gap-3 cursor-pointer ${
-                        selectedSessionId === session.id
-                          ? 'bg-slate-700/70 border-l-4 border-white'
-                          : 'hover:bg-slate-700/40'
-                      }`}
-                    >
-                      <div className="w-9 h-9 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                        {session.name?.[0]?.toUpperCase() || 'U'}
-                      </div>
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'chat'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <MessageSquare className="w-4 h-4" />
+                <span>Live Chat</span>
+              </div>
+              {unreadChatsCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                  {unreadChatsCount}
+                </span>
+              )}
+            </button>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <h3 className="font-bold text-xs text-white truncate">{session.name}</h3>
-                          <span className="text-[9px] text-slate-300 font-medium">{session.lastUpdated}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-300 truncate">
-                          {session.university} • {session.prodi}
-                        </p>
-                        <p className="text-[10px] text-slate-400 truncate mt-1">
-                          {session.messages?.[session.messages.length - 1]?.text || 'Belum ada pesan'}
-                        </p>
-                      </div>
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'orders'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <ShoppingBag className="w-4 h-4" />
+                <span>Pesanan & Pembayaran</span>
+              </div>
+              {pendingOrdersCount > 0 && (
+                <span className="bg-amber-400 text-slate-950 text-[10px] px-2 py-0.5 rounded-full font-black">
+                  {pendingOrdersCount}
+                </span>
+              )}
+            </button>
 
-                      {session.unreadCount > 0 && (
-                        <span className="w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shrink-0">
-                          {session.unreadCount}
-                        </span>
-                      )}
-                    </button>
-                  ))
-                )}
+            <button
+              onClick={() => setActiveTab('members')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'members'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4" />
+                <span>Data Member</span>
+              </div>
+              <span className="bg-slate-700 text-slate-200 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                {members.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('revenue')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'revenue'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <DollarSign className="w-4 h-4" />
+                <span>Pendapatan & Export</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('services')}
+              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border ${
+                activeTab === 'services'
+                  ? 'bg-white text-slate-950 border-white shadow-md font-extrabold'
+                  : 'bg-[#1e293b] text-slate-200 hover:text-white border-transparent hover:bg-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Edit3 className="w-4 h-4" />
+                <span>Kelola Layanan (CMS)</span>
+              </div>
+            </button>
+          </nav>
+        </div>
+
+        {/* Footer Admin Profile */}
+        <div className="p-3 border-t border-slate-700 bg-[#1e293b] space-y-2">
+          <div className="p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                AD
+              </div>
+              <div className="truncate">
+                <p className="text-xs font-bold text-white truncate">Administrator</p>
+                <p className="text-[10px] text-slate-300 truncate">admin@soobin.com</p>
               </div>
             </div>
+          </div>
 
-            {/* Chat Room Area */}
-            <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-sm">
-              {selectedSession ? (
-                <>
-                  {/* Session Header */}
-                  <div className="p-4 border-b border-slate-700 bg-[#1e293b] flex items-center justify-between">
-                    <div>
-                      <h2 className="font-bold text-sm text-white">{selectedSession.name}</h2>
-                      <div className="flex items-center gap-3 text-[11px] text-slate-300 mt-0.5 font-medium">
-                        <span className="flex items-center gap-1">
-                          <Mail className="w-3 h-3 text-slate-400" /> {selectedSession.email}
-                        </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <School className="w-3 h-3 text-slate-400" /> {selectedSession.university}
-                        </span>
-                      </div>
-                    </div>
+          <button
+            onClick={handleLogout}
+            className="w-full text-xs font-bold text-red-400 hover:text-red-300 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors cursor-pointer border border-red-500/20"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Keluar Sesi</span>
+          </button>
+        </div>
+      </aside>
 
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
-                      Session Active
-                    </span>
+      {/* RIGHT MAIN CONTAINER */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* TOP HEADER BAR */}
+        <header className="bg-[#1e293b] border-b border-slate-700 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-sm">
+          {/* Global Search Bar */}
+          <div className="relative max-w-md w-full">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <input
+              type="text"
+              placeholder="Cari pesanan, nama member, atau layanan..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#0f172a] border border-slate-600 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white transition-colors"
+            />
+          </div>
+
+          {/* Quick Actions & Realtime Status */}
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-emerald-400 flex items-center gap-2 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Sistem Online Realtime (WIB)
+            </span>
+
+            <button
+              onClick={() => {
+                syncOrdersWithCloud();
+                syncMembersWithCloud();
+                syncChatsWithCloud();
+              }}
+              disabled={ordersLoading}
+              className="p-2 rounded-xl bg-[#0f172a] hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
+              title="Refresh Data Realtime"
+            >
+              <RefreshCw className={`w-4 h-4 ${ordersLoading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </header>
+
+        {/* MAIN WORKSPACE CONTENT */}
+        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* OVERVIEW TAB */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              {/* TOP KPI STAT CARDS GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-emerald-400">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Total Pendapatan</span>
+                    <DollarSign className="w-5 h-5 bg-emerald-500/10 p-1 rounded-lg" />
                   </div>
-
-                  {/* Messages Stream */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0f172a]/60">
-                    {selectedSession.messages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
-                            msg.sender === 'admin'
-                              ? 'bg-blue-600 text-white rounded-tr-none shadow-sm'
-                              : 'bg-slate-700 text-white border border-slate-600 rounded-tl-none'
-                          }`}
-                        >
-                          <p className="whitespace-pre-wrap">{msg.text}</p>
-                          <span
-                            className={`block text-[9px] mt-1 text-right ${
-                              msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-300'
-                            }`}
-                          >
-                            {msg.timestamp}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    <div ref={chatEndRef} />
-                  </div>
-
-                  {/* Reply Input Box */}
-                  <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-700 bg-[#1e293b] flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Tulis balasan untuk pengguna..."
-                      value={adminReplyText}
-                      onChange={(e) => setAdminReplyText(e.target.value)}
-                      className="flex-1 bg-[#0f172a] border border-slate-600 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white"
-                    />
-                    <button
-                      type="submit"
-                      className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Kirim</span>
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                  <div className="w-16 h-16 bg-slate-700/50 border border-slate-600 rounded-2xl flex items-center justify-center text-white mb-4">
-                    <Headphones className="w-8 h-8" />
-                  </div>
-                  <p className="font-bold text-base text-white">Pilih Percakapan Pelanggan</p>
-                  <p className="text-xs text-slate-300 mt-1 max-w-xs leading-relaxed font-medium">
-                    Klik salah satu antrean percakapan di sebelah kiri untuk membalas pesan live chat.
+                  <p className="text-2xl font-black text-white">
+                    Rp {calculateTotalRevenue().toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[11px] text-slate-300 font-medium flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> Terverifikasi dari Lunas
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* Tab 2: Orders & Payments */}
-        {activeTab === 'orders' && (
-          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
-              <div>
-                <h2 className="font-bold text-base text-white flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5 text-amber-400" />
-                  Daftar Pesanan & Pembayaran QRIS / Transfer
-                </h2>
-                <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                  Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
-                </p>
+                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-blue-400">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Total Member</span>
+                    <Users className="w-5 h-5 bg-blue-500/10 p-1 rounded-lg" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{members.length} Member</p>
+                  <p className="text-[11px] text-slate-300 font-medium">Format MBR-0001 dst.</p>
+                </div>
+
+                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-amber-400">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Pesanan Menunggu</span>
+                    <ShoppingBag className="w-5 h-5 bg-amber-500/10 p-1 rounded-lg" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{pendingOrdersCount} Pesanan</p>
+                  <p className="text-[11px] text-slate-300 font-medium">Perlu Cek Verifikasi Admin</p>
+                </div>
+
+                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-purple-400">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Chat Sesi Aktif</span>
+                    <MessageSquare className="w-5 h-5 bg-purple-500/10 p-1 rounded-lg" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{Object.keys(chats).length} Sesi</p>
+                  <p className="text-[11px] text-slate-300 font-medium">{unreadChatsCount} Belum Dibaca</p>
+                </div>
               </div>
 
-              <button
-                onClick={syncOrdersWithCloud}
-                disabled={ordersLoading}
-                className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? 'animate-spin' : ''}`} />
-                <span>Refresh Pesanan</span>
-              </button>
-            </div>
-
-            {orders.length === 0 ? (
-              <div className="p-12 text-center text-slate-300 bg-[#0f172a]/60 rounded-2xl border border-slate-700">
-                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-400" />
-                <p className="font-bold text-base text-white">Belum Ada Pesanan Masuk</p>
-                <p className="text-xs text-slate-300 mt-1 font-medium">
-                  Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {orders.map((order) => {
-                  const isLunas = order.paymentStatus?.toLowerCase().includes('lunas');
-                  const isCancel = order.paymentStatus?.toLowerCase().includes('batal');
-
-                  return (
-                    <div
-                      key={order.id}
-                      className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 hover:border-slate-600 transition-colors space-y-4 shadow-sm"
+              {/* RECENT ACTIVITY & RECENT ORDERS SPLIT */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Recent Orders Table Overview */}
+                <div className="lg:col-span-2 bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                    <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-amber-400" />
+                      Pesanan Terbaru Masuk
+                    </h2>
+                    <button
+                      onClick={() => setActiveTab('orders')}
+                      className="text-xs font-bold text-blue-400 hover:text-blue-300"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 text-white flex items-center justify-center font-black text-xs">
-                            ORD
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-sm text-white">{order.customerName}</h3>
-                              <span className="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono border border-slate-600 font-bold">
-                                {order.id}
+                      Lihat Semua →
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs text-slate-200">
+                      <thead className="bg-[#0f172a] text-slate-300 font-extrabold text-[10px] uppercase border-b border-slate-700">
+                        <tr>
+                          <th className="p-3">ID Order</th>
+                          <th className="p-3">Nama Pelanggan</th>
+                          <th className="p-3">Layanan</th>
+                          <th className="p-3">Harga</th>
+                          <th className="p-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
+                        {orders.slice(0, 5).map((o) => (
+                          <tr key={o.id} className="hover:bg-slate-700/50">
+                            <td className="p-3 font-mono text-amber-400 font-bold">{o.id}</td>
+                            <td className="p-3 font-bold text-white">{o.customerName}</td>
+                            <td className="p-3 text-slate-200">{o.serviceName}</td>
+                            <td className="p-3 font-bold text-emerald-400">{o.price}</td>
+                            <td className="p-3">
+                              <span
+                                className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                  o.paymentStatus?.toLowerCase().includes('lunas')
+                                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                                }`}
+                              >
+                                {o.paymentStatus}
                               </span>
-                            </div>
-                            <p className="text-xs text-slate-300 font-medium">{order.customerEmail}</p>
-                          </div>
-                        </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
-                        {/* Status Badge */}
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
-                              isLunas
-                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40'
-                                : isCancel
-                                ? 'bg-red-500/15 text-red-300 border border-red-500/40'
-                                : 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
-                            }`}
-                          >
-                            {order.paymentStatus}
-                          </span>
+                {/* Registered Members Widget */}
+                <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-5 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                    <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-400" />
+                      Member Terdaftar Terbaru
+                    </h2>
+                    <button
+                      onClick={() => setActiveTab('members')}
+                      className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                    >
+                      Kelola →
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {members.slice(0, 4).map((m) => (
+                      <div key={m.id} className="p-3 bg-[#0f172a] border border-slate-700 rounded-xl flex items-center justify-between">
+                        <div>
+                          <p className="font-bold text-xs text-white">{m.name}</p>
+                          <p className="text-[10px] text-slate-300 font-medium">{m.email}</p>
                         </div>
+                        <span className="text-[10px] font-mono font-extrabold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                          {m.id}
+                        </span>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-                      {/* Main Details Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                        <div className="bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-1">
-                          <p className="text-slate-300 font-semibold">Jasa Layanan:</p>
-                          <p className="font-bold text-white text-sm">{order.serviceName}</p>
-                          <p className="text-emerald-400 font-extrabold">{order.price}</p>
-                          <p className="text-slate-300 text-[11px] pt-1 font-medium">
-                            Metode: <span className="text-white font-bold">{order.paymentMethod}</span>
+          {/* TAB 1: LIVE CHAT */}
+          {activeTab === 'chat' && (
+            <div className="flex gap-6 h-[calc(100vh-140px)] overflow-hidden">
+              {/* Sidebar Chat Sessions */}
+              <div className="w-80 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-sm">
+                <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-[#1e293b]">
+                  <h2 className="font-extrabold text-xs text-white uppercase tracking-wider">Antrean Percakapan</h2>
+                  <span className="text-[10px] bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-full font-bold">
+                    {Object.keys(chats).length} User
+                  </span>
+                </div>
+
+                <div className="flex-1 overflow-y-auto divide-y divide-slate-700/50">
+                  {Object.keys(chats).length === 0 ? (
+                    <div className="p-8 text-center text-xs text-slate-300 font-semibold">
+                      Belum ada percakapan masuk dari pengguna.
+                    </div>
+                  ) : (
+                    Object.values(chats).map((session) => (
+                      <button
+                        key={session.id}
+                        onClick={() => handleSelectSession(session.id)}
+                        className={`w-full p-4 text-left transition-colors flex items-start gap-3 cursor-pointer ${
+                          selectedSessionId === session.id
+                            ? 'bg-slate-700/70 border-l-4 border-white'
+                            : 'hover:bg-slate-700/40'
+                        }`}
+                      >
+                        <div className="w-9 h-9 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                          {session.name?.[0]?.toUpperCase() || 'U'}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <h3 className="font-bold text-xs text-white truncate">{session.name}</h3>
+                            <span className="text-[9px] text-slate-300 font-medium">{session.lastUpdated}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-300 truncate font-medium">
+                            {session.university} • {session.prodi}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate mt-1">
+                            {session.messages?.[session.messages.length - 1]?.text || 'Belum ada pesan'}
                           </p>
                         </div>
 
-                        <div className="md:col-span-2 bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-2">
-                          <p className="text-slate-300 font-semibold">Detail Formulir Kustom:</p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                            {order.customFields &&
-                              Object.entries(order.customFields).map(([k, v]) => (
-                                <div key={k} className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-700">
-                                  <span className="text-slate-300 block font-bold">{k}:</span>
-                                  <span className="text-white font-medium break-words">{v}</span>
-                                </div>
-                              ))}
+                        {session.unreadCount > 0 && (
+                          <span className="w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shrink-0">
+                            {session.unreadCount}
+                          </span>
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Chat Room Area */}
+              <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-sm">
+                {selectedSession ? (
+                  <>
+                    {/* Session Header */}
+                    <div className="p-4 border-b border-slate-700 bg-[#1e293b] flex items-center justify-between">
+                      <div>
+                        <h2 className="font-bold text-sm text-white">{selectedSession.name}</h2>
+                        <div className="flex items-center gap-3 text-[11px] text-slate-300 mt-0.5 font-medium">
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-3.5 h-3.5 text-slate-400" /> {selectedSession.email}
+                          </span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <School className="w-3.5 h-3.5 text-slate-400" /> {selectedSession.university}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
+                        Session Active
+                      </span>
+                    </div>
+
+                    {/* Messages Stream */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0f172a]/60">
+                      {selectedSession.messages.map((msg) => (
+                        <div
+                          key={msg.id}
+                          className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
+                              msg.sender === 'admin'
+                                ? 'bg-blue-600 text-white rounded-tr-none shadow-sm'
+                                : 'bg-slate-700 text-white border border-slate-600 rounded-tl-none'
+                            }`}
+                          >
+                            <p className="whitespace-pre-wrap">{msg.text}</p>
+                            <span
+                              className={`block text-[9px] mt-1 text-right ${
+                                msg.sender === 'admin' ? 'text-blue-100' : 'text-slate-300'
+                              }`}
+                            >
+                              {msg.timestamp}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      <div ref={chatEndRef} />
+                    </div>
+
+                    {/* Reply Input Box */}
+                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-700 bg-[#1e293b] flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Tulis balasan untuk pengguna..."
+                        value={adminReplyText}
+                        onChange={(e) => setAdminReplyText(e.target.value)}
+                        className="flex-1 bg-[#0f172a] border border-slate-600 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Kirim</span>
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                    <div className="w-16 h-16 bg-slate-700/50 border border-slate-600 rounded-2xl flex items-center justify-center text-white mb-4">
+                      <Headphones className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <p className="font-bold text-base text-white">Pilih Percakapan Pelanggan</p>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xs leading-relaxed font-medium">
+                      Klik salah satu antrean percakapan di sebelah kiri untuk membalas pesan live chat.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: ORDERS & PAYMENTS */}
+          {activeTab === 'orders' && (
+            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div>
+                  <h2 className="font-bold text-base text-white flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5 text-amber-400" />
+                    Daftar Pesanan & Pembayaran QRIS / Transfer
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                    Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
+                  </p>
+                </div>
+
+                <button
+                  onClick={syncOrdersWithCloud}
+                  disabled={ordersLoading}
+                  className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? 'animate-spin' : ''}`} />
+                  <span>Refresh Pesanan</span>
+                </button>
+              </div>
+
+              {filteredOrders.length === 0 ? (
+                <div className="p-12 text-center text-slate-300 bg-[#0f172a]/60 rounded-2xl border border-slate-700">
+                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-amber-400" />
+                  <p className="font-bold text-base text-white">Belum Ada Pesanan Masuk</p>
+                  <p className="text-xs text-slate-300 mt-1 font-medium">
+                    Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => {
+                    const isLunas = order.paymentStatus?.toLowerCase().includes('lunas');
+                    const isCancel = order.paymentStatus?.toLowerCase().includes('batal');
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 hover:border-slate-600 transition-colors space-y-4 shadow-sm"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 text-white flex items-center justify-center font-black text-xs">
+                              ORD
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-sm text-white">{order.customerName}</h3>
+                                <span className="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono border border-slate-600 font-bold">
+                                  {order.id}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-300 font-medium">{order.customerEmail}</p>
+                            </div>
+                          </div>
+
+                          {/* Status Badge */}
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
+                                isLunas
+                                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40'
+                                  : isCancel
+                                  ? 'bg-red-500/15 text-red-300 border border-red-500/40'
+                                  : 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
+                              }`}
+                            >
+                              {order.paymentStatus}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Main Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                          <div className="bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-1">
+                            <p className="text-slate-300 font-semibold">Jasa Layanan:</p>
+                            <p className="font-bold text-white text-sm">{order.serviceName}</p>
+                            <p className="text-emerald-400 font-extrabold">{order.price}</p>
+                            <p className="text-slate-300 text-[11px] pt-1 font-medium">
+                              Metode: <span className="text-white font-bold">{order.paymentMethod}</span>
+                            </p>
+                          </div>
+
+                          <div className="md:col-span-2 bg-[#1e293b] p-3.5 rounded-xl border border-slate-700 space-y-2">
+                            <p className="text-slate-300 font-semibold">Detail Formulir Kustom:</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                              {order.customFields &&
+                                Object.entries(order.customFields).map(([k, v]) => (
+                                  <div key={k} className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-700">
+                                    <span className="text-slate-300 block font-bold">{k}:</span>
+                                    <span className="text-white font-medium break-words">{v}</span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions Footer */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                          <div className="flex items-center gap-2">
+                            {/* Screenshot Proof Button */}
+                            {order.proofImage && (
+                              <button
+                                onClick={() => setSelectedProofImage(order.proofImage || null)}
+                                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span>Lihat Bukti Bayar (Screenshot)</span>
+                              </button>
+                            )}
+
+                            {/* File Download Button (Guaranteed Direct Download) */}
+                            {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
+                              <button
+                                onClick={() => handleDownloadFile(order)}
+                                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                              >
+                                <Download className="w-4 h-4" />
+                                <span>Unduh Dokumen File</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Status Toggle Buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
+                              className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                            >
+                              <XCircle className="w-4 h-4" />
+                              <span>Batalkan</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
+                              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-md"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              <span>Verifikasi Lunas</span>
+                            </button>
                           </div>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
-                      {/* Actions Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                        <div className="flex items-center gap-2">
-                          {/* Screenshot Proof Button */}
-                          {order.proofImage && (
+          {/* TAB 3: DATA MEMBER (50 per page, MBR-0001 format) */}
+          {activeTab === 'members' && (
+            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div>
+                  <h2 className="font-bold text-base text-white flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-400" />
+                    Daftar Member Terdaftar
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                    Total {filteredMembers.length} member terdaftar. Menampilkan 50 member per halaman.
+                  </p>
+                </div>
+
+                {/* Pagination Controls Top */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
+                    disabled={memberPage === 1}
+                    className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-xs font-bold text-white px-2">
+                    Halaman {memberPage} dari {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={memberPage === totalPages}
+                    className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Members Table */}
+              <div className="overflow-x-auto border border-slate-700 rounded-2xl">
+                <table className="w-full text-left text-xs text-slate-200">
+                  <thead className="bg-[#0f172a] text-slate-300 font-extrabold uppercase tracking-wider text-[10px] border-b border-slate-700">
+                    <tr>
+                      <th className="p-3.5">Kode ID Member</th>
+                      <th className="p-3.5">Nama Lengkap</th>
+                      <th className="p-3.5">Email</th>
+                      <th className="p-3.5">Kampus / Universitas</th>
+                      <th className="p-3.5">Program Studi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
+                    {currentMembers.map((mbr, idx) => (
+                      <tr key={mbr.id || idx} className="hover:bg-slate-700/50 transition-colors">
+                        <td className="p-3.5 font-mono text-blue-400 font-extrabold">{mbr.id}</td>
+                        <td className="p-3.5 font-bold text-white">{mbr.name}</td>
+                        <td className="p-3.5 text-slate-300 font-medium">{mbr.email}</td>
+                        <td className="p-3.5 text-slate-300 font-medium">{mbr.university || '-'}</td>
+                        <td className="p-3.5 text-slate-300 font-medium">{mbr.prodi || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Pagination */}
+              <div className="flex items-center justify-between pt-2">
+                <p className="text-xs text-slate-300 font-medium">
+                  Menampilkan {indexOfFirstMember + 1} - {Math.min(indexOfLastMember, filteredMembers.length)} dari {filteredMembers.length} Member
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
+                    disabled={memberPage === 1}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                  >
+                    Sebelumnya
+                  </button>
+                  <button
+                    onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={memberPage === totalPages}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
+                  >
+                    Selanjutnya
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: REVENUE & EXCEL REPORT */}
+          {activeTab === 'revenue' && (
+            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div>
+                  <h2 className="font-bold text-base text-white flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                    Dasbor Pendapatan & Export Laporan Excel
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                    Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleExportExcel}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md transition-colors"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>Export Laporan Excel (.csv)</span>
+                </button>
+              </div>
+
+              {/* Total Revenue Stat Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
+                  <p className="text-3xl font-black text-white">
+                    Rp {calculateTotalRevenue().toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[11px] text-slate-300 font-medium">Otomatis dihitung dari order status Lunas</p>
+                </div>
+
+                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
+                  <p className="text-3xl font-black text-white">
+                    {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
+                  </p>
+                  <p className="text-[11px] text-slate-300 font-medium">Siap diproses oleh tim admin</p>
+                </div>
+
+                <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">Waktu Sistem Realtime</p>
+                  <p className="text-base font-bold text-white">
+                    {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                  </p>
+                  <p className="text-[11px] text-slate-300 font-medium">Zona Waktu: Asia/Jakarta (WIB)</p>
+                </div>
+              </div>
+
+              {/* Itemized Table */}
+              <div className="border border-slate-700 rounded-2xl overflow-hidden">
+                <div className="p-4 bg-[#0f172a] border-b border-slate-700 font-bold text-xs text-white">
+                  Rincian Transaksi Pendapatan Masuk
+                </div>
+                <table className="w-full text-left text-xs text-slate-200">
+                  <thead className="bg-[#1e293b] text-slate-300 font-bold text-[10px] uppercase border-b border-slate-700">
+                    <tr>
+                      <th className="p-3.5">ID Order</th>
+                      <th className="p-3.5">Pelanggan</th>
+                      <th className="p-3.5">Layanan</th>
+                      <th className="p-3.5">Harga</th>
+                      <th className="p-3.5">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700 bg-[#0f172a]">
+                    {orders
+                      .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
+                      .map((o) => (
+                        <tr key={o.id} className="hover:bg-slate-800/60">
+                          <td className="p-3.5 font-mono text-amber-400 font-bold">{o.id}</td>
+                          <td className="p-3.5 font-bold text-white">{o.customerName}</td>
+                          <td className="p-3.5 text-slate-200 font-medium">{o.serviceName}</td>
+                          <td className="p-3.5 font-bold text-emerald-400">{o.price}</td>
+                          <td className="p-3.5 font-bold text-emerald-400">Terverifikasi Lunas</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: SERVICE CMS */}
+          {activeTab === 'services' && (
+            <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 space-y-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div>
+                  <h2 className="font-bold text-base text-white flex items-center gap-2">
+                    <Edit3 className="w-5 h-5 text-white" />
+                    Kelola Layanan & Harga (CMS Realtime)
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                    Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
+                  </p>
+                </div>
+
+                {saveSuccessMsg && (
+                  <span className="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl animate-fade-in">
+                    {saveSuccessMsg}
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {cmsServices.map((srv) => {
+                  const isEditing = editingServiceId === srv.id;
+
+                  return (
+                    <div
+                      key={srv.id}
+                      className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 space-y-3 relative group hover:border-slate-500 transition-colors shadow-sm"
+                    >
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Nama Layanan</label>
+                            <input
+                              type="text"
+                              value={editForm.name || srv.name}
+                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Harga Layanan</label>
+                            <input
+                              type="text"
+                              value={editForm.price || srv.price}
+                              onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-300 mb-1">Deskripsi Singkat</label>
+                            <textarea
+                              rows={2}
+                              value={editForm.description || srv.description}
+                              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                              className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
+                            />
+                          </div>
+
+                          <div className="flex justify-end gap-2 pt-2">
                             <button
-                              onClick={() => setSelectedProofImage(order.proofImage || null)}
-                              className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                              onClick={() => setEditingServiceId(null)}
+                              className="px-3.5 py-1.5 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600"
                             >
-                              <Eye className="w-4 h-4" />
-                              <span>Lihat Bukti Bayar (Screenshot)</span>
+                              Batal
                             </button>
-                          )}
-
-                          {/* File Download Button (Always Downloadable Direct) */}
-                          {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
                             <button
-                              onClick={() => handleDownloadFile(order)}
-                              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                              onClick={() => handleSaveCmsService(srv.id)}
+                              className="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
                             >
-                              <Download className="w-4 h-4" />
-                              <span>Unduh Dokumen File</span>
+                              <Save className="w-3.5 h-3.5" />
+                              <span>Simpan CMS</span>
                             </button>
-                          )}
+                          </div>
                         </div>
+                      ) : (
+                        <>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <span className="text-[9px] font-mono text-slate-200 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold uppercase">
+                                {srv.category}
+                              </span>
+                              <h3 className="font-bold text-base text-white mt-1.5">{srv.name}</h3>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setEditingServiceId(srv.id);
+                                setEditForm({ name: srv.name, price: srv.price, description: srv.description, badge: srv.badge });
+                              }}
+                              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
+                              title="Edit Layanan"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          </div>
 
-                        {/* Status Toggle Buttons */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                            className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
-                          >
-                            <XCircle className="w-4 h-4" />
-                            <span>Batalkan</span>
-                          </button>
+                          <p className="text-xs text-slate-300 leading-relaxed font-medium">{srv.description}</p>
 
-                          <button
-                            onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-md"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            <span>Verifikasi Lunas</span>
-                          </button>
-                        </div>
-                      </div>
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                            <span className="text-sm font-black text-amber-400">{srv.price}</span>
+                            {srv.badge && (
+                              <span className="text-[9px] font-black bg-slate-200 text-slate-950 px-2.5 py-0.5 rounded uppercase">
+                                {srv.badge}
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab 3: Data Member (50 items per page, starting MBR-0001) */}
-        {activeTab === 'members' && (
-          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
-              <div>
-                <h2 className="font-bold text-base text-white flex items-center gap-2">
-                  <Users className="w-5 h-5 text-blue-400" />
-                  Daftar Member Terdaftar
-                </h2>
-                <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                  Total {members.length} member terdaftar pada platform SOOBIN Services. Menampilkan 50 member per halaman.
-                </p>
-              </div>
-
-              {/* Pagination Controls Top */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
-                  disabled={memberPage === 1}
-                  className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-xs font-bold text-white px-2">
-                  Halaman {memberPage} dari {totalPages}
-                </span>
-                <button
-                  onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={memberPage === totalPages}
-                  className="p-2 rounded-xl bg-slate-700 border border-slate-600 text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
             </div>
-
-            {/* Members Table */}
-            <div className="overflow-x-auto border border-slate-700 rounded-2xl">
-              <table className="w-full text-left text-xs text-slate-200">
-                <thead className="bg-[#0f172a] text-slate-300 font-extrabold uppercase tracking-wider text-[10px] border-b border-slate-700">
-                  <tr>
-                    <th className="p-3.5">Kode ID Member</th>
-                    <th className="p-3.5">Nama Lengkap</th>
-                    <th className="p-3.5">Email</th>
-                    <th className="p-3.5">Kampus / Universitas</th>
-                    <th className="p-3.5">Program Studi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700 bg-[#1e293b]">
-                  {currentMembers.map((mbr, idx) => (
-                    <tr key={mbr.id || idx} className="hover:bg-slate-700/50 transition-colors">
-                      <td className="p-3.5 font-mono text-blue-400 font-extrabold">{mbr.id}</td>
-                      <td className="p-3.5 font-bold text-white">{mbr.name}</td>
-                      <td className="p-3.5 text-slate-300 font-medium">{mbr.email}</td>
-                      <td className="p-3.5 text-slate-300 font-medium">{mbr.university || '-'}</td>
-                      <td className="p-3.5 text-slate-300 font-medium">{mbr.prodi || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Bottom Pagination */}
-            <div className="flex items-center justify-between pt-2">
-              <p className="text-xs text-slate-300 font-medium">
-                Menampilkan {indexOfFirstMember + 1} - {Math.min(indexOfLastMember, members.length)} dari {members.length} Member
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setMemberPage((p) => Math.max(1, p - 1))}
-                  disabled={memberPage === 1}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
-                >
-                  Sebelumnya
-                </button>
-                <button
-                  onClick={() => setMemberPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={memberPage === totalPages}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-xs font-bold text-white disabled:opacity-40 hover:bg-slate-600 transition-colors cursor-pointer"
-                >
-                  Selanjutnya
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 4: Pendapatan & Export Excel */}
-        {activeTab === 'revenue' && (
-          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
-              <div>
-                <h2 className="font-bold text-base text-white flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-emerald-400" />
-                  Dasbor Pendapatan & Export Laporan Excel
-                </h2>
-                <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                  Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
-                </p>
-              </div>
-
-              <button
-                onClick={handleExportExcel}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md transition-colors"
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                <span>Export Laporan Excel (.csv)</span>
-              </button>
-            </div>
-
-            {/* Total Revenue Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
-                <p className="text-3xl font-black text-white">
-                  Rp {calculateTotalRevenue().toLocaleString('id-ID')}
-                </p>
-                <p className="text-[11px] text-slate-300 font-medium">Otomatis dihitung dari order status Lunas</p>
-              </div>
-
-              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
-                <p className="text-3xl font-black text-white">
-                  {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
-                </p>
-                <p className="text-[11px] text-slate-300 font-medium">Siap diproses oleh tim admin</p>
-              </div>
-
-              <div className="bg-[#0f172a] border border-slate-700 rounded-2xl p-6 space-y-2">
-                <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">Waktu Sistem Realtime</p>
-                <p className="text-base font-bold text-white">
-                  {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                </p>
-                <p className="text-[11px] text-slate-300 font-medium">Zona Waktu: Asia/Jakarta (WIB)</p>
-              </div>
-            </div>
-
-            {/* Itemized Table */}
-            <div className="border border-slate-700 rounded-2xl overflow-hidden">
-              <div className="p-4 bg-[#0f172a] border-b border-slate-700 font-bold text-xs text-white">
-                Rincian Transaksi Pendapatan Masuk
-              </div>
-              <table className="w-full text-left text-xs text-slate-200">
-                <thead className="bg-[#1e293b] text-slate-300 font-bold text-[10px] uppercase border-b border-slate-700">
-                  <tr>
-                    <th className="p-3.5">ID Order</th>
-                    <th className="p-3.5">Pelanggan</th>
-                    <th className="p-3.5">Layanan</th>
-                    <th className="p-3.5">Harga</th>
-                    <th className="p-3.5">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700 bg-[#0f172a]">
-                  {orders
-                    .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
-                    .map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-800/60">
-                        <td className="p-3.5 font-mono text-amber-400 font-bold">{o.id}</td>
-                        <td className="p-3.5 font-bold text-white">{o.customerName}</td>
-                        <td className="p-3.5 text-slate-200 font-medium">{o.serviceName}</td>
-                        <td className="p-3.5 font-bold text-emerald-400">{o.price}</td>
-                        <td className="p-3.5 font-bold text-emerald-400">Terverifikasi Lunas</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 5: Kelola Layanan (Realtime Service CMS - Professional Black/White) */}
-        {activeTab === 'services' && (
-          <div className="flex-1 bg-[#1e293b] border border-slate-700 rounded-2xl p-6 overflow-y-auto space-y-6 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-4">
-              <div>
-                <h2 className="font-bold text-base text-white flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-white" />
-                  Kelola Layanan & Harga (CMS Realtime)
-                </h2>
-                <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                  Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
-                </p>
-              </div>
-
-              {saveSuccessMsg && (
-                <span className="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl animate-fade-in">
-                  {saveSuccessMsg}
-                </span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {cmsServices.map((srv) => {
-                const isEditing = editingServiceId === srv.id;
-
-                return (
-                  <div
-                    key={srv.id}
-                    className="bg-[#0f172a] border border-slate-700 rounded-2xl p-5 space-y-3 relative group hover:border-slate-500 transition-colors shadow-sm"
-                  >
-                    {isEditing ? (
-                      <div className="space-y-3">
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Nama Layanan</label>
-                          <input
-                            type="text"
-                            value={editForm.name || srv.name}
-                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Harga Layanan</label>
-                          <input
-                            type="text"
-                            value={editForm.price || srv.price}
-                            onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-300 mb-1">Deskripsi Singkat</label>
-                          <textarea
-                            rows={2}
-                            value={editForm.description || srv.description}
-                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                            className="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-3.5 py-2 text-xs text-white font-medium"
-                          />
-                        </div>
-
-                        <div className="flex justify-end gap-2 pt-2">
-                          <button
-                            onClick={() => setEditingServiceId(null)}
-                            className="px-3.5 py-1.5 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600"
-                          >
-                            Batal
-                          </button>
-                          <button
-                            onClick={() => handleSaveCmsService(srv.id)}
-                            className="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
-                          >
-                            <Save className="w-3.5 h-3.5" />
-                            <span>Simpan CMS</span>
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <span className="text-[9px] font-mono text-slate-200 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold uppercase">
-                              {srv.category}
-                            </span>
-                            <h3 className="font-bold text-base text-white mt-1.5">{srv.name}</h3>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setEditingServiceId(srv.id);
-                              setEditForm({ name: srv.name, price: srv.price, description: srv.description, badge: srv.badge });
-                            }}
-                            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors cursor-pointer"
-                            title="Edit Layanan"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <p className="text-xs text-slate-300 leading-relaxed font-medium">{srv.description}</p>
-
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-                          <span className="text-sm font-black text-amber-400">{srv.price}</span>
-                          {srv.badge && (
-                            <span className="text-[9px] font-black bg-slate-200 text-slate-950 px-2.5 py-0.5 rounded uppercase">
-                              {srv.badge}
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
 
       {/* Proof Screenshot Image Viewer Modal */}
       <AnimatePresence>
