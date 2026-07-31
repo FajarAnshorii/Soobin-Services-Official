@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 const MEMBERS_BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/SoobinMembersList';
 
@@ -16,8 +16,8 @@ const DEFAULT_MEMBERS = [
 
 export async function GET() {
   try {
-    // 1. Try fetching from Supabase Table
-    const { data: supaMembers, error } = await supabase
+    // 1. Fetch from Supabase PostgreSQL Database using Service Role Client
+    const { data: supaMembers, error } = await supabaseAdmin
       .from('members')
       .select('*')
       .order('created_at', { ascending: true });
@@ -38,7 +38,7 @@ export async function GET() {
       return NextResponse.json(formatted);
     }
 
-    // 2. Fallback to High-Availability Cloud Database
+    // 2. High-Availability Fallback
     const res = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
     let data: any[] = [];
     if (res.ok) {
@@ -85,14 +85,14 @@ export async function POST(request: Request) {
       created_at: newMember.createdAt || new Date().toISOString(),
     };
 
-    // 1. Save to Supabase Cloud Database
+    // 1. Save directly to Supabase PostgreSQL Table using Service Role Client
     try {
-      await supabase.from('members').upsert(memberPayload, { onConflict: 'email' });
+      await supabaseAdmin.from('members').upsert(memberPayload, { onConflict: 'email' });
     } catch (e) {
       console.error('Supabase save member error', e);
     }
 
-    // 2. Save to High-Availability Cloud Database Sync
+    // 2. Sync to High-Availability Store
     let currentMembers: any[] = [];
     try {
       const getRes = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
