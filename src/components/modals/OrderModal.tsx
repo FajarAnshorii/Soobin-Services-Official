@@ -33,8 +33,8 @@ function FileUploadCard({
 }: {
   label: string;
   required?: boolean;
-  value?: { name: string; size: string } | null;
-  onChange: (fileInfo: { name: string; size: string } | null) => void;
+  value?: { name: string; size: string; fileData?: string } | null;
+  onChange: (fileInfo: { name: string; size: string; fileData?: string } | null) => void;
 }) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,7 +48,11 @@ function FileUploadCard({
       sizeStr = `${(file.size / 1024).toFixed(0)} KB`;
     }
 
-    onChange({ name: file.name, size: sizeStr });
+    const reader = new FileReader();
+    reader.onload = () => {
+      onChange({ name: file.name, size: sizeStr, fileData: reader.result as string });
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -119,7 +123,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
   const [formData, setFormData] = useState<Record<string, string>>({});
 
   // File upload state for Card Upload File
-  const [uploadedFile, setUploadedFile] = useState<{ name: string; size: string } | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; size: string; fileData?: string } | null>(null);
 
   // Sub-modal state for QRIS
   const [showQrisModal, setShowQrisModal] = useState(false);
@@ -188,6 +192,8 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       serviceName: service.name,
       category: service.category,
       price: service.price,
+      uploadedFileData: uploadedFile?.fileData || null,
+      uploadedFileName: uploadedFile?.name || null,
       paymentMethod: isChatAdminPrice
         ? 'Diskusi Admin (Custom Price)'
         : paymentMethod === 'qris'
