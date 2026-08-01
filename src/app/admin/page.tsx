@@ -8,7 +8,7 @@ import {
   School, Send, CircleAlert, Headphones,
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
-  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText
+  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2
 } from 'lucide-react';
 
 interface Message {
@@ -278,6 +278,21 @@ export default function AdminPage() {
     setIsAdminLoggedIn(false);
     localStorage.removeItem('soobin_admin_logged_in');
     localStorage.setItem('soobin_admin_active', 'false');
+  };
+
+  // Reset all chats in Supabase & state
+  const handleResetChats = async () => {
+    if (!window.confirm('Apakah Anda yakin ingin mereset dan menghapus seluruh antrean percakapan live chat?')) {
+      return;
+    }
+    try {
+      await fetch('/api/chats', { method: 'DELETE' });
+      setChats({});
+      setSelectedSessionId(null);
+      alert('Seluruh antrean percakapan live chat berhasil di-reset!');
+    } catch (err) {
+      console.error('Gagal reset chat:', err);
+    }
   };
 
   // Audio tone
@@ -898,10 +913,20 @@ export default function AdminPage() {
               {/* Sidebar Chat Sessions */}
               <div className="w-80 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs">
                 <div className="p-4 border-b border-slate-300 flex items-center justify-between bg-slate-50">
-                  <h2 className="font-black text-xs text-slate-900 uppercase tracking-wider">Antrean Percakapan</h2>
-                  <span className="text-[10px] bg-slate-200 text-slate-900 px-2.5 py-0.5 rounded-full font-black border border-slate-400">
-                    {Object.keys(chats).length} User
-                  </span>
+                  <div>
+                    <h2 className="font-black text-xs text-slate-900 uppercase tracking-wider">Antrean Percakapan</h2>
+                    <span className="text-[10px] text-slate-600 font-bold">
+                      {Object.keys(chats).length} User Aktif
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleResetChats}
+                    title="Reset Seluruh Chat"
+                    className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 text-[10px] font-black flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3 text-red-700" />
+                    <span>Reset Chat</span>
+                  </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto divide-y divide-slate-200">

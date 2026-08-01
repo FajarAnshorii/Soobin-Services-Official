@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Headphones, Send, X, Sun, Moon, Check, CheckCheck, MessageSquare } from 'lucide-react';
+import { Headphones, Send, X, Sun, Moon, Check, CheckCheck, MessageSquare, Lock, UserCheck } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 interface Message {
@@ -31,7 +32,7 @@ const BUCKET_URL = '/api/chats';
 export default function WhatsAppFloat() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [messageText, setMessageText] = useState('');
   const [sessionId, setSessionId] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -47,7 +48,7 @@ export default function WhatsAppFloat() {
     }
   }, []);
 
-  // Set Session ID dynamically based on auth state (Guest vs specific Member account)
+  // Set Session ID dynamically based on auth state
   useEffect(() => {
     setMessages([]);
     setUnreadCount(0);
@@ -56,78 +57,55 @@ export default function WhatsAppFloat() {
       const memberSessId = `chat_member_${user.email.replace(/[@.]/g, '_')}`;
       setSessionId(memberSessId);
     } else {
-      let guestSessId = localStorage.getItem('soobin_chat_guest_session_id');
-      if (!guestSessId) {
-        guestSessId = `chat_guest_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-        localStorage.setItem('soobin_chat_guest_session_id', guestSessId);
-      }
-      setSessionId(guestSessId);
+      setSessionId('');
     }
   }, [user]);
 
   // Sync session with logged-in user profile info
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId || !user) return;
 
     const syncProfile = async () => {
       try {
-        const res = await fetch(BUCKET_URL);
-        let cloudChats: { [id: string]: ChatSession } = {};
+        const res = await fetch(`${BUCKET_URL}?session_id=${sessionId}`);
+        let session: ChatSession | null = null;
         if (res.ok) {
-          cloudChats = await res.json();
+          session = await res.json();
         }
 
-        let session = cloudChats[sessionId] as ChatSession;
-
         if (!session) {
-          // Restore from local storage if available to prevent reload clearing issues
-          const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
-          const localChats = JSON.parse(localChatsStr);
-          const localSession = localChats[sessionId] as ChatSession;
-
-          if (localSession && localSession.messages.length > 0) {
-            session = localSession;
-          } else {
-            session = {
-              id: sessionId,
-              name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
-              email: user ? user.email : '',
-              university: user ? user.university : '',
-              prodi: user ? user.prodi : '',
-              lastUpdated: new Date().toISOString(),
-              unreadCount: 0,
-              userUnreadCount: 0,
-              messages: [],
-            };
-          }
-          cloudChats[sessionId] = session;
+          session = {
+            id: sessionId,
+            name: user.name,
+            email: user.email,
+            university: user.university || '',
+            prodi: user.prodi || '',
+            lastUpdated: new Date().toISOString(),
+            unreadCount: 0,
+            userUnreadCount: 0,
+            messages: [],
+          };
           
           await fetch(BUCKET_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cloudChats),
+            body: JSON.stringify(session),
           });
-        } else if (user && (session.name !== user.name || session.email !== user.email)) {
+        } else if (session.name !== user.name || session.email !== user.email) {
           session.name = user.name;
           session.email = user.email;
-          session.university = user.university;
-          session.prodi = user.prodi;
-          cloudChats[sessionId] = session;
+          session.university = user.university || '';
+          session.prodi = user.prodi || '';
 
           await fetch(BUCKET_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cloudChats),
+            body: JSON.stringify(session),
           });
         }
 
-        const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
-        const localChats = JSON.parse(localChatsStr);
-        localChats[sessionId] = session;
-        localStorage.setItem('soobin_chats', JSON.stringify(localChats));
-
-        setMessages(session.messages);
-        setUnreadCount(session.userUnreadCount);
+        setMessages(session.messages || []);
+        setUnreadCount(session.userUnreadCount || 0);
       } catch (e) {
         console.error('Failed to sync profile with cloud', e);
       }
@@ -138,86 +116,32 @@ export default function WhatsAppFloat() {
 
   // Cloud sync handler
   const syncWithCloud = async (currentSessionId: string, currentIsOpen: boolean) => {
-    if (!currentSessionId) return;
+    if (!currentSessionId || !user) return;
     try {
-      const res = await fetch(BUCKET_URL);
+      const res = await fetch(`${BUCKET_URL}?session_id=${currentSessionId}`);
       if (!res.ok) return;
-      const cloudChats = await res.json();
-
-      const cloudSession = cloudChats[currentSessionId] as ChatSession;
+      const cloudSession = await res.json();
       if (!cloudSession) return;
 
-      const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-      const localChats = JSON.parse(chatsStr);
-      const localSession = localChats[currentSessionId] as ChatSession;
+      setMessages(cloudSession.messages || []);
+      setUnreadCount(currentIsOpen ? 0 : (cloudSession.userUnreadCount || 0));
 
-      let hasChanges = false;
-      let mergedMessages = localSession ? [...localSession.messages] : [];
-
-      // Merge messages from cloud
-      const localMsgIds = new Set(mergedMessages.map(m => m.id));
-      cloudSession.messages.forEach((m) => {
-        if (localMsgIds.has(m.id)) {
-          const existing = mergedMessages.find(x => x.id === m.id);
-          if (existing && existing.read !== m.read) {
-            existing.read = m.read;
-            hasChanges = true;
-          }
-        } else {
-          mergedMessages.push(m);
-          hasChanges = true;
-        }
-      });
-
-      const getMessageTime = (msg: Message) => {
-        if (msg.createdAt) return msg.createdAt;
-        const match = msg.id.match(/\d+/);
-        return match ? parseInt(match[0], 10) : 0;
-      };
-      mergedMessages.sort((a, b) => getMessageTime(a) - getMessageTime(b));
-
-      const updatedSession: ChatSession = {
-        id: currentSessionId,
-        name: cloudSession.name || (user ? user.name : `Guest #${currentSessionId.slice(-4)}`),
-        email: cloudSession.email || (user ? user.email : ''),
-        university: cloudSession.university || (user ? user.university : ''),
-        prodi: cloudSession.prodi || (user ? user.prodi : ''),
-        lastUpdated: cloudSession.lastUpdated || new Date().toISOString(),
-        unreadCount: cloudSession.unreadCount,
-        userUnreadCount: currentIsOpen ? 0 : cloudSession.userUnreadCount,
-        messages: mergedMessages,
-      };
-
-      if (hasChanges || !localSession || localSession.userUnreadCount !== updatedSession.userUnreadCount) {
-        localChats[currentSessionId] = updatedSession;
-        localStorage.setItem('soobin_chats', JSON.stringify(localChats));
-        setMessages(mergedMessages);
-        setUnreadCount(updatedSession.userUnreadCount);
-
-        // Clear user unread count if opened
-        if (currentIsOpen && cloudSession.userUnreadCount > 0) {
-          updatedSession.userUnreadCount = 0;
-          localChats[currentSessionId] = updatedSession;
-          localStorage.setItem('soobin_chats', JSON.stringify(localChats));
-          
-          cloudChats[currentSessionId] = updatedSession;
-          await fetch(BUCKET_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cloudChats),
-          });
-        }
-
-        window.dispatchEvent(new Event('soobin_chat_update'));
+      if (currentIsOpen && cloudSession.userUnreadCount > 0) {
+        cloudSession.userUnreadCount = 0;
+        await fetch(BUCKET_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cloudSession),
+        });
       }
     } catch (e) {
       console.error('Failed to sync with cloud', e);
     }
   };
 
-  // 2-second cloud polling sync loop
+  // 2-second cloud polling sync loop for logged-in users
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId || !user) return;
 
     syncWithCloud(sessionId, isOpen);
 
@@ -226,34 +150,7 @@ export default function WhatsAppFloat() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [sessionId, isOpen]);
-
-  // Local storage same-tab listener
-  useEffect(() => {
-    if (!sessionId) return;
-
-    const handleLocalUpdate = () => {
-      try {
-        const chatsStr = localStorage.getItem('soobin_chats') || '{}';
-        const chats = JSON.parse(chatsStr);
-        const session = chats[sessionId] as ChatSession;
-        if (session) {
-          setMessages(session.messages);
-          setUnreadCount(isOpen ? 0 : session.userUnreadCount);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    window.addEventListener('storage', handleLocalUpdate);
-    window.addEventListener('soobin_chat_update', handleLocalUpdate);
-
-    return () => {
-      window.removeEventListener('storage', handleLocalUpdate);
-      window.removeEventListener('soobin_chat_update', handleLocalUpdate);
-    };
-  }, [sessionId, isOpen]);
+  }, [sessionId, isOpen, user]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -270,7 +167,7 @@ export default function WhatsAppFloat() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim() || !sessionId) return;
+    if (!messageText.trim() || !sessionId || !user) return;
 
     const now = new Date();
     const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -284,24 +181,22 @@ export default function WhatsAppFloat() {
       createdAt: Date.now(),
     };
 
-    const text = messageText;
     setMessageText('');
 
     try {
-      const res = await fetch(BUCKET_URL);
-      let cloudChats: { [id: string]: ChatSession } = {};
+      const res = await fetch(`${BUCKET_URL}?session_id=${sessionId}`);
+      let session: ChatSession | null = null;
       if (res.ok) {
-        cloudChats = await res.json();
+        session = await res.json();
       }
 
-      let session = cloudChats[sessionId] as ChatSession;
       if (!session) {
         session = {
           id: sessionId,
-          name: user ? user.name : `Guest #${sessionId.slice(-4)}`,
-          email: user ? user.email : '',
-          university: user ? user.university : '',
-          prodi: user ? user.prodi : '',
+          name: user.name,
+          email: user.email,
+          university: user.university || '',
+          prodi: user.prodi || '',
           lastUpdated: now.toISOString(),
           unreadCount: 0,
           userUnreadCount: 0,
@@ -309,32 +204,17 @@ export default function WhatsAppFloat() {
         };
       }
 
-      if (user) {
-        session.name = user.name;
-        session.email = user.email;
-        session.university = user.university;
-        session.prodi = user.prodi;
-      }
-
       session.messages.push(newMsg);
       session.lastUpdated = now.toISOString();
       session.unreadCount += 1;
 
-      cloudChats[sessionId] = session;
-
       await fetch(BUCKET_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cloudChats),
+        body: JSON.stringify(session),
       });
 
-      const localChatsStr = localStorage.getItem('soobin_chats') || '{}';
-      const localChats = JSON.parse(localChatsStr);
-      localChats[sessionId] = session;
-      localStorage.setItem('soobin_chats', JSON.stringify(localChats));
-
       setMessages([...session.messages]);
-      window.dispatchEvent(new Event('soobin_chat_update'));
     } catch (e) {
       console.error('Failed to send message to cloud', e);
     }
@@ -370,8 +250,8 @@ export default function WhatsAppFloat() {
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold">Admin Live</h3>
-                  <span className="text-[10px] text-green-500 font-medium">Aktif Sekarang</span>
+                  <h3 className="text-sm font-bold">Admin Live SOOBIN</h3>
+                  <span className="text-[10px] text-green-500 font-medium">Aktif Realtime</span>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -398,88 +278,110 @@ export default function WhatsAppFloat() {
             </div>
 
             {/* Body / Isi Pesan */}
-            <div
-              className={`flex-1 overflow-y-auto p-4 space-y-3.5 ${
-                theme === 'light' ? 'bg-gray-50/50' : 'bg-black/10'
-              }`}
-            >
-              {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-2">
-                  <MessageSquare className={`w-12 h-12 ${theme === 'light' ? 'text-gray-300' : 'text-white/15'}`} />
-                  <p className={`text-xs font-medium max-w-[200px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Halo! Admin Live siap membantu kebutuhan akademik Anda. Kirim pesan di bawah untuk memulai chat.
-                  </p>
+            {!user ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-3 bg-gradient-to-b from-transparent to-black/20">
+                <div className="w-14 h-14 bg-primary-800/10 border border-primary-500/20 rounded-2xl flex items-center justify-center text-primary-400 mb-1 shadow-inner">
+                  <Lock className="w-7 h-7 text-primary-400 animate-bounce" />
                 </div>
-              ) : (
-                messages.map((msg) => {
-                  const isAdmin = msg.sender === 'admin';
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`flex flex-col max-w-[80%] ${isAdmin ? 'mr-auto items-start' : 'ml-auto items-end'}`}
-                    >
-                      <div
-                        className={`px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium wrap-break-word w-full ${
-                          isAdmin
-                            ? theme === 'light'
-                              ? 'bg-white border border-gray-100 text-dark-800 rounded-tl-none shadow-sm'
-                              : 'bg-white/10 text-gray-100 rounded-tl-none border border-white/5'
-                            : theme === 'light'
-                              ? 'bg-primary-800 text-white rounded-tr-none'
-                              : 'bg-primary-700 text-white rounded-tr-none'
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1 px-1">
-                        <span className={`text-[9px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {msg.timestamp}
-                        </span>
-                        {!isAdmin && (
-                          msg.read ? (
-                            <CheckCheck className="w-3 h-3 text-blue-500" />
-                          ) : (
-                            <Check className="w-3 h-3 text-gray-400" />
-                          )
-                        )}
-                      </div>
+                <h4 className="font-bold text-sm text-white">Akses Live Chat Khusus Member</h4>
+                <p className="text-xs text-gray-400 max-w-[240px] leading-relaxed">
+                  Silakan login atau daftar akun terlebih dahulu untuk melakukan Live Chat dengan Admin SOOBIN Services.
+                </p>
+                <Link
+                  href="/auth"
+                  onClick={() => setIsOpen(false)}
+                  className="mt-2 bg-primary-800 hover:bg-primary-750 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Masuk / Daftar Member Baru</span>
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div
+                  className={`flex-1 overflow-y-auto p-4 space-y-3.5 ${
+                    theme === 'light' ? 'bg-gray-50/50' : 'bg-black/10'
+                  }`}
+                >
+                  {messages.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-2">
+                      <MessageSquare className={`w-12 h-12 ${theme === 'light' ? 'text-gray-300' : 'text-white/15'}`} />
+                      <p className={`text-xs font-medium max-w-[220px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Halo <span className="font-bold text-primary-400">{user.name}</span>! Admin Live siap membantu kebutuhan Anda. Kirim pesan di bawah untuk mulai percakapan.
+                      </p>
                     </div>
-                  );
-                })
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+                  ) : (
+                    messages.map((msg) => {
+                      const isAdmin = msg.sender === 'admin';
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex flex-col max-w-[80%] ${isAdmin ? 'mr-auto items-start' : 'ml-auto items-end'}`}
+                        >
+                          <div
+                            className={`px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium wrap-break-word w-full ${
+                              isAdmin
+                                ? theme === 'light'
+                                  ? 'bg-white border border-gray-100 text-dark-800 rounded-tl-none shadow-sm'
+                                  : 'bg-white/10 text-gray-100 rounded-tl-none border border-white/5'
+                                : theme === 'light'
+                                  ? 'bg-primary-800 text-white rounded-tr-none'
+                                  : 'bg-primary-700 text-white rounded-tr-none'
+                            }`}
+                          >
+                            {msg.text}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1 px-1">
+                            <span className={`text-[9px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              {msg.timestamp}
+                            </span>
+                            {!isAdmin && (
+                              msg.read ? (
+                                <CheckCheck className="w-3 h-3 text-blue-500" />
+                              ) : (
+                                <Check className="w-3 h-3 text-gray-400" />
+                              )
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
 
-            {/* Footer Input */}
-            <form
-              onSubmit={handleSendMessage}
-              className={`p-3 border-t flex gap-2 items-center ${
-                theme === 'light' ? 'bg-white border-gray-100' : 'bg-white/5 border-white/5'
-              }`}
-            >
-              <input
-                type="text"
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                placeholder="Tulis pesan Anda..."
-                className={`flex-1 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none border ${
-                  theme === 'light'
-                    ? 'bg-gray-50 border-gray-200 focus:border-primary-500 focus:bg-white text-dark-800'
-                    : 'bg-white/5 border-white/10 focus:border-primary-500 focus:bg-white/10 text-white'
-                }`}
-              />
-              <button
-                type="submit"
-                disabled={!messageText.trim()}
-                className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                  messageText.trim()
-                    ? 'bg-primary-800 hover:bg-primary-750 text-white'
-                    : 'bg-gray-150 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                <Send className="w-4.5 h-4.5" />
-              </button>
-            </form>
+                {/* Footer Input */}
+                <form
+                  onSubmit={handleSendMessage}
+                  className={`p-3 border-t flex gap-2 items-center ${
+                    theme === 'light' ? 'bg-white border-gray-100' : 'bg-white/5 border-white/5'
+                  }`}
+                >
+                  <input
+                    type="text"
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Tulis pesan Anda..."
+                    className={`flex-1 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none border ${
+                      theme === 'light'
+                        ? 'bg-gray-50 border-gray-200 focus:border-primary-500 focus:bg-white text-dark-800'
+                        : 'bg-white/5 border-white/10 focus:border-primary-500 focus:bg-white/10 text-white'
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!messageText.trim()}
+                    className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                      messageText.trim()
+                        ? 'bg-primary-800 hover:bg-primary-750 text-white'
+                        : 'bg-gray-150 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <Send className="w-4.5 h-4.5" />
+                  </button>
+                </form>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -502,7 +404,7 @@ export default function WhatsAppFloat() {
           <Headphones className="w-6.5 h-6.5" />
           
           {/* Unread Count Badge */}
-          {unreadCount > 0 && (
+          {unreadCount > 0 && user && (
             <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
               {unreadCount}
             </span>
