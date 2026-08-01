@@ -10,7 +10,7 @@ interface UniversityComboboxProps {
   required?: boolean;
 }
 
-// Popular / Major Indonesian Universities pre-loaded for instant response
+// Popular Indonesian & Global Top Universities pre-loaded for instant response
 const POPULAR_UNIVERSITIES = [
   'Universitas Trunojoyo Madura',
   'Universitas Indonesia',
@@ -27,11 +27,14 @@ const POPULAR_UNIVERSITIES = [
   'Universitas Hasanuddin',
   'Universitas Sumatera Utara',
   'Institut Teknologi Sepuluh Nopember',
-  'Universitas Udayana',
-  'Universitas Andalas',
-  'Universitas Riau',
-  'Universitas Negeri Yogyakarta',
-  'Universitas Negeri Semarang',
+  'Harvard University',
+  'Stanford University',
+  'Massachusetts Institute of Technology (MIT)',
+  'University of Oxford',
+  'University of Cambridge',
+  'National University of Singapore (NUS)',
+  'Nanyang Technological University (NTU)',
+  'The University of Tokyo',
 ];
 
 export default function UniversityCombobox({
@@ -51,44 +54,44 @@ export default function UniversityCombobox({
     setSearchTerm(value || '');
   }, [value]);
 
-  // Fetch full list of universities from APIs on mount
+  // Fetch full list of global (10,000+) & Indonesian (4,600+) universities
   useEffect(() => {
     let isMounted = true;
     const fetchUniversityData = async () => {
       setLoading(true);
       try {
         const [res1, res2, res3] = await Promise.allSettled([
+          fetch('https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json').then(r => r.json()),
           fetch('https://raw.githubusercontent.com/aryomuzakki/api-perguruan-tinggi-di-indonesia/main/data/pt.json').then(r => r.json()),
           fetch('https://raw.githubusercontent.com/candraprasetya/kampus-api/main/kampus.json').then(r => r.json()),
-          fetch('http://universities.hipolabs.com/search?country=Indonesia').then(r => r.json()),
         ]);
 
         const fullSet = new Set<string>(POPULAR_UNIVERSITIES);
 
-        // Process aryomuzakki api-perguruan-tinggi-di-indonesia
+        // Process Hipo university-domains-list (Global 10,200+ world universities)
         if (res1.status === 'fulfilled' && Array.isArray(res1.value)) {
           res1.value.forEach((item: any) => {
+            if (item && item.name) fullSet.add(item.name.trim());
+          });
+        }
+
+        // Process aryomuzakki api-perguruan-tinggi-di-indonesia (4,670+ Indonesian PTN/PTS)
+        if (res2.status === 'fulfilled' && Array.isArray(res2.value)) {
+          res2.value.forEach((item: any) => {
             if (item && item.nama) fullSet.add(item.nama.trim());
           });
         }
 
         // Process candraprasetya kampus-api
-        if (res2.status === 'fulfilled' && Array.isArray(res2.value)) {
-          res2.value.forEach((item: any) => {
+        if (res3.status === 'fulfilled' && Array.isArray(res3.value)) {
+          res3.value.forEach((item: any) => {
             const name = typeof item === 'string' ? item : item?.nama || item?.name;
             if (name) fullSet.add(name.trim());
           });
         }
 
-        // Process Hipo university-domains-list
-        if (res3.status === 'fulfilled' && Array.isArray(res3.value)) {
-          res3.value.forEach((item: any) => {
-            if (item && item.name) fullSet.add(item.name.trim());
-          });
-        }
-
         if (isMounted) {
-          const list = Array.from(fullSet).sort((a, b) => a.localeCompare(b, 'id'));
+          const list = Array.from(fullSet).sort((a, b) => a.localeCompare(b, 'en'));
           setUniversities(list);
         }
       } catch (err) {
@@ -118,7 +121,7 @@ export default function UniversityCombobox({
   // Filter list based on user search term
   const filteredUniversities = universities.filter((u) =>
     u.toLowerCase().includes((searchTerm || '').toLowerCase())
-  ).slice(0, 40); // Top 40 matching items
+  ).slice(0, 50); // Top 50 matching items
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -161,7 +164,7 @@ export default function UniversityCombobox({
           <div className="px-3 py-2 bg-white/5 flex items-center justify-between text-[11px] text-gray-400 font-medium">
             <span className="flex items-center gap-1">
               <Search className="w-3 h-3 text-primary-400" />
-              {loading ? 'Memuat data kampus...' : `${filteredUniversities.length} kampus ditemukan`}
+              {loading ? 'Memuat 14.000+ data kampus dunia...' : `${filteredUniversities.length} kampus ditemukan`}
             </span>
             <span className="text-[10px] text-primary-400 font-semibold">Bisa ketik custom / pilih</span>
           </div>
