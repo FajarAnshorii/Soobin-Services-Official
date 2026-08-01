@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+function parseIsoDate(val: any): string {
+  if (val && typeof val === 'string' && val.includes('T')) {
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return d.toISOString();
+  }
+  return new Date().toISOString();
+}
+
 // GET all active chat sessions or a single session from Supabase
 export async function GET(request: Request) {
   try {
@@ -85,7 +93,7 @@ export async function POST(request: Request) {
         prodi: body.prodi || '',
         unread_count: body.unreadCount || 0,
         messages: body.messages || [],
-        updated_at: new Date().toISOString(),
+        updated_at: parseIsoDate(body.lastUpdated),
       });
 
       if (error) throw error;
@@ -104,7 +112,7 @@ export async function POST(request: Request) {
           prodi: session.prodi || '',
           unread_count: session.unreadCount || 0,
           messages: session.messages || [],
-          updated_at: session.lastUpdated || new Date().toISOString(),
+          updated_at: parseIsoDate(session.lastUpdated),
         }));
 
       if (rows.length > 0) {

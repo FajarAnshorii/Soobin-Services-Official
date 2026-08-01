@@ -332,9 +332,10 @@ export default function AdminPage() {
 
     const updatedSession: ChatSession = {
       ...session,
-      messages: [...session.messages, newMsg],
-      lastUpdated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      messages: [...(session.messages || []), newMsg],
+      lastUpdated: new Date().toISOString(),
       userUnreadCount: (session.userUnreadCount || 0) + 1,
+      unreadCount: 0,
     };
 
     const updatedChats = {
@@ -349,7 +350,7 @@ export default function AdminPage() {
       await fetch(BUCKET_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedChats),
+        body: JSON.stringify(updatedSession),
       });
       localStorage.setItem('soobin_chats', JSON.stringify(updatedChats));
     } catch (err) {
