@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import PageTransitionLoader from '@/components/PageTransitionLoader';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -85,6 +87,9 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <CartProvider>
+            <Suspense fallback={null}>
+              <PageTransitionLoader />
+            </Suspense>
             {children}
           </CartProvider>
         </AuthProvider>
