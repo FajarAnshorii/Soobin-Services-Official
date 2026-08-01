@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { ArrowLeft, Mail, Lock, User as UserIcon, GraduationCap, School, AlertCircle, CheckCircle } from 'lucide-react';
+import UniversityCombobox from '@/components/UniversityCombobox';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -318,18 +319,16 @@ export default function AuthPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-gray-300 text-xs font-semibold">Universitas</label>
-                <div className="relative">
-                  <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={university}
-                    onChange={(e) => setUniversity(e.target.value)}
-                    placeholder="Universitas Indonesia, dll"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-11 pr-4 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-primary-500 transition-colors"
-                    required
-                  />
-                </div>
+                <label className="text-gray-300 text-xs font-semibold flex items-center justify-between">
+                  <span>Universitas / Kampus</span>
+                  <span className="text-[10px] text-primary-400 font-normal">Pilih / Ketik Custom</span>
+                </label>
+                <UniversityCombobox
+                  value={university}
+                  onChange={(val) => setUniversity(val)}
+                  placeholder="Ketik atau cari nama universitas..."
+                  required
+                />
               </div>
 
               <div className="space-y-1">
