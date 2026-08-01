@@ -189,9 +189,8 @@ export default function UniversityCombobox({
               );
             })
           ) : (
-            <div className="px-3.5 py-3 text-xs text-gray-400 text-center flex flex-col items-center gap-1">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>Gunakan nama custom: <strong className="text-white font-semibold">{searchTerm}</strong></span>
+            <div className="px-3.5 py-3 text-xs text-gray-400 text-center">
+              Kampus tidak ditemukan
             </div>
           )}
         </div>
