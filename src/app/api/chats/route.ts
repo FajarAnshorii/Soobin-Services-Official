@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-// GET all active chat sessions from Supabase
+// GET all active chat sessions or a single session from Supabase
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,12 +12,27 @@ export async function GET(request: Request) {
         .from('chats')
         .select('*')
         .eq('id', sessionId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         throw error;
       }
-      return NextResponse.json(data || null);
+
+      if (!data) {
+        return NextResponse.json(null);
+      }
+
+      return NextResponse.json({
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        university: data.university,
+        prodi: data.prodi,
+        unreadCount: data.unread_count || 0,
+        userUnreadCount: 0,
+        lastUpdated: data.updated_at,
+        messages: data.messages || [],
+      });
     }
 
     // Fetch all chats for admin dashboard
@@ -30,7 +45,7 @@ export async function GET(request: Request) {
       throw error;
     }
 
-    // Return as map { [id]: session } or array
+    // Return as map { [id]: session }
     const chatsMap: Record<string, any> = {};
     if (data && Array.isArray(data)) {
       data.forEach((row) => {
@@ -41,7 +56,7 @@ export async function GET(request: Request) {
           university: row.university,
           prodi: row.prodi,
           unreadCount: row.unread_count || 0,
-          userUnreadCount: row.user_unread_count || 0,
+          userUnreadCount: 0,
           lastUpdated: row.updated_at,
           messages: row.messages || [],
         };
@@ -55,14 +70,13 @@ export async function GET(request: Request) {
   }
 }
 
-// POST / Upsert chat session or message
+// POST / Upsert chat session or messages map to Supabase
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // If body contains whole chats map or single session
-    if (body.id && body.name) {
-      // Single session upsert
+    // Single session upsert
+    if (body && body.id && body.name) {
       const { error } = await supabaseAdmin.from('chats').upsert({
         id: body.id,
         name: body.name,
@@ -70,7 +84,6 @@ export async function POST(request: Request) {
         university: body.university || '',
         prodi: body.prodi || '',
         unread_count: body.unreadCount || 0,
-        user_unread_count: body.userUnreadCount || 0,
         messages: body.messages || [],
         updated_at: new Date().toISOString(),
       });
@@ -79,19 +92,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // If body is a map of sessions
-    if (typeof body === 'object' && !Array.isArray(body)) {
-      const rows = Object.values(body).map((session: any) => ({
-        id: session.id,
-        name: session.name || 'Member',
-        email: session.email || '',
-        university: session.university || '',
-        prodi: session.prodi || '',
-        unread_count: session.unreadCount || 0,
-        user_unread_count: session.userUnreadCount || 0,
-        messages: session.messages || [],
-        updated_at: session.lastUpdated || new Date().toISOString(),
-      }));
+    // Map of sessions upsert (e.g. from Admin dashboard)
+    if (body && typeof body === 'object' && !Array.isArray(body)) {
+      const rows = Object.values(body)
+        .filter((session: any) => session && session.id && session.name)
+        .map((session: any) => ({
+          id: session.id,
+          name: session.name || 'Member',
+          email: session.email || '',
+          university: session.university || '',
+          prodi: session.prodi || '',
+          unread_count: session.unreadCount || 0,
+          messages: session.messages || [],
+          updated_at: session.lastUpdated || new Date().toISOString(),
+        }));
 
       if (rows.length > 0) {
         const { error } = await supabaseAdmin.from('chats').upsert(rows);
