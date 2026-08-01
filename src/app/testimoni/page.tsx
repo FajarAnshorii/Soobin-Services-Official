@@ -171,8 +171,18 @@ export default function TestimoniPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-white py-6 sm:py-8 border-b border-gray-150 shadow-xs">
+      <section className="bg-white py-6 sm:py-8 border-b border-gray-150 shadow-xs relative">
         <div className="container-custom px-4">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 uppercase tracking-wider">
+              Terkonek Realtime Database Supabase
+            </span>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
             {[
               { value: allTestimonials.length, label: 'Total Testimoni' },
@@ -180,10 +190,12 @@ export default function TestimoniPage() {
               { value: fiveStarCount, label: 'Bintang 5 Sempurna' },
               { value: '20.000+', label: 'Mahasiswa Puas' },
             ].map((stat, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
-                <p className={`text-2xl sm:text-3xl font-black ${i === 1 ? 'text-amber-500' : 'text-primary-800'}`}>{stat.value}</p>
-                <p className="text-gray-500 text-xs sm:text-sm mt-0.5 font-medium">{stat.label}</p>
-              </motion.div>
+              <div key={i} className="flex flex-col items-center justify-center">
+                <p className={`text-2xl sm:text-3xl font-black ${i === 1 ? 'text-amber-500' : 'text-primary-800'}`}>
+                  {stat.value}
+                </p>
+                <p className="text-gray-500 text-xs sm:text-sm mt-0.5 font-semibold">{stat.label}</p>
+              </div>
             ))}
           </div>
         </div>
