@@ -228,11 +228,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setOrderHistory(updatedHistory);
       saveHistoryToStorage(updatedHistory);
 
-      // Trigger user order notification
+      // Trigger user order notification and save to Supabase Database
       items.forEach((item) => {
         const msg = `User ${user.name} telah memesan jasa ${item.name}`;
         messages.push(msg);
         addToast(msg, 'success');
+
+        // Save order record directly to Supabase Database
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: newOrder.id,
+            customerName: user.name,
+            customerEmail: user.email,
+            customerUniversity: user.university || '',
+            customerProdi: user.prodi || '',
+            serviceName: item.name,
+            price: item.price,
+            paymentMethod: 'WhatsApp / Cart Checkout',
+            paymentStatus: 'Menunggu Verifikasi Admin',
+            createdAt: new Date().toISOString(),
+          }),
+        }).catch(err => console.error('Failed saving order to Supabase:', err));
       });
     } else {
       // Guest ordering

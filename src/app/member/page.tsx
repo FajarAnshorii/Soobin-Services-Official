@@ -33,27 +33,80 @@ export default function MemberPage() {
   const activeTabParam = searchParams.get('tab') || 'history';
   const [activeTab, setActiveTab] = useState<string>(activeTabParam);
 
-  // Sync tab with search params
-  useEffect(() => {
-    if (activeTabParam === 'cart' || activeTabParam === 'history') {
-      setActiveTab(activeTabParam);
-    }
-  }, [activeTabParam]);
+  const [dbOrders, setDbOrders] = useState<any[]>([]);
+  const [fetchingOrders, setFetchingOrders] = useState<boolean>(true);
 
-  // Redirect guest users away from this page
+  // Fetch real-time orders directly from Supabase Database for the logged-in member
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth');
-    }
-  }, [user, loading, router]);
+    if (!user) return;
+    let isMounted = true;
 
-  if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-800"></div>
-      </div>
-    );
-  }
+    const fetchMemberOrders = async () => {
+      try {
+        const res = await fetch('/api/orders');
+        if (!res.ok) return;
+        const allOrders = await res.json();
+        if (!Array.isArray(allOrders)) return;
+
+        // Filter orders belonging to this member (by email)
+        const myOrders = allOrders.filter(
+          (o: any) => o && o.customerEmail && o.customerEmail.toLowerCase() === user.email.toLowerCase()
+        );
+
+        if (isMounted) {
+          setDbOrders(myOrders);
+          setFetchingOrders(false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch member orders from Supabase:', err);
+      } finally {
+        if (isMounted) setFetchingOrders(false);
+      }
+    };
+
+    fetchMemberOrders();
+    const interval = setInterval(fetchMemberOrders, 5000); // 5s realtime sync
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [user]);
+
+  // Combine local order history and Supabase DB orders
+  const combinedHistory = React.useMemo(() => {
+    const map = new Map<string, any>();
+
+    // Add DB orders first (realtime from Supabase)
+    dbOrders.forEach((o) => {
+      const createdDate = o.createdAt ? new Date(o.createdAt).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : 'Hari Ini';
+
+      map.set(o.id, {
+        id: o.id,
+        date: createdDate,
+        items: [{ name: o.serviceName, price: o.price }],
+        totalPrice: o.price,
+        status: o.paymentStatus || 'Sedang Diproses',
+        fileName: o.uploadedFileName,
+        proofImage: o.proofImage,
+      });
+    });
+
+    // Add local history orders
+    orderHistory.forEach((o) => {
+      if (!map.has(o.id)) {
+        map.set(o.id, o);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [dbOrders, orderHistory]);
 
   // Calculate total price of cart
   const getCartTotal = () => {
@@ -71,7 +124,7 @@ export default function MemberPage() {
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0) return;
+    if (!user || cart.length === 0) return;
 
     // Generate WhatsApp checkout message
     const waText = `Halo Kak, saya member SOOBIN:
@@ -113,10 +166,10 @@ Mohon segera diproses kak, terima kasih!`;
           <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-150 p-6 shadow-sm flex flex-col gap-6">
             <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
               <div className="w-16 h-16 rounded-full bg-primary-800 text-white flex items-center justify-center text-2xl font-black uppercase shadow-inner">
-                {user.name.charAt(0)}
+                {user?.name?.charAt(0) || 'M'}
               </div>
               <div className="flex flex-col truncate">
-                <h2 className="text-lg font-black text-gray-900 truncate">{user.name}</h2>
+                <h2 className="text-lg font-black text-gray-900 truncate">{user?.name}</h2>
                 <span className="bg-green-100 text-green-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider w-max mt-1">
                   Member SOOBIN
                 </span>
@@ -126,15 +179,15 @@ Mohon segera diproses kak, terima kasih!`;
             <div className="flex flex-col gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-3">
                 <Mail className="w-4.5 h-4.5 text-gray-400 shrink-0" />
-                <span className="truncate">{user.email}</span>
+                <span className="truncate">{user?.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Building className="w-4.5 h-4.5 text-gray-400 shrink-0" />
-                <span className="truncate">{user.university}</span>
+                <span className="truncate">{user?.university}</span>
               </div>
               <div className="flex items-center gap-3">
                 <GraduationCap className="w-4.5 h-4.5 text-gray-400 shrink-0" />
-                <span className="truncate">{user.prodi}</span>
+                <span className="truncate">{user?.prodi}</span>
               </div>
             </div>
           </div>
@@ -178,7 +231,11 @@ Mohon segera diproses kak, terima kasih!`;
               {activeTab === 'history' ? (
                 /* Tab 1: History */
                 <div className="flex flex-col gap-4">
-                  {orderHistory.length === 0 ? (
+                  {fetchingOrders && combinedHistory.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-800"></div>
+                    </div>
+                  ) : combinedHistory.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center flex flex-col items-center justify-center gap-4">
                       <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                         <ShoppingBag className="w-8 h-8" />
@@ -192,41 +249,54 @@ Mohon segera diproses kak, terima kasih!`;
                       </Link>
                     </div>
                   ) : (
-                    orderHistory.map((order) => (
-                      <div key={order.id} className="bg-white rounded-xl border border-gray-150 p-5 sm:p-6 shadow-sm flex flex-col gap-4">
-                        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-3">
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded">
-                              {order.id}
-                            </span>
-                            <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
-                              <Calendar className="w-3.5 h-3.5" /> {order.date}
+                    combinedHistory.map((order) => {
+                      const isLunas = order.status?.toLowerCase().includes('lunas');
+                      const isCancel = order.status?.toLowerCase().includes('batal');
+
+                      return (
+                        <div key={order.id} className="bg-white rounded-xl border border-gray-150 p-5 sm:p-6 shadow-sm flex flex-col gap-4">
+                          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-3">
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded">
+                                {order.id}
+                              </span>
+                              <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
+                                <Calendar className="w-3.5 h-3.5" /> {order.date}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase flex items-center gap-1 ${
+                              isLunas
+                                ? 'bg-green-100 text-green-800 border border-green-200'
+                                : isCancel
+                                  ? 'bg-red-100 text-red-800 border border-red-200'
+                                  : 'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}>
+                              <Clock className="w-3 h-3" /> {order.status}
                             </span>
                           </div>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase flex items-center gap-1 ${
-                            order.status === 'Selesai'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}>
-                            <Clock className="w-3 h-3" /> {order.status}
-                          </span>
-                        </div>
 
-                        <div className="flex flex-col gap-3">
-                          {order.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-sm font-semibold">
-                              <span className="text-gray-900">{item.name}</span>
-                              <span className="text-gray-500 text-xs">{item.price}</span>
-                            </div>
-                          ))}
-                        </div>
+                          <div className="flex flex-col gap-3">
+                            {order.items.map((item: any, idx: number) => (
+                              <div key={idx} className="flex justify-between items-center text-sm font-semibold">
+                                <span className="text-gray-900">{item.name}</span>
+                                <span className="text-gray-500 text-xs">{item.price}</span>
+                              </div>
+                            ))}
+                            {order.fileName && (
+                              <div className="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-200 flex items-center gap-2">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-primary-800" />
+                                <span>File Dokumen: <strong>{order.fileName}</strong></span>
+                              </div>
+                            )}
+                          </div>
 
-                        <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
-                          <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Harga</span>
-                          <span className="text-base font-extrabold text-primary-800">{order.totalPrice}</span>
+                          <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
+                            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Harga</span>
+                            <span className="text-base font-extrabold text-primary-800">{order.totalPrice}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               ) : (
