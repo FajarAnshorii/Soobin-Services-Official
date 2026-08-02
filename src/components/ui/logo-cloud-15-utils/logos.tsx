@@ -97,6 +97,48 @@ export const LogoBartleby = () => (
   </div>
 );
 
+// 11. IEEE Logo
+export const LogoIEEE = () => (
+  <div className="flex items-center gap-2.5 px-5 py-2.5 bg-white shadow-sm hover:shadow-md rounded-2xl border border-slate-200/80 transition-all">
+    <div className="w-6 h-6 rotate-45 bg-[#00629B] flex items-center justify-center text-white text-[9px] font-bold shrink-0">
+      <span className="-rotate-45">◆</span>
+    </div>
+    <span className="text-xl font-black tracking-wider text-[#00629B]">IEEE</span>
+  </div>
+);
+
+// 12. Cambridge Logo
+export const LogoCambridge = () => (
+  <div className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-sm hover:shadow-md rounded-2xl border border-slate-200/80 transition-all">
+    <div className="w-6 h-6 bg-[#A6192E] rounded flex items-center justify-center text-white font-bold text-[10px] shrink-0 border border-amber-400">
+      C
+    </div>
+    <span className="text-base font-extrabold tracking-widest text-[#000000] font-serif uppercase">CAMBRIDGE</span>
+  </div>
+);
+
+// 13. ResearchGate Logo
+export const LogoResearchGate = () => (
+  <div className="flex items-center px-5 py-2.5 bg-white shadow-sm hover:shadow-md rounded-2xl border border-slate-200/80 transition-all">
+    <span className="text-xl font-extrabold tracking-tight text-[#00CC99] font-serif">ResearchGate</span>
+  </div>
+);
+
+// 14. Wiley Logo
+export const LogoWiley = () => (
+  <div className="flex items-center px-5 py-2.5 bg-white shadow-sm hover:shadow-md rounded-2xl border border-slate-200/80 transition-all">
+    <span className="text-xl font-black tracking-widest text-[#1A1A1A] font-serif uppercase">WILEY</span>
+  </div>
+);
+
+// 15. Emerald Logo
+export const LogoEmerald = () => (
+  <div className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-sm hover:shadow-md rounded-2xl border border-slate-200/80 transition-all">
+    <div className="w-4 h-4 rotate-45 bg-[#006847] shrink-0" />
+    <span className="text-lg font-extrabold tracking-tight text-[#006847]">Emerald</span>
+  </div>
+);
+
 // Compatibility exports
 export const Logo01 = LogoNumerade;
 export const Logo02 = LogoScribd;
