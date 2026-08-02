@@ -666,20 +666,6 @@ export default function PremiumPage() {
                         );
                       })}
                     </div>
-
-                    {/* SNK accordion / notes */}
-                    {product.snk && product.snk.length > 0 && (
-                      <div className="mb-4 p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs space-y-1">
-                        <span className="font-bold text-amber-900 flex items-center gap-1.5 mb-1">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-600" /> Catatan Layanan:
-                        </span>
-                        <ul className="list-disc list-inside text-amber-800 space-y-0.5 text-[11px]">
-                          {product.snk.map((rule, i) => (
-                            <li key={i}>{rule}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
 
                   {/* Primary WhatsApp Button */}
