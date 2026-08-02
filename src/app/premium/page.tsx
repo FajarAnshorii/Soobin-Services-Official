@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ShieldCheck, Sparkles, MessageCircle, AlertCircle, Film, Music, Tv, AppWindow } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, ShieldCheck, CheckCircle2, Info } from 'lucide-react';
 
-// Pricing Calculation Rule:
+// Pricing Calculation Rule (User Profit Margin):
 // <= 20k   -> +2,000
 // <= 40k   -> +4,000
 // <= 100k  -> +5,000
@@ -35,20 +35,29 @@ function formatRupiah(amount: number): string {
 interface PriceOption {
   duration: string;
   supplierPrice: number;
+  note?: string;
 }
 
 interface ProductVariant {
+  id: string;
+  category: 'netflix' | 'vidio' | 'disney';
+  categoryLabel: string;
   title: string;
   badge?: string;
   description: string;
   options: PriceOption[];
+  snk?: string[];
 }
 
-const netflixVariants: ProductVariant[] = [
+const allProducts: ProductVariant[] = [
+  // --- NETFLIX ---
   {
-    title: '1 Profile 1 User',
-    badge: 'Paling Laris 🔥',
-    description: '1 Profile khusus untuk 1 pengguna, tidak berbagi dengan pengguna lain di profile tersebut.',
+    id: 'netflix-1u',
+    category: 'netflix',
+    categoryLabel: 'Netflix',
+    title: 'Netflix 1 Profile 1 User',
+    badge: 'Best Seller 🔥',
+    description: '1 Profile khusus untuk 1 pengguna, tidak berbagi layar dengan siapapun.',
     options: [
       { duration: '1 Hari', supplierPrice: 2500 },
       { duration: '2 Hari', supplierPrice: 4500 },
@@ -57,11 +66,19 @@ const netflixVariants: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 13000 },
       { duration: '1 Bulan', supplierPrice: 33000 },
     ],
+    snk: [
+      'Lebih dari 1 bulan menggunakan sistem renew.',
+      'Utamakan baca SNK sebelum order.',
+      'Estimasi fixing 3-7 hari, no rush!',
+    ],
   },
   {
-    title: '1 Profile 2 User',
-    badge: 'Hemat Banget 💡',
-    description: '1 Profile digunakan bersama 2 pengguna, harga lebih ekonomis.',
+    id: 'netflix-2u',
+    category: 'netflix',
+    categoryLabel: 'Netflix',
+    title: 'Netflix 1 Profile 2 User',
+    badge: 'Hemat 💡',
+    description: '1 Profile digunakan bersama 2 pengguna, pilihan paling ekonomis.',
     options: [
       { duration: '1 Hari', supplierPrice: 2000 },
       { duration: '2 Hari', supplierPrice: 4000 },
@@ -70,48 +87,184 @@ const netflixVariants: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 11000 },
       { duration: '1 Bulan', supplierPrice: 20000 },
     ],
+    snk: [
+      'Lebih dari 1 bulan menggunakan sistem renew.',
+      'Utamakan baca SNK sebelum order.',
+      'Estimasi fixing 3-7 hari, no rush!',
+    ],
   },
   {
-    title: 'Semi Private',
-    badge: 'Nyaman ✨',
-    description: 'Profile lebih terbatas dan tidak padat, pengalaman menonton stabil.',
+    id: 'netflix-semi-private',
+    category: 'netflix',
+    categoryLabel: 'Netflix',
+    title: 'Netflix Semi Private',
+    badge: 'Stabil ✨',
+    description: 'Jumlah user terbatas dan tidak padat untuk pengalaman streaming lancar.',
     options: [
       { duration: '3 Hari', supplierPrice: 9000 },
       { duration: '7 Hari', supplierPrice: 18000 },
       { duration: '1 Bulan', supplierPrice: 37000 },
     ],
+    snk: [
+      'Lebih dari 1 bulan menggunakan sistem renew.',
+      'Utamakan baca SNK sebelum order.',
+      'Estimasi fixing 3-7 hari, no rush!',
+    ],
   },
   {
-    title: 'Single Screen',
-    badge: 'Eksklusif Screen 🖥️',
-    description: 'Khusus untuk 1 layar aktif tanpa gangguan antrean batas layar.',
+    id: 'netflix-single-screen',
+    category: 'netflix',
+    categoryLabel: 'Netflix',
+    title: 'Netflix Single Screen',
+    badge: 'Bebas Antre 🖥️',
+    description: 'Layar khusus untuk Anda tanpa terganggu batas screen perangkat lain.',
     options: [
       { duration: '7 Hari', supplierPrice: 19000 },
       { duration: '1 Bulan', supplierPrice: 40000 },
     ],
+    snk: [
+      'Lebih dari 1 bulan menggunakan sistem renew.',
+      'Utamakan baca SNK sebelum order.',
+      'Estimasi fixing 3-7 hari, no rush!',
+    ],
   },
   {
-    title: 'Private Account',
+    id: 'netflix-private',
+    category: 'netflix',
+    categoryLabel: 'Netflix',
+    title: 'Netflix Private Account',
     badge: 'Full Private 👑',
-    description: 'Akun utuh penuh milik Anda sendiri! Bebas atur semua profile & PIN.',
+    description: 'Akun utuh milik Anda sendiri! Bebas atur semua profile & PIN.',
     options: [
       { duration: '1 Minggu', supplierPrice: 53000 },
       { duration: '1 Bulan', supplierPrice: 145000 },
+    ],
+    snk: [
+      'Lebih dari 1 bulan menggunakan sistem renew.',
+      'Utamakan baca SNK sebelum order.',
+      'Estimasi fixing 3-7 hari, no rush!',
+    ],
+  },
+
+  // --- VIDIO ---
+  {
+    id: 'vidio-daily-mobile',
+    category: 'vidio',
+    categoryLabel: 'Vidio',
+    title: 'Vidio Platinum Sharing Daily (Mobile)',
+    badge: 'Nonton Liga ⚽',
+    description: 'Akses tayangan Platinum Vidio khusus perangkat HP / Tablet.',
+    options: [
+      { duration: '1 Hari', supplierPrice: 4500 },
+      { duration: '1 Minggu', supplierPrice: 9500 },
+    ],
+    snk: [
+      'Dilarang tukar plan jika kesalahan bukan dari seller.',
+      'Login hanya untuk 1 device.',
+      'Tanya dulu sebelum beli soal plan biar nggak salah (no refund!).',
+    ],
+  },
+  {
+    id: 'vidio-daily-tv',
+    category: 'vidio',
+    categoryLabel: 'Vidio',
+    title: 'Vidio Platinum Sharing Daily (TV Only)',
+    badge: 'Layar Lebar 📺',
+    description: 'Akses Platinum Vidio khusus Smart TV / Android TV.',
+    options: [
+      { duration: '1 Hari', supplierPrice: 2000 },
+      { duration: '1 Minggu', supplierPrice: 4500 },
+    ],
+    snk: [
+      'Dilarang tukar plan jika kesalahan bukan dari seller.',
+      'Login hanya untuk 1 device (TV Only).',
+      'Tanya dulu sebelum beli (no refund!).',
+    ],
+  },
+  {
+    id: 'vidio-sharing-month',
+    category: 'vidio',
+    categoryLabel: 'Vidio',
+    title: 'Vidio Platinum Sharing (Bulanan)',
+    badge: 'Favorit 🌟',
+    description: 'Pilihan berlangganan bulanan Vidio Platinum sharing ekonomis.',
+    options: [
+      { duration: '1 Bulan (Pay TV Only)', supplierPrice: 9000 },
+      { duration: '1 Bulan (Mobile)', supplierPrice: 17000 },
+      { duration: '1 Bulan (2U All Device)', supplierPrice: 25000 },
+    ],
+    snk: [
+      'Dilarang tukar plan jika kesalahan bukan dari seller.',
+      'Login only 1 device.',
+      'Tanya admin via WA jika ragu perihal tipe device.',
+    ],
+  },
+  {
+    id: 'vidio-private',
+    category: 'vidio',
+    categoryLabel: 'Vidio',
+    title: 'Vidio Platinum Private Account',
+    badge: 'Private VIP 💎',
+    description: 'Akun privat utuh tanpa berbagi dengan pengguna lain.',
+    options: [
+      { duration: '1 Bulan (Pay TV Only)', supplierPrice: 14000 },
+      { duration: '1 Tahun (Pay TV Only)', supplierPrice: 20000 },
+      { duration: '1 Bulan (Mobile)', supplierPrice: 28000 },
+      { duration: '1 Bulan (All Device)', supplierPrice: 38000 },
+    ],
+    snk: [
+      'Login per perangkat sesuai tipe langganan yang dipilih.',
+      'Dilarang tukar plan jika salah pilih.',
+      'Garansi penuh sesuai durasi langganan.',
+    ],
+  },
+
+  // --- DISNEY+ ---
+  {
+    id: 'disney-6u',
+    category: 'disney',
+    categoryLabel: 'Disney+ Hotstar',
+    title: 'Disney+ Hotstar Sharing 6U',
+    badge: 'Marvel & Pixar 🦸',
+    description: 'Nonton film blockbuster Marvel, Disney, Pixar, & Star Wars terlengkap!',
+    options: [
+      { duration: '1 Hari', supplierPrice: 3500 },
+      { duration: '3 Hari', supplierPrice: 7000 },
+      { duration: '7 Hari', supplierPrice: 12000 },
+      { duration: '1 Bulan', supplierPrice: 22000 },
+    ],
+    snk: [
+      'Sharing 6 User aktif.',
+      'Utamakan baca SNK sebelum pemesanan.',
+      'Garansi akun dan pergantian cepat bila terjadi kendala.',
     ],
   },
 ];
 
 export default function PremiumPage() {
-  const [activeTab, setActiveTab] = useState<'netflix' | 'upcoming'>('netflix');
-  const [selectedOption, setSelectedOption] = useState<{
-    variantTitle: string;
-    duration: string;
-    price: number;
-  } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const handleOrderWhatsApp = (variantTitle: string, duration: string, sellingPrice: number) => {
-    const message = `Halo Kak, saya mau beli Akun Premium Netflix:\n\n` +
-      `📌 *Jenis*: ${variantTitle}\n` +
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      const matchCategory =
+        selectedCategory === 'all' || product.category === selectedCategory;
+      const matchQuery =
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchQuery;
+    });
+  }, [selectedCategory, searchQuery]);
+
+  const handleOrderWhatsApp = (
+    productTitle: string,
+    duration: string,
+    sellingPrice: number
+  ) => {
+    const message =
+      `Halo Kak, saya ingin pesan Akun Premium:\n\n` +
+      `📌 *Produk*: ${productTitle}\n` +
       `⏱️ *Durasi*: ${duration}\n` +
       `💰 *Harga*: ${formatRupiah(sellingPrice)}\n\n` +
       `Mohon diproses ya kak, terima kasih!`;
@@ -120,199 +273,207 @@ export default function PremiumPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white selection:bg-red-500 selection:text-white">
+    <main className="min-h-screen bg-slate-950 text-white selection:bg-red-500 selection:text-white">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative pt-28 sm:pt-36 pb-16 px-4 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900">
-        {/* Ambient Lights */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-red-600/15 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-10 right-10 w-72 h-72 bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
+      {/* Header Banner Section */}
+      <section className="pt-28 sm:pt-36 pb-12 px-4 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 relative overflow-hidden">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] bg-red-600/10 blur-[140px] rounded-full pointer-events-none" />
 
-        <div className="container-custom relative z-10 text-center">
+        <div className="container-custom text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 font-semibold text-xs sm:text-sm mb-4">
-              <Sparkles className="w-4 h-4" /> Official Premium Apps Catalogue
+              <Sparkles className="w-4 h-4" /> Katalog Lengkap Akun Premium
             </span>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4">
-              Katalog Akun <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-400 to-orange-400">Netflix Premium</span>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+              Semua Layanan <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-400 to-amber-400">Aplikasi Premium</span>
             </h1>
-            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Nikmati tayangan film & serial favorit Anda dengan garansi penuh, proses instan, dan harga termurah!
+            <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+              Temukan berbagai pilihan paket akun Netflix, Vidio, Disney+ Hotstar, dan lainnya dengan harga termurah di pasaran & garansi aman.
             </p>
           </motion.div>
 
-          {/* Navigation Category Tabs */}
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mt-8 flex-wrap">
+          {/* Search Bar Input */}
+          <div className="max-w-xl mx-auto mt-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Cari akun premium (Netflix, Vidio, Disney+)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-sm transition-all shadow-inner"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-white"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 flex-wrap">
             <button
-              onClick={() => setActiveTab('netflix')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md ${
-                activeTab === 'netflix'
-                  ? 'bg-red-600 text-white shadow-red-600/30 ring-2 ring-red-400'
-                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700'
+              onClick={() => setSelectedCategory('all')}
+              className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
-              <Film className="w-4 h-4 text-red-400" />
-              Netflix Premium
+              Semua Layanan ({allProducts.length})
             </button>
             <button
-              onClick={() => setActiveTab('upcoming')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
-                activeTab === 'upcoming'
-                  ? 'bg-slate-700 text-white ring-2 ring-slate-500'
-                  : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-700/60'
+              onClick={() => setSelectedCategory('netflix')}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                selectedCategory === 'netflix'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
-              <Music className="w-4 h-4 text-emerald-400" />
-              Spotify & Apps Lainnya
+              <Film className="w-4 h-4 text-red-500" />
+              Netflix
+            </button>
+            <button
+              onClick={() => setSelectedCategory('vidio')}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                selectedCategory === 'vidio'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Tv className="w-4 h-4 text-emerald-400" />
+              Vidio
+            </button>
+            <button
+              onClick={() => setSelectedCategory('disney')}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                selectedCategory === 'disney'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Sparkles className="w-4 h-4 text-blue-400" />
+              Disney+ Hotstar
             </button>
           </div>
         </div>
       </section>
 
-      {/* Main Content Section */}
+      {/* Product List Grid Section */}
       <section className="pb-24 px-4 relative z-10">
         <div className="container-custom">
-          {activeTab === 'netflix' && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-10"
-            >
-              {/* Netflix Header Banner */}
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-red-950/80 via-slate-900 to-slate-900 border border-red-900/40 shadow-2xl relative overflow-hidden">
-                <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-red-600/10 to-transparent pointer-events-none" />
-                
-                <div className="space-y-2 text-center md:text-left z-10">
-                  <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center justify-center md:justify-start gap-3">
-                    <span className="bg-red-600 text-white text-sm font-black px-2.5 py-1 rounded-md">N</span>
-                    Pricelist Netflix Premium
-                  </h2>
-                  <p className="text-slate-300 text-xs sm:text-sm max-w-xl">
-                    Pilih paket durasi harian hingga bulanan sesuai kebutuhan Anda. Garansi penuh selama masa aktif!
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0 z-10">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs font-semibold text-slate-300">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> Garansi Anti On-Hold
-                  </div>
-                </div>
-              </div>
-
-              {/* Grid of Product Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {netflixVariants.map((variant, idx) => (
-                  <motion.div
-                    key={variant.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.08, duration: 0.4 }}
-                    className="flex flex-col justify-between rounded-3xl bg-slate-800/60 border border-slate-700/80 hover:border-red-500/50 transition-all p-6 shadow-lg hover:shadow-2xl hover:shadow-red-950/30 group"
-                  >
-                    <div>
-                      {/* Top badge & title */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <h3 className="text-xl font-bold text-white group-hover:text-red-400 transition-colors">
-                          {variant.title}
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-slate-900/40 rounded-3xl border border-slate-800 max-w-md mx-auto space-y-3">
+              <Info className="w-10 h-10 text-slate-500 mx-auto" />
+              <p className="text-slate-300 font-bold text-base">Tidak ada akun premium ditemukan</p>
+              <p className="text-slate-500 text-xs">Coba kata kunci lain atau pilih kategori Semua Layanan.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product, idx) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05, duration: 0.3 }}
+                  className="flex flex-col justify-between rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-red-500/40 transition-all p-6 shadow-lg hover:shadow-xl hover:shadow-red-950/20 group"
+                >
+                  <div>
+                    {/* Card Top Info */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">
+                          {product.categoryLabel}
+                        </span>
+                        <h3 className="text-xl font-bold text-white group-hover:text-red-400 transition-colors mt-2">
+                          {product.title}
                         </h3>
-                        {variant.badge && (
-                          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-400 border border-red-500/30 shrink-0">
-                            {variant.badge}
-                          </span>
-                        )}
                       </div>
-                      <p className="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
-                        {variant.description}
-                      </p>
+                      {product.badge && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                          {product.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
+                      {product.description}
+                    </p>
 
-                      {/* Options Table / List */}
-                      <div className="space-y-2.5 mb-6">
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                          Pilihan Durasi & Harga:
-                        </p>
-                        {variant.options.map((opt) => {
-                          const sellingPrice = calculateSellingPrice(opt.supplierPrice);
-                          return (
-                            <div
-                              key={opt.duration}
-                              className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/80 border border-slate-700/50 hover:border-slate-600 transition-all"
-                            >
-                              <span className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
-                                {opt.duration}
+                    {/* Price List Options */}
+                    <div className="space-y-2 mb-6">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                        Pricelist Durasi:
+                      </p>
+                      {product.options.map((opt) => {
+                        const sellingPrice = calculateSellingPrice(opt.supplierPrice);
+                        return (
+                          <div
+                            key={opt.duration}
+                            className="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 transition-all"
+                          >
+                            <span className="text-xs sm:text-sm font-semibold text-slate-200 flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+                              {opt.duration}
+                            </span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-extrabold text-white">
+                                {formatRupiah(sellingPrice)}
                               </span>
-                              <div className="flex items-center gap-3">
-                                <span className="text-base font-extrabold text-white">
-                                  {formatRupiah(sellingPrice)}
-                                </span>
-                                <button
-                                  onClick={() => handleOrderWhatsApp(variant.title, opt.duration, sellingPrice)}
-                                  className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow hover:scale-105 active:scale-95 transition-all"
-                                >
-                                  Beli
-                                </button>
-                              </div>
+                              <button
+                                onClick={() =>
+                                  handleOrderWhatsApp(product.title, opt.duration, sellingPrice)
+                                }
+                                className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow hover:scale-105 active:scale-95 transition-all"
+                              >
+                                Pesan
+                              </button>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    {/* Quick WhatsApp Order Button */}
-                    <button
-                      onClick={() => handleOrderWhatsApp(variant.title, variant.options[variant.options.length - 1].duration, calculateSellingPrice(variant.options[variant.options.length - 1].supplierPrice))}
-                      className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-950/50 transition-all hover:scale-[1.02]"
-                    >
-                      <MessageCircle className="w-4 h-4 fill-white text-red-600" />
-                      Pesan {variant.title} Via WA
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
+                    {/* SNK accordion if available */}
+                    {product.snk && product.snk.length > 0 && (
+                      <div className="mb-4 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80 text-xs space-y-1">
+                        <span className="font-bold text-slate-400 flex items-center gap-1.5 mb-1">
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-400" /> Catatan Layanan:
+                        </span>
+                        <ul className="list-disc list-inside text-slate-400 space-y-0.5 text-[11px]">
+                          {product.snk.map((rule, i) => (
+                            <li key={i}>{rule}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
 
-              {/* Syarat & Ketentuan (SNK) Box */}
-              <div className="rounded-3xl bg-slate-800/40 border border-slate-700/60 p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-3 text-red-400 font-bold text-lg">
-                  <AlertCircle className="w-6 h-6 shrink-0" />
-                  Syarat & Ketentuan (SNK) Layanan Premium
-                </div>
-                <ul className="space-y-2 text-slate-300 text-sm list-disc list-inside leading-relaxed">
-                  <li><strong className="text-white">Sistem Renew:</strong> Pemesanan lebih dari 1 bulan menggunakan sistem renew otomatis/manual sesuai konfirmasi admin.</li>
-                  <li><strong className="text-white">Wajib Baca SNK:</strong> Mohon selalu utamakan membaca SNK sebelum memesan layanan.</li>
-                  <li><strong className="text-white">Estimasi Fixing:</strong> Garansi perbaikan/penggantian akun membutuhkan waktu 3-7 hari (no rush/bebas antre).</li>
-                  <li><strong className="text-white">Dukungan Garansi:</strong> Kami menjamin penggantian akun jika terjadi masalah teknis sesuai durasi langganan Anda.</li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'upcoming' && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="text-center py-16 px-4 bg-slate-800/40 rounded-3xl border border-slate-700/60 max-w-2xl mx-auto space-y-4"
-            >
-              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-                <Music className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">Layanan Aplikasi Lain Segera Hadir!</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Kami sedang menyiapkan katalog resmi untuk Spotify Premium, YouTube Premium, Canva Pro, CapCut, dan aplikasi lainnya dengan harga termurah.
-              </p>
-              <button
-                onClick={() => setActiveTab('netflix')}
-                className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-md transition-all inline-block"
-              >
-                Lihat Netflix Premium
-              </button>
-            </motion.div>
+                  {/* WhatsApp Direct Order Button */}
+                  <button
+                    onClick={() =>
+                      handleOrderWhatsApp(
+                        product.title,
+                        product.options[0].duration,
+                        calculateSellingPrice(product.options[0].supplierPrice)
+                      )
+                    }
+                    className="w-full py-3 px-4 rounded-2xl bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-700 hover:border-red-500 transition-all shadow-md"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-current" />
+                    Pesan {product.title}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
           )}
         </div>
       </section>
