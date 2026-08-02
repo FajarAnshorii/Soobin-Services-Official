@@ -5,14 +5,23 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, ShieldCheck } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, Palette, Video, Music2, Clapperboard, MonitorPlay } from 'lucide-react';
 
 // Pricing Calculation Rule (User Profit Margin):
-// <= 20k   -> +2,000
-// <= 40k   -> +4,000
-// <= 100k  -> +5,000
-// > 100k   -> +15,000
-function calculateSellingPrice(supplierPrice: number): number {
+// For Canva (< 5,000 perak):
+//   supplier <= 1,000 -> +500
+//   supplier < 5,000  -> +1,000
+// Standard Rule for all others:
+//   <= 20k   -> +2,000
+//   <= 40k   -> +4,000
+//   <= 100k  -> +5,000
+//   > 100k   -> +15,000
+function calculateSellingPrice(supplierPrice: number, category?: string): number {
+  if (category === 'canva' && supplierPrice < 5000) {
+    if (supplierPrice <= 1000) return supplierPrice + 500;
+    return supplierPrice + 1000;
+  }
+
   if (supplierPrice <= 20000) {
     return supplierPrice + 2000;
   } else if (supplierPrice <= 40000) {
@@ -39,7 +48,7 @@ interface PriceOption {
 
 interface ProductVariant {
   id: string;
-  category: 'netflix' | 'vidio' | 'disney';
+  category: 'netflix' | 'vidio' | 'disney' | 'hbo' | 'catchplay' | 'canva' | 'capcut' | 'wetv' | 'spotify' | 'bstation';
   categoryLabel: string;
   title: string;
   badge?: string;
@@ -151,7 +160,7 @@ const allProducts: ProductVariant[] = [
     category: 'vidio',
     categoryLabel: 'Vidio',
     title: 'Vidio Platinum Sharing Daily (Mobile)',
-    badge: 'LIGA INGGIS ⚽',
+    badge: 'LIGA INGGRIS ⚽',
     description: 'Akses tayangan Platinum Vidio khusus perangkat HP / Tablet.',
     options: [
       { duration: '1 Hari', supplierPrice: 4500 },
@@ -203,7 +212,7 @@ const allProducts: ProductVariant[] = [
     category: 'vidio',
     categoryLabel: 'Vidio',
     title: 'Vidio Platinum Private Account',
-    badge: 'FULL PRIVATE VIP 💎',
+    badge: 'VIP PRIVATE 💎',
     description: 'Akun privat utuh tanpa berbagi dengan pengguna lain.',
     options: [
       { duration: '1 Bulan (Pay TV Only)', supplierPrice: 14000 },
@@ -237,6 +246,204 @@ const allProducts: ProductVariant[] = [
       'Utamakan baca SNK sebelum pemesanan.',
       'Garansi akun dan pergantian cepat bila terjadi kendala.',
     ],
+  },
+
+  // --- HBO MAX ---
+  {
+    id: 'hbo-sharing',
+    category: 'hbo',
+    categoryLabel: 'HBO Max',
+    title: 'HBO Max Sharing',
+    badge: 'HOLLYWOOD BLOCKBUSTER 🎬',
+    description: 'Nonton serial eksklusif HBO, House of the Dragon, & film bioskop pilihan.',
+    options: [
+      { duration: '1 Hari', supplierPrice: 4000 },
+      { duration: '1 Minggu', supplierPrice: 10000 },
+      { duration: '1 Bulan (Standard)', supplierPrice: 18000 },
+      { duration: '1 Bulan (Ultimate)', supplierPrice: 25000 },
+    ],
+    snk: ['Garansi penuh sesuai durasi langganan.', 'Dilarang ubah password/profile sharing.'],
+  },
+  {
+    id: 'hbo-private',
+    category: 'hbo',
+    categoryLabel: 'HBO Max',
+    title: 'HBO Max Private',
+    badge: 'FULL PRIVATE VIP 👑',
+    description: 'Akun HBO Max privat utuh tanpa antrean atau batasan sharing.',
+    options: [
+      { duration: '1 Bulan (Standard)', supplierPrice: 61000 },
+      { duration: '1 Bulan (Ultimate)', supplierPrice: 88000 },
+    ],
+    snk: ['Full Private milik sendiri.', 'Garansi aktif penuh selama 1 bulan.'],
+  },
+
+  // --- CATCHPLAY ---
+  {
+    id: 'catchplay-sharing',
+    category: 'catchplay',
+    categoryLabel: 'Catchplay',
+    title: 'Catchplay+ Sharing',
+    badge: 'FILM BIOSKOP 🍿',
+    description: 'Ribuan koleksi film blockbuster bioskop & sinema Asia.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 9000 },
+      { duration: '6 Bulan', supplierPrice: 12000 },
+      { duration: '1 Tahun', supplierPrice: 16000 },
+    ],
+    snk: ['Proses kilat & garansi aktif penuh.'],
+  },
+
+  // --- CANVA PRO ---
+  {
+    id: 'canva-member',
+    category: 'canva',
+    categoryLabel: 'Canva Pro',
+    title: 'Canva Pro Member Invite',
+    badge: 'DESAIN UNLIMITED 🎨',
+    description: 'Akses semua elemen premium, hilangkan background, & font eksklusif Canva Pro.',
+    options: [
+      { duration: '1 Hari', supplierPrice: 300 },
+      { duration: '2 Hari', supplierPrice: 500 },
+      { duration: '5 Hari', supplierPrice: 800 },
+      { duration: '7 Hari', supplierPrice: 1000 },
+      { duration: '1 Bulan', supplierPrice: 2000 },
+      { duration: '2 Bulan', supplierPrice: 3000 },
+      { duration: '3 Bulan', supplierPrice: 4000 },
+      { duration: '6 Bulan (Full Garansi)', supplierPrice: 8000 },
+      { duration: '1 Tahun (Garansi 6 Bulan)', supplierPrice: 10000 },
+      { duration: '1 Tahun (Full Garansi)', supplierPrice: 14000 },
+    ],
+    snk: [
+      'Renew tiap bulan (kecuali versi Lifetime).',
+      'Dapat invite langsung ke email Canva milik Anda sendiri.',
+    ],
+  },
+  {
+    id: 'canva-lifetime',
+    category: 'canva',
+    categoryLabel: 'Canva Pro',
+    title: 'Canva Pro Lifetime Edu',
+    badge: 'LIFETIME ACCESS ♾️',
+    description: 'Akses Canva Pro durasi jangka panjang tanpa biaya bulanan!',
+    options: [{ duration: 'Lifetime (Garansi 6 Bulan)', supplierPrice: 11000 }],
+    snk: ['Tanpa renew bulanan.', 'Garansi 6 bulan penuh jika terjadi trouble.'],
+  },
+  {
+    id: 'canva-admin',
+    category: 'canva',
+    categoryLabel: 'Canva Pro',
+    title: 'Canva Pro Admin & Owner',
+    badge: 'TIM / BRAND OWNER 💼',
+    description: 'Dapatkan tim sendiri & bisa invite member tim Anda sesuka hati.',
+    options: [
+      { duration: '1 Bulan (Admin)', supplierPrice: 7000 },
+      { duration: '1 Bulan (Owner + Include Acc)', supplierPrice: 14000 },
+    ],
+    snk: [
+      'Bisa pakai akun sendiri atau akun dari seller.',
+      'Tambah role Designer +700.',
+    ],
+  },
+
+  // --- CAPCUT PRO ---
+  {
+    id: 'capcut-pro',
+    category: 'capcut',
+    categoryLabel: 'CapCut Pro',
+    title: 'CapCut Pro (PC & Mobile)',
+    badge: 'EDIT VIDEO RARE 🎥',
+    description: 'Buka efek pro, auto caption, & ekspor 4K tanpa watermark.',
+    options: [
+      { duration: '1 Minggu (Private)', supplierPrice: 14000 },
+      { duration: '1 Bulan (Sharing 3U)', supplierPrice: 22000 },
+      { duration: '1 Bulan (Private FullGar)', supplierPrice: 55000 },
+    ],
+    snk: [
+      'Akun diprovide oleh seller.',
+      'Resiko sharing sering limit.',
+      'Garansi backfree only (bukan limit atau incorrect password).',
+    ],
+  },
+
+  // --- WETV VIP ---
+  {
+    id: 'wetv-vip',
+    category: 'wetv',
+    categoryLabel: 'WeTV VIP',
+    title: 'WeTV VIP Premium',
+    badge: 'DRAMA ASIA & C-DRAMA ⛩️',
+    description: 'Nonton drama Korea, Drama China, & WeTV Original tanpa iklan.',
+    options: [
+      { duration: '1 Bulan (Sharing 6U)', supplierPrice: 8000 },
+      { duration: '1 Bulan (Sharing 3U)', supplierPrice: 13000 },
+      { duration: '3 Bulan (Sharing 6U)', supplierPrice: 18000 },
+      { duration: '1 Bulan (Private)', supplierPrice: 33000 },
+    ],
+    snk: ['Garansi aktif penuh.', 'Nonton cepat tanpa delay episode.'],
+  },
+
+  // --- SPOTIFY PREMIUM ---
+  {
+    id: 'spotify-famplan',
+    category: 'spotify',
+    categoryLabel: 'Spotify',
+    title: 'Spotify Famplan (Full Warranty)',
+    badge: 'MUSIK TANPA IKLAN 🎵',
+    description: 'Mendengarkan jutaan lagu & podcast tanpa iklan, bebas download offline.',
+    options: [
+      { duration: '7 Hari', supplierPrice: 6500 },
+      { duration: '19 Hari', supplierPrice: 10000 },
+      { duration: '1 Bulan', supplierPrice: 17000 },
+      { duration: '2 Bulan', supplierPrice: 27000 },
+      { duration: '3 Bulan', supplierPrice: 38000 },
+    ],
+    snk: [
+      'Tanyakan stok admin terlebih dahulu.',
+      'Region random sesuai stok (tetap bisa dengar lagu explicit).',
+      'Full garansi Backfree (BF).',
+      'Perpanjangan (PPJ) bulan ke-4 dan seterusnya +15k.',
+      'Opsional +2.000 jika menggunakan akun dari seller.',
+    ],
+  },
+  {
+    id: 'spotify-indplan',
+    category: 'spotify',
+    categoryLabel: 'Spotify',
+    title: 'Spotify Individual Plan',
+    badge: 'INDIVIDUAL VIP 🎧',
+    description: 'Plan khusus individual untuk mendengarkan lagu tanpa gangguan.',
+    options: [
+      { duration: '1 Bulan (No Warranty)', supplierPrice: 10000 },
+      { duration: '2 Bulan (No Warranty)', supplierPrice: 13000 },
+      { duration: '3 Bulan (No Warranty)', supplierPrice: 17000 },
+      { duration: '4 Bulan (No Warranty)', supplierPrice: 20000 },
+      { duration: '1 Bulan (Full Warranty)', supplierPrice: 21000 },
+      { duration: '2 Bulan (Full Warranty)', supplierPrice: 35000 },
+      { duration: '3 Bulan (Full Warranty)', supplierPrice: 41000 },
+    ],
+    snk: [
+      'Sistem replace jika akun sudah pernah premium.',
+      'Estimasi proses max 1x24 jam (No Rush).',
+    ],
+  },
+
+  // --- B-STATION ---
+  {
+    id: 'bstation-premium',
+    category: 'bstation',
+    categoryLabel: 'B-Station',
+    title: 'B-Station (Bilibili) Premium',
+    badge: 'ANIME & MANHWA ⛩️',
+    description: 'Streaming anime kualitas HD 1080p/4K subtitle Indonesia terlengkap.',
+    options: [
+      { duration: '1 Bulan (Sharing)', supplierPrice: 7000 },
+      { duration: '3 Bulan (Sharing)', supplierPrice: 11000 },
+      { duration: '6 Bulan (Sharing)', supplierPrice: 13000 },
+      { duration: '1 Tahun (Sharing)', supplierPrice: 15000 },
+      { duration: '1 Bulan (Private)', supplierPrice: 36000 },
+    ],
+    snk: ['Proses kilat & garansi aktif penuh.'],
   },
 ];
 
@@ -275,7 +482,7 @@ export default function PremiumPage() {
     <main className="min-h-screen bg-gray-50 text-gray-900">
       <Navbar />
 
-      {/* Hero Section Header (Matching Layanan Page Navy Theme) */}
+      {/* Hero Section Header */}
       <section className="bg-[#0B1527] pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 text-center">
         <div className="container-custom">
           <motion.div
@@ -287,7 +494,7 @@ export default function PremiumPage() {
               Layanan Aplikasi Premium
             </h1>
             <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-              Temukan berbagai layanan aplikasi streaming & premium terfavorit dengan harga termurah di pasaran
+              Temukan berbagai pilihan akun premium Netflix, Canva, Spotify, CapCut, Vidio, & Disney+ terlengkap dengan harga termurah & garansi aman
             </p>
           </motion.div>
         </div>
@@ -302,7 +509,7 @@ export default function PremiumPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari layanan premium (Netflix, Vidio, Disney+)..."
+                placeholder="Cari aplikasi premium (Netflix, Canva, Spotify, CapCut)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0F1E36] focus:ring-2 focus:ring-[#0F1E36]/10 text-sm transition-all shadow-sm"
@@ -318,51 +525,33 @@ export default function PremiumPage() {
             </div>
           </div>
 
-          {/* Filter Pills (Exact matching style from Layanan Page) */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition-all border ${
-                selectedCategory === 'all'
-                  ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
-                  : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
-              }`}
-            >
-              Semua ({allProducts.length})
-            </button>
-            <button
-              onClick={() => setSelectedCategory('netflix')}
-              className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all border ${
-                selectedCategory === 'netflix'
-                  ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
-                  : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
-              }`}
-            >
-              <Film className="w-4 h-4 text-red-500" />
-              Netflix
-            </button>
-            <button
-              onClick={() => setSelectedCategory('vidio')}
-              className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all border ${
-                selectedCategory === 'vidio'
-                  ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
-                  : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
-              }`}
-            >
-              <Tv className="w-4 h-4 text-emerald-600" />
-              Vidio
-            </button>
-            <button
-              onClick={() => setSelectedCategory('disney')}
-              className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all border ${
-                selectedCategory === 'disney'
-                  ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
-                  : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
-              }`}
-            >
-              <Sparkles className="w-4 h-4 text-blue-500" />
-              Disney+ Hotstar
-            </button>
+          {/* Filter Pills */}
+          <div className="flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap">
+            {[
+              { id: 'all', label: `Semua (${allProducts.length})` },
+              { id: 'netflix', label: 'Netflix' },
+              { id: 'canva', label: 'Canva Pro' },
+              { id: 'spotify', label: 'Spotify' },
+              { id: 'capcut', label: 'CapCut Pro' },
+              { id: 'vidio', label: 'Vidio' },
+              { id: 'disney', label: 'Disney+' },
+              { id: 'hbo', label: 'HBO Max' },
+              { id: 'wetv', label: 'WeTV VIP' },
+              { id: 'catchplay', label: 'Catchplay' },
+              { id: 'bstation', label: 'B-Station' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all border ${
+                  selectedCategory === cat.id
+                    ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
+                    : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -383,10 +572,10 @@ export default function PremiumPage() {
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05, duration: 0.3 }}
+                  transition={{ delay: idx * 0.04, duration: 0.3 }}
                   className="flex flex-col justify-between rounded-2xl bg-white border border-gray-200 hover:border-primary-800/40 transition-all p-6 shadow-sm hover:shadow-md relative overflow-hidden group"
                 >
-                  {/* Top Badge (Matching Green Pill Badge from Layanan page) */}
+                  {/* Top Badge */}
                   {product.badge && (
                     <div className="absolute top-0 right-0">
                       <span className="bg-[#00C853] text-white text-[10px] font-extrabold px-3 py-1 rounded-bl-xl uppercase tracking-wider shadow-sm">
@@ -415,7 +604,10 @@ export default function PremiumPage() {
                         Pricelist Durasi:
                       </p>
                       {product.options.map((opt) => {
-                        const sellingPrice = calculateSellingPrice(opt.supplierPrice);
+                        const sellingPrice = calculateSellingPrice(
+                          opt.supplierPrice,
+                          product.category
+                        );
                         return (
                           <div
                             key={opt.duration}
@@ -464,7 +656,7 @@ export default function PremiumPage() {
                       handleOrderWhatsApp(
                         product.title,
                         product.options[0].duration,
-                        calculateSellingPrice(product.options[0].supplierPrice)
+                        calculateSellingPrice(product.options[0].supplierPrice, product.category)
                       )
                     }
                     className="w-full py-3 px-4 rounded-xl bg-[#0F1E36] hover:bg-[#162A4A] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
