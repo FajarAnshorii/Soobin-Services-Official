@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, Palette, Video, ShieldCheck, Key } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, Gamepad2 } from 'lucide-react';
 
 // Pricing Calculation Rule (User Profit Margin):
 // If supplierPrice < 5,000 perak:
@@ -128,6 +128,56 @@ const allProducts: ProductVariant[] = [
     ],
   },
 
+  // --- ROBLOX / ROBUX VILOG ---
+  {
+    id: 'robux-vilog-login',
+    category: 'robux',
+    categoryLabel: 'Roblox & Robux',
+    title: 'Robux Vilog (Via Login)',
+    badge: 'TOP UP ROBUX 🎲',
+    description: 'Top up Robux murah via login instan & aman oleh worker terpercaya.',
+    options: [
+      { duration: '80 Robux', supplierPrice: 15500 },
+      { duration: '160 Robux', supplierPrice: 30500 },
+      { duration: '240 Robux', supplierPrice: 44500 },
+      { duration: '320 Robux', supplierPrice: 59000 },
+      { duration: '500 Robux', supplierPrice: 75500 },
+      { duration: '1000 Robux', supplierPrice: 150000 },
+      { duration: '1500 Robux', supplierPrice: 224000 },
+      { duration: '2000 Robux', supplierPrice: 299000 },
+      { duration: '2500 Robux', supplierPrice: 373500 },
+      { duration: '3000 Robux', supplierPrice: 448000 },
+    ],
+  },
+  {
+    id: 'robux-premium-plan',
+    category: 'robux',
+    categoryLabel: 'Roblox & Robux',
+    title: 'Roblox Premium + Robux Bonus',
+    badge: 'PREMIUM BENEFIT 🌟',
+    description: 'Dapat bonus 10% Robux, akses item eksklusif avatar, & booster khusus.',
+    options: [
+      { duration: '450 Robux + Prem', supplierPrice: 76000 },
+      { duration: '1000 Robux + Prem', supplierPrice: 151500 },
+      { duration: '2200 Robux + Prem', supplierPrice: 302000 },
+    ],
+  },
+
+  // --- YOUKU ---
+  {
+    id: 'youku-vip',
+    category: 'asian-drama',
+    categoryLabel: 'Asian Drama',
+    title: 'Youku VIP Premium',
+    badge: 'C-DRAMA EXCLUSIVE ⛩️',
+    description: 'Nonton drama China eksklusif, anime, & variety show Youku subtitle Indonesia.',
+    options: [
+      { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
+      { duration: '3 Bulan (Sharing)', supplierPrice: 11000 },
+      { duration: '1 Tahun (Sharing)', supplierPrice: 15000 },
+    ],
+  },
+
   // --- YOUTUBE PREMIUM ---
   {
     id: 'youtube-famplan',
@@ -223,7 +273,7 @@ const allProducts: ProductVariant[] = [
     ],
   },
 
-  // --- ASIAN DRAMA & STREAMING ---
+  // --- ASIAN DRAMA ---
   {
     id: 'iqiyi-vip',
     category: 'asian-drama',
@@ -627,7 +677,7 @@ export default function PremiumPage() {
               Layanan Aplikasi Premium
             </h1>
             <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-              Katalog terlengkap Netflix, Grammarly, Zoom, YouTube, PicsArt, Remini, iQIYI, VPN, & puluhan aplikasi resmi termurah
+              Katalog terlengkap Netflix, Robux, Youku, Grammarly, Zoom, YouTube, PicsArt, Remini, iQIYI, & puluhan aplikasi resmi termurah
             </p>
           </motion.div>
         </div>
@@ -642,7 +692,7 @@ export default function PremiumPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari aplikasi (Netflix, Grammarly, PicsArt, Remini, Zoom, iQIYI)..."
+                placeholder="Cari aplikasi (Netflix, Robux, Youku, Grammarly, PicsArt, Remini, Zoom)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0F1E36] focus:ring-2 focus:ring-[#0F1E36]/10 text-sm transition-all shadow-sm"
@@ -663,9 +713,10 @@ export default function PremiumPage() {
             {[
               { id: 'all', label: `Semua (${allProducts.length})` },
               { id: 'netflix', label: 'Netflix' },
+              { id: 'robux', label: 'Roblox & Robux' },
               { id: 'youtube', label: 'YouTube' },
               { id: 'editing', label: 'Editing Apps' },
-              { id: 'asian-drama', label: 'Asian Drama' },
+              { id: 'asian-drama', label: 'Asian Drama & Youku' },
               { id: 'vpn', label: 'VPN Premium' },
               { id: 'canva', label: 'Canva Pro' },
               { id: 'grammarly', label: 'Grammarly' },
