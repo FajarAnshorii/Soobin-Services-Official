@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Unlock, Globe, FileKey, Star } from 'lucide-react';
+import LogoCloud from '@/components/ui/logo-cloud-15';
 
 const freeSites = [
   { name: 'Bartleby', price: '2k' },
@@ -61,7 +62,7 @@ export default function UnlockDokumenSection() {
       <div className="container-custom">
         {/* Header */}
         <motion.div
-          className="text-center max-w-3xl mx-auto mb-12 sm:mb-16"
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -76,6 +77,17 @@ export default function UnlockDokumenSection() {
           <p className="text-gray-600 text-sm sm:text-base md:text-lg px-4">
             Unlock Dokumen Termurah untuk Keperluan Kuliah dan Sekolah
           </p>
+        </motion.div>
+
+        {/* Animated Logo Cloud Card with Border Beam & Marquee */}
+        <motion.div
+          className="mb-12 sm:mb-16"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <LogoCloud />
         </motion.div>
 
         {/* Free Sites Section */}
