@@ -114,16 +114,29 @@ export default function WhatsAppFloat() {
     syncProfile();
   }, [sessionId, user]);
 
+  const isOpenRef = useRef(isOpen);
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
   // Cloud sync handler
-  const syncWithCloud = async (currentSessionId: string, currentIsOpen: boolean) => {
-    if (!currentSessionId || !user) return;
+  const syncWithCloud = async () => {
+    if (!sessionId || !user) return;
     try {
-      const res = await fetch(`${BUCKET_URL}?session_id=${currentSessionId}`);
+      const res = await fetch(`${BUCKET_URL}?session_id=${sessionId}`);
       if (!res.ok) return;
       const cloudSession = await res.json();
       if (!cloudSession) return;
 
-      setMessages(cloudSession.messages || []);
+      const newMsgs = cloudSession.messages || [];
+      setMessages((prev) => {
+        if (JSON.stringify(prev) !== JSON.stringify(newMsgs)) {
+          return newMsgs;
+        }
+        return prev;
+      });
+
+      const currentIsOpen = isOpenRef.current;
       setUnreadCount(currentIsOpen ? 0 : (cloudSession.userUnreadCount || 0));
 
       if (currentIsOpen && cloudSession.userUnreadCount > 0) {
@@ -139,18 +152,18 @@ export default function WhatsAppFloat() {
     }
   };
 
-  // 2-second cloud polling sync loop for logged-in users
+  // 5-second cloud polling sync loop for logged-in users
   useEffect(() => {
     if (!sessionId || !user) return;
 
-    syncWithCloud(sessionId, isOpen);
+    syncWithCloud();
 
     const interval = setInterval(() => {
-      syncWithCloud(sessionId, isOpen);
-    }, 2000);
+      syncWithCloud();
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [sessionId, isOpen, user]);
+  }, [sessionId]);
 
   // Auto scroll to bottom
   useEffect(() => {

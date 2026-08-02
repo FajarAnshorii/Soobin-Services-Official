@@ -14,7 +14,7 @@ const row1Partners = [
 ];
 
 const row2Partners = [
-  { name: 'SOOBIN Services', logo: '/logo-soobin.png' },
+  { name: 'SOOBIN Services', logo: '/logo.png' },
   { name: 'TablePlus', logo: '/logo-tableplus.png' },
   { name: 'Google Colab', logo: '/logo-colab.png' },
   { name: 'Google Scholar', logo: '/logo-scholar.png' },
