@@ -79,30 +79,7 @@ const LogoCloud = () => {
           colorTo="#3d7ab5"
         />
 
-        <div className="absolute inset-x-0 top-0 flex -translate-y-1/2 items-center justify-center px-6 z-10">
-          <p
-            className="bg-white border border-slate-200 shadow-md rounded-full px-6 py-2 text-center font-extrabold text-gray-900 text-sm sm:text-base tracking-tight"
-            ref={textRef}
-          >
-            <span
-              ref={waveSpanRef}
-              style={{
-                backgroundImage:
-                  'linear-gradient(90deg, currentColor 0%, currentColor 45%, #1e4d7b 47%, #3d7ab5 50%, #1e4d7b 53%, currentColor 55%, currentColor 100%)',
-                backgroundSize: '250% 100%',
-                backgroundRepeat: 'no-repeat',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundPosition: '0% center',
-              }}
-            >
-              Platform Unlock Dokumen <span className="max-sm:hidden">Termurah & Terlengkap</span>
-            </span>
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-4 py-8 pt-12 px-2">
+        <div className="flex flex-col gap-4 py-6 px-2">
           {/* Row 1: Forward */}
           <Marquee className="[--duration:30s] [--gap:1.25rem]" pauseOnHover>
             <LogoNumerade />
