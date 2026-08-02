@@ -84,6 +84,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                window.addEventListener('error', function(e) {
+                  var isScriptError = e.target && e.target.tagName === 'SCRIPT';
+                  var msg = e.message || '';
+                  if (isScriptError || msg.indexOf('Loading chunk') !== -1 || msg.indexOf('ChunkLoadError') !== -1) {
+                    if (!sessionStorage.getItem('reloaded_chunk_fix')) {
+                      sessionStorage.setItem('reloaded_chunk_fix', '1');
+                      window.location.reload();
+                    }
+                  }
+                }, true);
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <CartProvider>
