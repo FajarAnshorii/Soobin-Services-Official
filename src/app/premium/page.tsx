@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, Gamepad2 } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info } from 'lucide-react';
 
 // Pricing Calculation Rule (User Profit Margin):
 // If supplierPrice < 5,000 perak:
@@ -128,7 +128,24 @@ const allProducts: ProductVariant[] = [
     ],
   },
 
-  // --- ROBLOX / ROBUX VILOG ---
+  // --- APPLE TV & APPLE MUSIC ---
+  {
+    id: 'apple-tv-music',
+    category: 'apple',
+    categoryLabel: 'Apple Services',
+    title: 'Apple TV+ & Apple Music',
+    badge: 'APPLE ECOSYSTEM 🍏',
+    description: 'Nikmati film eksklusif Apple Original & jutaan lagu kualitas Lossless Audio.',
+    options: [
+      { duration: 'Apple TV+ 1 Bulan (Sharing)', supplierPrice: 21000 },
+      { duration: 'Apple Music 1 Bulan (iMessage)', supplierPrice: 7000 },
+      { duration: 'Apple Music 2 Bulan (No Renew)', supplierPrice: 18000 },
+      { duration: 'Apple Music 3 Bulan (No Renew)', supplierPrice: 25000 },
+      { duration: 'Apple Music 4 Bulan (No Renew)', supplierPrice: 30000 },
+    ],
+  },
+
+  // --- ROBLOX / GAMEPASS & ROBUX VILOG ---
   {
     id: 'robux-vilog-login',
     category: 'robux',
@@ -150,6 +167,27 @@ const allProducts: ProductVariant[] = [
     ],
   },
   {
+    id: 'robux-gamepass',
+    category: 'robux',
+    categoryLabel: 'Roblox & Robux',
+    title: 'Robux Gamepass & Gift In Game',
+    badge: 'GAMEPASS & GIFT 🎁',
+    description: 'Settingan Gamepass instan & Gift In Game rate murah Rp 98/Robux.',
+    options: [
+      { duration: '100 Robux GP', supplierPrice: 14600 },
+      { duration: '200 Robux GP', supplierPrice: 28500 },
+      { duration: '300 Robux GP', supplierPrice: 41800 },
+      { duration: '400 Robux GP', supplierPrice: 54500 },
+      { duration: '500 Robux GP', supplierPrice: 69000 },
+      { duration: '600 Robux GP', supplierPrice: 82600 },
+      { duration: '700 Robux GP', supplierPrice: 96200 },
+      { duration: '800 Robux GP', supplierPrice: 109800 },
+      { duration: '900 Robux GP', supplierPrice: 123400 },
+      { duration: '1000 Robux GP', supplierPrice: 137000 },
+      { duration: 'Gift In Game (Per 100 Robux)', supplierPrice: 9800 },
+    ],
+  },
+  {
     id: 'robux-premium-plan',
     category: 'robux',
     categoryLabel: 'Roblox & Robux',
@@ -160,6 +198,25 @@ const allProducts: ProductVariant[] = [
       { duration: '450 Robux + Prem', supplierPrice: 76000 },
       { duration: '1000 Robux + Prem', supplierPrice: 151500 },
       { duration: '2200 Robux + Prem', supplierPrice: 302000 },
+    ],
+  },
+
+  // --- NOKOS & GMAIL ---
+  {
+    id: 'nokos-gmail',
+    category: 'nokos',
+    categoryLabel: 'Nokos & Account',
+    title: 'Nomor Kosong (Nokos) & Gmail',
+    badge: 'VERIFIKASI OTP 📱',
+    description: 'Nokos Telegram, WhatsApp, All App OTP, & akun Gmail fresh terpercaya.',
+    options: [
+      { duration: 'Nokos Tele (Fresh Surel)', supplierPrice: 6000 },
+      { duration: 'Nokos Tele (Non Fresh Surel)', supplierPrice: 5500 },
+      { duration: 'Nokos WA (Garansi 1 Bulan)', supplierPrice: 8000 },
+      { duration: 'Nokos WA (No Garansi)', supplierPrice: 5000 },
+      { duration: 'Nokos All App Verif', supplierPrice: 2000 },
+      { duration: 'Gmail Fresh Account', supplierPrice: 1500 },
+      { duration: 'Gmail Create Email', supplierPrice: 2000 },
     ],
   },
 
@@ -677,7 +734,7 @@ export default function PremiumPage() {
               Layanan Aplikasi Premium
             </h1>
             <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-              Katalog terlengkap Netflix, Robux, Youku, Grammarly, Zoom, YouTube, PicsArt, Remini, iQIYI, & puluhan aplikasi resmi termurah
+              Katalog terlengkap Apple TV, Apple Music, Robux, Nokos, Netflix, YouTube, Canva, & puluhan aplikasi resmi termurah
             </p>
           </motion.div>
         </div>
@@ -692,7 +749,7 @@ export default function PremiumPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari aplikasi (Netflix, Robux, Youku, Grammarly, PicsArt, Remini, Zoom)..."
+                placeholder="Cari aplikasi (Apple TV, Apple Music, Robux, Nokos, Netflix, Canva)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0F1E36] focus:ring-2 focus:ring-[#0F1E36]/10 text-sm transition-all shadow-sm"
@@ -712,11 +769,13 @@ export default function PremiumPage() {
           <div className="flex items-center justify-center gap-2 sm:gap-2 flex-wrap">
             {[
               { id: 'all', label: `Semua (${allProducts.length})` },
+              { id: 'apple', label: 'Apple TV & Music' },
+              { id: 'robux', label: 'Roblox & Gamepass' },
+              { id: 'nokos', label: 'Nokos & Gmail' },
               { id: 'netflix', label: 'Netflix' },
-              { id: 'robux', label: 'Roblox & Robux' },
               { id: 'youtube', label: 'YouTube' },
               { id: 'editing', label: 'Editing Apps' },
-              { id: 'asian-drama', label: 'Asian Drama & Youku' },
+              { id: 'asian-drama', label: 'Asian Drama' },
               { id: 'vpn', label: 'VPN Premium' },
               { id: 'canva', label: 'Canva Pro' },
               { id: 'grammarly', label: 'Grammarly' },
@@ -729,8 +788,6 @@ export default function PremiumPage() {
               { id: 'hbo', label: 'HBO Max' },
               { id: 'vision', label: 'Vision+' },
               { id: 'getcontact', label: 'Get Contact' },
-              { id: 'office', label: 'MS365 / WPS' },
-              { id: 'education', label: 'Edukasi' },
             ].map((cat) => (
               <button
                 key={cat.id}
