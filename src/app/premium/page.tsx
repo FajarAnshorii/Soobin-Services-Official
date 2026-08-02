@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, GraduationCap, Video, Music2, Clapperboard, MonitorPlay } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, Palette, Video, ShieldCheck, Key } from 'lucide-react';
 
 // Pricing Calculation Rule (User Profit Margin):
 // If supplierPrice < 5,000 perak:
@@ -54,7 +54,6 @@ interface ProductVariant {
   badge?: string;
   description: string;
   options: PriceOption[];
-  snk?: string[];
 }
 
 const allProducts: ProductVariant[] = [
@@ -74,7 +73,6 @@ const allProducts: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 13000 },
       { duration: '1 Bulan', supplierPrice: 33000 },
     ],
-    snk: ['Lebih dari 1 bulan menggunakan sistem renew.', 'Utamakan baca SNK sebelum order.', 'Estimasi fixing 3-7 hari, no rush!'],
   },
   {
     id: 'netflix-2u',
@@ -91,7 +89,6 @@ const allProducts: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 11000 },
       { duration: '1 Bulan', supplierPrice: 20000 },
     ],
-    snk: ['Lebih dari 1 bulan menggunakan sistem renew.', 'Utamakan baca SNK sebelum order.', 'Estimasi fixing 3-7 hari, no rush!'],
   },
   {
     id: 'netflix-semi-private',
@@ -105,7 +102,6 @@ const allProducts: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 18000 },
       { duration: '1 Bulan', supplierPrice: 37000 },
     ],
-    snk: ['Lebih dari 1 bulan menggunakan sistem renew.', 'Utamakan baca SNK sebelum order.', 'Estimasi fixing 3-7 hari, no rush!'],
   },
   {
     id: 'netflix-single-screen',
@@ -118,7 +114,6 @@ const allProducts: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 19000 },
       { duration: '1 Bulan', supplierPrice: 40000 },
     ],
-    snk: ['Lebih dari 1 bulan menggunakan sistem renew.', 'Utamakan baca SNK sebelum order.', 'Estimasi fixing 3-7 hari, no rush!'],
   },
   {
     id: 'netflix-private',
@@ -131,7 +126,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Minggu', supplierPrice: 53000 },
       { duration: '1 Bulan', supplierPrice: 145000 },
     ],
-    snk: ['Lebih dari 1 bulan menggunakan sistem renew.', 'Utamakan baca SNK sebelum order.', 'Estimasi fixing 3-7 hari, no rush!'],
   },
 
   // --- YOUTUBE PREMIUM ---
@@ -140,14 +134,13 @@ const allProducts: ProductVariant[] = [
     category: 'youtube',
     categoryLabel: 'YouTube Premium',
     title: 'YouTube Premium Famplan',
-    badge: 'NO ADS & BACKGROUND 🎵',
+    badge: 'NO ADS & MUSIC 🎵',
     description: 'Bebas iklan, putar latar belakang, & YouTube Music Premium.',
     options: [
       { duration: '1 Bulan', supplierPrice: 4000 },
       { duration: '2 Bulan', supplierPrice: 8000 },
       { duration: '3 Bulan', supplierPrice: 12000 },
     ],
-    snk: ['Opsional +2.000 jika menggunakan akun dari seller.'],
   },
   {
     id: 'youtube-indplan',
@@ -166,7 +159,160 @@ const allProducts: ProductVariant[] = [
       { duration: '5 Bulan (Mixplan)', supplierPrice: 48000 },
       { duration: '1 Bulan (Head/Owner)', supplierPrice: 8000 },
     ],
-    snk: ['Opsional +2.000 jika menggunakan akun dari seller.'],
+  },
+
+  // --- EDITING APPS ---
+  {
+    id: 'picsart-gold',
+    category: 'editing',
+    categoryLabel: 'Editing Apps',
+    title: 'PicsArt Gold Premium',
+    badge: 'FOTO & DESAIN 📸',
+    description: 'Buka semua filter gold, stiker premium, & fitur pengeditan AI.',
+    options: [
+      { duration: '1 Minggu (Sharing)', supplierPrice: 4500 },
+      { duration: '1 Bulan (Sharing)', supplierPrice: 7000 },
+      { duration: '1 Bulan (Private)', supplierPrice: 9000 },
+    ],
+  },
+  {
+    id: 'remini-pro',
+    category: 'editing',
+    categoryLabel: 'Editing Apps',
+    title: 'Remini Pro AI Enhancer',
+    badge: 'HD FOTO AI ✨',
+    description: 'Penjernih foto buram otomatis menggunakan AI tingkat tinggi.',
+    options: [
+      { duration: '1 Bulan (Web Sharing)', supplierPrice: 7000 },
+      { duration: '1 Bulan (Web Private)', supplierPrice: 17000 },
+      { duration: '1 Tahun (App Android Only)', supplierPrice: 17000 },
+    ],
+  },
+  {
+    id: 'camscanner-pro',
+    category: 'editing',
+    categoryLabel: 'Editing Apps',
+    title: 'CamScanner Premium Pro',
+    badge: 'SCAN DOKUMEN 📄',
+    description: 'Scan dokumen HD, hapus watermark, OCR teks, & konversi PDF.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 9000 },
+      { duration: '1 Tahun', supplierPrice: 14000 },
+      { duration: '1 Tahun (Private)', supplierPrice: 20000 },
+    ],
+  },
+  {
+    id: 'photo-editing-suite',
+    category: 'editing',
+    categoryLabel: 'Editing Apps',
+    title: 'Lightroom, VSCO, Polarr, Ibis Paint X, OldRoll, Epik, Meitu, Wink',
+    badge: 'EDITING SUITE 🎨',
+    description: 'Aplikasi pengedit foto, preset pro, komik, & kamera retro terlengkap.',
+    options: [
+      { duration: 'Ibis Paint X 1 Tahun (Android)', supplierPrice: 12000 },
+      { duration: 'Polarr 1 Tahun', supplierPrice: 12000 },
+      { duration: 'Lightroom 1 Tahun', supplierPrice: 12000 },
+      { duration: 'VSCO Pro 1 Tahun', supplierPrice: 12000 },
+      { duration: 'OldRoll Lifetime (Android)', supplierPrice: 10000 },
+      { duration: 'Epik 1 Tahun (Android)', supplierPrice: 15000 },
+      { duration: 'Wink VIP 1 Minggu (Android Private)', supplierPrice: 9000 },
+      { duration: 'Meitu VIP 1 Bulan (Android Sharing)', supplierPrice: 14000 },
+      { duration: 'Meitu VIP 1 Bulan (iOS Sharing)', supplierPrice: 17000 },
+      { duration: 'Meitu VIP 1 Minggu (Private)', supplierPrice: 9500 },
+      { duration: 'Meitu VIP 1 Bulan (iOS & Android Private)', supplierPrice: 40000 },
+    ],
+  },
+
+  // --- ASIAN DRAMA & STREAMING ---
+  {
+    id: 'iqiyi-vip',
+    category: 'asian-drama',
+    categoryLabel: 'Asian Drama',
+    title: 'iQIYI VIP Premium',
+    badge: 'DRAMA & ANIME ⛩️',
+    description: 'Nonton Drama China, K-Drama, & Anime dengan subtitle Indonesia kualitas 4K.',
+    options: [
+      { duration: '1 Bulan (Standard Sharing)', supplierPrice: 7000 },
+      { duration: '3 Bulan (Standard Sharing)', supplierPrice: 10000 },
+      { duration: '1 Tahun (Standard Sharing)', supplierPrice: 14000 },
+      { duration: '1 Bulan (Premium Sharing)', supplierPrice: 10000 },
+      { duration: '1 Bulan (Premium Anti Limit)', supplierPrice: 17000 },
+      { duration: '1 Tahun (Premium Sharing)', supplierPrice: 18000 },
+      { duration: '1 Bulan (Standard Private)', supplierPrice: 29000 },
+    ],
+  },
+  {
+    id: 'drakor-dramabox',
+    category: 'asian-drama',
+    categoryLabel: 'Asian Drama',
+    title: 'DrakorID, DramaBox, Viki, MangoTV, Melolo, GagaOOLala',
+    badge: 'FULL ASIAN DRAMA 🎭',
+    description: 'Koleksi lengkap drama Korea, China, drama pendek DramaBox, & sinema Asia.',
+    options: [
+      { duration: 'DrakorID 1 Bulan (Sharing)', supplierPrice: 8000 },
+      { duration: 'DrakorID 3 Bulan (Sharing)', supplierPrice: 14000 },
+      { duration: 'DrakorID 6 Bulan (Sharing)', supplierPrice: 18000 },
+      { duration: 'DrakorID 1 Tahun (Sharing)', supplierPrice: 21000 },
+      { duration: 'DramaBox 1 Bulan (Sharing)', supplierPrice: 11000 },
+      { duration: 'DramaBox 1 Tahun (Sharing Android)', supplierPrice: 30000 },
+      { duration: 'Viki Pass 1 Bulan Standard (Sharing)', supplierPrice: 9000 },
+      { duration: 'Viki Pass 1 Bulan Plus (Sharing)', supplierPrice: 13000 },
+      { duration: 'Viki Pass 1 Bulan Standard (Private)', supplierPrice: 20000 },
+      { duration: 'Viki Pass 1 Bulan Plus (Private)', supplierPrice: 28000 },
+      { duration: 'Mango TV 1 Bulan (Sharing)', supplierPrice: 10000 },
+      { duration: 'Melolo 1 Bulan (Sharing)', supplierPrice: 9000 },
+      { duration: 'Melolo 3 Bulan (Sharing)', supplierPrice: 14000 },
+      { duration: 'Melolo 6 Bulan (Sharing)', supplierPrice: 19000 },
+      { duration: 'Melolo 1 Tahun (Sharing)', supplierPrice: 25000 },
+      { duration: 'GagaOOLala 1 Bulan (Sharing)', supplierPrice: 9000 },
+    ],
+  },
+
+  // --- VPN PREMIUM ---
+  {
+    id: 'vpn-services',
+    category: 'vpn',
+    categoryLabel: 'VPN Premium',
+    title: 'ExpressVPN, NordVPN, Surfshark & HMA VPN',
+    badge: 'KONEKSI AMAN 🛡️',
+    description: 'VPN kecepatan tinggi, proteksi privasi penuh, & bebas unblock situs.',
+    options: [
+      { duration: 'ExpressVPN 1 Bulan (Sharing)', supplierPrice: 8000 },
+      { duration: 'ExpressVPN 1 Bulan (Private)', supplierPrice: 15000 },
+      { duration: 'HMA VPN 1 Bulan (Sharing)', supplierPrice: 8000 },
+      { duration: 'HMA VPN 1 Bulan (Private)', supplierPrice: 15000 },
+      { duration: 'NordVPN 1 Tahun (Sharing)', supplierPrice: 26000 },
+      { duration: 'Surfshark 1 Bulan (Sharing)', supplierPrice: 8000 },
+      { duration: 'Surfshark 2 Bulan (Sharing)', supplierPrice: 14000 },
+      { duration: 'Surfshark 1 Bulan (Private)', supplierPrice: 12000 },
+      { duration: 'Surfshark 2 Bulan (Private)', supplierPrice: 20000 },
+    ],
+  },
+
+  // --- VISION+ ---
+  {
+    id: 'vision-plus',
+    category: 'vision',
+    categoryLabel: 'Vision+',
+    title: 'Vision+ PayTV & BeIN Sports',
+    badge: 'LIVE SPORTS ⚽',
+    description: 'Nonton siaran langsung SPOTV, BeIN Sports 2/4/5, & saluran olahraga.',
+    options: [
+      { duration: '1 Minggu (Private PayTV)', supplierPrice: 9000 },
+      { duration: '1 Bulan (Sharing PayTV)', supplierPrice: 10000 },
+      { duration: '1 Bulan (Private PayTV)', supplierPrice: 15000 },
+    ],
+  },
+
+  // --- GET CONTACT ---
+  {
+    id: 'get-contact',
+    category: 'getcontact',
+    categoryLabel: 'Get Contact',
+    title: 'Get Contact Premium',
+    badge: 'CEK TAG NOMOR 📱',
+    description: 'Cek nama tag kontak HP, proteksi spam call, & pencarian nomor.',
+    options: [{ duration: '1 Bulan (Sharing)', supplierPrice: 10000 }],
   },
 
   // --- CANVA PRO ---
@@ -189,7 +335,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Tahun (Garansi 6 Bulan)', supplierPrice: 10000 },
       { duration: '1 Tahun (Full Garansi)', supplierPrice: 14000 },
     ],
-    snk: ['Renew tiap bulan (kecuali versi Lifetime).', 'Invite langsung ke email Canva milik Anda sendiri.'],
   },
   {
     id: 'canva-admin-owner',
@@ -203,7 +348,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Admin)', supplierPrice: 7000 },
       { duration: '1 Bulan (Owner + Include Acc)', supplierPrice: 14000 },
     ],
-    snk: ['Bisa pakai akun sendiri atau akun dari seller.', 'Tambah Designer +700.'],
   },
 
   // --- SPOTIFY PREMIUM ---
@@ -221,7 +365,6 @@ const allProducts: ProductVariant[] = [
       { duration: '2 Bulan', supplierPrice: 27000 },
       { duration: '3 Bulan', supplierPrice: 38000 },
     ],
-    snk: ['Tanyakan stok ke admin terlebih dahulu.', 'Full garansi Backfree (BF).', 'Perpanjangan (PPJ) bulan ke-4 dst +15k.', '+2.000 jika memakai akun dari seller.'],
   },
   {
     id: 'spotify-indplan',
@@ -239,7 +382,6 @@ const allProducts: ProductVariant[] = [
       { duration: '2 Bulan (Full Warranty)', supplierPrice: 35000 },
       { duration: '3 Bulan (Full Warranty)', supplierPrice: 41000 },
     ],
-    snk: ['Sistem replace jika akun sudah pernah premium.', 'Estimasi proses max 1x24 jam (No Rush).'],
   },
 
   // --- GRAMMARLY ---
@@ -254,7 +396,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9000 },
       { duration: '1 Bulan (Private)', supplierPrice: 29000 },
     ],
-    snk: ['Sangat direkomendasikan untuk penyusunan jurnal & skripsi.'],
   },
 
   // --- QUILLBOT ---
@@ -269,7 +410,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9500 },
       { duration: '1 Bulan (Private)', supplierPrice: 34000 },
     ],
-    snk: ['Garansi aktif penuh selama 1 bulan.'],
   },
 
   // --- MS 365 & WPS PRO ---
@@ -286,7 +426,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan - WPS Pro Sharing', supplierPrice: 9000 },
       { duration: '1 Bulan - WPS Pro Private', supplierPrice: 25000 },
     ],
-    snk: ['Akses fitur cloud & template premium.'],
   },
 
   // --- BRAINLY+ & DUOLINGO ---
@@ -302,7 +441,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan - Duolingo Famhead', supplierPrice: 15000 },
       { duration: '1 Tahun - Brainly+ (Garansi 6 Bulan)', supplierPrice: 17000 },
     ],
-    snk: ['Belajar tanpa gangguan iklan.'],
   },
 
   // --- ZOOM PRO ---
@@ -320,7 +458,6 @@ const allProducts: ProductVariant[] = [
       { duration: '2 Minggu', supplierPrice: 20000 },
       { duration: '1 Bulan', supplierPrice: 25000 },
     ],
-    snk: ['Kapasitas 100 peserta rapat.'],
   },
 
   // --- VIU PREMIUM ---
@@ -342,7 +479,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Tahun (Private Anti Limit)', supplierPrice: 11000 },
       { duration: 'Lifetime (Garansi 6 Bulan)', supplierPrice: 18000 },
     ],
-    snk: ['Tersedia varian anti-limit bebas gangguan.'],
   },
 
   // --- CAPCUT PRO ---
@@ -358,7 +494,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Sharing 3U)', supplierPrice: 22000 },
       { duration: '1 Bulan (Private FullGar)', supplierPrice: 55000 },
     ],
-    snk: ['Akun diprovide oleh seller.', 'Resiko sharing sering limit.', 'Garansi backfree only (bukan limit atau incorrect password).'],
   },
 
   // --- LOKLOK ---
@@ -375,7 +510,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Private Basic)', supplierPrice: 40000 },
       { duration: '1 Bulan (Private Standard Bisa TV)', supplierPrice: 57000 },
     ],
-    snk: ['Tersedia opsi layar Smart TV.'],
   },
 
   // --- VIDIO ---
@@ -390,7 +524,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Hari', supplierPrice: 4500 },
       { duration: '1 Minggu', supplierPrice: 9500 },
     ],
-    snk: ['Dilarang tukar plan jika kesalahan bukan dari seller.', 'Login hanya untuk 1 device.', 'Tanya dulu sebelum beli (no refund!).'],
   },
   {
     id: 'vidio-sharing-month',
@@ -410,7 +543,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Mobile Private)', supplierPrice: 28000 },
       { duration: '1 Bulan (All Device Private)', supplierPrice: 38000 },
     ],
-    snk: ['Login per perangkat sesuai tipe langganan.'],
   },
 
   // --- DISNEY+ ---
@@ -427,7 +559,6 @@ const allProducts: ProductVariant[] = [
       { duration: '7 Hari', supplierPrice: 12000 },
       { duration: '1 Bulan', supplierPrice: 22000 },
     ],
-    snk: ['Sharing 6 User aktif.', 'Utamakan baca SNK sebelum pemesanan.'],
   },
 
   // --- HBO MAX ---
@@ -446,33 +577,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Standard Private)', supplierPrice: 61000 },
       { duration: '1 Bulan (Ultimate Private)', supplierPrice: 88000 },
     ],
-    snk: ['Garansi penuh sesuai durasi langganan.'],
-  },
-
-  // --- CATCHPLAY & CRUNCHYROLL & ALIGHT & AMAZON PRIME ---
-  {
-    id: 'more-streaming-apps',
-    category: 'streaming-others',
-    categoryLabel: 'Streaming & Anime',
-    title: 'Catchplay+, Crunchyroll, Alight & Amazon Prime',
-    badge: 'SERI BERAGAM 🍿',
-    description: 'Koleksi lengkap film bioskop, anime premium, Alight Motion, & Amazon Prime Video.',
-    options: [
-      { duration: 'Catchplay 1 Bulan (Sharing)', supplierPrice: 9000 },
-      { duration: 'Catchplay 6 Bulan (Sharing)', supplierPrice: 12000 },
-      { duration: 'Catchplay 1 Tahun (Sharing)', supplierPrice: 16000 },
-      { duration: 'Crunchyroll 1 Bulan (Sharing)', supplierPrice: 9000 },
-      { duration: 'Crunchyroll 1 Tahun (Sharing)', supplierPrice: 15000 },
-      { duration: 'Alight Motion 1 Bulan (Sharing)', supplierPrice: 5000 },
-      { duration: 'Alight Motion 1 Tahun (Sharing)', supplierPrice: 10000 },
-      { duration: 'Alight Motion 1 Bulan (Private)', supplierPrice: 6000 },
-      { duration: 'Alight Motion 1 Tahun (Private)', supplierPrice: 12000 },
-      { duration: 'Amazon Prime 1 Minggu (Sharing)', supplierPrice: 5000 },
-      { duration: 'Amazon Prime 1 Bulan 4U (Sharing)', supplierPrice: 7000 },
-      { duration: 'Amazon Prime 1 Bulan 2U (Sharing)', supplierPrice: 10000 },
-      { duration: 'Amazon Prime 1 Bulan (Private)', supplierPrice: 18000 },
-    ],
-    snk: ['Proses kilat & garansi aktif penuh.'],
   },
 ];
 
@@ -523,7 +627,7 @@ export default function PremiumPage() {
               Layanan Aplikasi Premium
             </h1>
             <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-              Katalog lengkap Netflix, Grammarly, Zoom, YouTube, Canva, Viu, Spotify, & puluhan aplikasi premium resmi termurah
+              Katalog terlengkap Netflix, Grammarly, Zoom, YouTube, PicsArt, Remini, iQIYI, VPN, & puluhan aplikasi resmi termurah
             </p>
           </motion.div>
         </div>
@@ -538,7 +642,7 @@ export default function PremiumPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari aplikasi premium (Netflix, Grammarly, Zoom, YouTube, Canva, Viu)..."
+                placeholder="Cari aplikasi (Netflix, Grammarly, PicsArt, Remini, Zoom, iQIYI)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0F1E36] focus:ring-2 focus:ring-[#0F1E36]/10 text-sm transition-all shadow-sm"
@@ -560,6 +664,9 @@ export default function PremiumPage() {
               { id: 'all', label: `Semua (${allProducts.length})` },
               { id: 'netflix', label: 'Netflix' },
               { id: 'youtube', label: 'YouTube' },
+              { id: 'editing', label: 'Editing Apps' },
+              { id: 'asian-drama', label: 'Asian Drama' },
+              { id: 'vpn', label: 'VPN Premium' },
               { id: 'canva', label: 'Canva Pro' },
               { id: 'grammarly', label: 'Grammarly' },
               { id: 'quillbot', label: 'QuillBot' },
@@ -569,11 +676,10 @@ export default function PremiumPage() {
               { id: 'vidio', label: 'Vidio' },
               { id: 'disney', label: 'Disney+' },
               { id: 'hbo', label: 'HBO Max' },
-              { id: 'loklok', label: 'Loklok' },
-              { id: 'capcut', label: 'CapCut' },
+              { id: 'vision', label: 'Vision+' },
+              { id: 'getcontact', label: 'Get Contact' },
               { id: 'office', label: 'MS365 / WPS' },
               { id: 'education', label: 'Edukasi' },
-              { id: 'streaming-others', label: 'Lainnya' },
             ].map((cat) => (
               <button
                 key={cat.id}
