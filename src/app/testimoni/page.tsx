@@ -7,7 +7,7 @@ import TestimonialModal from '@/components/modals/TestimonialModal';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Star, MessageCircle, Filter, PlusCircle, Sparkles, UserCheck } from 'lucide-react';
+import { Star, MessageCircle, Filter, PlusCircle, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 
 interface TestimonialData {
@@ -135,7 +135,7 @@ export default function TestimoniPage() {
         <div className="container-custom">
           <motion.div className="text-center flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 flex items-center gap-1.5 backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5" /> Ulasan Realtime Member SOOBIN
+              Ulasan Realtime Member SOOBIN
             </span>
 
             <motion.h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 sm:mb-4 tracking-tight" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
@@ -173,16 +173,6 @@ export default function TestimoniPage() {
       {/* Stats Bar */}
       <section className="bg-white py-6 sm:py-8 border-b border-gray-150 shadow-xs relative">
         <div className="container-custom px-4">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 uppercase tracking-wider">
-              Terkonek Realtime Database Supabase
-            </span>
-          </div>
-
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
             {[
               { value: allTestimonials.length, label: 'Total Testimoni' },
@@ -191,7 +181,7 @@ export default function TestimoniPage() {
               { value: '20.000+', label: 'Mahasiswa Puas' },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center justify-center">
-                <p className={`text-2xl sm:text-3xl font-black ${i === 1 ? 'text-amber-500' : 'text-primary-800'}`}>
+                <p className={`text-2xl sm:text-3xl font-black ${i === 1 ? 'text-slate-900 font-bold' : 'text-primary-800'}`}>
                   {stat.value}
                 </p>
                 <p className="text-gray-500 text-xs sm:text-sm mt-0.5 font-semibold">{stat.label}</p>

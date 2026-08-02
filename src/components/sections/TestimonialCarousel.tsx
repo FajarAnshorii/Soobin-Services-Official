@@ -115,7 +115,7 @@ export default function TestimonialCarousel() {
                 <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
               ))}
             </div>
-            <span className="text-yellow-500 font-bold">4,9</span>
+            <span className="text-slate-900 font-bold">4,9</span>
             <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
             <span className="text-gray-500">Rating</span>
           </div>
