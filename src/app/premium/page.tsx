@@ -462,6 +462,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Meitu VIP Premium',
     badge: 'BEAUTY RETOUCH',
+    logo: '/logos/logo-meitu.png',
     description: 'Filter kecantikan eksklusif, poster komik, & pengeditan foto/video.',
     options: [
       { duration: '1 Bulan (Android Sharing)', supplierPrice: 14000 },
