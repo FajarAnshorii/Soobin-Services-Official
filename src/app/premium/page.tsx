@@ -865,7 +865,6 @@ export default function PremiumPage() {
               { id: 'apple', label: 'Apple TV & Music' },
               { id: 'robux', label: 'Roblox & Gamepass' },
               { id: 'nokos', label: 'Nokos & Gmail' },
-              { id: 'gmail', label: 'Gmail' },
               { id: 'netflix', label: 'Netflix' },
               { id: 'youtube', label: 'YouTube' },
               { id: 'editing', label: 'Editing Apps' },
