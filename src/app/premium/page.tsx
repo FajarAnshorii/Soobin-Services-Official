@@ -63,7 +63,7 @@ const allProducts: ProductVariant[] = [
     category: 'netflix',
     categoryLabel: 'Netflix',
     title: 'Netflix 1 Profile 1 User',
-    badge: 'BEST SELLER 🔥',
+    badge: 'BEST SELLER',
     description: '1 Profile khusus untuk 1 pengguna, tidak berbagi layar dengan pengguna lain.',
     options: [
       { duration: '1 Hari', supplierPrice: 2500 },
@@ -95,7 +95,7 @@ const allProducts: ProductVariant[] = [
     category: 'netflix',
     categoryLabel: 'Netflix',
     title: 'Netflix Semi Private',
-    badge: 'STABIL ✨',
+    badge: 'STABIL',
     description: 'Jumlah user terbatas dan tidak padat untuk pengalaman streaming lancar.',
     options: [
       { duration: '3 Hari', supplierPrice: 9000 },
@@ -108,7 +108,7 @@ const allProducts: ProductVariant[] = [
     category: 'netflix',
     categoryLabel: 'Netflix',
     title: 'Netflix Single Screen',
-    badge: 'SINGLE SCREEN 🖥️',
+    badge: 'SINGLE SCREEN',
     description: 'Layar khusus untuk Anda tanpa terganggu batas screen perangkat lain.',
     options: [
       { duration: '7 Hari', supplierPrice: 19000 },
@@ -120,7 +120,7 @@ const allProducts: ProductVariant[] = [
     category: 'netflix',
     categoryLabel: 'Netflix',
     title: 'Netflix Private Account',
-    badge: 'FULL PRIVATE 👑',
+    badge: 'FULL PRIVATE',
     description: 'Akun utuh milik Anda sendiri! Bebas atur semua profile & PIN.',
     options: [
       { duration: '1 Minggu', supplierPrice: 53000 },
@@ -134,7 +134,7 @@ const allProducts: ProductVariant[] = [
     category: 'apple',
     categoryLabel: 'Apple Services',
     title: 'Apple TV+ & Apple Music',
-    badge: 'APPLE ECOSYSTEM 🍏',
+    badge: 'APPLE ECOSYSTEM',
     description: 'Nikmati film eksklusif Apple Original & jutaan lagu kualitas Lossless Audio.',
     options: [
       { duration: 'Apple TV+ 1 Bulan (Sharing)', supplierPrice: 21000 },
@@ -151,7 +151,7 @@ const allProducts: ProductVariant[] = [
     category: 'robux',
     categoryLabel: 'Roblox & Robux',
     title: 'Robux Vilog (Via Login)',
-    badge: 'TOP UP ROBUX 🎲',
+    badge: 'TOP UP ROBUX',
     description: 'Top up Robux murah via login instan & aman oleh worker terpercaya.',
     options: [
       { duration: '80 Robux', supplierPrice: 15500 },
@@ -171,7 +171,7 @@ const allProducts: ProductVariant[] = [
     category: 'robux',
     categoryLabel: 'Roblox & Robux',
     title: 'Robux Gamepass & Gift In Game',
-    badge: 'GAMEPASS & GIFT 🎁',
+    badge: 'GAMEPASS & GIFT',
     description: 'Settingan Gamepass instan & Gift In Game rate murah Rp 98/Robux.',
     options: [
       { duration: '100 Robux GP', supplierPrice: 14600 },
@@ -192,7 +192,7 @@ const allProducts: ProductVariant[] = [
     category: 'robux',
     categoryLabel: 'Roblox & Robux',
     title: 'Roblox Premium + Robux Bonus',
-    badge: 'PREMIUM BENEFIT 🌟',
+    badge: 'PREMIUM BENEFIT',
     description: 'Dapat bonus 10% Robux, akses item eksklusif avatar, & booster khusus.',
     options: [
       { duration: '450 Robux + Prem', supplierPrice: 76000 },
@@ -207,7 +207,7 @@ const allProducts: ProductVariant[] = [
     category: 'nokos',
     categoryLabel: 'Nokos & Account',
     title: 'Nomor Kosong (Nokos) & Gmail',
-    badge: 'VERIFIKASI OTP 📱',
+    badge: 'VERIFIKASI OTP',
     description: 'Nokos Telegram, WhatsApp, All App OTP, & akun Gmail fresh terpercaya.',
     options: [
       { duration: 'Nokos Tele (Fresh Surel)', supplierPrice: 6000 },
@@ -226,7 +226,7 @@ const allProducts: ProductVariant[] = [
     category: 'asian-drama',
     categoryLabel: 'Asian Drama',
     title: 'Youku VIP Premium',
-    badge: 'C-DRAMA EXCLUSIVE ⛩️',
+    badge: 'C-DRAMA EXCLUSIVE',
     description: 'Nonton drama China eksklusif, anime, & variety show Youku subtitle Indonesia.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -241,7 +241,7 @@ const allProducts: ProductVariant[] = [
     category: 'youtube',
     categoryLabel: 'YouTube Premium',
     title: 'YouTube Premium Famplan',
-    badge: 'NO ADS & MUSIC 🎵',
+    badge: 'NO ADS & MUSIC',
     description: 'Bebas iklan, putar latar belakang, & YouTube Music Premium.',
     options: [
       { duration: '1 Bulan', supplierPrice: 4000 },
@@ -254,7 +254,7 @@ const allProducts: ProductVariant[] = [
     category: 'youtube',
     categoryLabel: 'YouTube Premium',
     title: 'YouTube Premium Indplan & Mix',
-    badge: 'INDIVIDUAL VIP 🔴',
+    badge: 'INDIVIDUAL VIP',
     description: 'Plan individual atau mixplan perpanjangan tanpa ganti-ganti akun.',
     options: [
       { duration: '1 Bulan (Indplan)', supplierPrice: 11000 },
@@ -274,7 +274,7 @@ const allProducts: ProductVariant[] = [
     category: 'editing',
     categoryLabel: 'Editing Apps',
     title: 'PicsArt Gold Premium',
-    badge: 'FOTO & DESAIN 📸',
+    badge: 'FOTO & DESAIN',
     description: 'Buka semua filter gold, stiker premium, & fitur pengeditan AI.',
     options: [
       { duration: '1 Minggu (Sharing)', supplierPrice: 4500 },
@@ -287,7 +287,7 @@ const allProducts: ProductVariant[] = [
     category: 'editing',
     categoryLabel: 'Editing Apps',
     title: 'Remini Pro AI Enhancer',
-    badge: 'HD FOTO AI ✨',
+    badge: 'HD FOTO AI',
     description: 'Penjernih foto buram otomatis menggunakan AI tingkat tinggi.',
     options: [
       { duration: '1 Bulan (Web Sharing)', supplierPrice: 7000 },
@@ -300,7 +300,7 @@ const allProducts: ProductVariant[] = [
     category: 'editing',
     categoryLabel: 'Editing Apps',
     title: 'CamScanner Premium Pro',
-    badge: 'SCAN DOKUMEN 📄',
+    badge: 'SCAN DOKUMEN',
     description: 'Scan dokumen HD, hapus watermark, OCR teks, & konversi PDF.',
     options: [
       { duration: '1 Bulan', supplierPrice: 9000 },
@@ -313,7 +313,7 @@ const allProducts: ProductVariant[] = [
     category: 'editing',
     categoryLabel: 'Editing Apps',
     title: 'Lightroom, VSCO, Polarr, Ibis Paint X, OldRoll, Epik, Meitu, Wink',
-    badge: 'EDITING SUITE 🎨',
+    badge: 'EDITING SUITE',
     description: 'Aplikasi pengedit foto, preset pro, komik, & kamera retro terlengkap.',
     options: [
       { duration: 'Ibis Paint X 1 Tahun (Android)', supplierPrice: 12000 },
@@ -336,7 +336,7 @@ const allProducts: ProductVariant[] = [
     category: 'asian-drama',
     categoryLabel: 'Asian Drama',
     title: 'iQIYI VIP Premium',
-    badge: 'DRAMA & ANIME ⛩️',
+    badge: 'DRAMA & ANIME',
     description: 'Nonton Drama China, K-Drama, & Anime dengan subtitle Indonesia kualitas 4K.',
     options: [
       { duration: '1 Bulan (Standard Sharing)', supplierPrice: 7000 },
@@ -353,7 +353,7 @@ const allProducts: ProductVariant[] = [
     category: 'asian-drama',
     categoryLabel: 'Asian Drama',
     title: 'DrakorID, DramaBox, Viki, MangoTV, Melolo, GagaOOLala',
-    badge: 'FULL ASIAN DRAMA 🎭',
+    badge: 'FULL ASIAN DRAMA',
     description: 'Koleksi lengkap drama Korea, China, drama pendek DramaBox, & sinema Asia.',
     options: [
       { duration: 'DrakorID 1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -381,7 +381,7 @@ const allProducts: ProductVariant[] = [
     category: 'vpn',
     categoryLabel: 'VPN Premium',
     title: 'ExpressVPN, NordVPN, Surfshark & HMA VPN',
-    badge: 'KONEKSI AMAN 🛡️',
+    badge: 'KONEKSI AMAN',
     description: 'VPN kecepatan tinggi, proteksi privasi penuh, & bebas unblock situs.',
     options: [
       { duration: 'ExpressVPN 1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -402,7 +402,7 @@ const allProducts: ProductVariant[] = [
     category: 'vision',
     categoryLabel: 'Vision+',
     title: 'Vision+ PayTV & BeIN Sports',
-    badge: 'LIVE SPORTS ⚽',
+    badge: 'LIVE SPORTS',
     description: 'Nonton siaran langsung SPOTV, BeIN Sports 2/4/5, & saluran olahraga.',
     options: [
       { duration: '1 Minggu (Private PayTV)', supplierPrice: 9000 },
@@ -417,7 +417,7 @@ const allProducts: ProductVariant[] = [
     category: 'getcontact',
     categoryLabel: 'Get Contact',
     title: 'Get Contact Premium',
-    badge: 'CEK TAG NOMOR 📱',
+    badge: 'CEK TAG NOMOR',
     description: 'Cek nama tag kontak HP, proteksi spam call, & pencarian nomor.',
     options: [{ duration: '1 Bulan (Sharing)', supplierPrice: 10000 }],
   },
@@ -428,7 +428,7 @@ const allProducts: ProductVariant[] = [
     category: 'canva',
     categoryLabel: 'Canva Pro',
     title: 'Canva Pro Member Invite',
-    badge: 'DESAIN UNLIMITED 🎨',
+    badge: 'DESAIN UNLIMITED',
     description: 'Akses semua elemen premium, hapus background, & font eksklusif Canva Pro.',
     options: [
       { duration: '1 Hari', supplierPrice: 300 },
@@ -448,7 +448,7 @@ const allProducts: ProductVariant[] = [
     category: 'canva',
     categoryLabel: 'Canva Pro',
     title: 'Canva Pro Admin, Owner & Lifetime',
-    badge: 'TIM OWNER 💼',
+    badge: 'TIM OWNER',
     description: 'Akses tim sendiri, invite anggota tim sesuka hati, atau paket Lifetime.',
     options: [
       { duration: 'Lifetime Edu (Garansi 6 Bulan)', supplierPrice: 11000 },
@@ -463,7 +463,7 @@ const allProducts: ProductVariant[] = [
     category: 'spotify',
     categoryLabel: 'Spotify',
     title: 'Spotify Famplan (Full Warranty)',
-    badge: 'MUSIK TANPA IKLAN 🎵',
+    badge: 'MUSIK TANPA IKLAN',
     description: 'Dengarkan lagu offline tanpa iklan & kualitas suara tertinggi.',
     options: [
       { duration: '7 Hari', supplierPrice: 6500 },
@@ -478,7 +478,7 @@ const allProducts: ProductVariant[] = [
     category: 'spotify',
     categoryLabel: 'Spotify',
     title: 'Spotify Individual Plan',
-    badge: 'INDIVIDUAL VIP 🎧',
+    badge: 'INDIVIDUAL VIP',
     description: 'Plan individual resmi tanpa gabung grup keluarga.',
     options: [
       { duration: '1 Bulan (No Warranty)', supplierPrice: 10000 },
@@ -497,7 +497,7 @@ const allProducts: ProductVariant[] = [
     category: 'grammarly',
     categoryLabel: 'Grammarly',
     title: 'Grammarly Premium',
-    badge: 'AKADEMIK & SKRIPSI 📝',
+    badge: 'AKADEMIK & SKRIPSI',
     description: 'Cek tata bahasa Inggris, kejelasan kalimat, & peningkatan kosakata profesional.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9000 },
@@ -511,7 +511,7 @@ const allProducts: ProductVariant[] = [
     category: 'quillbot',
     categoryLabel: 'QuillBot',
     title: 'QuillBot Premium',
-    badge: 'PARAFRASE AKURAT 🔄',
+    badge: 'PARAFRASE AKURAT',
     description: 'Buka mode parafrase unlimited, plagiarism checker, & pengubah nada tulisan.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9500 },
@@ -525,7 +525,7 @@ const allProducts: ProductVariant[] = [
     category: 'office',
     categoryLabel: 'Office & Document',
     title: 'Microsoft 365 & WPS Office Pro',
-    badge: 'PRODUKTIVITAS 💼',
+    badge: 'PRODUKTIVITAS',
     description: 'Lisensi Word, Excel, PowerPoint, Cloud Storage 1TB, & WPS Office Pro.',
     options: [
       { duration: '1 Bulan - MS365 Standard', supplierPrice: 8000 },
@@ -541,7 +541,7 @@ const allProducts: ProductVariant[] = [
     category: 'education',
     categoryLabel: 'Edukasi & Belajar',
     title: 'Brainly+ & Duolingo Super',
-    badge: 'EDUKASI 🎓',
+    badge: 'EDUKASI',
     description: 'Jawaban verified tanpa iklan di Brainly & belajar bahasa tanpa batas di Duolingo.',
     options: [
       { duration: '1 Bulan - Duolingo Super', supplierPrice: 9000 },
@@ -556,7 +556,7 @@ const allProducts: ProductVariant[] = [
     category: 'zoom',
     categoryLabel: 'Zoom Pro',
     title: 'Zoom Pro (100 Participants)',
-    badge: 'MEETING UNLIMITED 📹',
+    badge: 'MEETING UNLIMITED',
     description: 'Meeting tanpa batas durasi 40 menit & fitur co-host penuh.',
     options: [
       { duration: '1 Jam', supplierPrice: 3000 },
@@ -573,7 +573,7 @@ const allProducts: ProductVariant[] = [
     category: 'viu',
     categoryLabel: 'Viu',
     title: 'Viu Premium (Less Limit & Private Anti Limit)',
-    badge: 'DRAMA KOREA 🎬',
+    badge: 'DRAMA KOREA',
     description: 'Nonton drakor terbaru & variety show Asia tanpa batas.',
     options: [
       { duration: '1 Bulan (Less Limit)', supplierPrice: 2000 },
@@ -594,7 +594,7 @@ const allProducts: ProductVariant[] = [
     category: 'capcut',
     categoryLabel: 'CapCut Pro',
     title: 'CapCut Pro (PC & Mobile)',
-    badge: 'EDIT VIDEO RARE 🎥',
+    badge: 'EDIT VIDEO RARE',
     description: 'Buka efek pro, auto caption, & ekspor 4K tanpa watermark.',
     options: [
       { duration: '1 Minggu (Private)', supplierPrice: 14000 },
@@ -609,7 +609,7 @@ const allProducts: ProductVariant[] = [
     category: 'loklok',
     categoryLabel: 'Loklok',
     title: 'Loklok VIP (Sharing & Private)',
-    badge: 'ANIME & DRAMA 📺',
+    badge: 'ANIME & DRAMA',
     description: 'Streaming film, anime, & serial TV subtitle Indonesia.',
     options: [
       { duration: '1 Bulan (Sharing 3U)', supplierPrice: 17000 },
@@ -625,7 +625,7 @@ const allProducts: ProductVariant[] = [
     category: 'vidio',
     categoryLabel: 'Vidio',
     title: 'Vidio Platinum Sharing Daily (Mobile)',
-    badge: 'LIGA INGGRIS ⚽',
+    badge: 'LIGA INGGRIS',
     description: 'Akses tayangan Platinum Vidio khusus perangkat HP / Tablet.',
     options: [
       { duration: '1 Hari', supplierPrice: 4500 },
@@ -658,7 +658,7 @@ const allProducts: ProductVariant[] = [
     category: 'disney',
     categoryLabel: 'Disney+ Hotstar',
     title: 'Disney+ Hotstar Sharing 6U',
-    badge: 'MARVEL & PIXAR 🦸',
+    badge: 'MARVEL & PIXAR',
     description: 'Nonton film blockbuster Marvel, Disney, Pixar, & Star Wars terlengkap!',
     options: [
       { duration: '1 Hari', supplierPrice: 3500 },
@@ -674,7 +674,7 @@ const allProducts: ProductVariant[] = [
     category: 'hbo',
     categoryLabel: 'HBO Max',
     title: 'HBO Max (Sharing & Private)',
-    badge: 'HOLLYWOOD BLOCKBUSTER 🎬',
+    badge: 'HOLLYWOOD BLOCKBUSTER',
     description: 'Nonton serial eksklusif HBO, House of the Dragon, & film bioskop pilihan.',
     options: [
       { duration: '1 Hari (Sharing)', supplierPrice: 4000 },
