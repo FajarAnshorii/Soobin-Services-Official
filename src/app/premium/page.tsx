@@ -336,6 +336,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'PicsArt Gold Premium',
     badge: 'FOTO & DESAIN',
+    logo: '/logos/logo-picsart.png',
     description: 'Buka semua filter gold, stiker premium, & fitur pengeditan AI.',
     options: [
       { duration: '1 Minggu (Sharing)', supplierPrice: 4500 },
@@ -349,6 +350,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Remini Pro AI Enhancer',
     badge: 'HD FOTO AI',
+    logo: '/logos/logo-remini.png',
     description: 'Penjernih foto buram otomatis menggunakan AI tingkat tinggi.',
     options: [
       { duration: '1 Bulan (Web Sharing)', supplierPrice: 7000 },
@@ -362,6 +364,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'CamScanner Premium Pro',
     badge: 'SCAN DOKUMEN',
+    logo: '/logos/logo-camscanner.png',
     description: 'Scan dokumen HD, hapus watermark, OCR teks, & konversi PDF.',
     options: [
       { duration: '1 Bulan', supplierPrice: 9000 },
@@ -375,6 +378,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Lightroom Pro Premium',
     badge: 'PRESET PRO',
+    logo: '/logos/logo-lightroom.png',
     description: 'Akses preset profesional, fitur masking AI, & pengeditan warna Lightroom.',
     options: [
       { duration: '1 Tahun', supplierPrice: 12000 },
@@ -386,6 +390,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'VSCO Pro Premium',
     badge: 'FILTER RETRO',
+    logo: '/logos/logo-vsco.png',
     description: 'Buka 200+ filter eksklusif, alat pengeditan video, & preset estetik.',
     options: [
       { duration: '1 Tahun', supplierPrice: 12000 },
