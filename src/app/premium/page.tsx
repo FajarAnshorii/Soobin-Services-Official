@@ -402,6 +402,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Polarr Pro Premium',
     badge: 'CUSTOM FILTER',
+    logo: '/logos/logo-polarr.png',
     description: 'Buat & gunakan filter kustom dengan alat pengeditan warna presisi.',
     options: [
       { duration: '1 Tahun', supplierPrice: 12000 },
@@ -413,6 +414,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Ibis Paint X Prime',
     badge: 'DESAIN & KOMIK',
+    logo: '/logos/logo-ibispaint.png',
     description: 'Akses kuas prime, bahan gambar, font eksklusif, & fitur ilustrasi pro.',
     options: [
       { duration: '1 Tahun (Android)', supplierPrice: 12000 },
@@ -424,6 +426,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'OldRoll Vintage Camera',
     badge: 'RETRO CAMERA',
+    logo: '/logos/logo-oldroll.png',
     description: 'Efek kamera analog 8mm & film retro klasik tanpa batas.',
     options: [
       { duration: 'Lifetime (Android)', supplierPrice: 10000 },
@@ -435,6 +438,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Epik AI Photo Editor',
     badge: 'AI PHOTO EDIT',
+    logo: '/logos/logo-epik.png',
     description: 'Pengedit foto AI, buang background, templat pro, & retouch wajah.',
     options: [
       { duration: '1 Tahun (Android)', supplierPrice: 15000 },
@@ -446,6 +450,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'Wink VIP Video Enhancer',
     badge: 'HD VIDEO RETOUCH',
+    logo: '/logos/logo-wink.png',
     description: 'Penjernih video HD, retouch wajah otomatis, & pengeditan kualitas tinggi.',
     options: [
       { duration: '1 Minggu (Android Private)', supplierPrice: 9000 },
