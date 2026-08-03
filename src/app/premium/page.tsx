@@ -479,6 +479,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'iQIYI VIP Premium',
     badge: 'DRAMA & ANIME',
+    logo: '/logos/logo-iqiyi.png',
     description: 'Nonton Drama China, K-Drama, & Anime dengan subtitle Indonesia kualitas 4K.',
     options: [
       { duration: '1 Bulan (Standard Sharing)', supplierPrice: 7000 },
@@ -491,11 +492,25 @@ const allProducts: ProductVariant[] = [
     ],
   },
   {
+    id: 'youku-vip',
+    category: 'asian-drama',
+    categoryLabel: 'Asian Drama',
+    title: 'YOUKU VIP Premium',
+    badge: 'CHINA DRAMA',
+    logo: '/logos/logo-youku.png',
+    description: 'Nonton drama China eksklusif, serial wuxia, & variety show Youku VIP.',
+    options: [
+      { duration: '1 Bulan (Sharing)', supplierPrice: 10000 },
+      { duration: '1 Bulan (Private)', supplierPrice: 20000 },
+    ],
+  },
+  {
     id: 'drakor-id',
     category: 'asian-drama',
     categoryLabel: 'Asian Drama',
     title: 'DrakorID VIP Premium',
     badge: 'DRAMA KOREA',
+    logo: '/logos/logo-drakorid.png',
     description: 'Nonton drama Korea subtitle Indonesia lengkap & update episode tercepat.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -510,6 +525,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'DramaBox VIP Premium',
     badge: 'SHORT DRAMA',
+    logo: '/logos/logo-dramabox.png',
     description: 'Streaming drama pendek populer, miniseri viral, & konten eksklusif.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 11000 },
@@ -522,6 +538,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'Rakuten Viki Pass (Standard & Plus)',
     badge: 'KDRAMA & CDRAMA',
+    logo: '/logos/logo-viki.png',
     description: 'Streaming drama Korea, China, & Taiwan HD tanpa iklan dengan subtitle resmi.',
     options: [
       { duration: '1 Bulan Standard (Sharing)', supplierPrice: 9000 },
