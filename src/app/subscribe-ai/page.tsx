@@ -10,6 +10,16 @@ import { MarqueeLogoScroller } from '@/components/ui/marquee-logo-scroller';
 
 const aiLogos = [
   {
+    src: '/logos/logo-claudecode.png',
+    alt: 'Claude Code AI',
+    gradient: { from: '#d97706', via: '#b45309', to: '#78350f' },
+  },
+  {
+    src: '/logos/logo-hermes.png',
+    alt: 'Hermes Agent AI',
+    gradient: { from: '#000000', via: '#333333', to: '#000000' },
+  },
+  {
     src: '/logos/logo-chatgpt.png',
     alt: 'ChatGPT Plus & Go',
     gradient: { from: '#10a37f', via: '#000000', to: '#10a37f' },
@@ -25,24 +35,9 @@ const aiLogos = [
     gradient: { from: '#20b2aa', via: '#0f172a', to: '#20b2aa' },
   },
   {
-    src: '/logos/logo-claudecode.png',
-    alt: 'Claude Code AI',
-    gradient: { from: '#d97706', via: '#b45309', to: '#78350f' },
-  },
-  {
     src: '/logos/logo-quillbot.png',
     alt: 'QuillBot Premium',
     gradient: { from: '#4f9e4f', via: '#1b4d1b', to: '#4f9e4f' },
-  },
-  {
-    src: '/logos/logo-grammarly.png',
-    alt: 'Grammarly Premium',
-    gradient: { from: '#15c39a', via: '#0f172a', to: '#15c39a' },
-  },
-  {
-    src: '/logos/logo-canva.png',
-    alt: 'Canva Pro',
-    gradient: { from: '#00c4cc', via: '#7d2ae8', to: '#00c4cc' },
   },
 ];
 
@@ -92,7 +87,55 @@ interface AIProduct {
 }
 
 const aiProducts: AIProduct[] = [
-  // 1. CHATGPT PLUS
+  // 1. CLAUDE CODE (TOP LEFT)
+  {
+    id: 'claude-code',
+    category: 'claude',
+    categoryLabel: 'Claude Code',
+    title: 'Claude Code AI',
+    badge: 'AI CODING & DEV',
+    logo: '/logos/logo-claudecode.png',
+    description: 'Akses Claude Code agentic AI coding assistant dengan limit request tinggi & garansi penuh.',
+    features: [
+      'Akses resmi Claude 3.7 Sonnet & Agentic Coding',
+      'Pilihan durasi 14 hari & 30 hari',
+      'Limit request 250, 500, hingga 750 / 5 jam',
+      'Full garansi selama durasi aktif',
+    ],
+    options: [
+      { duration: '14 Hari (250 Req / 5 Jam)', supplierPrice: 43700 },
+      { duration: '14 Hari (500 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '14 Hari (750 Req / 5 Jam)', supplierPrice: 99000 },
+      { duration: '30 Hari (250 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '30 Hari (500 Req / 5 Jam)', supplierPrice: 126000 },
+      { duration: '30 Hari (750 Req / 5 Jam)', supplierPrice: 162000 },
+    ],
+  },
+
+  // 2. HERMES AGENT
+  {
+    id: 'hermes-agent',
+    category: 'hermes',
+    categoryLabel: 'Hermes Agent',
+    title: 'Hermes Agent AI',
+    badge: 'AI AGENT',
+    logo: '/logos/logo-hermes.png',
+    description: 'Akses Hermes Agent AI model canggih dengan kuota token fleksibel & garansi penuh.',
+    features: [
+      'Model AI Hermes Agent & Autonomous Workflows',
+      'Pilihan token 5M, 10M, 20M, hingga 30M Token',
+      'Koneksi cepat, stabil, & legal account',
+      'Full garansi selama masa aktif',
+    ],
+    options: [
+      { duration: '5M Token', supplierPrice: 37050 },
+      { duration: '10M Token', supplierPrice: 65550 },
+      { duration: '20M Token', supplierPrice: 121500 },
+      { duration: '30M Token', supplierPrice: 179100 },
+    ],
+  },
+
+  // 3. CHATGPT PLUS
   {
     id: 'chatgpt-plus',
     category: 'chatgpt',
@@ -219,31 +262,6 @@ const aiProducts: AIProduct[] = [
       { duration: '1 Bulan Private Account', supplierPrice: 34000 },
     ],
   },
-
-  // 6. CLAUDE CODE
-  {
-    id: 'claude-code',
-    category: 'claude',
-    categoryLabel: 'Claude Code',
-    title: 'Claude Code AI',
-    badge: 'AI CODING & DEV',
-    logo: '/logos/logo-claudecode.png',
-    description: 'Akses Claude Code agentic AI coding assistant dengan limit request tinggi & garansi penuh.',
-    features: [
-      'Akses resmi Claude 3.7 Sonnet & Agentic Coding',
-      'Pilihan durasi 14 hari & 30 hari',
-      'Limit request 250, 500, hingga 750 / 5 jam',
-      'Full garansi selama durasi aktif',
-    ],
-    options: [
-      { duration: '14 Hari (250 Req / 5 Jam)', supplierPrice: 43700 },
-      { duration: '14 Hari (500 Req / 5 Jam)', supplierPrice: 76000 },
-      { duration: '14 Hari (750 Req / 5 Jam)', supplierPrice: 99000 },
-      { duration: '30 Hari (250 Req / 5 Jam)', supplierPrice: 76000 },
-      { duration: '30 Hari (500 Req / 5 Jam)', supplierPrice: 126000 },
-      { duration: '30 Hari (750 Req / 5 Jam)', supplierPrice: 162000 },
-    ],
-  },
 ];
 
 export default function SubscribeAIPage() {
@@ -329,11 +347,12 @@ export default function SubscribeAIPage() {
           <div className="flex items-center gap-2 sm:gap-3 min-w-max justify-center">
             {[
               { id: 'all', label: 'Semua AI' },
+              { id: 'claude', label: 'Claude Code' },
+              { id: 'hermes', label: 'Hermes Agent' },
               { id: 'chatgpt', label: 'ChatGPT' },
               { id: 'gemini', label: 'Google Gemini' },
               { id: 'perplexity', label: 'Perplexity AI' },
               { id: 'quillbot', label: 'QuillBot' },
-              { id: 'claude', label: 'Claude Code' },
             ].map((cat) => (
               <button
                 key={cat.id}
