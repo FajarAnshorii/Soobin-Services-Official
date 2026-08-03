@@ -69,6 +69,16 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-youtube.png';
     case 'viu':
       return '/logos/logo-viu.png';
+    case 'vidio':
+      return '/logos/logo-vidio.png';
+    case 'vision':
+      return '/logos/logo-vision.png';
+    case 'getcontact':
+      return '/logos/logo-getcontact.png';
+    case 'spotify':
+      return '/logos/logo-spotify.png';
+    case 'canva':
+      return '/logos/logo-canva.png';
     default:
       return null;
   }
