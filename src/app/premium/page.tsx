@@ -288,6 +288,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'Youku VIP Premium',
     badge: 'C-DRAMA EXCLUSIVE',
+    logo: '/logos/logo-youku.png',
     description: 'Nonton drama China eksklusif, anime, & variety show Youku subtitle Indonesia.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -489,19 +490,6 @@ const allProducts: ProductVariant[] = [
       { duration: '1 Bulan (Premium Anti Limit)', supplierPrice: 17000 },
       { duration: '1 Tahun (Premium Sharing)', supplierPrice: 18000 },
       { duration: '1 Bulan (Standard Private)', supplierPrice: 29000 },
-    ],
-  },
-  {
-    id: 'youku-vip',
-    category: 'asian-drama',
-    categoryLabel: 'Asian Drama',
-    title: 'YOUKU VIP Premium',
-    badge: 'CHINA DRAMA',
-    logo: '/logos/logo-youku.png',
-    description: 'Nonton drama China eksklusif, serial wuxia, & variety show Youku VIP.',
-    options: [
-      { duration: '1 Bulan (Sharing)', supplierPrice: 10000 },
-      { duration: '1 Bulan (Private)', supplierPrice: 20000 },
     ],
   },
   {
