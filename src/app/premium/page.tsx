@@ -92,6 +92,9 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-perplexity.png';
     case 'quillbot':
       return '/logos/logo-quillbot.png';
+    case 'claude':
+    case 'claudecode':
+      return '/logos/logo-claudecode.png';
     default:
       return null;
   }
@@ -180,6 +183,23 @@ const allProducts: ProductVariant[] = [
     options: [
       { duration: '1 Bulan Sharing Account', supplierPrice: 9500 },
       { duration: '1 Bulan Private Account', supplierPrice: 34000 },
+    ],
+  },
+  {
+    id: 'claude-code',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Claude Code AI',
+    badge: 'AI CODING & DEV',
+    logo: '/logos/logo-claudecode.png',
+    description: 'Akses Claude Code agentic AI coding assistant dengan limit request tinggi & garansi penuh.',
+    options: [
+      { duration: '14 Hari (250 Req / 5 Jam)', supplierPrice: 43700 },
+      { duration: '14 Hari (500 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '14 Hari (750 Req / 5 Jam)', supplierPrice: 99000 },
+      { duration: '30 Hari (250 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '30 Hari (500 Req / 5 Jam)', supplierPrice: 126000 },
+      { duration: '30 Hari (750 Req / 5 Jam)', supplierPrice: 162000 },
     ],
   },
 

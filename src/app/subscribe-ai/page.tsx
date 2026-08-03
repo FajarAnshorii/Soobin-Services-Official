@@ -25,6 +25,11 @@ const aiLogos = [
     gradient: { from: '#20b2aa', via: '#0f172a', to: '#20b2aa' },
   },
   {
+    src: '/logos/logo-claudecode.png',
+    alt: 'Claude Code AI',
+    gradient: { from: '#d97706', via: '#b45309', to: '#78350f' },
+  },
+  {
     src: '/logos/logo-quillbot.png',
     alt: 'QuillBot Premium',
     gradient: { from: '#4f9e4f', via: '#1b4d1b', to: '#4f9e4f' },
@@ -214,6 +219,31 @@ const aiProducts: AIProduct[] = [
       { duration: '1 Bulan Private Account', supplierPrice: 34000 },
     ],
   },
+
+  // 6. CLAUDE CODE
+  {
+    id: 'claude-code',
+    category: 'claude',
+    categoryLabel: 'Claude Code',
+    title: 'Claude Code AI',
+    badge: 'AI CODING & DEV',
+    logo: '/logos/logo-claudecode.png',
+    description: 'Akses Claude Code agentic AI coding assistant dengan limit request tinggi & garansi penuh.',
+    features: [
+      'Akses resmi Claude 3.7 Sonnet & Agentic Coding',
+      'Pilihan durasi 14 hari & 30 hari',
+      'Limit request 250, 500, hingga 750 / 5 jam',
+      'Full garansi selama durasi aktif',
+    ],
+    options: [
+      { duration: '14 Hari (250 Req / 5 Jam)', supplierPrice: 43700 },
+      { duration: '14 Hari (500 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '14 Hari (750 Req / 5 Jam)', supplierPrice: 99000 },
+      { duration: '30 Hari (250 Req / 5 Jam)', supplierPrice: 76000 },
+      { duration: '30 Hari (500 Req / 5 Jam)', supplierPrice: 126000 },
+      { duration: '30 Hari (750 Req / 5 Jam)', supplierPrice: 162000 },
+    ],
+  },
 ];
 
 export default function SubscribeAIPage() {
@@ -303,6 +333,7 @@ export default function SubscribeAIPage() {
               { id: 'gemini', label: 'Google Gemini' },
               { id: 'perplexity', label: 'Perplexity AI' },
               { id: 'quillbot', label: 'QuillBot' },
+              { id: 'claude', label: 'Claude Code' },
             ].map((cat) => (
               <button
                 key={cat.id}
