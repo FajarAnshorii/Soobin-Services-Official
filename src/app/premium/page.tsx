@@ -166,18 +166,30 @@ const allProducts: ProductVariant[] = [
 
   // --- APPLE TV & APPLE MUSIC ---
   {
-    id: 'apple-tv-music',
+    id: 'apple-tv',
     category: 'apple',
     categoryLabel: 'Apple Services',
-    title: 'Apple TV+ & Apple Music',
-    badge: 'APPLE ECOSYSTEM',
-    description: 'Nikmati film eksklusif Apple Original & jutaan lagu kualitas Lossless Audio.',
+    title: 'Apple TV+ Premium',
+    badge: 'APPLE ORIGINAL',
+    logo: '/logos/logo-appletv.png',
+    description: 'Nikmati film & serial eksklusif Apple Original kualitas 4K HDR.',
     options: [
-      { duration: 'Apple TV+ 1 Bulan (Sharing)', supplierPrice: 21000 },
-      { duration: 'Apple Music 1 Bulan (iMessage)', supplierPrice: 7000 },
-      { duration: 'Apple Music 2 Bulan (No Renew)', supplierPrice: 18000 },
-      { duration: 'Apple Music 3 Bulan (No Renew)', supplierPrice: 25000 },
-      { duration: 'Apple Music 4 Bulan (No Renew)', supplierPrice: 30000 },
+      { duration: '1 Bulan (Sharing)', supplierPrice: 21000 },
+    ],
+  },
+  {
+    id: 'apple-music',
+    category: 'apple',
+    categoryLabel: 'Apple Services',
+    title: 'Apple Music Premium',
+    badge: 'LOSSLESS AUDIO',
+    logo: '/logos/logo-applemusic.png',
+    description: 'Streaming jutaan lagu resolusi Lossless Audio & Spatial Audio tanpa iklan.',
+    options: [
+      { duration: '1 Bulan (iMessage)', supplierPrice: 7000 },
+      { duration: '2 Bulan (No Renew)', supplierPrice: 18000 },
+      { duration: '3 Bulan (No Renew)', supplierPrice: 25000 },
+      { duration: '4 Bulan (No Renew)', supplierPrice: 30000 },
     ],
   },
 
