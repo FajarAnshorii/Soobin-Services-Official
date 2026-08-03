@@ -332,17 +332,24 @@ export default function SubscribeAIPage() {
                     <label className="block text-xs font-black text-neutral-900 uppercase tracking-wider">
                       PILIH DURASI / PAKET:
                     </label>
-                    <select
-                      value={selectedIndex}
-                      onChange={(e) => handleOptionChange(product.id, Number(e.target.value))}
-                      className="w-full bg-neutral-50 border border-neutral-300 rounded-xl py-3 px-3 text-xs sm:text-sm font-bold text-neutral-900 focus:outline-none focus:border-black"
-                    >
-                      {product.options.map((opt, idx) => (
-                        <option key={idx} value={idx}>
-                          {opt.duration} - {formatRupiah(calculateSellingPrice(opt.supplierPrice))}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={selectedIndex}
+                        onChange={(e) => handleOptionChange(product.id, Number(e.target.value))}
+                        className="w-full bg-neutral-50 border border-neutral-300 rounded-xl py-3.5 pl-4 pr-10 text-xs sm:text-sm font-bold text-neutral-900 focus:outline-none focus:border-black appearance-none cursor-pointer truncate"
+                      >
+                        {product.options.map((opt, idx) => (
+                          <option key={idx} value={idx}>
+                            {opt.duration} - {formatRupiah(calculateSellingPrice(opt.supplierPrice))}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-neutral-700">
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
 
                     {/* Pricing Box - B&W */}
                     <div className="bg-neutral-100 border border-neutral-300 rounded-2xl p-4 flex items-center justify-between">
