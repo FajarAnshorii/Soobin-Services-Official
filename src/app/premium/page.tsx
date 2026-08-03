@@ -13,7 +13,10 @@ import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, I
 //   <= 50k  -> +5.000
 //   <= 100k -> +8.000
 //   > 100k  -> +15.000
-function calculateSellingPrice(supplierPrice: number): number {
+function calculateSellingPrice(supplierPrice: number, customMargin?: number): number {
+  if (customMargin !== undefined) {
+    return supplierPrice + customMargin;
+  }
   if (supplierPrice < 10000) {
     return supplierPrice + 2000;
   } else if (supplierPrice <= 30000) {
@@ -38,6 +41,7 @@ function formatRupiah(amount: number): string {
 interface PriceOption {
   duration: string;
   supplierPrice: number;
+  customMargin?: number;
 }
 
 interface ProductVariant {
@@ -100,6 +104,17 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-hermes.png';
     case 'openclaw':
       return '/logos/logo-openclaw.png';
+    case 'claudepro':
+      return '/logos/logo-claudepro.png';
+    case 'midjourney':
+      return '/logos/logo-midjourney.png';
+    case 'higgsfield':
+      return '/logos/logo-higgsfield.png';
+    case 'jenni':
+    case 'jenniai':
+      return '/logos/logo-jenni.png';
+    case 'scispace':
+      return '/logos/logo-scispace.png';
     default:
       return null;
   }
@@ -122,6 +137,20 @@ const allProducts: ProductVariant[] = [
       { duration: '30 Hari (250 Req / 5 Jam)', supplierPrice: 76000 },
       { duration: '30 Hari (500 Req / 5 Jam)', supplierPrice: 126000 },
       { duration: '30 Hari (750 Req / 5 Jam)', supplierPrice: 162000 },
+    ],
+  },
+  {
+    id: 'claude-pro',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Claude Pro AI',
+    badge: 'ANTHROPIC AI',
+    logo: '/logos/logo-claudepro.png',
+    description: 'Akses Claude 3.7 Sonnet & Opus dengan limit request tinggi, Artifacts, & Projects.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 410130, customMargin: 50000 },
+      { duration: '3 Bulan', supplierPrice: 1220100, customMargin: 50000 },
+      { duration: '6 Bulan', supplierPrice: 2429420, customMargin: 50000 },
     ],
   },
   {
@@ -152,6 +181,63 @@ const allProducts: ProductVariant[] = [
       { duration: '10M Token', supplierPrice: 65550 },
       { duration: '20M Token', supplierPrice: 121500 },
       { duration: '30M Token', supplierPrice: 179100 },
+    ],
+  },
+  {
+    id: 'midjourney-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Midjourney AI',
+    badge: 'AI IMAGE GENERATION',
+    logo: '/logos/logo-midjourney.png',
+    description: 'Generator gambar AI terbaik di dunia dengan kualitas photorealistic & prompt v6.',
+    options: [
+      { duration: 'Midjourney Basic', supplierPrice: 204232, customMargin: 30000 },
+      { duration: 'Midjourney Standard', supplierPrice: 588882, customMargin: 30000 },
+      { duration: 'Midjourney Pro', supplierPrice: 1179920, customMargin: 30000 },
+    ],
+  },
+  {
+    id: 'higgsfield-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Higgsfield AI',
+    badge: 'AI VIDEO & ANIMATION',
+    logo: '/logos/logo-higgsfield.png',
+    description: 'Platform AI video generation & animasi sinematik dengan kontrol kamera presisi.',
+    options: [
+      { duration: 'Higgsfield Basic (5)', supplierPrice: 112308, customMargin: 30000 },
+      { duration: 'Higgsfield Basic (9)', supplierPrice: 189042, customMargin: 30000 },
+      { duration: 'Higgsfield Pro', supplierPrice: 583198, customMargin: 30000 },
+    ],
+  },
+  {
+    id: 'jenni-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Jenni AI Premium',
+    badge: 'ACADEMIC WRITING',
+    logo: '/logos/logo-jenni.png',
+    description: 'Asisten penulis skripsi & karya ilmiah AI dengan sitasi otomatis & autocompletion.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 17500, customMargin: 15000 },
+      { duration: '3 Bulan+', supplierPrice: 29900, customMargin: 15000 },
+      { duration: '6 Bulan+', supplierPrice: 44900, customMargin: 15000 },
+      { duration: '12 Bulan+', supplierPrice: 64900, customMargin: 15000 },
+    ],
+  },
+  {
+    id: 'scispace-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'SciSpace Premium',
+    badge: 'RESEARCH & LITERATURE',
+    logo: '/logos/logo-scispace.png',
+    description: 'Platform riset AI untuk analisis PDF jurnal, penjelasan rumus, & literature review.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 15000, customMargin: 20000 },
+      { duration: '3 Bulan', supplierPrice: 38900, customMargin: 20000 },
+      { duration: '6 Bulan', supplierPrice: 68900, customMargin: 20000 },
     ],
   },
   {
@@ -1228,7 +1314,7 @@ export default function PremiumPage() {
                         Pricelist Durasi:
                       </p>
                       {product.options.map((opt) => {
-                        const sellingPrice = calculateSellingPrice(opt.supplierPrice);
+                        const sellingPrice = calculateSellingPrice(opt.supplierPrice, opt.customMargin);
                         return (
                           <div
                             key={opt.duration}

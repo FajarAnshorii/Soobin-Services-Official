@@ -15,6 +15,11 @@ const aiLogos = [
     gradient: { from: '#d97706', via: '#b45309', to: '#78350f' },
   },
   {
+    src: '/logos/logo-claudepro.png',
+    alt: 'Claude Pro AI',
+    gradient: { from: '#d97706', via: '#000000', to: '#d97706' },
+  },
+  {
     src: '/logos/logo-hermes.png',
     alt: 'Hermes Agent AI',
     gradient: { from: '#000000', via: '#333333', to: '#000000' },
@@ -23,6 +28,26 @@ const aiLogos = [
     src: '/logos/logo-openclaw.png',
     alt: 'OpenClaw AI',
     gradient: { from: '#dc2626', via: '#991b1b', to: '#000000' },
+  },
+  {
+    src: '/logos/logo-midjourney.png',
+    alt: 'Midjourney AI',
+    gradient: { from: '#2563eb', via: '#1e40af', to: '#000000' },
+  },
+  {
+    src: '/logos/logo-higgsfield.png',
+    alt: 'Higgsfield AI',
+    gradient: { from: '#9333ea', via: '#6b21a8', to: '#000000' },
+  },
+  {
+    src: '/logos/logo-jenni.png',
+    alt: 'Jenni AI',
+    gradient: { from: '#0f172a', via: '#334155', to: '#000000' },
+  },
+  {
+    src: '/logos/logo-scispace.png',
+    alt: 'SciSpace AI',
+    gradient: { from: '#0284c7', via: '#ea580c', to: '#0284c7' },
   },
   {
     src: '/logos/logo-chatgpt.png',
@@ -52,7 +77,10 @@ const aiLogos = [
 //   <= 50k  -> +5.000
 //   <= 100k -> +8.000
 //   > 100k  -> +15.000
-function calculateSellingPrice(supplierPrice: number): number {
+function calculateSellingPrice(supplierPrice: number, customMargin?: number): number {
+  if (customMargin !== undefined) {
+    return supplierPrice + customMargin;
+  }
   if (supplierPrice < 10000) {
     return supplierPrice + 2000;
   } else if (supplierPrice <= 30000) {
@@ -77,6 +105,7 @@ function formatRupiah(amount: number): string {
 interface PriceOption {
   duration: string;
   supplierPrice: number;
+  customMargin?: number;
 }
 
 interface AIProduct {
@@ -117,7 +146,29 @@ const aiProducts: AIProduct[] = [
     ],
   },
 
-  // 2. HERMES AGENT
+  // 2. CLAUDE PRO
+  {
+    id: 'claude-pro',
+    category: 'claude',
+    categoryLabel: 'Claude Pro',
+    title: 'Claude Pro AI',
+    badge: 'ANTHROPIC AI',
+    logo: '/logos/logo-claudepro.png',
+    description: 'Akses Claude 3.7 Sonnet & Opus dengan limit request tinggi, Artifacts, & Projects.',
+    features: [
+      'Akses resmi Claude 3.7 Sonnet & Opus',
+      'Fitur Artifacts, Code Generation & Analysis',
+      'Akun resmi & legal account',
+      'Full garansi selama durasi berlangganan',
+    ],
+    options: [
+      { duration: '1 Bulan', supplierPrice: 410130, customMargin: 50000 },
+      { duration: '3 Bulan', supplierPrice: 1220100, customMargin: 50000 },
+      { duration: '6 Bulan', supplierPrice: 2429420, customMargin: 50000 },
+    ],
+  },
+
+  // 3. HERMES AGENT
   {
     id: 'hermes-agent',
     category: 'hermes',
@@ -140,7 +191,7 @@ const aiProducts: AIProduct[] = [
     ],
   },
 
-  // 3. OPEN CLAW
+  // 4. OPEN CLAW
   {
     id: 'open-claw',
     category: 'openclaw',
@@ -160,6 +211,95 @@ const aiProducts: AIProduct[] = [
       { duration: '10M Token', supplierPrice: 65550 },
       { duration: '20M Token', supplierPrice: 121500 },
       { duration: '30M Token', supplierPrice: 179100 },
+    ],
+  },
+
+  // 5. MIDJOURNEY AI
+  {
+    id: 'midjourney-ai',
+    category: 'midjourney',
+    categoryLabel: 'Midjourney',
+    title: 'Midjourney AI',
+    badge: 'AI IMAGE GENERATION',
+    logo: '/logos/logo-midjourney.png',
+    description: 'Generator gambar AI terbaik di dunia dengan kualitas photorealistic & prompt v6.',
+    features: [
+      'Akses Discord & Midjourney Web',
+      'Pilihan paket Basic, Standard, & Pro',
+      'Fast GPU hours & commercial usage rights',
+      'Full garansi selama masa aktif',
+    ],
+    options: [
+      { duration: 'Midjourney Basic', supplierPrice: 204232, customMargin: 30000 },
+      { duration: 'Midjourney Standard', supplierPrice: 588882, customMargin: 30000 },
+      { duration: 'Midjourney Pro', supplierPrice: 1179920, customMargin: 30000 },
+    ],
+  },
+
+  // 6. HIGGSFIELD AI
+  {
+    id: 'higgsfield-ai',
+    category: 'higgsfield',
+    categoryLabel: 'Higgsfield',
+    title: 'Higgsfield AI',
+    badge: 'AI VIDEO & ANIMATION',
+    logo: '/logos/logo-higgsfield.png',
+    description: 'Platform AI video generation & animasi sinematik dengan kontrol kamera presisi.',
+    features: [
+      'Generasi video AI sinematik & gerak kamera',
+      'Pilihan paket Basic (5), Basic (9), & Pro',
+      'High resolution video rendering',
+      'Full garansi selama durasi aktif',
+    ],
+    options: [
+      { duration: 'Higgsfield Basic (5)', supplierPrice: 112308, customMargin: 30000 },
+      { duration: 'Higgsfield Basic (9)', supplierPrice: 189042, customMargin: 30000 },
+      { duration: 'Higgsfield Pro', supplierPrice: 583198, customMargin: 30000 },
+    ],
+  },
+
+  // 7. JENNI AI PREMIUM
+  {
+    id: 'jenni-ai',
+    category: 'jenni',
+    categoryLabel: 'Jenni AI',
+    title: 'Jenni AI Premium',
+    badge: 'ACADEMIC WRITING',
+    logo: '/logos/logo-jenni.png',
+    description: 'Asisten penulis skripsi & karya ilmiah AI dengan sitasi otomatis & autocompletion.',
+    features: [
+      'AI Autocomplete tulisan akademik & jurnal',
+      'Sitasi otomatis APA, MLA, Chicago, Harvard',
+      'Fitur AI Outline & Plagiarism Checker',
+      'Full garansi sesuai durasi pilihan',
+    ],
+    options: [
+      { duration: '1 Bulan', supplierPrice: 17500, customMargin: 15000 },
+      { duration: '3 Bulan+', supplierPrice: 29900, customMargin: 15000 },
+      { duration: '6 Bulan+', supplierPrice: 44900, customMargin: 15000 },
+      { duration: '12 Bulan+', supplierPrice: 64900, customMargin: 15000 },
+    ],
+  },
+
+  // 8. SCISPACE PREMIUM
+  {
+    id: 'scispace-ai',
+    category: 'scispace',
+    categoryLabel: 'SciSpace',
+    title: 'SciSpace Premium',
+    badge: 'RESEARCH & LITERATURE',
+    logo: '/logos/logo-scispace.png',
+    description: 'Platform riset AI untuk analisis PDF jurnal, penjelasan rumus, & literature review.',
+    features: [
+      'Chat dengan PDF jurnal & artikel ilmiah',
+      'Penjelasan rumus matematika & grafik',
+      'Literature review generator otomatis',
+      'Full garansi selama masa aktif',
+    ],
+    options: [
+      { duration: '1 Bulan', supplierPrice: 15000, customMargin: 20000 },
+      { duration: '3 Bulan', supplierPrice: 38900, customMargin: 20000 },
+      { duration: '6 Bulan', supplierPrice: 68900, customMargin: 20000 },
     ],
   },
 
@@ -318,7 +458,7 @@ export default function SubscribeAIPage() {
   const getWhatsAppUrl = (product: AIProduct) => {
     const selectedIndex = selectedOptions[product.id] || 0;
     const option = product.options[selectedIndex];
-    const finalPrice = calculateSellingPrice(option.supplierPrice);
+    const finalPrice = calculateSellingPrice(option.supplierPrice, option.customMargin);
     const message = `Halo SOOBIN Services, saya ingin memesan *${product.title}*\n\n📌 Paket: *${option.duration}*\n💰 Harga: *${formatRupiah(finalPrice)}*\n\nApakah stok masih tersedia? Terima kasih!`;
     return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
   };
@@ -375,9 +515,13 @@ export default function SubscribeAIPage() {
           <div className="flex items-center gap-2 sm:gap-3 min-w-max justify-center">
             {[
               { id: 'all', label: 'Semua AI' },
-              { id: 'claude', label: 'Claude Code' },
+              { id: 'claude', label: 'Claude AI' },
               { id: 'hermes', label: 'Hermes Agent' },
               { id: 'openclaw', label: 'OpenClaw' },
+              { id: 'midjourney', label: 'Midjourney' },
+              { id: 'higgsfield', label: 'Higgsfield' },
+              { id: 'jenni', label: 'Jenni AI' },
+              { id: 'scispace', label: 'SciSpace' },
               { id: 'chatgpt', label: 'ChatGPT' },
               { id: 'gemini', label: 'Google Gemini' },
               { id: 'perplexity', label: 'Perplexity AI' },
@@ -415,7 +559,7 @@ export default function SubscribeAIPage() {
           {filteredProducts.map((product) => {
             const selectedIndex = selectedOptions[product.id] || 0;
             const currentOption = product.options[selectedIndex] || product.options[0];
-            const finalPrice = calculateSellingPrice(currentOption.supplierPrice);
+            const finalPrice = calculateSellingPrice(currentOption.supplierPrice, currentOption.customMargin);
 
             return (
               <motion.div
@@ -476,7 +620,7 @@ export default function SubscribeAIPage() {
                       >
                         {product.options.map((opt, idx) => (
                           <option key={idx} value={idx}>
-                            {opt.duration} - {formatRupiah(calculateSellingPrice(opt.supplierPrice))}
+                            {opt.duration} - {formatRupiah(calculateSellingPrice(opt.supplierPrice, opt.customMargin))}
                           </option>
                         ))}
                       </select>
