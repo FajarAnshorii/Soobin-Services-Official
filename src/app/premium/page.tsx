@@ -553,6 +553,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'MangoTV VIP Premium',
     badge: 'CHINA VARIETY',
+    logo: '/logos/logo-mangotv.png',
     description: 'Nonton drama China, variety show hits, & acara TV Tiongkok terpopuler.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 10000 },
@@ -564,6 +565,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'Melolo VIP Premium',
     badge: 'SHORT MOVIE',
+    logo: '/logos/logo-melolo.png',
     description: 'Platform streaming film pendek & drama serial Asia favorit.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9000 },
@@ -578,6 +580,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Asian Drama',
     title: 'GagaOOLala VIP Premium',
     badge: 'ASIAN CINEMA',
+    logo: '/logos/logo-gagaoolala.png',
     description: 'Layanan streaming film & serial drama inklusif pertama di Asia.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 9000 },
