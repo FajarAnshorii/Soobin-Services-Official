@@ -6,6 +6,40 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
+import { MarqueeLogoScroller } from '@/components/ui/marquee-logo-scroller';
+
+const aiLogos = [
+  {
+    src: '/logos/logo-chatgpt.png',
+    alt: 'ChatGPT Plus & Go',
+    gradient: { from: '#10a37f', via: '#000000', to: '#10a37f' },
+  },
+  {
+    src: '/logos/logo-gemini.png',
+    alt: 'Google Gemini Advanced',
+    gradient: { from: '#4285f4', via: '#9b51e0', to: '#ea4335' },
+  },
+  {
+    src: '/logos/logo-perplexity.png',
+    alt: 'Perplexity Pro AI',
+    gradient: { from: '#20b2aa', via: '#0f172a', to: '#20b2aa' },
+  },
+  {
+    src: '/logos/logo-quillbot.png',
+    alt: 'QuillBot Premium',
+    gradient: { from: '#4f9e4f', via: '#1b4d1b', to: '#4f9e4f' },
+  },
+  {
+    src: '/logos/logo-grammarly.png',
+    alt: 'Grammarly Premium',
+    gradient: { from: '#15c39a', via: '#0f172a', to: '#15c39a' },
+  },
+  {
+    src: '/logos/logo-canva.png',
+    alt: 'Canva Pro',
+    gradient: { from: '#00c4cc', via: '#7d2ae8', to: '#00c4cc' },
+  },
+];
 
 // Pricing Calculation Rule (User Profit Margin):
 //   < 10k   -> +2.000
@@ -284,6 +318,16 @@ export default function SubscribeAIPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Marquee Logo Scroller AI Partners */}
+      <section className="pt-8 pb-2 px-4 container-custom">
+        <MarqueeLogoScroller
+          title="EKOSISTEM AI TERLENGKAP"
+          description="Platform kecerdasan buatan resmi yang tersedia di SOOBIN Services dengan akses instan & garansi penuh."
+          logos={aiLogos}
+          speed="normal"
+        />
       </section>
 
       {/* Product Cards Grid - B&W Clean */}
