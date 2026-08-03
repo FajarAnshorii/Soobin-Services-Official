@@ -390,7 +390,6 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Editing Apps',
     title: 'VSCO Pro Premium',
     badge: 'FILTER RETRO',
-    logo: '/logos/logo-vsco.png',
     description: 'Buka 200+ filter eksklusif, alat pengeditan video, & preset estetik.',
     options: [
       { duration: '1 Tahun', supplierPrice: 12000 },
