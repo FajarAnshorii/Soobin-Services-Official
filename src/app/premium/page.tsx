@@ -443,6 +443,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'VPN Premium',
     title: 'ExpressVPN Premium',
     badge: 'KECEPATAN TINGGI',
+    logo: '/logos/logo-expressvpn.png',
     description: 'VPN kecepatan tinggi, proteksi privasi penuh, & koneksi super lancar.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -455,6 +456,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'VPN Premium',
     title: 'NordVPN Premium',
     badge: 'DOUBLE ENCRYPTION',
+    logo: '/logos/logo-nordvpn.png',
     description: 'Keamanan tingkat tinggi dengan proteksi CyberSec & Double VPN.',
     options: [
       { duration: '1 Tahun (Sharing)', supplierPrice: 26000 },
@@ -466,6 +468,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'VPN Premium',
     title: 'Surfshark VPN Premium',
     badge: 'UNLIMITED DEVICE',
+    logo: '/logos/logo-surfshark.png',
     description: 'Koneksi cepat tanpa batas perangkat & fitur CleanWeb bebas iklan.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
@@ -480,6 +483,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'VPN Premium',
     title: 'HMA VPN Premium',
     badge: 'KONEKSI AMAN',
+    logo: '/logos/logo-hma.png',
     description: 'Proteksi IP global, lokasi server terlengkap, & bebas unblock situs.',
     options: [
       { duration: '1 Bulan (Sharing)', supplierPrice: 8000 },
