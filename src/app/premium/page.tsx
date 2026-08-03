@@ -83,6 +83,15 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-roblox.png';
     case 'gmail':
       return '/logos/logo-gmail.png';
+    case 'chatgpt':
+    case 'gpt':
+      return '/logos/logo-chatgpt.png';
+    case 'gemini':
+      return '/logos/logo-gemini.png';
+    case 'perplexity':
+      return '/logos/logo-perplexity.png';
+    case 'quillbot':
+      return '/logos/logo-quillbot.png';
     default:
       return null;
   }
@@ -96,6 +105,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Subscribe AI',
     title: 'ChatGPT Plus (GPT-4o & Canvas)',
     badge: 'AI TERPOPULER',
+    logo: '/logos/logo-chatgpt.png',
     description: 'Akses GPT-4o, DALL-E 3, Browsing, Advanced Data Analysis, Canvas, & garansi penuh.',
     options: [
       { duration: 'Sharing 8 User - 1 Hari', supplierPrice: 6000 },
@@ -125,6 +135,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Subscribe AI',
     title: 'ChatGPT Go',
     badge: 'FAST & STABLE',
+    logo: '/logos/logo-chatgpt.png',
     description: 'Akses ChatGPT cepat, hemat, full garansi, & akun dari seller.',
     options: [
       { duration: '1 Bulan Sharing (5 User)', supplierPrice: 15000 },
@@ -137,6 +148,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Subscribe AI',
     title: 'Google Gemini Advanced / Ultra',
     badge: 'GOOGLE AI',
+    logo: '/logos/logo-gemini.png',
     description: 'Model AI 1.5 Pro 2M context, Google One 2TB, full garansi.',
     options: [
       { duration: 'Famplan Invite 1 Bulan', supplierPrice: 10000 },
@@ -151,6 +163,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Subscribe AI',
     title: 'Perplexity Pro AI',
     badge: 'RESEARCH AI',
+    logo: '/logos/logo-perplexity.png',
     description: 'Akses Pro Search, Claude 3.5 Sonnet, GPT-4o, legal paid & full garansi.',
     options: [
       { duration: '1 Bulan Sharing Account', supplierPrice: 20000 },
@@ -162,6 +175,7 @@ const allProducts: ProductVariant[] = [
     categoryLabel: 'Subscribe AI',
     title: 'QuillBot Premium',
     badge: 'PARAFRASE UNLIMITED',
+    logo: '/logos/logo-quillbot.png',
     description: 'Buka mode parafrase unlimited, plagiarism checker, & pengubah nada tulisan.',
     options: [
       { duration: '1 Bulan Sharing Account', supplierPrice: 9500 },

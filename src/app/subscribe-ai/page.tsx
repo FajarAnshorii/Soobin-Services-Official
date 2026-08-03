@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -45,6 +46,7 @@ interface AIProduct {
   categoryLabel: string;
   title: string;
   badge: string;
+  logo: string;
   description: string;
   features: string[];
   options: PriceOption[];
@@ -58,6 +60,7 @@ const aiProducts: AIProduct[] = [
     categoryLabel: 'ChatGPT Plus',
     title: 'ChatGPT Plus (GPT-4o & Canvas)',
     badge: 'PALING POPULER',
+    logo: '/logos/logo-chatgpt.png',
     description: 'Akses GPT-4o, DALL-E 3, Browsing, Advanced Data Analysis, Canvas, & garansi penuh.',
     features: [
       'Sharing full garansi backfree & disable',
@@ -100,6 +103,7 @@ const aiProducts: AIProduct[] = [
     categoryLabel: 'ChatGPT Go',
     title: 'ChatGPT Go',
     badge: 'FAST & STABLE',
+    logo: '/logos/logo-chatgpt.png',
     description: 'Akses ChatGPT cepat, hemat, full garansi, & akun dari seller.',
     features: [
       'Full garansi selama masa aktif',
@@ -120,6 +124,7 @@ const aiProducts: AIProduct[] = [
     categoryLabel: 'Google Gemini',
     title: 'Google Gemini Advanced / Ultra',
     badge: 'GOOGLE AI 1.5 PRO',
+    logo: '/logos/logo-gemini.png',
     description: 'Model AI tercanggih Google dengan context window 2M token & Google One 2TB.',
     features: [
       'Full garansi sesuai durasi paket',
@@ -142,6 +147,7 @@ const aiProducts: AIProduct[] = [
     categoryLabel: 'Perplexity AI',
     title: 'Perplexity Pro AI',
     badge: 'RESEARCH & ACADEMIC',
+    logo: '/logos/logo-perplexity.png',
     description: 'Mesin pencari AI dengan Pro Search unlimited, Claude 3.5 Sonnet, & GPT-4o.',
     features: [
       'Full garansi selama masa aktif',
@@ -161,6 +167,7 @@ const aiProducts: AIProduct[] = [
     categoryLabel: 'QuillBot Premium',
     title: 'QuillBot Premium',
     badge: 'PARAFRASE UNLIMITED',
+    logo: '/logos/logo-quillbot.png',
     description: 'Buka semua mode parafrase tanpa batas kata, plagiarism checker, & Grammar Check.',
     features: [
       'Mode parafrase unlimited (Standard, Fluency, Academic, Creative)',
@@ -297,12 +304,18 @@ export default function SubscribeAIPage() {
               >
                 {/* Header Card - Solid Black */}
                 <div className="p-6 bg-black text-white border-b border-neutral-800">
-                  <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div className="bg-white rounded-xl px-3 py-1.5 h-10 border border-neutral-300 flex items-center justify-center shrink-0">
+                      <Image
+                        src={product.logo}
+                        alt={product.title}
+                        width={90}
+                        height={28}
+                        className="h-6 w-auto object-contain"
+                      />
+                    </div>
                     <span className="px-3 py-1 bg-neutral-900 border border-neutral-700 rounded-full text-[10px] font-black uppercase tracking-widest text-neutral-300">
                       {product.badge}
-                    </span>
-                    <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
-                      {product.categoryLabel}
                     </span>
                   </div>
 
