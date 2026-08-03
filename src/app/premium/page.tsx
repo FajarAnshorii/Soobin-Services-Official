@@ -79,6 +79,14 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-spotify.png';
     case 'canva':
       return '/logos/logo-canva.png';
+    case 'zoom':
+      return '/logos/logo-zoom.png';
+    case 'grammarly':
+      return '/logos/logo-grammarly.png';
+    case 'apple':
+      return '/logos/logo-appletv.png';
+    case 'robux':
+      return '/logos/logo-roblox.png';
     default:
       return null;
   }
