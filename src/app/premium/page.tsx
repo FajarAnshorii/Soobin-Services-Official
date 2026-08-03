@@ -52,9 +52,27 @@ interface ProductVariant {
   categoryLabel: string;
   title: string;
   badge?: string;
+  logo?: string;
   description: string;
   options: PriceOption[];
 }
+
+const getCategoryLogo = (category: string): string | null => {
+  switch (category) {
+    case 'netflix':
+      return '/logos/logo-netflix.png';
+    case 'hbo':
+      return '/logos/logo-hbomax.png';
+    case 'disney':
+      return '/logos/logo-disney.png';
+    case 'youtube':
+      return '/logos/logo-youtube.png';
+    case 'viu':
+      return '/logos/logo-viu.png';
+    default:
+      return null;
+  }
+};
 
 const allProducts: ProductVariant[] = [
   // --- NETFLIX ---
@@ -816,22 +834,31 @@ export default function PremiumPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product, idx) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.03, duration: 0.3 }}
-                  className="flex flex-col justify-between rounded-2xl bg-white border border-gray-200 hover:border-primary-800/40 transition-all p-6 shadow-sm hover:shadow-md relative overflow-hidden group"
-                >
-                  {/* Top Badge */}
-                  {product.badge && (
-                    <div className="absolute top-0 right-0">
-                      <span className="bg-[#00C853] text-white text-[10px] font-extrabold px-3 py-1 rounded-bl-xl uppercase tracking-wider shadow-sm">
-                        {product.badge}
-                      </span>
-                    </div>
-                  )}
+              {filteredProducts.map((product, idx) => {
+                const logoUrl = product.logo || getCategoryLogo(product.category);
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.03, duration: 0.3 }}
+                    className="flex flex-col justify-between rounded-2xl bg-white border border-gray-200 hover:border-primary-800/40 transition-all p-6 shadow-sm hover:shadow-md relative overflow-hidden group"
+                  >
+                    {/* Top Badge & Logo */}
+                    {(product.badge || logoUrl) && (
+                      <div className="absolute top-0 right-0 flex items-center shadow-sm rounded-bl-xl overflow-hidden border-b border-l border-gray-200/80">
+                        {logoUrl && (
+                          <div className="bg-white px-2.5 py-1 flex items-center justify-center h-7 border-r border-gray-100">
+                            <img src={logoUrl} alt={product.categoryLabel} className="h-4 w-auto max-w-[55px] object-contain" />
+                          </div>
+                        )}
+                        {product.badge && (
+                          <span className="bg-[#00C853] text-white text-[10px] font-extrabold px-3 py-1 uppercase tracking-wider h-7 flex items-center">
+                            {product.badge}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                   <div>
                     {/* Header Info */}
@@ -894,10 +921,10 @@ export default function PremiumPage() {
                     className="w-full py-3 px-4 rounded-xl bg-[#0F1E36] hover:bg-[#162A4A] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
                   >
                     <MessageCircle className="w-4 h-4 fill-white" />
-                    Pesan {product.title}
                   </button>
                 </motion.div>
-              ))}
+              );
+            })}
             </div>
           )}
         </div>
