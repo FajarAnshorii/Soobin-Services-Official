@@ -785,7 +785,9 @@ export default function PremiumPage() {
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       const matchCategory =
-        selectedCategory === 'all' || product.category === selectedCategory;
+        selectedCategory === 'all' ||
+        product.category === selectedCategory ||
+        (selectedCategory === 'nokos' && (product.category === 'nokos' || product.category === 'gmail'));
       const matchQuery =
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -863,6 +865,7 @@ export default function PremiumPage() {
               { id: 'apple', label: 'Apple TV & Music' },
               { id: 'robux', label: 'Roblox & Gamepass' },
               { id: 'nokos', label: 'Nokos & Gmail' },
+              { id: 'gmail', label: 'Gmail' },
               { id: 'netflix', label: 'Netflix' },
               { id: 'youtube', label: 'YouTube' },
               { id: 'editing', label: 'Editing Apps' },
