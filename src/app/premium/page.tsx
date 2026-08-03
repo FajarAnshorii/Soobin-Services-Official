@@ -739,19 +739,6 @@ const allProducts: ProductVariant[] = [
     ],
   },
 
-  // --- QUILLBOT ---
-  {
-    id: 'quillbot-pro',
-    category: 'quillbot',
-    categoryLabel: 'QuillBot',
-    title: 'QuillBot Premium',
-    badge: 'PARAFRASE AKURAT',
-    description: 'Buka mode parafrase unlimited, plagiarism checker, & pengubah nada tulisan.',
-    options: [
-      { duration: '1 Bulan (Sharing)', supplierPrice: 9500 },
-      { duration: '1 Bulan (Private)', supplierPrice: 34000 },
-    ],
-  },
 
   // --- MS 365 & WPS PRO ---
   {
@@ -1015,7 +1002,6 @@ export default function PremiumPage() {
               { id: 'vpn', label: 'VPN Premium' },
               { id: 'canva', label: 'Canva Pro' },
               { id: 'grammarly', label: 'Grammarly' },
-              { id: 'quillbot', label: 'QuillBot' },
               { id: 'zoom', label: 'Zoom Pro' },
               { id: 'spotify', label: 'Spotify' },
               { id: 'viu', label: 'Viu' },
