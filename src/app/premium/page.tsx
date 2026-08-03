@@ -87,6 +87,8 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-appletv.png';
     case 'robux':
       return '/logos/logo-roblox.png';
+    case 'gmail':
+      return '/logos/logo-gmail.png';
     default:
       return null;
   }
@@ -251,18 +253,29 @@ const allProducts: ProductVariant[] = [
 
   // --- NOKOS & GMAIL ---
   {
-    id: 'nokos-gmail',
+    id: 'nokos-account',
     category: 'nokos',
     categoryLabel: 'Nokos & Account',
-    title: 'Nomor Kosong (Nokos) & Gmail',
+    title: 'Nomor Kosong (Nokos) OTP',
     badge: 'VERIFIKASI OTP',
-    description: 'Nokos Telegram, WhatsApp, All App OTP, & akun Gmail fresh terpercaya.',
+    description: 'Nokos Telegram, WhatsApp, & All App verifikasi OTP instan & aman.',
     options: [
       { duration: 'Nokos Tele (Fresh Surel)', supplierPrice: 6000 },
       { duration: 'Nokos Tele (Non Fresh Surel)', supplierPrice: 5500 },
       { duration: 'Nokos WA (Garansi 1 Bulan)', supplierPrice: 8000 },
       { duration: 'Nokos WA (No Garansi)', supplierPrice: 5000 },
       { duration: 'Nokos All App Verif', supplierPrice: 2000 },
+    ],
+  },
+  {
+    id: 'gmail-account',
+    category: 'gmail',
+    categoryLabel: 'Gmail Account',
+    title: 'Akun Gmail Fresh & Custom',
+    badge: 'AKUN VERIFIED',
+    logo: '/logos/logo-gmail.png',
+    description: 'Akun Gmail fresh terpercaya & opsi pembuatan email custom.',
+    options: [
       { duration: 'Gmail Fresh Account', supplierPrice: 1500 },
       { duration: 'Gmail Create Email', supplierPrice: 2000 },
     ],
