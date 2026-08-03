@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/layanan', label: 'Layanan' },
   { href: '/premium', label: 'Premium' },
+  { href: '/subscribe-ai', label: 'Subscribe AI' },
   { href: '/testimoni', label: 'Testimoni' },
   { href: '/faq', label: 'FAQ' },
 ];

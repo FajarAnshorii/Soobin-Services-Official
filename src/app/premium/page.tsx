@@ -8,26 +8,20 @@ import { motion } from 'framer-motion';
 import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info } from 'lucide-react';
 
 // Pricing Calculation Rule (User Profit Margin):
-// If supplierPrice < 5,000 perak:
-//   <= 1,000 perak -> +500
-//   < 5,000 perak  -> +1,000
-// Standard Rule:
-//   <= 20k   -> +2,000
-//   <= 40k   -> +4,000
-//   <= 100k  -> +5,000
-//   > 100k   -> +15,000
+//   < 10k   -> +2.000
+//   <= 30k  -> +3.000
+//   <= 50k  -> +5.000
+//   <= 100k -> +8.000
+//   > 100k  -> +15.000
 function calculateSellingPrice(supplierPrice: number): number {
-  if (supplierPrice < 5000) {
-    if (supplierPrice <= 1000) return supplierPrice + 500;
-    return supplierPrice + 1000;
-  }
-
-  if (supplierPrice <= 20000) {
+  if (supplierPrice < 10000) {
     return supplierPrice + 2000;
-  } else if (supplierPrice <= 40000) {
-    return supplierPrice + 4000;
-  } else if (supplierPrice <= 100000) {
+  } else if (supplierPrice <= 30000) {
+    return supplierPrice + 3000;
+  } else if (supplierPrice <= 50000) {
     return supplierPrice + 5000;
+  } else if (supplierPrice <= 100000) {
+    return supplierPrice + 8000;
   } else {
     return supplierPrice + 15000;
   }
@@ -95,6 +89,86 @@ const getCategoryLogo = (category: string): string | null => {
 };
 
 const allProducts: ProductVariant[] = [
+  // --- SUBSCRIBE AI ---
+  {
+    id: 'chatgpt-plus',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'ChatGPT Plus (GPT-4o & Canvas)',
+    badge: 'AI TERPOPULER',
+    description: 'Akses GPT-4o, DALL-E 3, Browsing, Advanced Data Analysis, Canvas, & garansi penuh.',
+    options: [
+      { duration: 'Sharing 8 User - 1 Hari', supplierPrice: 6000 },
+      { duration: 'Sharing 8 User - 3 Hari', supplierPrice: 11000 },
+      { duration: 'Sharing 8 User - 7 Hari', supplierPrice: 15000 },
+      { duration: 'Sharing 8 User - 1 Bulan', supplierPrice: 32000 },
+      { duration: 'Sharing 5 User - 1 Hari', supplierPrice: 10000 },
+      { duration: 'Sharing 5 User - 3 Hari', supplierPrice: 16000 },
+      { duration: 'Sharing 5 User - 7 Hari', supplierPrice: 18000 },
+      { duration: 'Sharing 5 User - 1 Bulan', supplierPrice: 38000 },
+      { duration: 'Sharing 3 User - 1 Hari', supplierPrice: 14000 },
+      { duration: 'Sharing 3 User - 3 Hari', supplierPrice: 24000 },
+      { duration: 'Sharing 3 User - 7 Hari', supplierPrice: 32000 },
+      { duration: 'Sharing 3 User - 1 Bulan', supplierPrice: 85000 },
+      { duration: 'Sharing 2 User - 1 Hari', supplierPrice: 19000 },
+      { duration: 'Sharing 2 User - 3 Hari', supplierPrice: 30000 },
+      { duration: 'Sharing 2 User - 7 Hari', supplierPrice: 40000 },
+      { duration: 'Sharing 2 User - 1 Bulan', supplierPrice: 90000 },
+      { duration: 'Private 1 Bulan (Full Garansi)', supplierPrice: 215000 },
+      { duration: 'Private 1 Bulan (Garansi Deactive 1x)', supplierPrice: 120000 },
+      { duration: 'Private 1 Bulan (Garansi Deactive 2x)', supplierPrice: 150000 },
+    ],
+  },
+  {
+    id: 'chatgpt-go',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'ChatGPT Go',
+    badge: 'FAST & STABLE',
+    description: 'Akses ChatGPT cepat, hemat, full garansi, & akun dari seller.',
+    options: [
+      { duration: '1 Bulan Sharing (5 User)', supplierPrice: 15000 },
+      { duration: '1 Bulan Private Account', supplierPrice: 50000 },
+    ],
+  },
+  {
+    id: 'gemini-advanced',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Google Gemini Advanced / Ultra',
+    badge: 'GOOGLE AI',
+    description: 'Model AI 1.5 Pro 2M context, Google One 2TB, full garansi.',
+    options: [
+      { duration: 'Famplan Invite 1 Bulan', supplierPrice: 10000 },
+      { duration: 'Famplan Invite 3 Bulan', supplierPrice: 15000 },
+      { duration: 'Famplan Invite 4 Bulan', supplierPrice: 23000 },
+      { duration: 'Head Account 1 Bulan (Invite 5 Email)', supplierPrice: 20000 },
+    ],
+  },
+  {
+    id: 'perplexity-pro',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Perplexity Pro AI',
+    badge: 'RESEARCH AI',
+    description: 'Akses Pro Search, Claude 3.5 Sonnet, GPT-4o, legal paid & full garansi.',
+    options: [
+      { duration: '1 Bulan Sharing Account', supplierPrice: 20000 },
+    ],
+  },
+  {
+    id: 'quillbot-pro',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'QuillBot Premium',
+    badge: 'PARAFRASE UNLIMITED',
+    description: 'Buka mode parafrase unlimited, plagiarism checker, & pengubah nada tulisan.',
+    options: [
+      { duration: '1 Bulan Sharing Account', supplierPrice: 9500 },
+      { duration: '1 Bulan Private Account', supplierPrice: 34000 },
+    ],
+  },
+
   // --- NETFLIX ---
   {
     id: 'netflix-1u',
@@ -992,6 +1066,7 @@ export default function PremiumPage() {
           <div className="flex items-center justify-center gap-2 sm:gap-2 flex-wrap">
             {[
               { id: 'all', label: `Semua (${allProducts.length})` },
+              { id: 'subscribe-ai', label: 'Subscribe AI' },
               { id: 'apple', label: 'Apple TV & Music' },
               { id: 'robux', label: 'Roblox & Gamepass' },
               { id: 'nokos', label: 'Nokos & Gmail' },
