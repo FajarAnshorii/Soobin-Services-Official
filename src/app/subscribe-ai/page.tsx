@@ -40,6 +40,16 @@ const aiLogos = [
     gradient: { from: '#9333ea', via: '#6b21a8', to: '#000000' },
   },
   {
+    src: '/logos/logo-kling.png',
+    alt: 'Kling AI',
+    gradient: { from: '#06b6d4', via: '#3b82f6', to: '#eab308' },
+  },
+  {
+    src: '/logos/logo-gamma.png',
+    alt: 'Gamma AI',
+    gradient: { from: '#a855f7', via: '#ec4899', to: '#f97316' },
+  },
+  {
     src: '/logos/logo-jenni.png',
     alt: 'Jenni AI',
     gradient: { from: '#0f172a', via: '#334155', to: '#000000' },
@@ -255,6 +265,51 @@ const aiProducts: AIProduct[] = [
       { duration: 'Higgsfield Basic (5)', supplierPrice: 112308, customMargin: 30000 },
       { duration: 'Higgsfield Basic (9)', supplierPrice: 189042, customMargin: 30000 },
       { duration: 'Higgsfield Pro', supplierPrice: 583198, customMargin: 30000 },
+    ],
+  },
+
+  // 7. KLING AI
+  {
+    id: 'kling-ai',
+    category: 'kling',
+    categoryLabel: 'Kling AI',
+    title: 'Kling AI',
+    badge: 'AI VIDEO GENERATION',
+    logo: '/logos/logo-kling.png',
+    description: 'Generator video & animasi AI dengan motion camera control & generasi sinematik 1080p.',
+    features: [
+      'Model Kling AI Video Generator 1080p',
+      'Pilihan paket 660, 1.000, & 5.000 Kredit',
+      'High-speed rendering & commercial rights',
+      'Full garansi selama durasi aktif',
+    ],
+    options: [
+      { duration: '660 Kredit', supplierPrice: 120000, customMargin: 30000 },
+      { duration: '1.000 Kredit', supplierPrice: 195000, customMargin: 30000 },
+      { duration: '5.000 Kredit', supplierPrice: 275000, customMargin: 30000 },
+    ],
+  },
+
+  // 8. GAMMA AI
+  {
+    id: 'gamma-ai',
+    category: 'gamma',
+    categoryLabel: 'Gamma AI',
+    title: 'Gamma AI Plus / Pro',
+    badge: 'AI PRESENTATION & DOCS',
+    logo: '/logos/logo-gamma.png',
+    description: 'Platform AI pembuat slide presentasi, dokumen, & halaman web interaktif serba instan.',
+    features: [
+      'AI Generator Presentasi & Webpage instan',
+      'Export PDF, PPTX, & custom branding',
+      'Unlimited AI credits & premium card template',
+      'Full garansi sesuai durasi pilihan',
+    ],
+    options: [
+      { duration: '1 Bulan', supplierPrice: 25000, customMargin: 10000 },
+      { duration: '2 Bulan', supplierPrice: 50000, customMargin: 15000 },
+      { duration: '3 Bulan', supplierPrice: 75000, customMargin: 20000 },
+      { duration: '4 Bulan', supplierPrice: 100000, customMargin: 30000 },
     ],
   },
 
@@ -520,6 +575,8 @@ export default function SubscribeAIPage() {
               { id: 'openclaw', label: 'OpenClaw' },
               { id: 'midjourney', label: 'Midjourney' },
               { id: 'higgsfield', label: 'Higgsfield' },
+              { id: 'kling', label: 'Kling AI' },
+              { id: 'gamma', label: 'Gamma AI' },
               { id: 'jenni', label: 'Jenni AI' },
               { id: 'scispace', label: 'SciSpace' },
               { id: 'chatgpt', label: 'ChatGPT' },

@@ -115,6 +115,12 @@ const getCategoryLogo = (category: string): string | null => {
       return '/logos/logo-jenni.png';
     case 'scispace':
       return '/logos/logo-scispace.png';
+    case 'kling':
+    case 'klingai':
+      return '/logos/logo-kling.png';
+    case 'gamma':
+    case 'gammaai':
+      return '/logos/logo-gamma.png';
     default:
       return null;
   }
@@ -209,6 +215,35 @@ const allProducts: ProductVariant[] = [
       { duration: 'Higgsfield Basic (5)', supplierPrice: 112308, customMargin: 30000 },
       { duration: 'Higgsfield Basic (9)', supplierPrice: 189042, customMargin: 30000 },
       { duration: 'Higgsfield Pro', supplierPrice: 583198, customMargin: 30000 },
+    ],
+  },
+  {
+    id: 'kling-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Kling AI',
+    badge: 'AI VIDEO GENERATION',
+    logo: '/logos/logo-kling.png',
+    description: 'Generator video & animasi AI dengan motion camera control & generasi sinematik 1080p.',
+    options: [
+      { duration: '660 Kredit', supplierPrice: 120000, customMargin: 30000 },
+      { duration: '1.000 Kredit', supplierPrice: 195000, customMargin: 30000 },
+      { duration: '5.000 Kredit', supplierPrice: 275000, customMargin: 30000 },
+    ],
+  },
+  {
+    id: 'gamma-ai',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'Gamma AI Plus / Pro',
+    badge: 'AI PRESENTATION & DOCS',
+    logo: '/logos/logo-gamma.png',
+    description: 'Platform AI pembuat slide presentasi, dokumen, & halaman web interaktif serba instan.',
+    options: [
+      { duration: '1 Bulan', supplierPrice: 25000, customMargin: 10000 },
+      { duration: '2 Bulan', supplierPrice: 50000, customMargin: 15000 },
+      { duration: '3 Bulan', supplierPrice: 75000, customMargin: 20000 },
+      { duration: '4 Bulan', supplierPrice: 100000, customMargin: 30000 },
     ],
   },
   {
