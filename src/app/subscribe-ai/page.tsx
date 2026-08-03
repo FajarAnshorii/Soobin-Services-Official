@@ -20,6 +20,11 @@ const aiLogos = [
     gradient: { from: '#000000', via: '#333333', to: '#000000' },
   },
   {
+    src: '/logos/logo-openclaw.png',
+    alt: 'OpenClaw AI',
+    gradient: { from: '#dc2626', via: '#991b1b', to: '#000000' },
+  },
+  {
     src: '/logos/logo-chatgpt.png',
     alt: 'ChatGPT Plus & Go',
     gradient: { from: '#10a37f', via: '#000000', to: '#10a37f' },
@@ -135,7 +140,30 @@ const aiProducts: AIProduct[] = [
     ],
   },
 
-  // 3. CHATGPT PLUS
+  // 3. OPEN CLAW
+  {
+    id: 'open-claw',
+    category: 'openclaw',
+    categoryLabel: 'OpenClaw',
+    title: 'OpenClaw AI',
+    badge: 'AI AGENT & SCRAPING',
+    logo: '/logos/logo-openclaw.png',
+    description: 'Akses OpenClaw AI model canggih dengan kuota token fleksibel & garansi penuh.',
+    features: [
+      'Model AI OpenClaw & Web Automation Agent',
+      'Pilihan token 5M, 10M, 20M, hingga 30M Token',
+      'Koneksi cepat, stabil, & legal account',
+      'Full garansi selama masa aktif',
+    ],
+    options: [
+      { duration: '5M Token', supplierPrice: 37050 },
+      { duration: '10M Token', supplierPrice: 65550 },
+      { duration: '20M Token', supplierPrice: 121500 },
+      { duration: '30M Token', supplierPrice: 179100 },
+    ],
+  },
+
+  // 4. CHATGPT PLUS
   {
     id: 'chatgpt-plus',
     category: 'chatgpt',
@@ -349,6 +377,7 @@ export default function SubscribeAIPage() {
               { id: 'all', label: 'Semua AI' },
               { id: 'claude', label: 'Claude Code' },
               { id: 'hermes', label: 'Hermes Agent' },
+              { id: 'openclaw', label: 'OpenClaw' },
               { id: 'chatgpt', label: 'ChatGPT' },
               { id: 'gemini', label: 'Google Gemini' },
               { id: 'perplexity', label: 'Perplexity AI' },

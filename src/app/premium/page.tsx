@@ -98,6 +98,8 @@ const getCategoryLogo = (category: string): string | null => {
     case 'hermes':
     case 'hermesagent':
       return '/logos/logo-hermes.png';
+    case 'openclaw':
+      return '/logos/logo-openclaw.png';
     default:
       return null;
   }
@@ -130,6 +132,21 @@ const allProducts: ProductVariant[] = [
     badge: 'AI AGENT',
     logo: '/logos/logo-hermes.png',
     description: 'Akses Hermes Agent AI model canggih dengan kuota token fleksibel & garansi penuh.',
+    options: [
+      { duration: '5M Token', supplierPrice: 37050 },
+      { duration: '10M Token', supplierPrice: 65550 },
+      { duration: '20M Token', supplierPrice: 121500 },
+      { duration: '30M Token', supplierPrice: 179100 },
+    ],
+  },
+  {
+    id: 'open-claw',
+    category: 'subscribe-ai',
+    categoryLabel: 'Subscribe AI',
+    title: 'OpenClaw AI',
+    badge: 'AI AGENT & SCRAPING',
+    logo: '/logos/logo-openclaw.png',
+    description: 'Akses OpenClaw AI model canggih dengan kuota token fleksibel & garansi penuh.',
     options: [
       { duration: '5M Token', supplierPrice: 37050 },
       { duration: '10M Token', supplierPrice: 65550 },
