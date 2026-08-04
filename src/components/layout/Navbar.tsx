@@ -176,11 +176,13 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden transition-all duration-300 overflow-hidden ${
-          isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+        className={`lg:hidden transition-all duration-300 ${
+          isOpen
+            ? 'max-h-[calc(100vh-80px)] opacity-100 overflow-y-auto'
+            : 'max-h-0 opacity-0 overflow-hidden'
         }`}
       >
-        <div className="bg-white border-t border-gray-100 shadow-lg">
+        <div className="bg-white border-t border-gray-100 shadow-xl pb-8">
           <div className="container-custom py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
