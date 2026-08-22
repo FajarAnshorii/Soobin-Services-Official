@@ -83,11 +83,26 @@ const DEFAULT_SERVICES: ServiceConfig[] = [
   { id: 501, category: 'joki-skripsi', name: 'Bimbingan & Joki Skripsi Full', price: 'Chat Admin', description: 'Pengerjaan bab 1 - 5 lengkap dengan revisi.', badge: 'PROMO' }
 ];
 
-// Helper to get YYYY-MM-DD date key in Asia/Jakarta (WIB) timezone
-const getWIBDateKey = (dateInput?: string | Date | null): string => {
-  if (!dateInput) return '';
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return '';
+// Helper to get YYYY-MM-DD date key in Asia/Jakarta (WIB) timezone with fallback to orderId timestamp
+const getWIBDateKey = (dateInput?: string | Date | null, orderId?: string): string => {
+  let d: Date | null = null;
+  if (dateInput) {
+    const parsed = new Date(dateInput);
+    if (!isNaN(parsed.getTime())) {
+      d = parsed;
+    }
+  }
+  if (!d && orderId) {
+    const match = orderId.match(/\d{10,13}/);
+    if (match) {
+      const ts = parseInt(match[0], 10);
+      const parsedTs = new Date(ts);
+      if (!isNaN(parsedTs.getTime()) && parsedTs.getFullYear() >= 2020) {
+        d = parsedTs;
+      }
+    }
+  }
+  if (!d) return '';
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Jakarta',
     year: 'numeric',
@@ -97,11 +112,26 @@ const getWIBDateKey = (dateInput?: string | Date | null): string => {
 };
 
 // Helper to format full Indonesian date with Day, Date, Month, Year & Time WIB
-const formatFullDateIndonesian = (dateInput?: string | Date | null): string => {
-  if (!dateInput) return '-';
+const formatFullDateIndonesian = (dateInput?: string | Date | null, orderId?: string): string => {
+  let d: Date | null = null;
+  if (dateInput) {
+    const parsed = new Date(dateInput);
+    if (!isNaN(parsed.getTime())) {
+      d = parsed;
+    }
+  }
+  if (!d && orderId) {
+    const match = orderId.match(/\d{10,13}/);
+    if (match) {
+      const ts = parseInt(match[0], 10);
+      const parsedTs = new Date(ts);
+      if (!isNaN(parsedTs.getTime()) && parsedTs.getFullYear() >= 2020) {
+        d = parsedTs;
+      }
+    }
+  }
+  if (!d) return '-';
   try {
-    const d = new Date(dateInput);
-    if (isNaN(d.getTime())) return String(dateInput);
     const dateFormatted = new Intl.DateTimeFormat('id-ID', {
       timeZone: 'Asia/Jakarta',
       weekday: 'long',
@@ -197,11 +227,9 @@ export default function AdminPage() {
   const dayOrderCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
-      if (o.createdAt) {
-        const key = getWIBDateKey(o.createdAt);
-        if (key) {
-          counts[key] = (counts[key] || 0) + 1;
-        }
+      const key = getWIBDateKey(o.createdAt, o.id);
+      if (key) {
+        counts[key] = (counts[key] || 0) + 1;
       }
     });
     return counts;
@@ -212,7 +240,7 @@ export default function AdminPage() {
 
   // Orders filtered by selected date
   const ordersForSelectedDate = useMemo(() => {
-    return orders.filter((o) => getWIBDateKey(o.createdAt) === selectedDateKey);
+    return orders.filter((o) => getWIBDateKey(o.createdAt, o.id) === selectedDateKey);
   }, [orders, selectedDateKey]);
 
   // Verified lunas orders for selected date
@@ -325,7 +353,7 @@ export default function AdminPage() {
     }
   };
 
-  // Sync Orders API
+  // Sync Orders API (Realtime Cloud Supabase)
   const syncOrdersWithCloud = async () => {
     setOrdersLoading(true);
     try {
@@ -339,16 +367,20 @@ export default function AdminPage() {
         }
       }
 
+      // Prioritize cloudOrders from Supabase as absolute source of truth
       const orderMap = new Map<string, OrderItem>();
-      [...cloudOrders, ...localOrders].forEach((item) => {
-        if (item && item.id) {
-          orderMap.set(item.id, item);
-        }
+      localOrders.forEach((item: OrderItem) => {
+        if (item && item.id) orderMap.set(item.id, item);
+      });
+      cloudOrders.forEach((item: OrderItem) => {
+        if (item && item.id) orderMap.set(item.id, item);
       });
 
-      const merged = Array.from(orderMap.values()).sort(
-        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-      );
+      const merged = Array.from(orderMap.values()).sort((a, b) => {
+        const timeA = new Date(a.createdAt || '').getTime() || parseInt(a.id?.replace(/\D/g, '') || '0', 10);
+        const timeB = new Date(b.createdAt || '').getTime() || parseInt(b.id?.replace(/\D/g, '') || '0', 10);
+        return timeB - timeA;
+      });
 
       setOrders(merged);
       localStorage.setItem('soobin_all_orders', JSON.stringify(merged));
@@ -1274,13 +1306,17 @@ export default function AdminPage() {
                               ORD
                             </div>
                             <div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <h3 className="font-black text-sm text-slate-900">{order.customerName}</h3>
                                 <span className="text-[10px] bg-slate-200 text-slate-900 px-2 py-0.5 rounded font-mono border border-slate-400 font-black">
                                   {order.id}
                                 </span>
+                                <span className="text-[11px] font-black text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-slate-300 flex items-center gap-1.5 shadow-2xs">
+                                  <CalendarIcon className="w-3.5 h-3.5 text-slate-900" />
+                                  {formatFullDateIndonesian(order.createdAt, order.id)}
+                                </span>
                               </div>
-                              <p className="text-xs text-slate-900 font-bold">{order.customerEmail}</p>
+                              <p className="text-xs text-slate-900 font-bold mt-0.5">{order.customerEmail}</p>
                             </div>
                           </div>
 
@@ -1302,13 +1338,19 @@ export default function AdminPage() {
 
                         {/* Main Details Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                          <div className="bg-white p-3.5 rounded-xl border border-slate-300 space-y-1 shadow-xs">
+                          <div className="bg-white p-3.5 rounded-xl border border-slate-300 space-y-1.5 shadow-xs">
                             <p className="text-slate-900 font-bold">Jasa Layanan:</p>
                             <p className="font-black text-slate-900 text-sm">{order.serviceName}</p>
                             <p className="text-slate-900 font-black">{order.price}</p>
-                            <p className="text-slate-900 text-[11px] pt-1 font-bold">
-                              Metode: <span className="text-slate-900 font-black">{order.paymentMethod}</span>
-                            </p>
+                            <div className="pt-1 text-[11px] space-y-0.5 border-t border-slate-100">
+                              <p className="text-slate-900 font-bold">
+                                Metode: <span className="text-slate-900 font-black">{order.paymentMethod || 'QRIS / Transfer'}</span>
+                              </p>
+                              <p className="text-slate-700 font-bold flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-slate-600" />
+                                <span>Tanggal: {formatFullDateIndonesian(order.createdAt, order.id)}</span>
+                              </p>
+                            </div>
                           </div>
 
                           <div className="md:col-span-2 bg-white p-3.5 rounded-xl border border-slate-300 space-y-2 shadow-xs">
@@ -1563,7 +1605,7 @@ export default function AdminPage() {
                         <tr key={o.id} className="hover:bg-slate-50 transition-colors">
                           <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
                           <td className="p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
-                            {formatFullDateIndonesian(o.createdAt)}
+                            {formatFullDateIndonesian(o.createdAt, o.id)}
                           </td>
                           <td className="p-3.5">
                             <p className="font-black text-slate-900">{o.customerName}</p>
