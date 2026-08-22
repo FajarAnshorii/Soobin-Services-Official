@@ -3,28 +3,9 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 const BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/BwZ7LSeatW';
 
-// Helper to auto-purge heavy base64 files older than 48 hours (2 days) from Supabase
-async function purgeExpiredOrderFiles() {
-  try {
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    await supabaseAdmin
-      .from('orders')
-      .update({
-        uploaded_file_data: null,
-        proof_image: null,
-      })
-      .lt('created_at', twoDaysAgo);
-  } catch (err) {
-    console.error('Auto-purge expired files error:', err);
-  }
-}
-
 export async function GET() {
   try {
-    // 1. Run Auto-Purge for files older than 2 days (48 hours)
-    await purgeExpiredOrderFiles();
-
-    // 2. Fetch from Supabase Orders Table
+    // 1. Fetch from Supabase Orders Table (Read-Only without mutating database)
     const { data: supaOrders, error } = await supabaseAdmin
       .from('orders')
       .select('*')
@@ -47,8 +28,8 @@ export async function GET() {
           paymentMethod: o.payment_method || o.paymentMethod,
           paymentStatus: o.payment_status || o.paymentStatus,
           customFields: o.custom_fields || o.customFields || {},
-          proofImage: isExpired ? null : (o.proof_image || o.proofImage || null),
-          uploadedFileData: isExpired ? null : (o.uploaded_file_data || o.uploadedFileData || null),
+          proofImage: o.proof_image || o.proofImage || null,
+          uploadedFileData: o.uploaded_file_data || o.uploadedFileData || null,
           uploadedFileName: o.uploaded_file_name || o.uploadedFileName || null,
           createdAt: o.created_at || o.createdAt,
           isFileExpired: isExpired,
@@ -57,7 +38,7 @@ export async function GET() {
       return NextResponse.json(formatted);
     }
 
-    // 3. High-Availability Fallback Bin
+    // 2. High-Availability Fallback Bin
     const res = await fetch(BIN_URL, { cache: 'no-store' });
     if (!res.ok) {
       if (res.status === 404) return NextResponse.json([]);
@@ -74,9 +55,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const newOrder = await request.json();
-
-    // Run Auto-Purge to keep database lean
-    purgeExpiredOrderFiles().catch(console.error);
 
     // Save to Supabase Cloud Database Table
     try {
