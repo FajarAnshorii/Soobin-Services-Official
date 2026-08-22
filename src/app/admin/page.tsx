@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as XLSX from 'xlsx';
+import { Calendar } from '@/components/ui/mini-calendar';
 import {
   Mail, Lock, LogOut, MessageSquare, Shield,
   School, Send, CircleAlert, Headphones,
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
-  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star
+  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon
 } from 'lucide-react';
 
 interface Message {
@@ -81,6 +83,46 @@ const DEFAULT_SERVICES: ServiceConfig[] = [
   { id: 501, category: 'joki-skripsi', name: 'Bimbingan & Joki Skripsi Full', price: 'Chat Admin', description: 'Pengerjaan bab 1 - 5 lengkap dengan revisi.', badge: 'PROMO' }
 ];
 
+// Helper to get YYYY-MM-DD date key in Asia/Jakarta (WIB) timezone
+const getWIBDateKey = (dateInput?: string | Date | null): string => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
+};
+
+// Helper to format full Indonesian date with Day, Date, Month, Year & Time WIB
+const formatFullDateIndonesian = (dateInput?: string | Date | null): string => {
+  if (!dateInput) return '-';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return String(dateInput);
+    const dateFormatted = new Intl.DateTimeFormat('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(d);
+    return `${dateFormatted} WIB`;
+  } catch (e) {
+    return String(dateInput);
+  }
+};
+
+const parsePriceNumber = (priceStr: string): number => {
+  if (!priceStr) return 0;
+  const num = parseInt(priceStr.replace(/[^0-9]/g, ''), 10);
+  return isNaN(num) ? 0 : num;
+};
+
 export default function AdminPage() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
@@ -136,6 +178,10 @@ export default function AdminPage() {
   const [selectedProofImage, setSelectedProofImage] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
+  // Revenue & Calendar Date State
+  const [selectedRevenueDate, setSelectedRevenueDate] = useState<Date>(new Date());
+  const [revenueFilterMode, setRevenueFilterMode] = useState<'daily' | 'all'>('daily');
+
   // Members state & Pagination (50 items per page)
   const [members, setMembers] = useState<MemberUser[]>([]);
   const [memberPage, setMemberPage] = useState(1);
@@ -146,6 +192,51 @@ export default function AdminPage() {
   const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Partial<ServiceConfig>>({});
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  // Compute order counts per day (YYYY-MM-DD -> count) for mini-calendar & daily stats
+  const dayOrderCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    orders.forEach((o) => {
+      if (o.createdAt) {
+        const key = getWIBDateKey(o.createdAt);
+        if (key) {
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      }
+    });
+    return counts;
+  }, [orders]);
+
+  // Selected date key in WIB
+  const selectedDateKey = useMemo(() => getWIBDateKey(selectedRevenueDate), [selectedRevenueDate]);
+
+  // Orders filtered by selected date
+  const ordersForSelectedDate = useMemo(() => {
+    return orders.filter((o) => getWIBDateKey(o.createdAt) === selectedDateKey);
+  }, [orders, selectedDateKey]);
+
+  // Verified lunas orders for selected date
+  const lunasOrdersSelectedDate = useMemo(() => {
+    return ordersForSelectedDate.filter(
+      (o) => o.paymentStatus?.toLowerCase().includes('lunas') || o.paymentStatus?.toLowerCase().includes('terverifikasi')
+    );
+  }, [ordersForSelectedDate]);
+
+  // Revenue total for selected date
+  const revenueForSelectedDate = useMemo(() => {
+    return lunasOrdersSelectedDate.reduce((sum, o) => sum + parsePriceNumber(o.price), 0);
+  }, [lunasOrdersSelectedDate]);
+
+  // Pending & Canceled orders for selected date
+  const pendingOrdersSelectedDate = useMemo(() => {
+    return ordersForSelectedDate.filter(
+      (o) => !o.paymentStatus?.toLowerCase().includes('lunas') && !o.paymentStatus?.toLowerCase().includes('batal')
+    );
+  }, [ordersForSelectedDate]);
+
+  const cancelOrdersSelectedDate = useMemo(() => {
+    return ordersForSelectedDate.filter((o) => o.paymentStatus?.toLowerCase().includes('batal'));
+  }, [ordersForSelectedDate]);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
@@ -467,41 +558,65 @@ export default function AdminPage() {
       }, 0);
   };
 
-  // Export Excel CSV
-  const handleExportExcel = () => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: 'Asia/Jakarta',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    };
-    const wibFormatted = new Intl.DateTimeFormat('id-ID', options).format(now);
-    const monthYearStr = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  // Export Excel (.xlsx) for Selected Date
+  const handleExportDailyExcel = () => {
+    const dateLabel = formatFullDateIndonesian(selectedRevenueDate);
+    const targetOrders = ordersForSelectedDate;
 
-    let csvContent = `LAPORAN PENDAPATAN BULANAN SOOBIN SERVICES\n`;
-    csvContent += `Bulan & Tahun,${monthYearStr}\n`;
-    csvContent += `Waktu Export Realtime,${wibFormatted} WIB\n`;
-    csvContent += `Total Pendapatan Terverifikasi,Rp ${calculateTotalRevenue().toLocaleString('id-ID')}\n\n`;
+    if (targetOrders.length === 0) {
+      alert(`Belum ada transaksi pesanan pada tanggal ${selectedDateKey}`);
+      return;
+    }
 
-    csvContent += `ID Order,Nama Pelanggan,Email Pelanggan,Jenis Jasa Layanan,Harga,Metode Pembayaran,Status Pembayaran,Tanggal Order\n`;
+    const rows = targetOrders.map((o) => ({
+      'ID Order': o.id,
+      'Tanggal, Bulan, Tahun & Waktu': formatFullDateIndonesian(o.createdAt),
+      'Nama Pelanggan': o.customerName,
+      'Email Pelanggan': o.customerEmail,
+      'Layanan': o.serviceName,
+      'Harga': o.price,
+      'Metode Pembayaran': o.paymentMethod,
+      'Status Pembayaran': o.paymentStatus,
+    }));
 
-    orders.forEach((o) => {
-      const dateStr = new Date(o.createdAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-      csvContent += `"${o.id}","${o.customerName}","${o.customerEmail}","${o.serviceName}","${o.price}","${o.paymentMethod}","${o.paymentStatus}","${dateStr} WIB"\n`;
-    });
+    const summaryData = [
+      { 'METRIK': 'LAPORAN PENDAPATAN HARIAN SOOBIN SERVICES', 'NILAI': '' },
+      { 'METRIK': 'Tanggal Laporan', 'NILAI': dateLabel },
+      { 'METRIK': 'Total Pendapatan Terverifikasi', 'NILAI': `Rp ${revenueForSelectedDate.toLocaleString('id-ID')}` },
+      { 'METRIK': 'Total Jumlah Orderan', 'NILAI': `${ordersForSelectedDate.length} Order` },
+      { 'METRIK': 'Order Lunas Terverifikasi', 'NILAI': `${lunasOrdersSelectedDate.length} Order` },
+      { 'METRIK': 'Order Menunggu Verifikasi', 'NILAI': `${pendingOrdersSelectedDate.length} Order` },
+      { 'METRIK': 'Order Dibatalkan', 'NILAI': `${cancelOrdersSelectedDate.length} Order` },
+    ];
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Laporan_Pendapatan_SOOBIN_${monthYearStr.replace(' ', '_')}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const workbook = XLSX.utils.book_new();
+    const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+    const mainSheet = XLSX.utils.json_to_sheet(rows);
+
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Ringkasan Harian');
+    XLSX.utils.book_append_sheet(workbook, mainSheet, `Order_${selectedDateKey}`);
+
+    XLSX.writeFile(workbook, `Laporan_Pendapatan_SOOBIN_Harian_${selectedDateKey}.xlsx`);
+  };
+
+  // Export Excel (.xlsx) for All Orders in Database
+  const handleExportAllExcel = () => {
+    const rows = orders.map((o) => ({
+      'ID Order': o.id,
+      'Tanggal, Bulan, Tahun & Waktu': formatFullDateIndonesian(o.createdAt),
+      'Nama Pelanggan': o.customerName,
+      'Email Pelanggan': o.customerEmail,
+      'Layanan': o.serviceName,
+      'Harga': o.price,
+      'Metode Pembayaran': o.paymentMethod,
+      'Status Pembayaran': o.paymentStatus,
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const mainSheet = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(workbook, mainSheet, 'Semua Orderan Database');
+
+    XLSX.writeFile(workbook, `Laporan_Pendapatan_SOOBIN_Semua_Database.xlsx`);
   };
 
   // Save Service CMS
@@ -1352,83 +1467,314 @@ export default function AdminPage() {
 
           {/* TAB 4: REVENUE & EXCEL REPORT */}
           {activeTab === 'revenue' && (
-            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
+            <div className="space-y-6">
+              {/* Top Banner Header */}
+              <div className="bg-white border border-slate-300 rounded-2xl p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-slate-900" />
-                    Dasbor Pendapatan & Export Laporan Excel
+                    Dasbor Pendapatan Per Hari & Export Laporan Excel
                   </h2>
                   <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Pendapatan hanya bertambah jika pesanan disetujui (`Verifikasi Lunas`). Dilengkapi Export Excel resmi realtime WIB.
+                    Analisis pendapatan harian, riwayat orderan realtime 100% terkoneksi database Supabase, dan export Excel harian / bulanan.
                   </p>
                 </div>
 
-                <button
-                  onClick={handleExportExcel}
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
-                >
-                  <FileSpreadsheet className="w-4 h-4 text-white" />
-                  <span>Export Laporan Excel (.csv)</span>
-                </button>
-              </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={handleExportDailyExcel}
+                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-white" />
+                    <span>Export Excel Tanggal Ini (.xlsx)</span>
+                  </button>
 
-              {/* Total Revenue Stat Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Total Pendapatan Terverifikasi</p>
-                  <p className="text-3xl font-black text-slate-900">
-                    Rp {calculateTotalRevenue().toLocaleString('id-ID')}
-                  </p>
-                  <p className="text-[11px] text-slate-900 font-bold">Otomatis dihitung dari order status Lunas</p>
-                </div>
-
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Total Pesanan Terverifikasi</p>
-                  <p className="text-3xl font-black text-slate-900">
-                    {orders.filter((o) => o.paymentStatus?.toLowerCase().includes('lunas')).length} Order
-                  </p>
-                  <p className="text-[11px] text-slate-900 font-bold">Siap diproses oleh tim admin</p>
-                </div>
-
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Waktu Sistem Realtime</p>
-                  <p className="text-base font-black text-slate-900">
-                    {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                  </p>
-                  <p className="text-[11px] text-slate-900 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
+                  <button
+                    onClick={handleExportAllExcel}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <Download className="w-4 h-4 text-slate-900" />
+                    <span>Export Excel Semua Data</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Itemized Table */}
-              <div className="border border-slate-300 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-slate-100 border-b border-slate-300 font-black text-xs text-slate-900">
-                  Rincian Transaksi Pendapatan Masuk
+              {/* Main Grid: Left Calendar Selector, Right Selected Date Daily Stats */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column: Mini Calendar & Quick Date Controls */}
+                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 className="font-black text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-slate-900" />
+                      Pilih Tanggal Pendapatan
+                    </h3>
+                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
+                      100% Database Realtime
+                    </span>
+                  </div>
+
+                  {/* Quick Jump Buttons */}
+                  <div className="flex items-center justify-between gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <button
+                      onClick={() => setSelectedRevenueDate(new Date())}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date())
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-900 hover:bg-slate-200'
+                      }`}
+                    >
+                      Hari Ini
+                    </button>
+                    <button
+                      onClick={() => setSelectedRevenueDate(new Date(Date.now() + 86400000))}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date(Date.now() + 86400000))
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-900 hover:bg-slate-200'
+                      }`}
+                    >
+                      Besok
+                    </button>
+                    <button
+                      onClick={() => setSelectedRevenueDate(new Date(Date.now() - 86400000))}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date(Date.now() - 86400000))
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-900 hover:bg-slate-200'
+                      }`}
+                    >
+                      Kemarin
+                    </button>
+                  </div>
+
+                  {/* HTML5 Date Input Picker */}
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-black text-slate-900">Pilih dari Kalender Pop-up:</label>
+                    <input
+                      type="date"
+                      value={selectedDateKey}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setSelectedRevenueDate(new Date(e.target.value));
+                        }
+                      }}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-black focus:outline-none focus:border-slate-900 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Integrated Mini Calendar Component */}
+                  <div className="pt-1">
+                    <Calendar
+                      selectedDate={selectedRevenueDate}
+                      onSelectDate={(d) => setSelectedRevenueDate(d)}
+                      dayOrderCounts={dayOrderCounts}
+                    />
+                  </div>
+
+                  <div className="p-3 bg-slate-50 border border-slate-300 rounded-xl text-[11px] text-slate-900 font-bold leading-relaxed">
+                    💡 <span className="font-black">Petunjuk:</span> Klik tanggal pada kalender di atas untuk melihat total pendapatan dan jumlah orderan pada hari tersebut secara terpisah.
+                  </div>
                 </div>
-                <table className="w-full text-left text-xs text-slate-900">
-                  <thead className="bg-white text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
-                    <tr>
-                      <th className="p-3.5">ID Order</th>
-                      <th className="p-3.5">Pelanggan</th>
-                      <th className="p-3.5">Layanan</th>
-                      <th className="p-3.5">Harga</th>
-                      <th className="p-3.5">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
-                    {orders
-                      .filter((o) => o.paymentStatus?.toLowerCase().includes('lunas'))
-                      .map((o) => (
-                        <tr key={o.id} className="hover:bg-slate-50">
-                          <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
-                          <td className="p-3.5 font-black text-slate-900">{o.customerName}</td>
-                          <td className="p-3.5 text-slate-900 font-bold">{o.serviceName}</td>
-                          <td className="p-3.5 font-black text-slate-900">{o.price}</td>
-                          <td className="p-3.5 font-black text-slate-900">Terverifikasi Lunas</td>
+
+                {/* Right Column: Daily Revenue Stats & Summary for Selected Date */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Selected Date Header Card */}
+                  <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-4 shadow-xs">
+                    <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Laporan Statistik Harian</span>
+                        <h3 className="text-lg font-black text-slate-900 capitalize">
+                          {formatFullDateIndonesian(selectedRevenueDate).split('•')[0]}
+                        </h3>
+                      </div>
+                      <span className="text-xs font-mono font-black text-slate-900 bg-slate-100 border border-slate-300 px-3 py-1 rounded-xl">
+                        Kode Tanggal: {selectedDateKey}
+                      </span>
+                    </div>
+
+                    {/* Daily Stat Cards Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
+                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Pendapatan Tanggal Ini</p>
+                        <p className="text-2xl font-black text-slate-900">
+                          Rp {revenueForSelectedDate.toLocaleString('id-ID')}
+                        </p>
+                        <p className="text-[10px] text-slate-700 font-bold">
+                          {lunasOrdersSelectedDate.length} Order Status Lunas
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
+                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Total Orderan Tanggal Ini</p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {ordersForSelectedDate.length} Order
+                        </p>
+                        <p className="text-[10px] text-slate-700 font-bold">
+                          {pendingOrdersSelectedDate.length} Menunggu • {cancelOrdersSelectedDate.length} Batal
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
+                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Status Database</p>
+                        <p className="text-sm font-black text-emerald-800 flex items-center gap-1.5 pt-1">
+                          <CheckCircle className="w-4 h-4 text-emerald-800" />
+                          Terhubung 100% Realtime
+                        </p>
+                        <p className="text-[10px] text-slate-700 font-bold pt-0.5">
+                          Tersimpan otomatis di Supabase
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={handleExportDailyExcel}
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs"
+                      >
+                        <FileSpreadsheet className="w-4 h-4" />
+                        <span>Unduh Excel Tanggal Ini ({selectedDateKey})</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* All-Time Overall KPI Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
+                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Pendapatan Keseluruhan</p>
+                      <p className="text-xl font-black text-slate-900">
+                        Rp {calculateTotalRevenue().toLocaleString('id-ID')}
+                      </p>
+                      <p className="text-[10px] text-slate-700 font-bold">Semua transaksi Lunas</p>
+                    </div>
+
+                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
+                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Pesanan Keseluruhan</p>
+                      <p className="text-xl font-black text-slate-900">{orders.length} Order</p>
+                      <p className="text-[10px] text-slate-700 font-bold">Semua data riwayat</p>
+                    </div>
+
+                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
+                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Member Terdaftar</p>
+                      <p className="text-xl font-black text-slate-900">{members.length} Member</p>
+                      <p className="text-[10px] text-slate-700 font-bold">Format MBR-0001 dst.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Itemized Order History Table with Filter Switcher */}
+              <div className="bg-white border border-slate-300 rounded-2xl overflow-hidden shadow-xs space-y-0">
+                <div className="p-4 bg-slate-50 border-b border-slate-300 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-slate-900" />
+                      Riwayat Transaksi Order (Lengkap Tanggal, Bulan, Tahun & Jam)
+                    </h3>
+                    <p className="text-xs text-slate-700 font-bold mt-0.5">
+                      Menampilkan transaksi orderan realtime yang tersimpan 100% di database cloud Supabase.
+                    </p>
+                  </div>
+
+                  {/* Filter Switcher */}
+                  <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-300 shadow-xs">
+                    <button
+                      onClick={() => setRevenueFilterMode('daily')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer ${
+                        revenueFilterMode === 'daily'
+                          ? 'bg-slate-900 text-white'
+                          : 'text-slate-900 hover:bg-slate-100'
+                      }`}
+                    >
+                      Tanggal Ini ({ordersForSelectedDate.length})
+                    </button>
+                    <button
+                      onClick={() => setRevenueFilterMode('all')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer ${
+                        revenueFilterMode === 'all'
+                          ? 'bg-slate-900 text-white'
+                          : 'text-slate-900 hover:bg-slate-100'
+                      }`}
+                    >
+                      Semua Order ({orders.length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-900">
+                    <thead className="bg-slate-100 text-slate-900 font-black text-[10px] uppercase tracking-wider border-b border-slate-300">
+                      <tr>
+                        <th className="p-3.5">ID Order</th>
+                        <th className="p-3.5">Tanggal, Bulan, Tahun & Jam (WIB)</th>
+                        <th className="p-3.5">Pelanggan</th>
+                        <th className="p-3.5">Layanan</th>
+                        <th className="p-3.5">Harga</th>
+                        <th className="p-3.5">Metode</th>
+                        <th className="p-3.5">Status Pembayaran</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 bg-white">
+                      {(revenueFilterMode === 'daily' ? ordersForSelectedDate : orders).length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-12 text-center text-slate-700 bg-slate-50">
+                            <ShoppingBag className="w-10 h-10 mx-auto mb-2 text-slate-400" />
+                            <p className="font-black text-sm text-slate-900">
+                              {revenueFilterMode === 'daily'
+                                ? `Belum ada pesanan masuk pada tanggal ${formatFullDateIndonesian(selectedRevenueDate).split('•')[0]}`
+                                : 'Belum ada transaksi pesanan di database'}
+                            </p>
+                            <p className="text-xs text-slate-600 font-bold mt-1">
+                              Setiap pesanan baru akan langsung otomatis terdaftar secara realtime.
+                            </p>
+                            {revenueFilterMode === 'daily' && (
+                              <button
+                                onClick={() => setRevenueFilterMode('all')}
+                                className="mt-3 px-4 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-black cursor-pointer hover:bg-black"
+                              >
+                                Lihat Semua Transaksi Database
+                              </button>
+                            )}
+                          </td>
                         </tr>
-                      ))}
-                  </tbody>
-                </table>
+                      ) : (
+                        (revenueFilterMode === 'daily' ? ordersForSelectedDate : orders).map((o) => {
+                          const isLunas = o.paymentStatus?.toLowerCase().includes('lunas');
+                          const isCancel = o.paymentStatus?.toLowerCase().includes('batal');
+
+                          return (
+                            <tr key={o.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
+                              <td className="p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
+                                {formatFullDateIndonesian(o.createdAt)}
+                              </td>
+                              <td className="p-3.5">
+                                <p className="font-black text-slate-900">{o.customerName}</p>
+                                <p className="text-[10px] text-slate-600 font-bold">{o.customerEmail}</p>
+                              </td>
+                              <td className="p-3.5 font-bold text-slate-900">{o.serviceName}</td>
+                              <td className="p-3.5 font-black text-slate-900">{o.price}</td>
+                              <td className="p-3.5 text-slate-900 font-bold">{o.paymentMethod || 'QRIS / Transfer'}</td>
+                              <td className="p-3.5">
+                                <span
+                                  className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                                    isLunas
+                                      ? 'bg-slate-900 text-white border border-slate-900'
+                                      : isCancel
+                                      ? 'bg-slate-200 text-slate-900 border border-slate-400'
+                                      : 'bg-slate-200 text-slate-900 border border-slate-400'
+                                  }`}
+                                >
+                                  {o.paymentStatus}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
