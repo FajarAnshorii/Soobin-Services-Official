@@ -236,7 +236,17 @@ export default function AdminPage() {
   const [adminReplyText, setAdminReplyText] = useState('');
 
   // Orders states
-  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [orders, setOrders] = useState<OrderItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('soobin_all_orders');
+        return cached ? JSON.parse(cached) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
   const [selectedProofImage, setSelectedProofImage] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
@@ -245,7 +255,17 @@ export default function AdminPage() {
   const [revenueFilterMode, setRevenueFilterMode] = useState<'daily' | 'all'>('daily');
 
   // Members state & Pagination (50 items per page)
-  const [members, setMembers] = useState<MemberUser[]>([]);
+  const [members, setMembers] = useState<MemberUser[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('soobin_all_members');
+        return cached ? JSON.parse(cached) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
   const [memberPage, setMemberPage] = useState(1);
   const membersPerPage = 50;
 
@@ -706,21 +726,29 @@ export default function AdminPage() {
   };
 
   // Filtered lists based on search query
-  const filteredOrders = orders.filter(
-    (o) =>
-      o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOrders = orders.filter((o) => {
+    if (!o) return false;
+    const q = (searchQuery || '').toLowerCase().trim();
+    if (!q) return true;
+    return (
+      (o.id || '').toLowerCase().includes(q) ||
+      (o.customerName || '').toLowerCase().includes(q) ||
+      (o.customerEmail || '').toLowerCase().includes(q) ||
+      (o.serviceName || '').toLowerCase().includes(q)
+    );
+  });
 
-  const filteredMembers = members.filter(
-    (m) =>
-      m.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.university && m.university.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredMembers = members.filter((m) => {
+    if (!m) return false;
+    const q = (searchQuery || '').toLowerCase().trim();
+    if (!q) return true;
+    return (
+      (m.id || '').toLowerCase().includes(q) ||
+      (m.name || '').toLowerCase().includes(q) ||
+      (m.email || '').toLowerCase().includes(q) ||
+      ((m.university || '') && (m.university || '').toLowerCase().includes(q))
+    );
+  });
 
   // Pagination for Members
   const indexOfLastMember = memberPage * membersPerPage;
