@@ -1125,12 +1125,12 @@ export default function AdminPage() {
                     <table className="w-full text-left text-xs text-slate-900">
                       <thead className="bg-slate-100 text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
                         <tr>
-                          <th className="p-3">ID Order</th>
-                          <th className="p-3">Waktu (WIB)</th>
-                          <th className="p-3">Nama Pelanggan</th>
-                          <th className="p-3">Layanan</th>
-                          <th className="p-3">Harga</th>
-                          <th className="p-3">Status</th>
+                          <th className="p-3 whitespace-nowrap">ID Order</th>
+                          <th className="p-3 whitespace-nowrap">Waktu (WIB)</th>
+                          <th className="p-3 whitespace-nowrap">Nama Pelanggan</th>
+                          <th className="p-3 whitespace-nowrap">Layanan</th>
+                          <th className="p-3 whitespace-nowrap">Harga</th>
+                          <th className="p-3 whitespace-nowrap">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 bg-white">
@@ -1141,32 +1141,39 @@ export default function AdminPage() {
                             </td>
                           </tr>
                         ) : (
-                          orders.slice(0, 5).map((o) => (
-                            <tr
-                              key={o.id}
-                              onClick={() => setActiveTab('orders')}
-                              className="hover:bg-slate-50 cursor-pointer transition-colors"
-                            >
-                              <td className="p-3 font-mono text-slate-900 font-black">{o.id}</td>
-                              <td className="p-3 text-slate-700 font-bold whitespace-nowrap">
-                                {formatFullDateIndonesian(o.createdAt, o.id)}
-                              </td>
-                              <td className="p-3 font-black text-slate-900">{o.customerName}</td>
-                              <td className="p-3 text-slate-900 font-bold">{o.serviceName}</td>
-                              <td className="p-3 font-black text-slate-900">{o.price}</td>
-                              <td className="p-3">
-                                <span
-                                  className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
-                                    o.paymentStatus?.toLowerCase().includes('lunas')
-                                      ? 'bg-slate-900 text-white border border-slate-900'
-                                      : 'bg-slate-200 text-slate-900 border border-slate-400'
-                                  }`}
-                                >
-                                  {o.paymentStatus}
-                                </span>
-                              </td>
-                            </tr>
-                          ))
+                          orders.slice(0, 5).map((o) => {
+                            const isLunas = o.paymentStatus?.toLowerCase().includes('lunas') || o.paymentStatus?.toLowerCase().includes('terverifikasi');
+                            const isCancel = o.paymentStatus?.toLowerCase().includes('batal');
+
+                            return (
+                              <tr
+                                key={o.id}
+                                onClick={() => setActiveTab('orders')}
+                                className="hover:bg-slate-50 cursor-pointer transition-colors"
+                              >
+                                <td className="p-3 font-mono text-slate-900 font-black whitespace-nowrap">{o.id}</td>
+                                <td className="p-3 text-slate-700 font-bold whitespace-nowrap">
+                                  {formatFullDateIndonesian(o.createdAt, o.id)}
+                                </td>
+                                <td className="p-3 font-black text-slate-900 whitespace-nowrap">{o.customerName}</td>
+                                <td className="p-3 text-slate-900 font-bold whitespace-nowrap">{o.serviceName}</td>
+                                <td className="p-3 font-black text-slate-900 whitespace-nowrap">{o.price}</td>
+                                <td className="p-3 whitespace-nowrap">
+                                  <span
+                                    className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase inline-flex items-center gap-1 whitespace-nowrap shadow-2xs ${
+                                      isLunas
+                                        ? 'bg-slate-900 text-white border border-slate-900'
+                                        : isCancel
+                                        ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                                        : 'bg-slate-200 text-slate-900 border border-slate-400'
+                                    }`}
+                                  >
+                                    {isLunas ? '✓ LUNAS (TERVERIFIKASI)' : isCancel ? '✕ DIBATALKAN' : o.paymentStatus}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })
                         )}
                       </tbody>
                     </table>
