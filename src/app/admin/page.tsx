@@ -49,7 +49,20 @@ interface OrderItem {
   uploadedFileData?: string;
   uploadedFileName?: string;
   createdAt: string;
+  isFileExpired?: boolean;
 }
+
+// Helper to determine if file is expired (> 48 hours / 2 days)
+const isOrderFileExpired = (order: OrderItem): boolean => {
+  if (order.isFileExpired) return true;
+  const now = Date.now();
+  const TWO_DAYS_MS = 48 * 60 * 60 * 1000;
+  const orderTime = new Date(order.createdAt || 0).getTime() || parseInt(String(order.id).replace(/\D/g, '') || '0', 10);
+  if (orderTime > 0 && (now - orderTime) > TWO_DAYS_MS) {
+    return true;
+  }
+  return false;
+};
 
 interface MemberUser {
   id: string;
@@ -572,6 +585,11 @@ export default function AdminPage() {
 
   // Direct document download
   const handleDownloadFile = (order: OrderItem) => {
+    if (isOrderFileExpired(order) && !order.uploadedFileData) {
+      alert(`File dokumen untuk pesanan ${order.id} sudah kedaluwarsa (> 2 hari) dan telah dibersihkan secara otomatis dari database untuk menghemat kapasitas. Data riwayat pesanan & pendapatan tetap tersimpan aman.`);
+      return;
+    }
+
     let fileUrl = order.uploadedFileData;
     let fileName = order.uploadedFileName || `Dokumen_${order.id}.docx`;
 
@@ -1390,9 +1408,9 @@ export default function AdminPage() {
 
                         {/* Actions Footer */}
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                          <div className="flex items-center gap-2">
-                            {/* Screenshot Proof Button */}
-                            {order.proofImage && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            {/* Screenshot Proof Button or Expired Label */}
+                            {order.proofImage ? (
                               <button
                                 onClick={() => setSelectedProofImage(order.proofImage || null)}
                                 className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors"
@@ -1400,10 +1418,15 @@ export default function AdminPage() {
                                 <Eye className="w-4 h-4 text-slate-900" />
                                 <span>Lihat Bukti Bayar (Screenshot)</span>
                               </button>
-                            )}
+                            ) : isOrderFileExpired(order) ? (
+                              <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-600 text-[11px] font-bold flex items-center gap-1" title="Foto bukti bayar otomatis di-reset dari database setelah 2 hari">
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                                <span>Bukti Bayar Kedaluwarsa (&gt; 2 Hari)</span>
+                              </span>
+                            ) : null}
 
-                            {/* File Download Button (Guaranteed Direct Download) */}
-                            {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
+                            {/* File Download Button or Expired Label */}
+                            {order.uploadedFileData ? (
                               <button
                                 onClick={() => handleDownloadFile(order)}
                                 className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
@@ -1411,7 +1434,12 @@ export default function AdminPage() {
                                 <Download className="w-4 h-4" />
                                 <span>Unduh Dokumen File</span>
                               </button>
-                            )}
+                            ) : (order.customFields?.['File Ter-upload'] || order.uploadedFileName) ? (
+                              <span className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px] font-black flex items-center gap-1.5 shadow-2xs" title="File dokumen otomatis di-reset dari database setelah 2 hari untuk menghemat memori. Data riwayat pesanan & pendapatan tetap tersimpan aman.">
+                                <Clock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                                <span>File Dokumen Kedaluwarsa (&gt; 2 Hari)</span>
+                              </span>
+                            ) : null}
                           </div>
 
                           {/* Status Toggle Buttons */}
