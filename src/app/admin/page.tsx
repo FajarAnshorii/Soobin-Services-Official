@@ -1467,314 +1467,126 @@ export default function AdminPage() {
 
           {/* TAB 4: REVENUE & EXCEL REPORT */}
           {activeTab === 'revenue' && (
-            <div className="space-y-6">
-              {/* Top Banner Header */}
-              <div className="bg-white border border-slate-300 rounded-2xl p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-slate-900" />
-                    Dasbor Pendapatan Per Hari & Export Laporan Excel
+                    Dasbor Pendapatan & Export Laporan Excel
                   </h2>
                   <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Analisis pendapatan harian, riwayat orderan realtime 100% terkoneksi database Supabase, dan export Excel harian / bulanan.
+                    Pilih tanggal pada kalender untuk melihat pendapatan dan riwayat orderan per hari secara realtime.
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    onClick={handleExportDailyExcel}
-                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 text-white" />
-                    <span>Export Excel Tanggal Ini (.xlsx)</span>
-                  </button>
+                <button
+                  onClick={handleExportDailyExcel}
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-white" />
+                  <span>Export Laporan Excel (.xlsx)</span>
+                </button>
+              </div>
 
-                  <button
-                    onClick={handleExportAllExcel}
-                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center gap-2 cursor-pointer transition-colors"
-                  >
-                    <Download className="w-4 h-4 text-slate-900" />
-                    <span>Export Excel Semua Data</span>
-                  </button>
+              {/* 3 Top KPI Stat Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                    Total Pendapatan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
+                  </p>
+                  <p className="text-3xl font-black text-slate-900">
+                    Rp {revenueForSelectedDate.toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[11px] text-slate-900 font-bold">Otomatis dihitung dari order status Lunas</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                    Total Pesanan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
+                  </p>
+                  <p className="text-3xl font-black text-slate-900">
+                    {ordersForSelectedDate.length} Order
+                  </p>
+                  <p className="text-[11px] text-slate-900 font-bold">
+                    {lunasOrdersSelectedDate.length} Terverifikasi Lunas
+                  </p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Waktu Sistem Realtime</p>
+                  <p className="text-base font-black text-slate-900 capitalize">
+                    {selectedRevenueDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                  <p className="text-[11px] text-slate-900 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
                 </div>
               </div>
 
-              {/* Main Grid: Left Calendar Selector, Right Selected Date Daily Stats */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column: Mini Calendar & Quick Date Controls */}
-                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-4 shadow-xs">
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <h3 className="font-black text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-slate-900" />
-                      Pilih Tanggal Pendapatan
-                    </h3>
-                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
-                      100% Database Realtime
-                    </span>
-                  </div>
-
-                  {/* Quick Jump Buttons */}
-                  <div className="flex items-center justify-between gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                    <button
-                      onClick={() => setSelectedRevenueDate(new Date())}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date())
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'text-slate-900 hover:bg-slate-200'
-                      }`}
-                    >
-                      Hari Ini
-                    </button>
-                    <button
-                      onClick={() => setSelectedRevenueDate(new Date(Date.now() + 86400000))}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date(Date.now() + 86400000))
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'text-slate-900 hover:bg-slate-200'
-                      }`}
-                    >
-                      Besok
-                    </button>
-                    <button
-                      onClick={() => setSelectedRevenueDate(new Date(Date.now() - 86400000))}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                        getWIBDateKey(selectedRevenueDate) === getWIBDateKey(new Date(Date.now() - 86400000))
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'text-slate-900 hover:bg-slate-200'
-                      }`}
-                    >
-                      Kemarin
-                    </button>
-                  </div>
-
-                  {/* HTML5 Date Input Picker */}
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-black text-slate-900">Pilih dari Kalender Pop-up:</label>
-                    <input
-                      type="date"
-                      value={selectedDateKey}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setSelectedRevenueDate(new Date(e.target.value));
-                        }
-                      }}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-black focus:outline-none focus:border-slate-900 focus:bg-white"
-                    />
-                  </div>
-
-                  {/* Integrated Mini Calendar Component */}
-                  <div className="pt-1">
-                    <Calendar
-                      selectedDate={selectedRevenueDate}
-                      onSelectDate={(d) => setSelectedRevenueDate(d)}
-                      dayOrderCounts={dayOrderCounts}
-                    />
-                  </div>
-
-                  <div className="p-3 bg-slate-50 border border-slate-300 rounded-xl text-[11px] text-slate-900 font-bold leading-relaxed">
-                    💡 <span className="font-black">Petunjuk:</span> Klik tanggal pada kalender di atas untuk melihat total pendapatan dan jumlah orderan pada hari tersebut secara terpisah.
-                  </div>
-                </div>
-
-                {/* Right Column: Daily Revenue Stats & Summary for Selected Date */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Selected Date Header Card */}
-                  <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-4 shadow-xs">
-                    <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 gap-2">
-                      <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Laporan Statistik Harian</span>
-                        <h3 className="text-lg font-black text-slate-900 capitalize">
-                          {formatFullDateIndonesian(selectedRevenueDate).split('•')[0]}
-                        </h3>
-                      </div>
-                      <span className="text-xs font-mono font-black text-slate-900 bg-slate-100 border border-slate-300 px-3 py-1 rounded-xl">
-                        Kode Tanggal: {selectedDateKey}
-                      </span>
-                    </div>
-
-                    {/* Daily Stat Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
-                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Pendapatan Tanggal Ini</p>
-                        <p className="text-2xl font-black text-slate-900">
-                          Rp {revenueForSelectedDate.toLocaleString('id-ID')}
-                        </p>
-                        <p className="text-[10px] text-slate-700 font-bold">
-                          {lunasOrdersSelectedDate.length} Order Status Lunas
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
-                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Total Orderan Tanggal Ini</p>
-                        <p className="text-2xl font-black text-slate-900">
-                          {ordersForSelectedDate.length} Order
-                        </p>
-                        <p className="text-[10px] text-slate-700 font-bold">
-                          {pendingOrdersSelectedDate.length} Menunggu • {cancelOrdersSelectedDate.length} Batal
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-1 shadow-xs">
-                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-wider">Status Database</p>
-                        <p className="text-sm font-black text-emerald-800 flex items-center gap-1.5 pt-1">
-                          <CheckCircle className="w-4 h-4 text-emerald-800" />
-                          Terhubung 100% Realtime
-                        </p>
-                        <p className="text-[10px] text-slate-700 font-bold pt-0.5">
-                          Tersimpan otomatis di Supabase
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-1">
-                      <button
-                        onClick={handleExportDailyExcel}
-                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs"
-                      >
-                        <FileSpreadsheet className="w-4 h-4" />
-                        <span>Unduh Excel Tanggal Ini ({selectedDateKey})</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* All-Time Overall KPI Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
-                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Pendapatan Keseluruhan</p>
-                      <p className="text-xl font-black text-slate-900">
-                        Rp {calculateTotalRevenue().toLocaleString('id-ID')}
-                      </p>
-                      <p className="text-[10px] text-slate-700 font-bold">Semua transaksi Lunas</p>
-                    </div>
-
-                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
-                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Pesanan Keseluruhan</p>
-                      <p className="text-xl font-black text-slate-900">{orders.length} Order</p>
-                      <p className="text-[10px] text-slate-700 font-bold">Semua data riwayat</p>
-                    </div>
-
-                    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-1 shadow-xs">
-                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-wider">Total Member Terdaftar</p>
-                      <p className="text-xl font-black text-slate-900">{members.length} Member</p>
-                      <p className="text-[10px] text-slate-700 font-bold">Format MBR-0001 dst.</p>
-                    </div>
-                  </div>
-                </div>
+              {/* Mini Calendar Component */}
+              <div>
+                <Calendar
+                  selectedDate={selectedRevenueDate}
+                  onSelectDate={(d) => setSelectedRevenueDate(d)}
+                />
               </div>
 
-              {/* Itemized Order History Table with Filter Switcher */}
-              <div className="bg-white border border-slate-300 rounded-2xl overflow-hidden shadow-xs space-y-0">
-                <div className="p-4 bg-slate-50 border-b border-slate-300 flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h3 className="font-black text-sm text-slate-900 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-slate-900" />
-                      Riwayat Transaksi Order (Lengkap Tanggal, Bulan, Tahun & Jam)
-                    </h3>
-                    <p className="text-xs text-slate-700 font-bold mt-0.5">
-                      Menampilkan transaksi orderan realtime yang tersimpan 100% di database cloud Supabase.
-                    </p>
-                  </div>
-
-                  {/* Filter Switcher */}
-                  <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-300 shadow-xs">
-                    <button
-                      onClick={() => setRevenueFilterMode('daily')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                        revenueFilterMode === 'daily'
-                          ? 'bg-slate-900 text-white'
-                          : 'text-slate-900 hover:bg-slate-100'
-                      }`}
-                    >
-                      Tanggal Ini ({ordersForSelectedDate.length})
-                    </button>
-                    <button
-                      onClick={() => setRevenueFilterMode('all')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                        revenueFilterMode === 'all'
-                          ? 'bg-slate-900 text-white'
-                          : 'text-slate-900 hover:bg-slate-100'
-                      }`}
-                    >
-                      Semua Order ({orders.length})
-                    </button>
-                  </div>
+              {/* Itemized Table */}
+              <div className="border border-slate-300 rounded-2xl overflow-hidden">
+                <div className="p-4 bg-slate-100 border-b border-slate-300 flex items-center justify-between font-black text-xs text-slate-900">
+                  <span>
+                    Rincian Transaksi Pendapatan Masuk ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })})
+                  </span>
+                  <span className="text-[11px] text-slate-600 font-bold">
+                    {ordersForSelectedDate.length} Pesanan
+                  </span>
                 </div>
-
-                {/* Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-900">
-                    <thead className="bg-slate-100 text-slate-900 font-black text-[10px] uppercase tracking-wider border-b border-slate-300">
+                <table className="w-full text-left text-xs text-slate-900">
+                  <thead className="bg-white text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
+                    <tr>
+                      <th className="p-3.5">ID Order</th>
+                      <th className="p-3.5">Tanggal, Bulan, Tahun & Jam (WIB)</th>
+                      <th className="p-3.5">Pelanggan</th>
+                      <th className="p-3.5">Layanan</th>
+                      <th className="p-3.5">Harga</th>
+                      <th className="p-3.5">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 bg-white">
+                    {ordersForSelectedDate.length === 0 ? (
                       <tr>
-                        <th className="p-3.5">ID Order</th>
-                        <th className="p-3.5">Tanggal, Bulan, Tahun & Jam (WIB)</th>
-                        <th className="p-3.5">Pelanggan</th>
-                        <th className="p-3.5">Layanan</th>
-                        <th className="p-3.5">Harga</th>
-                        <th className="p-3.5">Metode</th>
-                        <th className="p-3.5">Status Pembayaran</th>
+                        <td colSpan={6} className="p-8 text-center text-slate-500 font-bold">
+                          Tidak ada pesanan masuk pada tanggal ini.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
-                      {(revenueFilterMode === 'daily' ? ordersForSelectedDate : orders).length === 0 ? (
-                        <tr>
-                          <td colSpan={7} className="p-12 text-center text-slate-700 bg-slate-50">
-                            <ShoppingBag className="w-10 h-10 mx-auto mb-2 text-slate-400" />
-                            <p className="font-black text-sm text-slate-900">
-                              {revenueFilterMode === 'daily'
-                                ? `Belum ada pesanan masuk pada tanggal ${formatFullDateIndonesian(selectedRevenueDate).split('•')[0]}`
-                                : 'Belum ada transaksi pesanan di database'}
-                            </p>
-                            <p className="text-xs text-slate-600 font-bold mt-1">
-                              Setiap pesanan baru akan langsung otomatis terdaftar secara realtime.
-                            </p>
-                            {revenueFilterMode === 'daily' && (
-                              <button
-                                onClick={() => setRevenueFilterMode('all')}
-                                className="mt-3 px-4 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-black cursor-pointer hover:bg-black"
-                              >
-                                Lihat Semua Transaksi Database
-                              </button>
-                            )}
+                    ) : (
+                      ordersForSelectedDate.map((o) => (
+                        <tr key={o.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
+                          <td className="p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
+                            {formatFullDateIndonesian(o.createdAt)}
+                          </td>
+                          <td className="p-3.5">
+                            <p className="font-black text-slate-900">{o.customerName}</p>
+                            <p className="text-[10px] text-slate-600 font-bold">{o.customerEmail}</p>
+                          </td>
+                          <td className="p-3.5 text-slate-900 font-bold">{o.serviceName}</td>
+                          <td className="p-3.5 font-black text-slate-900">{o.price}</td>
+                          <td className="p-3.5">
+                            <span
+                              className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                                o.paymentStatus?.toLowerCase().includes('lunas')
+                                  ? 'bg-slate-900 text-white'
+                                  : 'bg-slate-200 text-slate-900 border border-slate-400'
+                              }`}
+                            >
+                              {o.paymentStatus}
+                            </span>
                           </td>
                         </tr>
-                      ) : (
-                        (revenueFilterMode === 'daily' ? ordersForSelectedDate : orders).map((o) => {
-                          const isLunas = o.paymentStatus?.toLowerCase().includes('lunas');
-                          const isCancel = o.paymentStatus?.toLowerCase().includes('batal');
-
-                          return (
-                            <tr key={o.id} className="hover:bg-slate-50 transition-colors">
-                              <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
-                              <td className="p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
-                                {formatFullDateIndonesian(o.createdAt)}
-                              </td>
-                              <td className="p-3.5">
-                                <p className="font-black text-slate-900">{o.customerName}</p>
-                                <p className="text-[10px] text-slate-600 font-bold">{o.customerEmail}</p>
-                              </td>
-                              <td className="p-3.5 font-bold text-slate-900">{o.serviceName}</td>
-                              <td className="p-3.5 font-black text-slate-900">{o.price}</td>
-                              <td className="p-3.5 text-slate-900 font-bold">{o.paymentMethod || 'QRIS / Transfer'}</td>
-                              <td className="p-3.5">
-                                <span
-                                  className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                                    isLunas
-                                      ? 'bg-slate-900 text-white border border-slate-900'
-                                      : isCancel
-                                      ? 'bg-slate-200 text-slate-900 border border-slate-400'
-                                      : 'bg-slate-200 text-slate-900 border border-slate-400'
-                                  }`}
-                                >
-                                  {o.paymentStatus}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
