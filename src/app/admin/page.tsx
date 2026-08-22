@@ -249,6 +249,7 @@ export default function AdminPage() {
   });
   const [selectedProofImage, setSelectedProofImage] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   // Revenue & Calendar Date State
   const [selectedRevenueDate, setSelectedRevenueDate] = useState<Date>(new Date());
@@ -573,20 +574,27 @@ export default function AdminPage() {
     }
   };
 
-  // Update order status
+  // Update order status directly in Supabase
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId);
     const updated = orders.map((o) => (o.id === orderId ? { ...o, paymentStatus: newStatus } : o));
     setOrders(updated);
     localStorage.setItem('soobin_all_orders', JSON.stringify(updated));
 
     try {
-      await fetch(ORDERS_URL, {
+      const res = await fetch(ORDERS_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, status: newStatus }),
       });
+      if (!res.ok) {
+        throw new Error('Gagal update status di database');
+      }
     } catch (err) {
-      console.error('Failed updating status', err);
+      console.error('Failed updating status in database', err);
+      syncOrdersWithCloud();
+    } finally {
+      setTimeout(() => setUpdatingOrderId(null), 300);
     }
   };
 
@@ -1550,19 +1558,29 @@ export default function AdminPage() {
                           {/* Status Toggle Buttons */}
                           <div className="flex items-center gap-2">
                             <button
+                              disabled={updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                              className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors"
+                              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border ${
+                                isCancel
+                                  ? 'bg-rose-100 text-rose-900 border-rose-400 shadow-xs ring-2 ring-rose-300'
+                                  : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'
+                              } ${updatingOrderId === order.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                               <XCircle className="w-4 h-4 text-slate-900" />
-                              <span>Batalkan</span>
+                              <span>{isCancel ? '✕ Dibatalkan' : 'Batalkan'}</span>
                             </button>
 
                             <button
+                              disabled={updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border shadow-xs ${
+                                isLunas
+                                  ? 'bg-slate-900 text-white border-slate-900 ring-2 ring-slate-400'
+                                  : 'bg-slate-900 hover:bg-black text-white border-transparent'
+                              } ${updatingOrderId === order.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                              <CheckCircle className="w-4 h-4" />
-                              <span>Verifikasi Lunas</span>
+                              <CheckCircle className="w-4 h-4 text-white" />
+                              <span>{isLunas ? '✓ Lunas (Terverifikasi)' : 'Verifikasi Lunas'}</span>
                             </button>
                           </div>
                         </div>
