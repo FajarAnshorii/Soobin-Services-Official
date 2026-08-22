@@ -147,6 +147,25 @@ const formatFullDateIndonesian = (dateInput?: string | Date | null, orderId?: st
   }
 };
 
+// Helper to format live chat timestamps nicely (Tanggal, Bulan, Tahun & Jam WIB)
+const formatChatDate = (dateInput?: string | number | Date | null): string => {
+  if (!dateInput) return '-';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return String(dateInput);
+    return new Intl.DateTimeFormat('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(d) + ' WIB';
+  } catch (e) {
+    return String(dateInput);
+  }
+};
+
 const parsePriceNumber = (priceStr: string): number => {
   if (!priceStr) return 0;
   const num = parseInt(priceStr.replace(/[^0-9]/g, ''), 10);
@@ -1149,9 +1168,11 @@ export default function AdminPage() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-0.5">
+                          <div className="flex items-center justify-between gap-1 mb-0.5">
                             <h3 className="font-black text-xs text-slate-900 truncate">{session.name}</h3>
-                            <span className="text-[9px] text-slate-900 font-bold">{session.lastUpdated}</span>
+                            <span className="text-[9px] text-slate-700 font-extrabold shrink-0">
+                              {formatChatDate(session.lastUpdated)}
+                            </span>
                           </div>
                           <p className="text-[11px] text-slate-900 truncate font-extrabold">
                             {session.university} • {session.prodi}
@@ -1213,10 +1234,10 @@ export default function AdminPage() {
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                             <span
                               className={`block text-[9px] mt-1 text-right font-black ${
-                                msg.sender === 'admin' ? 'text-slate-300' : 'text-slate-900'
+                                msg.sender === 'admin' ? 'text-slate-300' : 'text-slate-500'
                               }`}
                             >
-                              {msg.timestamp}
+                              {formatChatDate(msg.createdAt || msg.timestamp)}
                             </span>
                           </div>
                         </div>

@@ -183,7 +183,7 @@ export default function WhatsAppFloat() {
     if (!messageText.trim() || !sessionId || !user) return;
 
     const now = new Date();
-    const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const timeString = `${now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
 
     const newMsg: Message = {
       id: `msg_${Date.now()}`,
