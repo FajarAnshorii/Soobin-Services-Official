@@ -1029,46 +1029,70 @@ export default function AdminPage() {
           {/* OVERVIEW TAB */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* TOP KPI STAT CARDS GRID - ALL TEXT BLACK */}
+              {/* TOP KPI STAT CARDS GRID - ALL INTERACTIVE & CONNECTED */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                <div
+                  onClick={() => setActiveTab('revenue')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center justify-between text-slate-900">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Total Pendapatan</span>
-                    <DollarSign className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 group-hover:text-black">Total Pendapatan</span>
+                    <DollarSign className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-colors" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">
                     Rp {calculateTotalRevenue().toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-900 font-extrabold flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-slate-900" /> Terverifikasi dari Lunas
-                  </p>
+                  <div className="flex items-center justify-between text-[11px] text-slate-900 font-extrabold pt-1">
+                    <span className="flex items-center gap-1">
+                      <TrendingUp className="w-3.5 h-3.5 text-slate-900" /> Terverifikasi
+                    </span>
+                    <span className="text-[10px] font-black underline group-hover:text-black">Lihat Rincian →</span>
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                <div
+                  onClick={() => setActiveTab('members')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center justify-between text-slate-900">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Total Member</span>
-                    <Users className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 group-hover:text-black">Total Member</span>
+                    <Users className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-colors" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{members.length} Member</p>
-                  <p className="text-[11px] text-slate-900 font-extrabold">Format MBR-0001 dst.</p>
+                  <div className="flex items-center justify-between text-[11px] text-slate-900 font-extrabold pt-1">
+                    <span>Format MBR-0001 dst.</span>
+                    <span className="text-[10px] font-black underline group-hover:text-black">Kelola Member →</span>
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                <div
+                  onClick={() => setActiveTab('orders')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center justify-between text-slate-900">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Pesanan Menunggu</span>
-                    <ShoppingBag className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 group-hover:text-black">Pesanan Menunggu</span>
+                    <ShoppingBag className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-colors" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{pendingOrdersCount} Pesanan</p>
-                  <p className="text-[11px] text-slate-900 font-extrabold">Perlu Cek Verifikasi Admin</p>
+                  <div className="flex items-center justify-between text-[11px] text-slate-900 font-extrabold pt-1">
+                    <span>Perlu Verifikasi Admin</span>
+                    <span className="text-[10px] font-black underline group-hover:text-black">Cek Pesanan →</span>
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-2 shadow-xs">
+                <div
+                  onClick={() => setActiveTab('chat')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center justify-between text-slate-900">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900">Chat Sesi Aktif</span>
-                    <MessageSquare className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 group-hover:text-black">Chat Sesi Aktif</span>
+                    <MessageSquare className="w-5 h-5 bg-slate-100 p-1 rounded-lg border border-slate-300 text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-colors" />
                   </div>
                   <p className="text-2xl font-black text-slate-900">{Object.keys(chats).length} Sesi</p>
-                  <p className="text-[11px] text-slate-900 font-extrabold">{unreadChatsCount} Belum Dibaca</p>
+                  <div className="flex items-center justify-between text-[11px] text-slate-900 font-extrabold pt-1">
+                    <span>{unreadChatsCount} Belum Dibaca</span>
+                    <span className="text-[10px] font-black underline group-hover:text-black">Buka Live Chat →</span>
+                  </div>
                 </div>
               </div>
 
@@ -1083,9 +1107,9 @@ export default function AdminPage() {
                     </h2>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-black text-slate-900 hover:text-black underline"
+                      className="text-xs font-black text-slate-900 hover:text-black underline cursor-pointer"
                     >
-                      Lihat Semua →
+                      Lihat Semua ({orders.length}) →
                     </button>
                   </div>
 
@@ -1094,6 +1118,7 @@ export default function AdminPage() {
                       <thead className="bg-slate-100 text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
                         <tr>
                           <th className="p-3">ID Order</th>
+                          <th className="p-3">Waktu (WIB)</th>
                           <th className="p-3">Nama Pelanggan</th>
                           <th className="p-3">Layanan</th>
                           <th className="p-3">Harga</th>
@@ -1101,25 +1126,40 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 bg-white">
-                        {orders.slice(0, 5).map((o) => (
-                          <tr key={o.id} className="hover:bg-slate-50">
-                            <td className="p-3 font-mono text-slate-900 font-black">{o.id}</td>
-                            <td className="p-3 font-black text-slate-900">{o.customerName}</td>
-                            <td className="p-3 text-slate-900 font-bold">{o.serviceName}</td>
-                            <td className="p-3 font-black text-slate-900">{o.price}</td>
-                            <td className="p-3">
-                              <span
-                                className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
-                                  o.paymentStatus?.toLowerCase().includes('lunas')
-                                    ? 'bg-slate-900 text-white border border-slate-900'
-                                    : 'bg-slate-200 text-slate-900 border border-slate-400'
-                                }`}
-                              >
-                                {o.paymentStatus}
-                              </span>
+                        {orders.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-6 text-center text-slate-500 font-bold">
+                              Belum ada transaksi di database
                             </td>
                           </tr>
-                        ))}
+                        ) : (
+                          orders.slice(0, 5).map((o) => (
+                            <tr
+                              key={o.id}
+                              onClick={() => setActiveTab('orders')}
+                              className="hover:bg-slate-50 cursor-pointer transition-colors"
+                            >
+                              <td className="p-3 font-mono text-slate-900 font-black">{o.id}</td>
+                              <td className="p-3 text-slate-700 font-bold whitespace-nowrap">
+                                {formatFullDateIndonesian(o.createdAt, o.id)}
+                              </td>
+                              <td className="p-3 font-black text-slate-900">{o.customerName}</td>
+                              <td className="p-3 text-slate-900 font-bold">{o.serviceName}</td>
+                              <td className="p-3 font-black text-slate-900">{o.price}</td>
+                              <td className="p-3">
+                                <span
+                                  className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
+                                    o.paymentStatus?.toLowerCase().includes('lunas')
+                                      ? 'bg-slate-900 text-white border border-slate-900'
+                                      : 'bg-slate-200 text-slate-900 border border-slate-400'
+                                  }`}
+                                >
+                                  {o.paymentStatus}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -1134,25 +1174,77 @@ export default function AdminPage() {
                     </h2>
                     <button
                       onClick={() => setActiveTab('members')}
-                      className="text-xs font-black text-slate-900 hover:text-black underline"
+                      className="text-xs font-black text-slate-900 hover:text-black underline cursor-pointer"
                     >
-                      Kelola →
+                      Kelola ({members.length}) →
                     </button>
                   </div>
 
                   <div className="space-y-3">
-                    {members.slice(0, 4).map((m) => (
-                      <div key={m.id} className="p-3 bg-slate-50 border border-slate-300 rounded-xl flex items-center justify-between">
-                        <div>
-                          <p className="font-black text-xs text-slate-900">{m.name}</p>
-                          <p className="text-[10px] text-slate-900 font-bold">{m.email}</p>
+                    {members.length === 0 ? (
+                      <p className="text-xs text-slate-500 font-bold p-4 text-center">Belum ada member terdaftar</p>
+                    ) : (
+                      members.slice(0, 4).map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={() => setActiveTab('members')}
+                          className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl flex items-center justify-between cursor-pointer transition-colors"
+                        >
+                          <div className="min-w-0 pr-2">
+                            <p className="font-black text-xs text-slate-900 truncate">{m.name}</p>
+                            <p className="text-[10px] text-slate-900 font-bold truncate">{m.email}</p>
+                            {(m.university || m.prodi) && (
+                              <p className="text-[9px] text-slate-600 font-semibold truncate mt-0.5">
+                                {[m.university, m.prodi].filter(Boolean).join(' • ')}
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-[10px] font-mono font-black text-slate-900 bg-slate-200 px-2 py-0.5 rounded border border-slate-400 shrink-0">
+                            {m.id}
+                          </span>
                         </div>
-                        <span className="text-[10px] font-mono font-black text-slate-900 bg-slate-200 px-2 py-0.5 rounded border border-slate-400">
-                          {m.id}
-                        </span>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
+                </div>
+              </div>
+
+              {/* BOTTOM QUICK STATUS: REVENUE TODAY, CMS & TESTIMONIALS */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-1">
+                <div
+                  onClick={() => setActiveTab('revenue')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Laporan Keuangan & Export</p>
+                    <p className="text-sm font-black text-slate-900">Kalender Pendapatan Harian</p>
+                    <p className="text-[11px] text-slate-700 font-bold">Buka & Export Rekap Excel →</p>
+                  </div>
+                  <CalendarIcon className="w-8 h-8 text-slate-800 p-1.5 bg-slate-100 rounded-xl border border-slate-300 shrink-0" />
+                </div>
+
+                <div
+                  onClick={() => setActiveTab('services')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Katalog Layanan (CMS)</p>
+                    <p className="text-sm font-black text-slate-900">{cmsServices.length} Layanan Aktif</p>
+                    <p className="text-[11px] text-slate-700 font-bold">Kelola Harga & Deskripsi →</p>
+                  </div>
+                  <Edit3 className="w-8 h-8 text-slate-800 p-1.5 bg-slate-100 rounded-xl border border-slate-300 shrink-0" />
+                </div>
+
+                <div
+                  onClick={() => setActiveTab('testimonials')}
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Testimoni & Kepuasan</p>
+                    <p className="text-sm font-black text-slate-900">{testimonialsList.length} Ulasan Pelanggan</p>
+                    <p className="text-[11px] text-slate-700 font-bold">Pantau Rating & Feedback →</p>
+                  </div>
+                  <Star className="w-8 h-8 text-amber-500 fill-amber-400 p-1.5 bg-amber-50 rounded-xl border border-amber-300 shrink-0" />
                 </div>
               </div>
             </div>
