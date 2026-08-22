@@ -405,39 +405,26 @@ export default function AdminPage() {
     }
   };
 
-  // Sync Orders API (Realtime Cloud Supabase)
+  // Sync Orders API (100% Realtime Database Supabase)
   const syncOrdersWithCloud = async () => {
     setOrdersLoading(true);
     try {
-      const localOrders = JSON.parse(localStorage.getItem('soobin_all_orders') || '[]');
-      let cloudOrders: OrderItem[] = [];
-      const res = await fetch(ORDERS_URL);
+      const res = await fetch(ORDERS_URL, { cache: 'no-store' });
       if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          cloudOrders = data;
+        const cloudOrders: OrderItem[] = await res.json();
+        if (Array.isArray(cloudOrders)) {
+          // Pure 100% Supabase Database: sort descending by timestamp
+          const sorted = cloudOrders.sort((a, b) => {
+            const timeA = new Date(a.createdAt || '').getTime() || parseInt(a.id?.replace(/\D/g, '') || '0', 10);
+            const timeB = new Date(b.createdAt || '').getTime() || parseInt(b.id?.replace(/\D/g, '') || '0', 10);
+            return timeB - timeA;
+          });
+          setOrders(sorted);
+          localStorage.setItem('soobin_all_orders', JSON.stringify(sorted));
         }
       }
-
-      // Prioritize cloudOrders from Supabase as absolute source of truth
-      const orderMap = new Map<string, OrderItem>();
-      localOrders.forEach((item: OrderItem) => {
-        if (item && item.id) orderMap.set(item.id, item);
-      });
-      cloudOrders.forEach((item: OrderItem) => {
-        if (item && item.id) orderMap.set(item.id, item);
-      });
-
-      const merged = Array.from(orderMap.values()).sort((a, b) => {
-        const timeA = new Date(a.createdAt || '').getTime() || parseInt(a.id?.replace(/\D/g, '') || '0', 10);
-        const timeB = new Date(b.createdAt || '').getTime() || parseInt(b.id?.replace(/\D/g, '') || '0', 10);
-        return timeB - timeA;
-      });
-
-      setOrders(merged);
-      localStorage.setItem('soobin_all_orders', JSON.stringify(merged));
     } catch (e) {
-      console.error('Failed to sync orders', e);
+      console.error('Failed to sync orders from database', e);
     } finally {
       setOrdersLoading(false);
     }
