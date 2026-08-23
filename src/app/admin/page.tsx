@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/mini-calendar';
 import {
   Mail, Lock, LogOut, MessageSquare, Shield,
   School, Send, CircleAlert, Headphones,
-  ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode,
+  ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, Plus,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
   Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon
 } from 'lucide-react';
@@ -270,11 +270,33 @@ export default function AdminPage() {
   const [memberPage, setMemberPage] = useState(1);
   const membersPerPage = 50;
 
-  // Services CMS state
-  const [cmsServices, setCmsServices] = useState<ServiceConfig[]>(DEFAULT_SERVICES);
+  // Services CMS state & Full CRUD
+  const [cmsServices, setCmsServices] = useState<ServiceConfig[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('soobin_cms_services');
+        return cached ? JSON.parse(cached) : DEFAULT_SERVICES;
+      } catch (e) {
+        return DEFAULT_SERVICES;
+      }
+    }
+    return DEFAULT_SERVICES;
+  });
   const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Partial<ServiceConfig>>({});
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+  const [serviceCategoryFilter, setServiceCategoryFilter] = useState<string>('all');
+  const [serviceSearchTerm, setServiceSearchTerm] = useState<string>('');
+  const [isCreateServiceOpen, setIsCreateServiceOpen] = useState<boolean>(false);
+  const [newService, setNewService] = useState<Partial<ServiceConfig>>({
+    category: 'turnitin',
+    name: '',
+    price: '',
+    description: 'Pengerjaan cepat & garansi kualitas hasil terbaik.',
+    badge: '',
+  });
+  const [deletingServiceId, setDeletingServiceId] = useState<number | null>(null);
+  const [servicesLoading, setServicesLoading] = useState(false);
 
   // Compute order counts per day (YYYY-MM-DD -> count) for mini-calendar & daily stats
   const dayOrderCounts = useMemo(() => {
@@ -431,6 +453,25 @@ export default function AdminPage() {
     }
   };
 
+  // Sync Services API (100% Realtime Database Supabase)
+  const syncServicesWithCloud = async () => {
+    setServicesLoading(true);
+    try {
+      const res = await fetch('/api/services', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          setCmsServices(data.services);
+          localStorage.setItem('soobin_cms_services', JSON.stringify(data.services));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to sync services from database', e);
+    } finally {
+      setServicesLoading(false);
+    }
+  };
+
   // Polling loop
   useEffect(() => {
     if (!isAdminLoggedIn) return;
@@ -438,6 +479,7 @@ export default function AdminPage() {
     syncChatsWithCloud();
     syncOrdersWithCloud();
     syncMembersWithCloud();
+    syncServicesWithCloud();
 
     const interval = setInterval(() => {
       syncChatsWithCloud();
@@ -703,22 +745,109 @@ export default function AdminPage() {
     XLSX.writeFile(workbook, `Laporan_Pendapatan_SOOBIN_Semua_Database.xlsx`);
   };
 
-  // Save Service CMS
-  const handleSaveCmsService = (id: number) => {
-    const updated = cmsServices.map((s) => (s.id === id ? { ...s, ...editForm } : s));
-    setCmsServices(updated);
-    localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+  // CREATE Service in Supabase
+  const handleCreateService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newService.name || !newService.price) {
+      alert('Nama dan Harga Layanan wajib diisi!');
+      return;
+    }
 
-    fetch('/api/services', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated),
-    }).catch(console.error);
-
-    setEditingServiceId(null);
-    setSaveSuccessMsg(`Layanan ID ${id} berhasil diperbarui secara realtime di web resmi!`);
-    setTimeout(() => setSaveSuccessMsg(''), 4000);
+    try {
+      const res = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newService),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        const created = result.service || { ...newService, id: Date.now() };
+        const updated = [...cmsServices, created];
+        setCmsServices(updated);
+        localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        setIsCreateServiceOpen(false);
+        setNewService({
+          category: 'turnitin',
+          name: '',
+          price: '',
+          description: 'Pengerjaan cepat & garansi kualitas hasil terbaik.',
+          badge: '',
+        });
+        setSaveSuccessMsg(`Layanan "${created.name}" berhasil ditambahkan ke database!`);
+        setTimeout(() => setSaveSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      console.error('Failed creating service', err);
+    }
   };
+
+  // UPDATE Service in Supabase
+  const handleSaveCmsService = async (id: number) => {
+    const existing = cmsServices.find((s) => s.id === id);
+    const updatedItem: ServiceConfig = {
+      id,
+      category: editForm.category || existing?.category || 'umum',
+      name: editForm.name || existing?.name || '',
+      price: editForm.price || existing?.price || '',
+      description: editForm.description || existing?.description || '',
+      badge: editForm.badge !== undefined ? editForm.badge : (existing?.badge || null),
+    };
+
+    const updatedList = cmsServices.map((s) => (s.id === id ? updatedItem : s));
+    setCmsServices(updatedList);
+    localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
+
+    try {
+      const res = await fetch('/api/services', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedItem),
+      });
+      if (res.ok) {
+        setEditingServiceId(null);
+        setSaveSuccessMsg(`Layanan "${updatedItem.name}" berhasil diperbarui di database!`);
+        setTimeout(() => setSaveSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      console.error('Failed updating service in database', err);
+    }
+  };
+
+  // DELETE Service from Supabase
+  const handleDeleteService = async (id: number, name: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus layanan "${name}" dari database?`)) return;
+
+    setDeletingServiceId(id);
+    try {
+      const res = await fetch(`/api/services?id=${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        const updated = cmsServices.filter((s) => s.id !== id);
+        setCmsServices(updated);
+        localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        setSaveSuccessMsg(`Layanan "${name}" berhasil dihapus dari database!`);
+        setTimeout(() => setSaveSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      console.error('Failed deleting service', err);
+    } finally {
+      setDeletingServiceId(null);
+    }
+  };
+
+  // Filtered CMS Services based on category and search
+  const filteredCmsServices = cmsServices.filter((s) => {
+    const matchesCategory =
+      serviceCategoryFilter === 'all' || s.category?.toLowerCase() === serviceCategoryFilter.toLowerCase();
+    const q = serviceSearchTerm.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.description || '').toLowerCase().includes(q) ||
+      (s.category || '').toLowerCase().includes(q);
+    return matchesCategory && matchesSearch;
+  });
 
   // Filtered lists based on search query
   const filteredOrders = orders.filter((o) => {
@@ -1812,121 +1941,393 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB 5: SERVICE CMS */}
+          {/* TAB 5: SERVICE CMS (FULL 100% CRUD REALTIME SUPABASE) */}
           {activeTab === 'services' && (
-            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
-                <div>
-                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <Edit3 className="w-5 h-5 text-slate-900" />
-                    Kelola Layanan & Harga (CMS Realtime)
-                  </h2>
-                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Ubah nama, harga, deskripsi, dan badge layanan secara langsung. Perubahan akan realtime di web resmi saat direfresh.
-                  </p>
+            <div className="space-y-6">
+              {/* Header & Actions */}
+              <div className="bg-white border border-slate-300 rounded-2xl p-6 shadow-xs space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-300 pb-4">
+                  <div>
+                    <h2 className="font-black text-lg text-slate-900 flex items-center gap-2">
+                      <Edit3 className="w-5 h-5 text-slate-900" />
+                      Kelola Layanan & Harga (CMS Database Realtime)
+                    </h2>
+                    <p className="text-xs text-slate-700 mt-1 font-bold">
+                      Full CRUD: Tambah, edit, cari, dan hapus layanan resmi yang tersambung 100% langsung ke database Supabase.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={syncServicesWithCloud}
+                      disabled={servicesLoading}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-black border border-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Sinkronkan dengan Database Supabase"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${servicesLoading ? 'animate-spin' : ''}`} />
+                      <span>{servicesLoading ? 'Sinkron...' : 'Sinkron Database'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsCreateServiceOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>+ Tambah Layanan Baru</span>
+                    </button>
+                  </div>
                 </div>
 
                 {saveSuccessMsg && (
-                  <span className="text-xs font-black bg-slate-900 text-white border border-slate-900 px-3.5 py-1.5 rounded-xl animate-fade-in">
-                    {saveSuccessMsg}
-                  </span>
+                  <div className="p-3 bg-slate-900 text-white rounded-xl text-xs font-black flex items-center justify-between animate-fade-in shadow-xs">
+                    <span>✓ {saveSuccessMsg}</span>
+                    <button onClick={() => setSaveSuccessMsg('')} className="text-white hover:text-slate-300">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Filter & Search Bar */}
+                <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                  <div className="relative w-full sm:w-80">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Cari nama, harga, deskripsi..."
+                      value={serviceSearchTerm}
+                      onChange={(e) => setServiceSearchTerm(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-900 font-bold focus:bg-white focus:outline-none focus:border-slate-900 transition-colors"
+                    />
+                    {serviceSearchTerm && (
+                      <button
+                        onClick={() => setServiceSearchTerm('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+                    {[
+                      { key: 'all', label: 'Semua' },
+                      { key: 'turnitin', label: 'Turnitin' },
+                      { key: 'parafrase', label: 'Parafrase' },
+                      { key: 'joki-tugas', label: 'Joki Tugas' },
+                      { key: 'joki-skripsi', label: 'Joki Skripsi' },
+                      { key: 'olah-data', label: 'Olah Data' },
+                      { key: 'desain-ppt', label: 'Desain PPT' },
+                      { key: 'formatting', label: 'Formatting' },
+                      { key: 'umum', label: 'Umum' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.key}
+                        onClick={() => setServiceCategoryFilter(cat.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-black whitespace-nowrap transition-colors cursor-pointer ${
+                          serviceCategoryFilter === cat.key
+                            ? 'bg-slate-900 text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-black text-slate-600 flex items-center justify-between pt-1">
+                  <span>Menampilkan {filteredCmsServices.length} dari total {cmsServices.length} layanan di database</span>
+                  {serviceCategoryFilter !== 'all' && (
+                    <button
+                      onClick={() => setServiceCategoryFilter('all')}
+                      className="text-slate-900 underline hover:text-black font-black"
+                    >
+                      Reset Filter
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Service Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredCmsServices.length === 0 ? (
+                  <div className="col-span-full bg-white border border-slate-300 rounded-2xl p-12 text-center space-y-3">
+                    <p className="text-sm font-black text-slate-700">Tidak ada layanan yang sesuai dengan pencarian atau filter.</p>
+                    <button
+                      onClick={() => {
+                        setServiceSearchTerm('');
+                        setServiceCategoryFilter('all');
+                      }}
+                      className="px-4 py-2 bg-slate-900 text-white text-xs font-black rounded-xl hover:bg-black"
+                    >
+                      Reset Pencarian
+                    </button>
+                  </div>
+                ) : (
+                  filteredCmsServices.map((srv) => {
+                    const isEditing = editingServiceId === srv.id;
+
+                    return (
+                      <div
+                        key={srv.id}
+                        className="bg-white border border-slate-300 rounded-2xl p-5 space-y-3 relative group hover:border-slate-400 transition-colors shadow-xs"
+                      >
+                        {isEditing ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-900 mb-1">Kategori</label>
+                                <select
+                                  value={editForm.category || srv.category || 'umum'}
+                                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold"
+                                >
+                                  <option value="turnitin">Turnitin</option>
+                                  <option value="parafrase">Parafrase</option>
+                                  <option value="joki-tugas">Joki Tugas</option>
+                                  <option value="joki-skripsi">Joki Skripsi</option>
+                                  <option value="olah-data">Olah Data</option>
+                                  <option value="desain-ppt">Desain PPT</option>
+                                  <option value="formatting">Formatting</option>
+                                  <option value="subscribe-ai">Subscribe AI</option>
+                                  <option value="umum">Umum</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-900 mb-1">Badge Promosi (Opsional)</label>
+                                <input
+                                  type="text"
+                                  placeholder="POPULER / BEST SELLER / PROMO"
+                                  value={editForm.badge !== undefined ? editForm.badge || '' : srv.badge || ''}
+                                  onChange={(e) => setEditForm({ ...editForm, badge: e.target.value })}
+                                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-black text-slate-900 mb-1">Nama Layanan</label>
+                              <input
+                                type="text"
+                                value={editForm.name !== undefined ? editForm.name : srv.name}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-black text-slate-900 mb-1">Harga Layanan</label>
+                              <input
+                                type="text"
+                                value={editForm.price !== undefined ? editForm.price : srv.price}
+                                onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-black text-slate-900 mb-1">Deskripsi Singkat</label>
+                              <textarea
+                                rows={2}
+                                value={editForm.description !== undefined ? editForm.description : srv.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold"
+                              />
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
+                              <button
+                                onClick={() => setEditingServiceId(null)}
+                                className="px-3.5 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black hover:bg-slate-200 border border-slate-300"
+                              >
+                                Batal
+                              </button>
+                              <button
+                                onClick={() => handleSaveCmsService(srv.id)}
+                                className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                                <span>Simpan ke Database</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[9px] font-mono text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded font-black uppercase">
+                                    {srv.category}
+                                  </span>
+                                  <span className="text-[9px] font-mono text-slate-500 font-bold">
+                                    #{srv.id}
+                                  </span>
+                                </div>
+                                <h3 className="font-black text-base text-slate-900">{srv.name}</h3>
+                              </div>
+
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => {
+                                    setEditingServiceId(srv.id);
+                                    setEditForm({
+                                      category: srv.category,
+                                      name: srv.name,
+                                      price: srv.price,
+                                      description: srv.description,
+                                      badge: srv.badge,
+                                    });
+                                  }}
+                                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 transition-colors cursor-pointer shadow-xs"
+                                  title="Edit Layanan"
+                                >
+                                  <Edit3 className="w-4 h-4 text-slate-900" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteService(srv.id, srv.name)}
+                                  disabled={deletingServiceId === srv.id}
+                                  className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-colors cursor-pointer shadow-xs"
+                                  title="Hapus Layanan dari Database"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-slate-700 leading-relaxed font-bold">{srv.description}</p>
+
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                              <span className="text-sm font-black text-slate-900">{srv.price}</span>
+                              {srv.badge && (
+                                <span className="text-[9px] font-black bg-slate-900 text-white px-2.5 py-0.5 rounded uppercase">
+                                  {srv.badge}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {cmsServices.map((srv) => {
-                  const isEditing = editingServiceId === srv.id;
-
-                  return (
-                    <div
-                      key={srv.id}
-                      className="bg-slate-50 border border-slate-300 rounded-2xl p-5 space-y-3 relative group hover:border-slate-400 transition-colors shadow-xs"
-                    >
-                      {isEditing ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-[11px] font-black text-slate-900 mb-1">Nama Layanan</label>
-                            <input
-                              type="text"
-                              value={editForm.name || srv.name}
-                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-black text-slate-900 mb-1">Harga Layanan</label>
-                            <input
-                              type="text"
-                              value={editForm.price || srv.price}
-                              onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-black text-slate-300 mb-1">Deskripsi Singkat</label>
-                            <textarea
-                              rows={2}
-                              value={editForm.description || srv.description}
-                              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black"
-                            />
-                          </div>
-
-                          <div className="flex justify-end gap-2 pt-2">
-                            <button
-                              onClick={() => setEditingServiceId(null)}
-                              className="px-3.5 py-1.5 rounded-lg bg-slate-200 text-slate-900 text-xs font-black hover:bg-slate-300"
-                            >
-                              Batal
-                            </button>
-                            <button
-                              onClick={() => handleSaveCmsService(srv.id)}
-                              className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-                            >
-                              <Save className="w-3.5 h-3.5" />
-                              <span>Simpan CMS</span>
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <span className="text-[9px] font-mono text-slate-900 bg-slate-200 border border-slate-400 px-2 py-0.5 rounded font-black uppercase">
-                                {srv.category}
-                              </span>
-                              <h3 className="font-black text-base text-slate-900 mt-1.5">{srv.name}</h3>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setEditingServiceId(srv.id);
-                                setEditForm({ name: srv.name, price: srv.price, description: srv.description, badge: srv.badge });
-                              }}
-                              className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 transition-colors cursor-pointer shadow-xs"
-                              title="Edit Layanan"
-                            >
-                              <Edit3 className="w-4 h-4 text-slate-900" />
-                            </button>
-                          </div>
-
-                          <p className="text-xs text-slate-900 leading-relaxed font-bold">{srv.description}</p>
-
-                          <div className="flex items-center justify-between pt-3 border-t border-slate-300">
-                            <span className="text-sm font-black text-slate-900">{srv.price}</span>
-                            {srv.badge && (
-                              <span className="text-[9px] font-black bg-slate-900 text-white px-2.5 py-0.5 rounded uppercase">
-                                {srv.badge}
-                              </span>
-                            )}
-                          </div>
-                        </>
-                      )}
+              {/* CREATE SERVICE MODAL */}
+              {isCreateServiceOpen && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                  <div className="bg-white border border-slate-300 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-scale-in">
+                    <div className="flex items-center justify-between border-b border-slate-300 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Plus className="w-5 h-5 text-slate-900" />
+                        <h3 className="font-black text-base text-slate-900">Tambah Layanan Baru ke Database</h3>
+                      </div>
+                      <button
+                        onClick={() => setIsCreateServiceOpen(false)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
+
+                    <form onSubmit={handleCreateService} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-black text-slate-900 mb-1">
+                            Kategori <span className="text-rose-500">*</span>
+                          </label>
+                          <select
+                            value={newService.category || 'turnitin'}
+                            onChange={(e) => setNewService({ ...newService, category: e.target.value })}
+                            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold focus:bg-white"
+                          >
+                            <option value="turnitin">Turnitin</option>
+                            <option value="parafrase">Parafrase</option>
+                            <option value="joki-tugas">Joki Tugas</option>
+                            <option value="joki-skripsi">Joki Skripsi</option>
+                            <option value="olah-data">Olah Data</option>
+                            <option value="desain-ppt">Desain PPT</option>
+                            <option value="formatting">Formatting</option>
+                            <option value="subscribe-ai">Subscribe AI</option>
+                            <option value="umum">Umum</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black text-slate-900 mb-1">
+                            Badge Promosi (Opsional)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Contoh: POPULER / BEST SELLER"
+                            value={newService.badge || ''}
+                            onChange={(e) => setNewService({ ...newService, badge: e.target.value })}
+                            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold focus:bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black text-slate-900 mb-1">
+                          Nama Layanan <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Contoh: Cek Turnitin No Repository Instant"
+                          value={newService.name || ''}
+                          onChange={(e) => setNewService({ ...newService, name: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black focus:bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black text-slate-900 mb-1">
+                          Harga Layanan <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Contoh: Rp 8.000 atau Rp 5.000 / Hal atau Chat Admin"
+                          value={newService.price || ''}
+                          onChange={(e) => setNewService({ ...newService, price: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-black focus:bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black text-slate-900 mb-1">
+                          Deskripsi Singkat Layanan
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="Jelaskan detail layanan atau keunggulan pengerjaan..."
+                          value={newService.description || ''}
+                          onChange={(e) => setNewService({ ...newService, description: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold focus:bg-white"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => setIsCreateServiceOpen(false)}
+                          className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black border border-slate-300 cursor-pointer"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>Simpan ke Database</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
