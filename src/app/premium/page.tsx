@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -1173,11 +1173,39 @@ const allProducts: ProductVariant[] = [
 ];
 
 export default function PremiumPage() {
+  const [productsList, setProductsList] = useState<ProductVariant[]>(allProducts);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  useEffect(() => {
+    fetch('/api/services?category=premium', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const dbServices = data.services;
+          setProductsList((prev) =>
+            prev.map((p) => {
+              const matched = dbServices.find((db: any) =>
+                db.name?.toLowerCase() === p.title.toLowerCase() ||
+                db.name?.toLowerCase().includes(p.title.toLowerCase())
+              );
+              if (matched) {
+                return {
+                  ...p,
+                  description: matched.description || p.description,
+                  badge: matched.badge !== undefined ? matched.badge : p.badge,
+                };
+              }
+              return p;
+            })
+          );
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
+    return productsList.filter((product) => {
       const matchCategory =
         selectedCategory === 'all' ||
         product.category === selectedCategory ||

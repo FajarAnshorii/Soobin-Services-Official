@@ -2033,6 +2033,8 @@ export default function AdminPage() {
                       { key: 'desain', label: 'Desain Grafis & PPT' },
                       { key: 'uiux', label: 'UI/UX Design' },
                       { key: 'medsos', label: 'Media Sosial' },
+                      { key: 'subscribe-ai', label: 'Subscribe AI' },
+                      { key: 'premium', label: 'Apps & Streaming Premium' },
                       { key: 'umum', label: 'Umum' },
                     ].map((cat) => (
                       <button
@@ -2051,7 +2053,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="text-[11px] font-black text-slate-600 flex items-center justify-between pt-1">
-                  <span>Menampilkan {filteredCmsServices.length} dari total {cmsServices.length} layanan di database Supabase</span>
+                  <span>Menampilkan {filteredCmsServices.length} dari total {cmsServices.length} layanan & produk di database Supabase</span>
                   {serviceCategoryFilter !== 'all' && (
                     <button
                       onClick={() => setServiceCategoryFilter('all')}
@@ -2108,6 +2110,8 @@ export default function AdminPage() {
                                   <option value="desain">Desain Grafis & PPT</option>
                                   <option value="uiux">UI/UX Design</option>
                                   <option value="medsos">Media Sosial</option>
+                                  <option value="subscribe-ai">Subscribe AI</option>
+                                  <option value="premium">Apps & Streaming Premium</option>
                                   <option value="umum">Umum</option>
                                 </select>
                               </div>
@@ -2272,6 +2276,8 @@ export default function AdminPage() {
                             <option value="desain">Desain Grafis & PPT</option>
                             <option value="uiux">UI/UX Design</option>
                             <option value="medsos">Media Sosial</option>
+                            <option value="subscribe-ai">Subscribe AI</option>
+                            <option value="premium">Apps & Streaming Premium</option>
                             <option value="umum">Umum</option>
                           </select>
                         </div>
