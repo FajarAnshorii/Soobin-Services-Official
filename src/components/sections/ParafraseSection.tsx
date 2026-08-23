@@ -34,6 +34,7 @@ const demoPairs = [
 ];
 
 export default function ParafraseSection() {
+  const [parafrasePrice, setParafrasePrice] = useState('Rp 2.000/HALAMAN');
   const [pairIndex, setPairIndex] = useState(0);
   const [origText, setOrigText] = useState('');
   const [paraText, setParaText] = useState('');
@@ -42,6 +43,22 @@ export default function ParafraseSection() {
   const [simOrigVisible, setSimOrigVisible] = useState(false);
   const [simParaVisible, setSimParaVisible] = useState(false);
   const [isReadyToCycle, setIsReadyToCycle] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/services?category=parafrase', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const pItem = data.services.find((s: any) =>
+            s.name?.toLowerCase().includes('parafrase') || s.category === 'parafrase'
+          );
+          if (pItem && pItem.price) {
+            setParafrasePrice(pItem.price.toUpperCase());
+          }
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const origIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const paraIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -169,7 +186,7 @@ export default function ParafraseSection() {
               PARAFRASE DOKUMEN
             </h2>
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-400 mb-4 sm:mb-6">
-              Rp 2.000/HALAMAN
+              {parafrasePrice}
             </p>
             <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
               Termurah di Pasaran dan Terpercaya 2K+ Customer

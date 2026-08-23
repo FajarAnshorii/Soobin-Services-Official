@@ -1,37 +1,36 @@
-'use client';
-
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Unlock, Globe, FileKey, Star } from 'lucide-react';
 import LogoCloud from '@/components/ui/logo-cloud-15';
 
-const freeSites = [
-  { name: 'Bartleby', price: '2k' },
-  { name: 'Academia', price: '2k' },
-  { name: 'Numerade', price: '3k' },
-  { name: 'Quizlet', price: '2k' },
-  { name: 'Scribd', price: '2k' },
-  { name: 'Chegg', price: '2k' },
-  { name: 'Studocu', price: '3k' },
-  { name: 'Slideshare', price: '3k' },
-  { name: 'Coursehero', price: '3k' },
-  { name: 'Scribd Book', price: '3k' },
-  { name: 'Sage', price: '3k' },
-  { name: 'Wiley', price: '3k' },
+const DEFAULT_FREE_SITES = [
+  { name: 'Bartleby', price: 'Rp 2.000' },
+  { name: 'Academia', price: 'Rp 2.000' },
+  { name: 'Numerade', price: 'Rp 3.000' },
+  { name: 'Quizlet', price: 'Rp 2.000' },
+  { name: 'Scribd', price: 'Rp 2.000' },
+  { name: 'Chegg', price: 'Rp 2.000' },
+  { name: 'Studocu', price: 'Rp 3.000' },
+  { name: 'Slideshare', price: 'Rp 3.000' },
+  { name: 'Coursehero', price: 'Rp 3.000' },
+  { name: 'Scribd Book', price: 'Rp 3.000' },
+  { name: 'Sage', price: 'Rp 3.000' },
+  { name: 'Wiley', price: 'Rp 3.000' },
 ];
 
-const academicSites = [
-  { name: 'ResearchGate', price: '3k' },
-  { name: 'ISTOR', price: '3k' },
-  { name: 'IEEE', price: '3k' },
-  { name: 'Springer', price: '3k' },
-  { name: 'ACS', price: '4.5k' },
-  { name: 'Elsevier', price: '4.5k' },
-  { name: 'Emerald', price: '4.5k' },
-  { name: 'Oxford', price: '4.5k' },
-  { name: 'Cambridge', price: '4.5k' },
-  { name: 'Nature', price: '4.5k' },
-  { name: 'APA Psycnet', price: '4.5k' },
-  { name: 'Scientific', price: '4.5k' },
+const DEFAULT_ACADEMIC_SITES = [
+  { name: 'ResearchGate', price: 'Rp 3.000' },
+  { name: 'ISTOR', price: 'Rp 3.000' },
+  { name: 'IEEE', price: 'Rp 3.000' },
+  { name: 'Springer', price: 'Rp 3.000' },
+  { name: 'ACS', price: 'Rp 4.500' },
+  { name: 'Elsevier', price: 'Rp 4.500' },
+  { name: 'Emerald', price: 'Rp 4.500' },
+  { name: 'Oxford', price: 'Rp 4.500' },
+  { name: 'Cambridge', price: 'Rp 4.500' },
+  { name: 'Nature', price: 'Rp 4.500' },
+  { name: 'APA Psycnet', price: 'Rp 4.500' },
+  { name: 'Scientific', price: 'Rp 4.500' },
 ];
 
 const SiteCard = ({ name, price, index }: { name: string; price: string; index: number }) => (
@@ -57,6 +56,37 @@ const SiteCard = ({ name, price, index }: { name: string; price: string; index: 
 );
 
 export default function UnlockDokumenSection() {
+  const [freeSitesList, setFreeSitesList] = useState(DEFAULT_FREE_SITES);
+  const [academicSitesList, setAcademicSitesList] = useState(DEFAULT_ACADEMIC_SITES);
+
+  useEffect(() => {
+    fetch('/api/services?category=unlock', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const dbServices = data.services;
+          setFreeSitesList((prev) =>
+            prev.map((site) => {
+              const matched = dbServices.find((db: any) =>
+                db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
+                site.name.toLowerCase().includes(db.name?.toLowerCase())
+              );
+              return matched ? { ...site, price: matched.price } : site;
+            })
+          );
+          setAcademicSitesList((prev) =>
+            prev.map((site) => {
+              const matched = dbServices.find((db: any) =>
+                db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
+                site.name.toLowerCase().includes(db.name?.toLowerCase())
+              );
+              return matched ? { ...site, price: matched.price } : site;
+            })
+          );
+        }
+      })
+      .catch(console.error);
+  }, []);
   return (
     <section id="unlock-dokumen" className="bg-white section-padding">
       <div className="container-custom">
@@ -103,7 +133,7 @@ export default function UnlockDokumenSection() {
             <h3 className="text-lg sm:text-xl font-bold text-dark-800">Platform Umum</h3>
           </div>
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {freeSites.map((site, index) => (
+            {freeSitesList.map((site, index) => (
               <SiteCard key={site.name} {...site} index={index} />
             ))}
           </div>
@@ -121,8 +151,8 @@ export default function UnlockDokumenSection() {
             <h3 className="text-lg sm:text-xl font-bold text-dark-800">Platform Akademik</h3>
           </div>
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {academicSites.map((site, index) => (
-              <SiteCard key={site.name} {...site} index={index + freeSites.length} />
+            {academicSitesList.map((site, index) => (
+              <SiteCard key={site.name} {...site} index={index + freeSitesList.length} />
             ))}
           </div>
         </motion.div>

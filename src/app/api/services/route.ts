@@ -4,13 +4,22 @@ import { supabaseAdmin } from '@/lib/supabase';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// 1. GET - Fetch all services from Supabase
-export async function GET() {
+// 1. GET - Fetch all services (or filter by category) from Supabase
+export async function GET(request: Request) {
   try {
-    const { data: supaServices, error } = await supabaseAdmin
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+
+    let query = supabaseAdmin
       .from('services')
       .select('*')
       .order('id', { ascending: true });
+
+    if (category && category !== 'all') {
+      query = query.eq('category', category);
+    }
+
+    const { data: supaServices, error } = await query;
 
     if (error) {
       console.error('Supabase services GET error:', error);

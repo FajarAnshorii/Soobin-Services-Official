@@ -1,26 +1,26 @@
-'use client';
-
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   FileText, Code, BookOpen, Calculator, Pen, Languages,
   Presentation, ClipboardList, Database, FileSpreadsheet
 } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
-const services = [
-  { icon: Languages, label: 'Translate Grammar', price: '2.000/Hal' },
-  { icon: BookOpen, label: 'Daftar Pustaka', price: '1.000/Sumber' },
-  { icon: Presentation, label: 'Pembuatan PPT', price: '3.000/Hal' },
-  { icon: ClipboardList, label: 'Daftar Isi Otomatis', price: '10.000' },
-  { icon: FileText, label: 'Pengetikan File', price: '1.000/Hal' },
-  { icon: FileText, label: 'Review Jurnal', price: '25k/Review' },
+const DEFAULT_SUPPORTING = [
+  { icon: Languages, label: 'Translate Grammar', price: 'Rp 2.000/Hal' },
+  { icon: BookOpen, label: 'Daftar Pustaka', price: 'Rp 1.000/Sumber' },
+  { icon: Presentation, label: 'Pembuatan PPT', price: 'Rp 3.000/Hal' },
+  { icon: ClipboardList, label: 'Daftar Isi Otomatis', price: 'Rp 10.000' },
+  { icon: FileText, label: 'Pengetikan File', price: 'Rp 1.000/Hal' },
+  { icon: FileText, label: 'Review Jurnal', price: 'Rp 25.000/Review' },
 ];
 
-const mainServices = [
-  { label: 'Joki Makalah', price: 'Start 40k' },
-  { label: 'Joki Mendeley', price: '1k/Sumber' },
-  { label: 'Joki Artikel', price: 'Start 50k' },
-  { label: 'Joki Jurnal', price: 'Start 70k' },
-  { label: 'Joki Essay', price: 'Start 40k' },
+const DEFAULT_MAIN = [
+  { label: 'Joki Makalah', price: 'Start Rp 40.000' },
+  { label: 'Joki Mendeley', price: 'Rp 1.000/Sumber' },
+  { label: 'Joki Artikel', price: 'Start Rp 50.000' },
+  { label: 'Joki Jurnal', price: 'Start Rp 70.000' },
+  { label: 'Joki Essay', price: 'Start Rp 40.000' },
   { label: 'Joki Tugas Informatika', price: 'Chat Admin' },
   { label: 'Joki Tugas Coding', price: 'Chat Admin' },
   { label: 'Joki Pantun Dongeng', price: 'Chat Admin' },
@@ -36,10 +36,43 @@ const mainServices = [
   { label: 'Nomor Halaman', price: 'Chat Admin' },
 ];
 
-import { useCart } from '@/context/CartContext';
-
 export default function JokiTugasSection() {
   const { placeDirectOrder } = useCart();
+  const [supportingServices, setSupportingServices] = useState(DEFAULT_SUPPORTING);
+  const [mainServicesList, setMainServicesList] = useState(DEFAULT_MAIN);
+
+  useEffect(() => {
+    fetch('/api/services?category=joki-tugas', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const dbServices = data.services;
+
+          // Map supporting services
+          setSupportingServices((prev) =>
+            prev.map((s) => {
+              const matched = dbServices.find((db: any) =>
+                db.name?.toLowerCase().includes(s.label.toLowerCase()) ||
+                s.label.toLowerCase().includes(db.name?.toLowerCase())
+              );
+              return matched ? { ...s, price: matched.price } : s;
+            })
+          );
+
+          // Map main services
+          setMainServicesList((prev) =>
+            prev.map((s) => {
+              const matched = dbServices.find((db: any) =>
+                db.name?.toLowerCase().includes(s.label.toLowerCase()) ||
+                s.label.toLowerCase().includes(db.name?.toLowerCase())
+              );
+              return matched ? { ...s, price: matched.price } : s;
+            })
+          );
+        }
+      })
+      .catch(console.error);
+  }, []);
   return (
     <section id="joki-tugas" className="bg-white section-padding">
       <div className="container-custom">
@@ -75,7 +108,7 @@ export default function JokiTugasSection() {
             Layanan Pendukung
           </h3>
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {services.map((service, index) => (
+            {supportingServices.map((service, index) => (
               <motion.div
                 key={service.label}
                 className="bg-gray-50 border border-gray-200 rounded-xl p-3 sm:p-4 flex items-center justify-between"
@@ -112,7 +145,7 @@ export default function JokiTugasSection() {
             Layanan Utama
           </h3>
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {mainServices.map((service, index) => (
+            {mainServicesList.map((service, index) => (
               <motion.div
                 key={service.label}
                 className="bg-linear-to-br from-dark-800 to-primary-900 border border-primary-700/30 rounded-xl p-3 sm:p-4 lg:p-5 flex items-center justify-between"

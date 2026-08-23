@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   GraduationCap, BookOpen, FileSearch, Archive,
@@ -8,16 +6,16 @@ import {
   FlaskConical, Users, Route, Map, Sparkles, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
-const categories = [
+const DEFAULT_CATEGORIES = [
   {
     id: 'persiapan',
     label: 'Persiapan Penelitian',
     icon: Target,
     services: [
-      { num: '01', title: 'Konsultasi Judul Penelitian', price: '15k–35k' },
-      { num: '02', title: 'Rekomendasi Judul Penelitian', price: '25k–75k' },
-      { num: '03', title: 'Bantu Susun Rumusan Masalah', price: '20k–50k' },
-      { num: '04', title: 'Bantu Susun Tujuan Penelitian', price: '20k–50k' },
+      { num: '01', title: 'Konsultasi Judul Penelitian', price: 'Rp 15.000–35.000' },
+      { num: '02', title: 'Rekomendasi Judul Penelitian', price: 'Rp 25.000–75.000' },
+      { num: '03', title: 'Bantu Susun Rumusan Masalah', price: 'Rp 20.000–50.000' },
+      { num: '04', title: 'Bantu Susun Tujuan Penelitian', price: 'Rp 20.000–50.000' },
     ],
   },
   {
@@ -25,10 +23,10 @@ const categories = [
     label: 'Manfaat & Landasan',
     icon: BookMarked,
     services: [
-      { num: '05', title: 'Bantu Susun Manfaat Penelitian', price: '20k–50k' },
-      { num: '06', title: 'Bantu Susun Kerangka Berpikir', price: '40k–100k' },
-      { num: '07', title: 'Bantu Susun Kerangka Konsep', price: '40k–100k' },
-      { num: '08', title: 'Bantu Susun Hipotesis', price: '25k–75k' },
+      { num: '05', title: 'Bantu Susun Manfaat Penelitian', price: 'Rp 20.000–50.000' },
+      { num: '06', title: 'Bantu Susun Kerangka Berpikir', price: 'Rp 40.000–100.000' },
+      { num: '07', title: 'Bantu Susun Kerangka Konsep', price: 'Rp 40.000–100.000' },
+      { num: '08', title: 'Bantu Susun Hipotesis', price: 'Rp 25.000–75.000' },
     ],
   },
   {
@@ -36,10 +34,10 @@ const categories = [
     label: 'Variabel & Metode',
     icon: FlaskConical,
     services: [
-      { num: '09', title: 'Bantu Tentukan Variabel Penelitian', price: '25k–75k' },
-      { num: '10', title: 'Bantu Cari Gap Penelitian', price: '50k–150k' },
-      { num: '11', title: 'Bantu Tentukan Metode Penelitian', price: '50k–150k' },
-      { num: '12', title: 'Bantu Tentukan Populasi & Sampel', price: '40k–100k' },
+      { num: '09', title: 'Bantu Tentukan Variabel Penelitian', price: 'Rp 25.000–75.000' },
+      { num: '10', title: 'Bantu Cari Gap Penelitian', price: 'Rp 50.000–150.000' },
+      { num: '11', title: 'Bantu Tentukan Metode Penelitian', price: 'Rp 50.000–150.000' },
+      { num: '12', title: 'Bantu Tentukan Populasi & Sampel', price: 'Rp 40.000–100.000' },
     ],
   },
   {
@@ -47,15 +45,15 @@ const categories = [
     label: 'Teknik & Roadmap',
     icon: Route,
     services: [
-      { num: '13', title: 'Bantu Teknik Sampling', price: '35k–100k' },
-      { num: '14', title: 'Bantu Susun Alur Penelitian', price: '50k–150k' },
-      { num: '15', title: 'Bantu Susun Roadmap Penelitian', price: '75k–200k' },
-      { num: '16', title: 'Bantu Novelty Penelitian', price: '75k–250k' },
+      { num: '13', title: 'Bantu Teknik Sampling', price: 'Rp 35.000–100.000' },
+      { num: '14', title: 'Bantu Susun Alur Penelitian', price: 'Rp 50.000–150.000' },
+      { num: '15', title: 'Bantu Susun Roadmap Penelitian', price: 'Rp 75.000–200.000' },
+      { num: '16', title: 'Bantu Novelty Penelitian', price: 'Rp 75.000–250.000' },
     ],
   },
 ];
 
-const paketCards = [
+const DEFAULT_PAKET_CARDS = [
   {
     icon: GraduationCap,
     title: 'Paket Sempro',
@@ -83,10 +81,34 @@ const paketCards = [
 ];
 
 export default function SkripsiSection() {
+  const [categoriesList, setCategoriesList] = useState(DEFAULT_CATEGORIES);
   const [activeTab, setActiveTab] = useState('persiapan');
   const [currentPage, setCurrentPage] = useState(0);
 
-  const activeCategory = categories.find((c) => c.id === activeTab) || categories[0];
+  useEffect(() => {
+    fetch('/api/services?category=joki-skripsi', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const dbServices = data.services;
+          setCategoriesList((prevCats) =>
+            prevCats.map((cat) => ({
+              ...cat,
+              services: cat.services.map((srv) => {
+                const matched = dbServices.find((db: any) =>
+                  db.name?.toLowerCase().includes(srv.title.toLowerCase()) ||
+                  srv.title.toLowerCase().includes(db.name?.toLowerCase())
+                );
+                return matched ? { ...srv, price: matched.price } : srv;
+              }),
+            }))
+          );
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const activeCategory = categoriesList.find((c) => c.id === activeTab) || categoriesList[0];
   const itemsPerPage = 4;
   const totalPages = Math.ceil(activeCategory.services.length / itemsPerPage);
   const visibleServices = activeCategory.services.slice(
@@ -137,7 +159,7 @@ export default function SkripsiSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          {categories.map((cat) => (
+          {categoriesList.map((cat) => (
             <button
               key={cat.id}
               onClick={() => handleTabChange(cat.id)}
@@ -189,14 +211,14 @@ export default function SkripsiSection() {
                     {service.title}
                   </span>
                   <span className="md:hidden text-primary-800 font-bold text-xs sm:text-sm mt-1">
-                    Rp {service.price}
+                    {service.price}
                   </span>
                 </div>
 
                 {/* Price - desktop */}
                 <div className="hidden md:flex justify-end">
                   <span className="text-primary-800 font-bold whitespace-nowrap">
-                    Rp {service.price}
+                    {service.price}
                   </span>
                 </div>
               </motion.div>
@@ -246,7 +268,7 @@ export default function SkripsiSection() {
 
         {/* Paket Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          {paketCards.map((card, index) => (
+          {DEFAULT_PAKET_CARDS.map((card, index) => (
             <motion.div
               key={card.title}
               className={`relative bg-white rounded-2xl p-4 sm:p-6 lg:p-8 text-center border-2 ${
