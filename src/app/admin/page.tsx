@@ -2021,14 +2021,18 @@ export default function AdminPage() {
 
                   <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
                     {[
-                      { key: 'all', label: 'Semua' },
-                      { key: 'turnitin', label: 'Turnitin' },
+                      { key: 'all', label: `Semua (${cmsServices.length})` },
+                      { key: 'turnitin', label: 'Cek Turnitin & AI' },
                       { key: 'parafrase', label: 'Parafrase' },
                       { key: 'joki-tugas', label: 'Joki Tugas' },
                       { key: 'joki-skripsi', label: 'Joki Skripsi' },
-                      { key: 'olah-data', label: 'Olah Data' },
-                      { key: 'desain-ppt', label: 'Desain PPT' },
-                      { key: 'formatting', label: 'Formatting' },
+                      { key: 'uji-data', label: 'Uji & Olah Data' },
+                      { key: 'tugas-sekolah', label: 'Tugas Sekolah' },
+                      { key: 'laporan-akademik', label: 'Laporan Akademik' },
+                      { key: 'unlock', label: 'Unlock Dokumen' },
+                      { key: 'desain', label: 'Desain Grafis & PPT' },
+                      { key: 'uiux', label: 'UI/UX Design' },
+                      { key: 'medsos', label: 'Media Sosial' },
                       { key: 'umum', label: 'Umum' },
                     ].map((cat) => (
                       <button
@@ -2047,7 +2051,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="text-[11px] font-black text-slate-600 flex items-center justify-between pt-1">
-                  <span>Menampilkan {filteredCmsServices.length} dari total {cmsServices.length} layanan di database</span>
+                  <span>Menampilkan {filteredCmsServices.length} dari total {cmsServices.length} layanan di database Supabase</span>
                   {serviceCategoryFilter !== 'all' && (
                     <button
                       onClick={() => setServiceCategoryFilter('all')}
@@ -2093,14 +2097,17 @@ export default function AdminPage() {
                                   onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold"
                                 >
-                                  <option value="turnitin">Turnitin</option>
+                                  <option value="turnitin">Cek Turnitin & AI</option>
                                   <option value="parafrase">Parafrase</option>
-                                  <option value="joki-tugas">Joki Tugas</option>
+                                  <option value="joki-tugas">Joki Tugas Kuliah</option>
                                   <option value="joki-skripsi">Joki Skripsi</option>
-                                  <option value="olah-data">Olah Data</option>
-                                  <option value="desain-ppt">Desain PPT</option>
-                                  <option value="formatting">Formatting</option>
-                                  <option value="subscribe-ai">Subscribe AI</option>
+                                  <option value="uji-data">Uji & Olah Data (SPSS/PLS/dll)</option>
+                                  <option value="tugas-sekolah">Tugas Sekolah (SMP/SMA)</option>
+                                  <option value="laporan-akademik">Laporan Akademik / Magang</option>
+                                  <option value="unlock">Unlock Dokumen</option>
+                                  <option value="desain">Desain Grafis & PPT</option>
+                                  <option value="uiux">UI/UX Design</option>
+                                  <option value="medsos">Media Sosial</option>
                                   <option value="umum">Umum</option>
                                 </select>
                               </div>
@@ -2254,14 +2261,17 @@ export default function AdminPage() {
                             onChange={(e) => setNewService({ ...newService, category: e.target.value })}
                             className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold focus:bg-white"
                           >
-                            <option value="turnitin">Turnitin</option>
+                            <option value="turnitin">Cek Turnitin & AI</option>
                             <option value="parafrase">Parafrase</option>
-                            <option value="joki-tugas">Joki Tugas</option>
+                            <option value="joki-tugas">Joki Tugas Kuliah</option>
                             <option value="joki-skripsi">Joki Skripsi</option>
-                            <option value="olah-data">Olah Data</option>
-                            <option value="desain-ppt">Desain PPT</option>
-                            <option value="formatting">Formatting</option>
-                            <option value="subscribe-ai">Subscribe AI</option>
+                            <option value="uji-data">Uji & Olah Data (SPSS/PLS/dll)</option>
+                            <option value="tugas-sekolah">Tugas Sekolah (SMP/SMA)</option>
+                            <option value="laporan-akademik">Laporan Akademik / Magang</option>
+                            <option value="unlock">Unlock Dokumen</option>
+                            <option value="desain">Desain Grafis & PPT</option>
+                            <option value="uiux">UI/UX Design</option>
+                            <option value="medsos">Media Sosial</option>
                             <option value="umum">Umum</option>
                           </select>
                         </div>
