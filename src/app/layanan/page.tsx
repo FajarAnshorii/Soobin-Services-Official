@@ -1024,7 +1024,30 @@ export default function LayananPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<any>(null);
-  const [servicesList, setServicesList] = useState(services);
+  const [servicesList, setServicesList] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('soobin_cms_services');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map((ds: any) => {
+              const defaultItem = services.find((s) => s.id === ds.id || s.name?.toLowerCase() === ds.name?.toLowerCase());
+              return {
+                id: ds.id,
+                category: ds.category || defaultItem?.category || 'umum',
+                name: ds.name || defaultItem?.name,
+                price: ds.price || defaultItem?.price,
+                badge: ds.badge !== undefined ? ds.badge : defaultItem?.badge,
+                icon: defaultItem?.icon || Globe,
+              };
+            });
+          }
+        }
+      } catch (e) {}
+    }
+    return services;
+  });
 
   useEffect(() => {
     fetch('/api/services', { cache: 'no-store' })
@@ -1043,6 +1066,9 @@ export default function LayananPage() {
             };
           });
           setServicesList(mapped);
+          try {
+            localStorage.setItem('soobin_cms_services', JSON.stringify(data.services));
+          } catch (e) {}
         }
       })
       .catch(console.error);
