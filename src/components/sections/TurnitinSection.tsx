@@ -1,23 +1,57 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileCheck, Zap, Shield, Clock } from 'lucide-react';
 
 import { useCart } from '@/context/CartContext';
 
-const plans = [
+const DEFAULT_PLANS = [
   { amount: '1x', price: 'Rp 8.000', badge: null },
   { amount: '3x', price: 'Rp 24.000', badge: 'Hemat!' },
   { amount: '6x', price: 'Rp 48.000', badge: 'Best Deal!' },
 ];
 
-const aiPlans = [
+const DEFAULT_AI_PLANS = [
   { amount: '1x', price: 'Rp 5.000' },
   { amount: '2x', price: 'Rp 10.000' },
 ];
 
 export default function TurnitinSection() {
   const { placeDirectOrder } = useCart();
+  const [plans, setPlans] = useState(DEFAULT_PLANS);
+  const [aiPlans, setAiPlans] = useState(DEFAULT_AI_PLANS);
+
+  useEffect(() => {
+    fetch('/api/services', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
+          const srv = data.services;
+          const t1 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 1x') || s.id === 1);
+          const t3 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 3x') || s.id === 2);
+          const t6 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 6x') || s.id === 3);
+
+          const ai1 = srv.find((s: any) => s.name?.toLowerCase().includes('ai 1x') || s.id === 4);
+          const ai2 = srv.find((s: any) => s.name?.toLowerCase().includes('ai 2x') || s.id === 5);
+
+          setPlans([
+            { amount: '1x', price: t1?.price || 'Rp 8.000', badge: t1?.badge || null },
+            { amount: '3x', price: t3?.price || 'Rp 24.000', badge: t3?.badge || 'Hemat!' },
+            { amount: '6x', price: t6?.price || 'Rp 48.000', badge: t6?.badge || 'Best Deal!' },
+          ]);
+
+          setAiPlans([
+            { amount: '1x', price: ai1?.price || 'Rp 5.000' },
+            { amount: '2x', price: ai2?.price || 'Rp 10.000' },
+          ]);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const baseTurnitinPrice = plans[0]?.price || 'Rp 8.000';
+
   return (
     <section id="cek-turnitin" className="bg-gray-50 section-padding">
       <div className="container-custom">
@@ -36,7 +70,7 @@ export default function TurnitinSection() {
             CEK TURNITIN & CEK A.I
           </h2>
           <p className="text-gray-600 text-base sm:text-lg px-4">
-            <span className="text-primary-800 font-bold text-xl sm:text-2xl">Rp 8.000/CEK</span>
+            <span className="text-primary-800 font-bold text-xl sm:text-2xl">{baseTurnitinPrice}/CEK</span>
             <br />
             Termurah di Pasaran dan Lebih dari 5K+ Files Checked
           </p>

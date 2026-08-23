@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // 1. GET - Fetch all services from Supabase
 export async function GET() {
   try {
@@ -14,7 +17,14 @@ export async function GET() {
       return NextResponse.json({ error: error.message, services: [] }, { status: 500 });
     }
 
-    return NextResponse.json({ services: supaServices || [] });
+    return NextResponse.json(
+      { services: supaServices || [] },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        },
+      }
+    );
   } catch (error: any) {
     console.error('API GET services error:', error);
     return NextResponse.json({ error: error.message || 'Failed fetching services', services: [] }, { status: 500 });

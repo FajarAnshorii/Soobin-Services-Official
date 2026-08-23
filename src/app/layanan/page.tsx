@@ -1027,12 +1027,12 @@ export default function LayananPage() {
   const [servicesList, setServicesList] = useState(services);
 
   useEffect(() => {
-    fetch('/api/services')
+    fetch('/api/services', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (data && Array.isArray(data.services) && data.services.length > 0) {
           const mapped = data.services.map((ds: any) => {
-            const defaultItem = services.find((s) => s.id === ds.id);
+            const defaultItem = services.find((s) => s.id === ds.id || s.name?.toLowerCase() === ds.name?.toLowerCase());
             return {
               id: ds.id,
               category: ds.category || defaultItem?.category || 'umum',
