@@ -86,14 +86,14 @@ const BUCKET_URL = '/api/chats';
 const ORDERS_URL = '/api/orders';
 
 const DEFAULT_SERVICES: ServiceConfig[] = [
-  { id: 101, category: 'turnitin', name: 'Cek Turnitin Standard', price: 'Rp 8.000', description: 'Hasil instant, sertakan filter bibliography & quotes.', badge: 'POPULER' },
-  { id: 102, category: 'turnitin', name: 'Cek Turnitin 3x Paket', price: 'Rp 20.000', description: 'Paket hemat 3x pengecekan dengan laporan lengkap.', badge: 'BEST DEAL' },
-  { id: 201, category: 'parafrase', name: 'Parafrase Ringan (< 25%)', price: 'Rp 5.000 / Halaman', description: 'Menurunkan persentase Turnitin hingga aman.', badge: null },
-  { id: 202, category: 'parafrase', name: 'Parafrase Skripsi Full Bab', price: 'Rp 150.000', description: 'Pengerjaan cepat & garansi hingga lolos Turnitin.', badge: 'RECOMMENDED' },
-  { id: 301, category: 'joki-tugas', name: 'Joki Tugas Kuliah / Makalah', price: 'Chat Admin', description: 'Pengerjaan sesuai deadline & modul mata kuliah.', badge: null },
-  { id: 302, category: 'tugas-sekolah', name: 'Joki Tugas Sekolah / PR', price: 'Chat Admin', description: 'Bantuan pengerjaan soal & tugas sekolah.', badge: null },
-  { id: 401, category: 'uji-data', name: 'Analisa Data SPSS / SmartPLS', price: 'Rp 150.000', description: 'Lengkap dengan output & interpretasi bab 4.', badge: 'HOT' },
-  { id: 501, category: 'joki-skripsi', name: 'Bimbingan & Joki Skripsi Full', price: 'Chat Admin', description: 'Pengerjaan bab 1 - 5 lengkap dengan revisi.', badge: 'PROMO' }
+  { id: 1, category: 'turnitin', name: 'Cek Turnitin 1x', price: 'Rp 9.000', description: 'Pengerjaan cepat & garansi kualitas hasil terbaik.', badge: null },
+  { id: 2, category: 'turnitin', name: 'Cek Turnitin 3x', price: 'Rp 24.000', description: 'Paket hemat 3x pengecekan dengan laporan lengkap.', badge: 'Hemat!' },
+  { id: 3, category: 'turnitin', name: 'Cek Turnitin 6x', price: 'Rp 48.000', description: 'Pengecekan lengkap dan garansi hasil valid.', badge: 'Best Deal!' },
+  { id: 4, category: 'turnitin', name: 'Cek AI 1x', price: 'Rp 5.000', description: 'Deteksi AI hasil instan dan detail.', badge: 'ZEROGPT' },
+  { id: 5, category: 'turnitin', name: 'Cek AI 2x', price: 'Rp 10.000', description: 'Paket 2x deteksi AI instan.', badge: 'ZEROGPT' },
+  { id: 6, category: 'parafrase', name: 'Parafrase Dokumen', price: 'Rp 2.000/Hal', description: 'Menurunkan persentase Turnitin hingga aman.', badge: null },
+  { id: 7, category: 'joki-tugas', name: 'Translate Grammar', price: 'Rp 2.000/Hal', description: 'Penerjemahan dan perbaikan tata bahasa baku.', badge: null },
+  { id: 8, category: 'joki-tugas', name: 'Daftar Pustaka', price: 'Rp 1.000/Sumber', description: 'Penyusunan referensi APA/IEEE/Harvard rapi.', badge: null },
 ];
 
 // Helper to get YYYY-MM-DD date key in Asia/Jakarta (WIB) timezone with fallback to orderId timestamp
@@ -296,6 +296,7 @@ export default function AdminPage() {
     badge: '',
   });
   const [deletingServiceId, setDeletingServiceId] = useState<number | null>(null);
+  const [savingServiceId, setSavingServiceId] = useState<number | null>(null);
   const [servicesLoading, setServicesLoading] = useState(false);
 
   // Compute order counts per day (YYYY-MM-DD -> count) for mini-calendar & daily stats
@@ -786,16 +787,19 @@ export default function AdminPage() {
     const existing = cmsServices.find((s) => s.id === id);
     const updatedItem: ServiceConfig = {
       id,
-      category: editForm.category || existing?.category || 'umum',
-      name: editForm.name || existing?.name || '',
-      price: editForm.price || existing?.price || '',
-      description: editForm.description || existing?.description || '',
-      badge: editForm.badge !== undefined ? editForm.badge : (existing?.badge || null),
+      category: editForm.category !== undefined ? editForm.category : (existing?.category || 'umum'),
+      name: editForm.name !== undefined ? editForm.name : (existing?.name || ''),
+      price: editForm.price !== undefined ? editForm.price : (existing?.price || ''),
+      description: editForm.description !== undefined ? editForm.description : (existing?.description || ''),
+      badge: editForm.badge ? editForm.badge.trim() : (editForm.badge === '' ? null : (existing?.badge || null)),
     };
 
+    // Optimistic UI update
     const updatedList = cmsServices.map((s) => (s.id === id ? updatedItem : s));
     setCmsServices(updatedList);
     localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
+    setEditingServiceId(null);
+    setSavingServiceId(id);
 
     try {
       const res = await fetch('/api/services', {
@@ -804,12 +808,19 @@ export default function AdminPage() {
         body: JSON.stringify(updatedItem),
       });
       if (res.ok) {
-        setEditingServiceId(null);
-        setSaveSuccessMsg(`Layanan "${updatedItem.name}" berhasil diperbarui di database!`);
+        setSaveSuccessMsg(`Layanan "${updatedItem.name}" berhasil disimpan ke database (${updatedItem.price})!`);
         setTimeout(() => setSaveSuccessMsg(''), 4000);
+        // Sync fresh from Supabase
+        syncServicesWithCloud();
+      } else {
+        const errData = await res.json();
+        alert(`Gagal menyimpan ke database: ${errData.error || 'Terjadi kesalahan'}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed updating service in database', err);
+      alert(`Gagal menyimpan ke database: ${err.message || 'Koneksi bermasalah'}`);
+    } finally {
+      setSavingServiceId(null);
     }
   };
 
@@ -2144,11 +2155,13 @@ export default function AdminPage() {
                                 Batal
                               </button>
                               <button
+                                type="button"
+                                disabled={savingServiceId === srv.id}
                                 onClick={() => handleSaveCmsService(srv.id)}
-                                className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+                                className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
                               >
-                                <Save className="w-3.5 h-3.5" />
-                                <span>Simpan ke Database</span>
+                                <Save className={`w-3.5 h-3.5 ${savingServiceId === srv.id ? 'animate-spin' : ''}`} />
+                                <span>{savingServiceId === srv.id ? 'Menyimpan...' : 'Simpan ke Database'}</span>
                               </button>
                             </div>
                           </div>
