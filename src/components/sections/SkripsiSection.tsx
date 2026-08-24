@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   GraduationCap, BookOpen, FileSearch, Archive,
-  Target, BookMarked, Lightbulb, BarChart3,
-  FlaskConical, Users, Route, Map, Sparkles, ChevronLeft, ChevronRight
+  Target, BookMarked, FlaskConical, Route, Sparkles, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const DEFAULT_CATEGORIES = [
   {
@@ -58,57 +59,55 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_PAKET_CARDS = [
   {
     icon: GraduationCap,
-    title: 'Paket Sempro',
-    description: 'Persiapan seminar proposal lengkap',
-    badge: null,
-  },
-  {
-    icon: BookOpen,
-    title: 'Bab 1 / 2 / 3',
-    description: 'Penulisan bab dengan kualitas tinggi',
-    badge: 'Best Seller',
-  },
-  {
-    icon: FileSearch,
-    title: 'Cari Referensi',
-    description: 'Pencarian referensi jurnal terakreditasi',
-    badge: null,
+    badge: 'Paket Sempro',
+    title: 'Paket Sempro Proposal',
+    price: 'Chat Admin',
+    description: 'Lengkap dari Bab 1, 2, 3 + PPT Presentasi + Kisi-kisi Pertanyaan Dosen Penguji.',
+    features: ['Bab 1, 2, 3 Full', 'Free PPT Sidang', 'Revisi Sampai ACC', 'Garansi Lolos Sempro'],
+    popular: false,
   },
   {
     icon: Archive,
-    title: 'Paket Lengkap',
-    description: 'Semua jurusan, terima jadi',
-    badge: 'Termurah',
+    badge: 'Best Seller',
+    title: 'Paket Full Skripsi Bab 1–5',
+    price: 'Chat Admin',
+    description: 'Pengerjaan total dari judul hingga penutup, termasuk pengolahan data & analisis.',
+    features: ['Bab 1 s/d 5 Lengkap', 'Uji Data Statistik / Kualitatif', 'Free Parafrase Turnitin', 'Bimbingan Materi Sidang'],
+    popular: true,
+  },
+  {
+    icon: Sparkles,
+    badge: 'Komprehensif',
+    title: 'Paket Siap Sidang Skripsi',
+    price: 'Chat Admin',
+    description: 'Fokus persiapan sidang skripsi: revisi akhir, PPT profesional, dan simulasi tanya-jawab.',
+    features: ['Revisi Pasca Sempro/Hasil', 'PPT Sidang Animasi Modern', 'Naskah Publikasi / Jurnal', 'Simulasi Pertanyaan Penguji'],
+    popular: false,
   },
 ];
 
 export default function SkripsiSection() {
-  const [categoriesList, setCategoriesList] = useState(DEFAULT_CATEGORIES);
+  const { placeDirectOrder } = useCart();
   const [activeTab, setActiveTab] = useState('persiapan');
   const [currentPage, setCurrentPage] = useState(0);
 
-  useEffect(() => {
-    fetch('/api/services?category=joki-skripsi', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const dbServices = data.services;
-          setCategoriesList((prevCats) =>
-            prevCats.map((cat) => ({
-              ...cat,
-              services: cat.services.map((srv) => {
-                const matched = dbServices.find((db: any) =>
-                  db.name?.toLowerCase().includes(srv.title.toLowerCase()) ||
-                  srv.title.toLowerCase().includes(db.name?.toLowerCase())
-                );
-                return matched ? { ...srv, price: matched.price } : srv;
-              }),
-            }))
+  const { services: realtimeDbServices } = useRealtimeServices('joki-skripsi');
+
+  const categoriesList = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      return DEFAULT_CATEGORIES.map((cat) => ({
+        ...cat,
+        services: cat.services.map((srv) => {
+          const matched = realtimeDbServices.find((db: any) =>
+            db.name?.toLowerCase().includes(srv.title.toLowerCase()) ||
+            srv.title.toLowerCase().includes(db.name?.toLowerCase())
           );
-        }
-      })
-      .catch(console.error);
-  }, []);
+          return matched ? { ...srv, price: matched.price } : srv;
+        }),
+      }));
+    }
+    return DEFAULT_CATEGORIES;
+  }, [realtimeDbServices]);
 
   const activeCategory = categoriesList.find((c) => c.id === activeTab) || categoriesList[0];
   const itemsPerPage = 4;

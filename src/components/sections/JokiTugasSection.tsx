@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   FileText, Code, BookOpen, Calculator, Pen, Languages,
   Presentation, ClipboardList, Database, FileSpreadsheet
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const DEFAULT_SUPPORTING = [
   { icon: Languages, label: 'Translate Grammar', price: 'Rp 2.000/Hal' },
@@ -40,41 +41,31 @@ const DEFAULT_MAIN = [
 
 export default function JokiTugasSection() {
   const { placeDirectOrder } = useCart();
-  const [supportingServices, setSupportingServices] = useState(DEFAULT_SUPPORTING);
-  const [mainServicesList, setMainServicesList] = useState(DEFAULT_MAIN);
+  const { services: realtimeDbServices } = useRealtimeServices('joki-tugas');
 
-  useEffect(() => {
-    fetch('/api/services?category=joki-tugas', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const dbServices = data.services;
+  const { supportingServices, mainServicesList } = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      const supp = DEFAULT_SUPPORTING.map((s) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase().includes(s.label.toLowerCase()) ||
+          s.label.toLowerCase().includes(db.name?.toLowerCase())
+        );
+        return matched ? { ...s, price: matched.price } : s;
+      });
 
-          // Map supporting services
-          setSupportingServices((prev) =>
-            prev.map((s) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase().includes(s.label.toLowerCase()) ||
-                s.label.toLowerCase().includes(db.name?.toLowerCase())
-              );
-              return matched ? { ...s, price: matched.price } : s;
-            })
-          );
+      const main = DEFAULT_MAIN.map((m) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase().includes(m.label.toLowerCase()) ||
+          m.label.toLowerCase().includes(db.name?.toLowerCase())
+        );
+        return matched ? { ...m, price: matched.price } : m;
+      });
 
-          // Map main services
-          setMainServicesList((prev) =>
-            prev.map((s) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase().includes(s.label.toLowerCase()) ||
-                s.label.toLowerCase().includes(db.name?.toLowerCase())
-              );
-              return matched ? { ...s, price: matched.price } : s;
-            })
-          );
-        }
-      })
-      .catch(console.error);
-  }, []);
+      return { supportingServices: supp, mainServicesList: main };
+    }
+    return { supportingServices: DEFAULT_SUPPORTING, mainServicesList: DEFAULT_MAIN };
+  }, [realtimeDbServices]);
+
   return (
     <section id="joki-tugas" className="bg-white section-padding">
       <div className="container-custom">

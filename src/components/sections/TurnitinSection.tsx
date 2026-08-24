@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileCheck, Zap, Shield, Clock } from 'lucide-react';
-
 import { useCart } from '@/context/CartContext';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const DEFAULT_PLANS = [
   { amount: '1x', price: 'Rp 8.000', badge: null },
@@ -19,36 +19,31 @@ const DEFAULT_AI_PLANS = [
 
 export default function TurnitinSection() {
   const { placeDirectOrder } = useCart();
-  const [plans, setPlans] = useState(DEFAULT_PLANS);
-  const [aiPlans, setAiPlans] = useState(DEFAULT_AI_PLANS);
+  const { services: realtimeServices } = useRealtimeServices('turnitin');
 
-  useEffect(() => {
-    fetch('/api/services', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const srv = data.services;
-          const t1 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 1x') || s.id === 1);
-          const t3 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 3x') || s.id === 2);
-          const t6 = srv.find((s: any) => s.name?.toLowerCase().includes('turnitin 6x') || s.id === 3);
+  const { plans, aiPlans } = useMemo(() => {
+    if (realtimeServices && realtimeServices.length > 0) {
+      const t1 = realtimeServices.find((s: any) => s.name?.toLowerCase().includes('turnitin 1x') || s.id === 1);
+      const t3 = realtimeServices.find((s: any) => s.name?.toLowerCase().includes('turnitin 3x') || s.id === 2);
+      const t6 = realtimeServices.find((s: any) => s.name?.toLowerCase().includes('turnitin 6x') || s.id === 3);
 
-          const ai1 = srv.find((s: any) => s.name?.toLowerCase().includes('ai 1x') || s.id === 4);
-          const ai2 = srv.find((s: any) => s.name?.toLowerCase().includes('ai 2x') || s.id === 5);
+      const ai1 = realtimeServices.find((s: any) => s.name?.toLowerCase().includes('ai 1x') || s.id === 4);
+      const ai2 = realtimeServices.find((s: any) => s.name?.toLowerCase().includes('ai 2x') || s.id === 5);
 
-          setPlans([
-            { amount: '1x', price: t1?.price || 'Rp 8.000', badge: t1?.badge || null },
-            { amount: '3x', price: t3?.price || 'Rp 24.000', badge: t3?.badge || 'Hemat!' },
-            { amount: '6x', price: t6?.price || 'Rp 48.000', badge: t6?.badge || 'Best Deal!' },
-          ]);
-
-          setAiPlans([
-            { amount: '1x', price: ai1?.price || 'Rp 5.000' },
-            { amount: '2x', price: ai2?.price || 'Rp 10.000' },
-          ]);
-        }
-      })
-      .catch(console.error);
-  }, []);
+      return {
+        plans: [
+          { amount: '1x', price: t1?.price || 'Rp 8.000', badge: t1?.badge || null },
+          { amount: '3x', price: t3?.price || 'Rp 24.000', badge: t3?.badge || 'Hemat!' },
+          { amount: '6x', price: t6?.price || 'Rp 48.000', badge: t6?.badge || 'Best Deal!' },
+        ],
+        aiPlans: [
+          { amount: '1x', price: ai1?.price || 'Rp 5.000' },
+          { amount: '2x', price: ai2?.price || 'Rp 10.000' },
+        ],
+      };
+    }
+    return { plans: DEFAULT_PLANS, aiPlans: DEFAULT_AI_PLANS };
+  }, [realtimeServices]);
 
   const baseTurnitinPrice = plans[0]?.price || 'Rp 8.000';
 

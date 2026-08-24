@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Unlock, Globe, FileKey, Star } from 'lucide-react';
 import LogoCloud from '@/components/ui/logo-cloud-15';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const DEFAULT_FREE_SITES = [
   { name: 'Bartleby', price: 'Rp 2.000' },
@@ -58,37 +59,30 @@ const SiteCard = ({ name, price, index }: { name: string; price: string; index: 
 );
 
 export default function UnlockDokumenSection() {
-  const [freeSitesList, setFreeSitesList] = useState(DEFAULT_FREE_SITES);
-  const [academicSitesList, setAcademicSitesList] = useState(DEFAULT_ACADEMIC_SITES);
+  const { services: realtimeDbServices } = useRealtimeServices('unlock');
 
-  useEffect(() => {
-    fetch('/api/services?category=unlock', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const dbServices = data.services;
-          setFreeSitesList((prev) =>
-            prev.map((site) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
-                site.name.toLowerCase().includes(db.name?.toLowerCase())
-              );
-              return matched ? { ...site, price: matched.price } : site;
-            })
-          );
-          setAcademicSitesList((prev) =>
-            prev.map((site) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
-                site.name.toLowerCase().includes(db.name?.toLowerCase())
-              );
-              return matched ? { ...site, price: matched.price } : site;
-            })
-          );
-        }
-      })
-      .catch(console.error);
-  }, []);
+  const { freeSitesList, academicSitesList } = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      const free = DEFAULT_FREE_SITES.map((site) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
+          site.name.toLowerCase().includes(db.name?.toLowerCase())
+        );
+        return matched ? { ...site, price: matched.price } : site;
+      });
+
+      const academic = DEFAULT_ACADEMIC_SITES.map((site) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase().includes(site.name.toLowerCase()) ||
+          site.name.toLowerCase().includes(db.name?.toLowerCase())
+        );
+        return matched ? { ...site, price: matched.price } : site;
+      });
+
+      return { freeSitesList: free, academicSitesList: academic };
+    }
+    return { freeSitesList: DEFAULT_FREE_SITES, academicSitesList: DEFAULT_ACADEMIC_SITES };
+  }, [realtimeDbServices]);
   return (
     <section id="unlock-dokumen" className="bg-white section-padding">
       <div className="container-custom">

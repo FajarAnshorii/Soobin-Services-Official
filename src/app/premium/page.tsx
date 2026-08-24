@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
 import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 // Pricing Calculation Rule (User Profit Margin):
 //   < 10k   -> +2.000
@@ -1173,36 +1174,29 @@ const allProducts: ProductVariant[] = [
 ];
 
 export default function PremiumPage() {
-  const [productsList, setProductsList] = useState<ProductVariant[]>(allProducts);
+  const { services: realtimeDbServices } = useRealtimeServices('premium');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  useEffect(() => {
-    fetch('/api/services?category=premium', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const dbServices = data.services;
-          setProductsList((prev) =>
-            prev.map((p) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase() === p.title.toLowerCase() ||
-                db.name?.toLowerCase().includes(p.title.toLowerCase())
-              );
-              if (matched) {
-                return {
-                  ...p,
-                  description: matched.description || p.description,
-                  badge: matched.badge !== undefined ? matched.badge : p.badge,
-                };
-              }
-              return p;
-            })
-          );
+  const productsList = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      return allProducts.map((p) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase() === p.title.toLowerCase() ||
+          db.name?.toLowerCase().includes(p.title.toLowerCase())
+        );
+        if (matched) {
+          return {
+            ...p,
+            description: matched.description || p.description,
+            badge: matched.badge !== undefined ? matched.badge : p.badge,
+          };
         }
-      })
-      .catch(console.error);
-  }, []);
+        return p;
+      });
+    }
+    return allProducts;
+  }, [realtimeDbServices]);
 
   const filteredProducts = useMemo(() => {
     return productsList.filter((product) => {

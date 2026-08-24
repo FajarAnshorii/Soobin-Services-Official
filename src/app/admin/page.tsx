@@ -746,11 +746,21 @@ export default function AdminPage() {
     const workbook = XLSX.utils.book_new();
     const mainSheet = XLSX.utils.json_to_sheet(rows);
     XLSX.utils.book_append_sheet(workbook, mainSheet, 'Semua Orderan Database');
-
     XLSX.writeFile(workbook, `Laporan_Pendapatan_SOOBIN_Semua_Database.xlsx`);
   };
 
-  // CREATE Service in Supabase
+  // Helper to notify other tabs/pages immediately
+  const broadcastServiceChange = (payload: any) => {
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('soobin_services_sync');
+        bc.postMessage(payload);
+        setTimeout(() => bc.close(), 100);
+      }
+    } catch (e) {}
+  };
+
+  // 1. CREATE New Service in Supabase
   const handleCreateService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newService.name || !newService.price) {
@@ -783,13 +793,14 @@ export default function AdminPage() {
         });
         setSaveSuccessMsg(`Layanan "${created.name}" berhasil ditambahkan ke database!`);
         setTimeout(() => setSaveSuccessMsg(''), 4000);
+        broadcastServiceChange({ type: 'SERVICE_UPDATED', service: created });
       }
     } catch (err) {
       console.error('Failed creating service', err);
     }
   };
 
-  // UPDATE Service in Supabase
+  // 2. UPDATE Service in Supabase
   const handleSaveCmsService = async (id: number) => {
     setSavingServiceId(id);
     const existing = cmsServices.find((s) => s.id === id);
@@ -821,6 +832,8 @@ export default function AdminPage() {
         setEditingServiceId(null);
         setSaveSuccessMsg(`✓ Layanan "${updatedItem.name}" berhasil disimpan ke Database (${updatedItem.price})!`);
         setTimeout(() => setSaveSuccessMsg(''), 5000);
+        // Broadcast to all open tabs and pages
+        broadcastServiceChange({ type: 'SERVICE_UPDATED', service: updatedItem });
         // Sync fresh from Supabase
         syncServicesWithCloud();
       } else {
@@ -835,7 +848,7 @@ export default function AdminPage() {
     }
   };
 
-  // DELETE Service from Supabase
+  // 3. DELETE Service from Supabase
   const handleDeleteService = async (id: number, name: string) => {
     if (!confirm(`Apakah Anda yakin ingin menghapus layanan "${name}" dari database?`)) return;
 
@@ -854,6 +867,7 @@ export default function AdminPage() {
         }
         setSaveSuccessMsg(`Layanan "${name}" berhasil dihapus dari database!`);
         setTimeout(() => setSaveSuccessMsg(''), 4000);
+        broadcastServiceChange({ type: 'SERVICE_UPDATED', deletedId: id });
       }
     } catch (err) {
       console.error('Failed deleting service', err);

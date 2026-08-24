@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
 import { MarqueeLogoScroller } from '@/components/ui/marquee-logo-scroller';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const aiLogos = [
   {
@@ -488,37 +489,30 @@ const aiProducts: AIProduct[] = [
 ];
 
 export default function SubscribeAIPage() {
-  const [productsList, setProductsList] = useState<AIProduct[]>(aiProducts);
+  const { services: realtimeDbServices } = useRealtimeServices('subscribe-ai');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    fetch('/api/services?category=subscribe-ai', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const dbServices = data.services;
-          setProductsList((prev) =>
-            prev.map((p) => {
-              const matched = dbServices.find((db: any) =>
-                db.name?.toLowerCase() === p.title.toLowerCase() ||
-                db.name?.toLowerCase().includes(p.title.toLowerCase())
-              );
-              if (matched) {
-                return {
-                  ...p,
-                  description: matched.description || p.description,
-                  badge: matched.badge !== undefined ? matched.badge : p.badge,
-                };
-              }
-              return p;
-            })
-          );
+  const productsList = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      return aiProducts.map((p) => {
+        const matched = realtimeDbServices.find((db: any) =>
+          db.name?.toLowerCase() === p.title.toLowerCase() ||
+          db.name?.toLowerCase().includes(p.title.toLowerCase())
+        );
+        if (matched) {
+          return {
+            ...p,
+            description: matched.description || p.description,
+            badge: (matched.badge !== undefined && matched.badge !== null) ? matched.badge : p.badge,
+          };
         }
-      })
-      .catch(console.error);
-  }, []);
+        return p;
+      });
+    }
+    return aiProducts;
+  }, [realtimeDbServices]);
 
   const filteredProducts = useMemo(() => {
     return productsList.filter((product) => {

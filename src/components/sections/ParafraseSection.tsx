@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Clock, Shield, FileText, Zap, CheckCircle } from 'lucide-react';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const benefits = [
   { icon: Zap, text: 'Proses Ngebut' },
@@ -34,7 +35,7 @@ const demoPairs = [
 ];
 
 export default function ParafraseSection() {
-  const [parafrasePrice, setParafrasePrice] = useState('Rp 2.000/HALAMAN');
+  const { services: realtimeDbServices } = useRealtimeServices('parafrase');
   const [pairIndex, setPairIndex] = useState(0);
   const [origText, setOrigText] = useState('');
   const [paraText, setParaText] = useState('');
@@ -44,21 +45,17 @@ export default function ParafraseSection() {
   const [simParaVisible, setSimParaVisible] = useState(false);
   const [isReadyToCycle, setIsReadyToCycle] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/services?category=parafrase', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const pItem = data.services.find((s: any) =>
-            s.name?.toLowerCase().includes('parafrase') || s.category === 'parafrase'
-          );
-          if (pItem && pItem.price) {
-            setParafrasePrice(pItem.price.toUpperCase());
-          }
-        }
-      })
-      .catch(console.error);
-  }, []);
+  const parafrasePrice = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      const pItem = realtimeDbServices.find((s: any) =>
+        s.name?.toLowerCase().includes('parafrase') || s.category === 'parafrase'
+      );
+      if (pItem && pItem.price) {
+        return pItem.price.toUpperCase();
+      }
+    }
+    return 'RP 2.000/HALAMAN';
+  }, [realtimeDbServices]);
 
   const origIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const paraIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import OrderModal from '@/components/modals/OrderModal';
+import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Filter },
@@ -1024,55 +1025,26 @@ export default function LayananPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<any>(null);
-  const [servicesList, setServicesList] = useState<any[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('soobin_cms_services');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((ds: any) => {
-              const defaultItem = services.find((s) => s.id === ds.id || s.name?.toLowerCase() === ds.name?.toLowerCase());
-              return {
-                id: ds.id,
-                category: ds.category || defaultItem?.category || 'umum',
-                name: ds.name || defaultItem?.name,
-                price: ds.price || defaultItem?.price,
-                badge: ds.badge !== undefined ? ds.badge : defaultItem?.badge,
-                icon: defaultItem?.icon || Globe,
-              };
-            });
-          }
-        }
-      } catch (e) {}
+
+  // Triple-layer Realtime Database Sync (Supabase WebSockets + BroadcastChannel + Window Focus)
+  const { services: realtimeDbServices } = useRealtimeServices();
+
+  const servicesList = useMemo(() => {
+    if (realtimeDbServices && realtimeDbServices.length > 0) {
+      return realtimeDbServices.map((ds: any) => {
+        const defaultItem = services.find((s) => s.id === ds.id || s.name?.toLowerCase() === ds.name?.toLowerCase());
+        return {
+          id: ds.id,
+          category: ds.category || defaultItem?.category || 'umum',
+          name: ds.name || defaultItem?.name,
+          price: ds.price || defaultItem?.price,
+          badge: ds.badge !== undefined ? ds.badge : defaultItem?.badge,
+          icon: defaultItem?.icon || Globe,
+        };
+      });
     }
     return services;
-  });
-
-  useEffect(() => {
-    fetch('/api/services', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.services) && data.services.length > 0) {
-          const mapped = data.services.map((ds: any) => {
-            const defaultItem = services.find((s) => s.id === ds.id || s.name?.toLowerCase() === ds.name?.toLowerCase());
-            return {
-              id: ds.id,
-              category: ds.category || defaultItem?.category || 'umum',
-              name: ds.name || defaultItem?.name,
-              price: ds.price || defaultItem?.price,
-              badge: ds.badge !== undefined ? ds.badge : defaultItem?.badge,
-              icon: defaultItem?.icon || Globe,
-            };
-          });
-          setServicesList(mapped);
-          try {
-            localStorage.setItem('soobin_cms_services', JSON.stringify(data.services));
-          } catch (e) {}
-        }
-      })
-      .catch(console.error);
-  }, []);
+  }, [realtimeDbServices]);
 
   const filteredServices = servicesList.filter((service) => {
     const matchesCategory = activeCategory === 'all' || service.category === activeCategory;
