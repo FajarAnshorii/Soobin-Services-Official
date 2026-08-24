@@ -35,12 +35,14 @@ interface FramerCarouselProps {
   items?: CarouselItem[];
   autoPlay?: boolean;
   interval?: number;
+  className?: string;
 }
 
 export function FramerCarousel({
   items = defaultItems,
   autoPlay = true,
-  interval = 4000
+  interval = 4000,
+  className = ''
 }: FramerCarouselProps) {
   const [index, setIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -87,7 +89,7 @@ export function FramerCarousel({
 
   return (
     <div
-      className="w-full max-w-2xl lg:max-w-[660px] mx-auto px-4 sm:px-6 py-2 sm:py-3"
+      className={`w-full ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={() => setIsHovered(true)}
@@ -132,7 +134,7 @@ export function FramerCarousel({
             disabled={index === 0}
             onClick={() => setIndex((i) => Math.max(0, i - 1))}
             aria-label="Previous Slide"
-            className={`absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 z-10
+            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 z-10
               ${
                 index === 0
                   ? 'opacity-40 cursor-not-allowed bg-white/70 text-gray-400'
@@ -140,7 +142,7 @@ export function FramerCarousel({
               }`}
           >
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -159,7 +161,7 @@ export function FramerCarousel({
             disabled={index === items.length - 1}
             onClick={() => setIndex((i) => Math.min(items.length - 1, i + 1))}
             aria-label="Next Slide"
-            className={`absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 z-10
+            className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 z-10
               ${
                 index === items.length - 1
                   ? 'opacity-40 cursor-not-allowed bg-white/70 text-gray-400'
@@ -167,7 +169,7 @@ export function FramerCarousel({
               }`}
           >
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -182,14 +184,14 @@ export function FramerCarousel({
           </motion.button>
 
           {/* Progress Indicator (Pill & Dots) */}
-          <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-gray-900/40 backdrop-blur-md rounded-full border border-white/20 shadow-md">
+          <div className="absolute bottom-2.5 sm:bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-gray-900/40 backdrop-blur-md rounded-full border border-white/20 shadow-md">
             {items.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setIndex(i)}
                 aria-label={`Slide ${i + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  i === index ? 'w-7 sm:w-8 bg-white shadow-sm' : 'w-2 bg-white/50 hover:bg-white/80'
+                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                  i === index ? 'w-6 sm:w-7 bg-white shadow-sm' : 'w-1.5 sm:w-2 bg-white/50 hover:bg-white/80'
                 }`}
               />
             ))}
