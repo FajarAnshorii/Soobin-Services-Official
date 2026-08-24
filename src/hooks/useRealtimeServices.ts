@@ -15,9 +15,12 @@ export interface ServiceItem {
 export function useRealtimeServices(categoryFilter?: string) {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
 
   // Function to fetch services from API
-  const fetchServices = useCallback(async () => {
+  const fetchServices = useCallback(async (silent = false) => {
+    if (!silent) setIsSyncing(true);
     try {
       const url = categoryFilter && categoryFilter !== 'all'
         ? `/api/services?category=${encodeURIComponent(categoryFilter)}`
@@ -26,14 +29,18 @@ export function useRealtimeServices(categoryFilter?: string) {
       const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        if (data && Array.isArray(data.services)) {
+        if (data && Array.isArray(data.services) && data.services.length > 0) {
           setServices(data.services);
+          setLastSyncTime(new Date());
         }
       }
     } catch (err) {
       console.error('Error fetching realtime services:', err);
     } finally {
       setLoading(false);
+      if (!silent) {
+        setTimeout(() => setIsSyncing(false), 600);
+      }
     }
   }, [categoryFilter]);
 
@@ -41,12 +48,14 @@ export function useRealtimeServices(categoryFilter?: string) {
     fetchServices();
 
     // 1. Layer 1: Supabase Realtime WebSocket Subscription
+    const channelId = `realtime_services_${categoryFilter || 'all'}_${Date.now()}`;
     const channel = supabase
-      .channel('realtime_services_changes')
+      .channel(channelId)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'services' },
         (payload) => {
+          setIsSyncing(true);
           if (payload.eventType === 'UPDATE') {
             const updated = payload.new as ServiceItem;
             setServices((prev) =>
@@ -66,8 +75,10 @@ export function useRealtimeServices(categoryFilter?: string) {
             const oldItem = payload.old as { id: number };
             setServices((prev) => prev.filter((s) => s.id !== oldItem.id));
           }
-          // Also trigger a clean background re-fetch
-          fetchServices();
+          setLastSyncTime(new Date());
+          setTimeout(() => setIsSyncing(false), 600);
+          // Also fetch fresh
+          fetchServices(true);
         }
       )
       .subscribe();
@@ -79,7 +90,13 @@ export function useRealtimeServices(categoryFilter?: string) {
         bc = new BroadcastChannel('soobin_services_sync');
         bc.onmessage = (event) => {
           if (event.data?.type === 'SERVICE_UPDATED' || event.data?.type === 'SYNC_ALL') {
-            fetchServices();
+            if (event.data?.service) {
+              const updated = event.data.service as ServiceItem;
+              setServices((prev) =>
+                prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s))
+              );
+            }
+            fetchServices(true);
           }
         };
       }
@@ -90,19 +107,19 @@ export function useRealtimeServices(categoryFilter?: string) {
     // 3. Layer 3: Window Focus & Visibility Change Listener
     const handleFocusOrVisible = () => {
       if (document.visibilityState === 'visible') {
-        fetchServices();
+        fetchServices(true);
       }
     };
 
     window.addEventListener('focus', handleFocusOrVisible);
     document.addEventListener('visibilitychange', handleFocusOrVisible);
 
-    // Fallback periodic light sync every 15 seconds
+    // 4. Layer 4: Fast smart background sync every 3.5 seconds
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
-        fetchServices();
+        fetchServices(true);
       }
-    }, 15000);
+    }, 3500);
 
     return () => {
       supabase.removeChannel(channel);
@@ -115,5 +132,5 @@ export function useRealtimeServices(categoryFilter?: string) {
     };
   }, [fetchServices, categoryFilter]);
 
-  return { services, loading, refetch: fetchServices };
+  return { services, loading, isSyncing, lastSyncTime, refetch: fetchServices };
 }

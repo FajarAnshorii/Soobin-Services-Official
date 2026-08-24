@@ -1027,7 +1027,7 @@ export default function LayananPage() {
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<any>(null);
 
   // Triple-layer Realtime Database Sync (Supabase WebSockets + BroadcastChannel + Window Focus)
-  const { services: realtimeDbServices } = useRealtimeServices();
+  const { services: realtimeDbServices, isSyncing, refetch } = useRealtimeServices();
 
   const servicesList = useMemo(() => {
     if (realtimeDbServices && realtimeDbServices.length > 0) {
@@ -1074,7 +1074,7 @@ export default function LayananPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
       {/* Hero Section */}
@@ -1107,19 +1107,34 @@ export default function LayananPage() {
       </section>
 
       {/* Filter & Search Section */}
-      <section className="pt-3 pb-4 sm:pt-4 sm:pb-5 md:py-5 bg-white border-b sticky top-16 md:top-20 z-40">
+      <section className="pt-3 pb-4 sm:pt-4 sm:pb-5 md:py-5 bg-white border-b sticky top-16 md:top-20 z-40 shadow-xs">
         <div className="container-custom px-4">
-          <div className="relative w-full mb-3 sm:mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Cari layanan..."
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              className="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-primary-800 transition-all"
-            />
+          <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari layanan..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-primary-800 transition-all"
+              />
+            </div>
+
+            {/* Realtime Synchronize Live Indicator & Action Button */}
+            <button
+              onClick={() => refetch()}
+              title="Sinkronisasi data database realtime"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-slate-700 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline text-[11px] font-black text-slate-800">
+                {isSyncing ? 'Menyinkronkan...' : 'Realtime Sync'}
+              </span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            </button>
           </div>
 
           <div className="flex flex-wrap gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 justify-start pb-2">
