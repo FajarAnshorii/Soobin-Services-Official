@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/sections/Hero';
+import PosterCarouselSection from '@/components/sections/PosterCarouselSection';
 import PartnerSection from '@/components/sections/PartnerSection';
 import HowItWorksSection from '@/components/sections/HowItWorksSection';
 import TurnitinSection from '@/components/sections/TurnitinSection';
@@ -41,6 +42,7 @@ export default function Home() {
       />
       <Navbar />
       <Hero />
+      <PosterCarouselSection />
       <PartnerSection />
       <HowItWorksSection />
       <TurnitinSection />
