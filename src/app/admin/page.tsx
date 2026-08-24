@@ -784,6 +784,7 @@ export default function AdminPage() {
 
   // UPDATE Service in Supabase
   const handleSaveCmsService = async (id: number) => {
+    setSavingServiceId(id);
     const existing = cmsServices.find((s) => s.id === id);
     const updatedItem: ServiceConfig = {
       id,
@@ -794,22 +795,21 @@ export default function AdminPage() {
       badge: editForm.badge ? editForm.badge.trim() : (editForm.badge === '' ? null : (existing?.badge || null)),
     };
 
-    // Optimistic UI update
-    const updatedList = cmsServices.map((s) => (s.id === id ? updatedItem : s));
-    setCmsServices(updatedList);
-    localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
-    setEditingServiceId(null);
-    setSavingServiceId(id);
-
     try {
       const res = await fetch('/api/services', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedItem),
       });
+
       if (res.ok) {
-        setSaveSuccessMsg(`Layanan "${updatedItem.name}" berhasil disimpan ke database (${updatedItem.price})!`);
-        setTimeout(() => setSaveSuccessMsg(''), 4000);
+        // Update local state and cache
+        const updatedList = cmsServices.map((s) => (s.id === id ? updatedItem : s));
+        setCmsServices(updatedList);
+        localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
+        setEditingServiceId(null);
+        setSaveSuccessMsg(`✓ Layanan "${updatedItem.name}" berhasil disimpan ke Database (${updatedItem.price})!`);
+        setTimeout(() => setSaveSuccessMsg(''), 5000);
         // Sync fresh from Supabase
         syncServicesWithCloud();
       } else {
@@ -2464,6 +2464,32 @@ export default function AdminPage() {
           )}
         </main>
       </div>
+
+      {/* Floating Save Toast Notification */}
+      <AnimatePresence>
+        {saveSuccessMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 max-w-md bg-slate-900 text-white border-2 border-emerald-500 rounded-2xl p-4 shadow-2xl flex items-start gap-3"
+          >
+            <div className="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-black text-sm">
+              ✓
+            </div>
+            <div className="flex-1 text-xs">
+              <p className="font-black text-emerald-400 uppercase tracking-wider text-[10px]">Tersimpan ke Database</p>
+              <p className="font-bold text-slate-100 mt-0.5">{saveSuccessMsg}</p>
+            </div>
+            <button
+              onClick={() => setSaveSuccessMsg('')}
+              className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Proof Screenshot Image Viewer Modal */}
       <AnimatePresence>
