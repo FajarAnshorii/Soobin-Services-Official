@@ -190,6 +190,17 @@ Mohon segera diproses kak, terima kasih!`;
                 <span className="truncate">{user?.prodi}</span>
               </div>
             </div>
+
+            {/* Member Benefit Box */}
+            <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl p-3.5 flex items-start gap-2.5">
+              <div className="text-emerald-600 font-black text-base shrink-0 mt-0.5">👑</div>
+              <div className="flex flex-col">
+                <span className="text-xs font-black text-emerald-900">Hak Istimewa Member</span>
+                <p className="text-[11px] text-emerald-700 leading-relaxed mt-0.5">
+                  Diskon 5% otomatis aktif di seluruh layanan joki skripsi, tugas, dan akun premium!
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Right Column: Cart & History Tabs */}

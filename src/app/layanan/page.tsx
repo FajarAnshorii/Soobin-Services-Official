@@ -18,6 +18,7 @@ import {
 import { useCart } from '@/context/CartContext';
 import OrderModal from '@/components/modals/OrderModal';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
+import { getPriceWithMemberDiscount } from '@/lib/priceUtils';
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Filter },
@@ -1167,23 +1168,23 @@ export default function LayananPage() {
           >
             {user ? (
               <div className="bg-linear-to-r from-primary-900 to-primary-800 text-white p-5 sm:p-6 rounded-2xl relative border border-primary-850 shadow-xl overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/15 rounded-full blur-2xl"></div>
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Member Aktif
+                      <span className="bg-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                        👑 Member Resmi Aktif
                       </span>
-                      <h4 className="text-xs sm:text-sm font-semibold text-primary-300">Diskon Member 5% Aktif</h4>
+                      <h4 className="text-xs sm:text-sm font-semibold text-emerald-300">Diskon Otomatis 5% All Layanan</h4>
                     </div>
                     <h3 className="text-lg sm:text-xl font-bold">Selamat Datang, {user.name}!</h3>
                     <p className="text-gray-300 text-xs mt-1">
-                      Terdaftar dari <span className="font-semibold text-white">{user.university}</span> ({user.prodi}). Potongan harga 5% khusus untuk seluruh Jasa Skripsi telah diterapkan otomatis.
+                      Terdaftar dari <span className="font-semibold text-white">{user.university}</span> ({user.prodi}). Potongan harga <strong>5% otomatis diterapkan</strong> pada seluruh katalog harga layanan di bawah ini.
                     </p>
                   </div>
-                  <div className="shrink-0 bg-green-500/10 border border-green-500/20 text-green-300 rounded-xl px-4 py-2.5 text-center">
-                    <span className="block text-2xl font-black">5%</span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider">Skripsi Disc</span>
+                  <div className="shrink-0 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 rounded-xl px-5 py-3 text-center shadow-inner">
+                    <span className="block text-2xl font-black">5% OFF</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-200">Semua Layanan</span>
                   </div>
                 </div>
               </div>
@@ -1192,16 +1193,16 @@ export default function LayananPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl"></div>
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold">✨ Dapatkan Diskon Member 5% Khusus Jasa Skripsi!</h3>
+                    <h3 className="text-base sm:text-lg font-bold">✨ Dapatkan Diskon Otomatis 5% untuk Semua Layanan!</h3>
                     <p className="text-gray-400 text-xs mt-1">
-                      Daftarkan diri Anda sekarang untuk menikmati potongan harga langsung di setiap pemesanan Jasa Skripsi.
+                      Daftarkan akun member Anda sekarang untuk menikmati potongan harga langsung 5% di seluruh layanan SOOBIN Services.
                     </p>
                   </div>
                   <Link
                     href="/auth"
                     className="shrink-0 bg-primary-800 hover:bg-primary-750 text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-xl transition-colors shadow-lg shadow-primary-950/20 text-center"
                   >
-                    Daftar Sekarang
+                    Daftar Member Sekarang
                   </Link>
                 </div>
               </div>
@@ -1216,14 +1217,8 @@ export default function LayananPage() {
           >
             {visibleServices.map((service, index) => {
               const displayBadge = getDisplayBadge(service);
-              const isSkripsi = service.category === 'joki-skripsi';
-              const hasDiscount = !!user && isSkripsi && service.price !== 'Chat Admin';
-
-              // Pre-fill WhatsApp message text
-              const waText = !!user && isSkripsi
-                ? `Halo Kak, saya member SOOBIN (Nama: ${user.name}, Kampus: ${user.university}, Prodi: ${user.prodi}). Mau order Jasa ${service.name} dengan Diskon Member 5%.`
-                : `Halo Kak Mau ${service.name}`;
-              const waLink = `https://wa.me/6287815797525?text=${encodeURIComponent(waText)}`;
+              const isMember = Boolean(user);
+              const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
 
               return (
                 <motion.div
@@ -1255,7 +1250,7 @@ export default function LayananPage() {
                           addToCart({
                             id: service.id,
                             name: service.name,
-                            price: service.price,
+                            price: priceInfo.isDiscounted ? priceInfo.discountedPriceStr : service.price,
                             category: service.category
                           });
                         }}
@@ -1270,15 +1265,15 @@ export default function LayananPage() {
                     {service.name}
                   </h3>
                   
-                  {hasDiscount ? (
+                  {priceInfo.isDiscounted ? (
                     <div className="mb-3">
-                      <p className="text-gray-400 line-through text-xs mb-0.5">{service.price}</p>
+                      <p className="text-gray-400 line-through text-xs mb-0.5">{priceInfo.originalPriceStr}</p>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className="text-green-600 font-bold text-sm sm:text-base">
-                          {calculateDiscountedPrice(service.price)}
+                        <p className="text-emerald-600 font-extrabold text-sm sm:text-base">
+                          {priceInfo.discountedPriceStr}
                         </p>
-                        <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                          DISC 5%
+                        <span className="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                          MEMBER -5%
                         </span>
                       </div>
                     </div>
@@ -1287,9 +1282,9 @@ export default function LayananPage() {
                       <p className="font-bold text-sm sm:text-base text-primary-800">
                         {service.price}
                       </p>
-                      {!!user && isSkripsi && service.price === 'Chat Admin' && (
-                        <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                          DISC 5%
+                      {isMember && priceInfo.isChatAdmin && (
+                        <span className="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                          MEMBER -5%
                         </span>
                       )}
                     </div>

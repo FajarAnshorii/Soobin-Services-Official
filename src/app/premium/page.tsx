@@ -7,6 +7,8 @@ import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
 import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, RefreshCw } from 'lucide-react';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
+import { useAuth } from '@/context/AuthContext';
+import { getPriceWithMemberDiscount, formatRupiah } from '@/lib/priceUtils';
 
 // Pricing Calculation Rule (User Profit Margin):
 //   < 10k   -> +2.000
@@ -29,14 +31,6 @@ function calculateSellingPrice(supplierPrice: number, customMargin?: number): nu
   } else {
     return supplierPrice + 15000;
   }
-}
-
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 interface PriceOption {
@@ -1239,16 +1233,26 @@ export default function PremiumPage() {
     });
   }, [productsList, selectedCategory, searchQuery]);
 
+  const { user } = useAuth();
+  const isMember = Boolean(user);
+
   const handleOrderWhatsApp = (
     productTitle: string,
     duration: string,
     sellingPrice: number
   ) => {
+    const rawPriceStr = formatRupiah(sellingPrice);
+    const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
+
     const message =
       `Halo Kak, saya ingin pesan Akun Premium:\n\n` +
       `📌 *Produk*: ${productTitle}\n` +
       `⏱️ *Durasi*: ${duration}\n` +
-      `💰 *Harga*: ${formatRupiah(sellingPrice)}\n\n` +
+      (priceInfo.isDiscounted
+        ? `🏷️ *Harga Normal*: ${priceInfo.originalPriceStr}\n` +
+          `🎁 *Diskon Member (5%)*: -${priceInfo.discountAmountStr}\n` +
+          `💰 *Total Bayar*: ${priceInfo.discountedPriceStr} (Member Resmi SOOBIN 👑)\n\n`
+        : `💰 *Harga*: ${rawPriceStr}\n\n`) +
       `Mohon diproses ya kak, terima kasih!`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/6285156550742?text=${encoded}`, '_blank');
@@ -1271,6 +1275,37 @@ export default function PremiumPage() {
             Akses ribuan hiburan streaming, tools produktivitas, AI, editing, hingga gamepass dengan harga termurah & legal 100%.
           </p>
 
+          {/* Member Banner */}
+          {user ? (
+            <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-sm shrink-0">
+                  👑
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-emerald-200">Member Aktif: {user.name}</p>
+                  <p className="text-[11px] text-gray-300">Diskon 5% otomatis aktif untuk seluruh pricelist akun premium!</p>
+                </div>
+              </div>
+              <span className="bg-emerald-500 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg shrink-0">
+                -5% ALL
+              </span>
+            </div>
+          ) : (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 backdrop-blur-md">
+              <div>
+                <p className="text-xs font-bold text-white">✨ Mau diskon 5% untuk semua akun?</p>
+                <p className="text-[11px] text-gray-300">Daftar member gratis & nikmati harga khusus member sekarang.</p>
+              </div>
+              <a
+                href="/auth"
+                className="bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition-colors shrink-0 shadow-sm"
+              >
+                Daftar Member
+              </a>
+            </div>
+          )}
+
           {/* Search Box */}
           <div className="pt-4 max-w-xl mx-auto relative">
             <div className="relative">
@@ -1288,30 +1323,18 @@ export default function PremiumPage() {
       </section>
 
       {/* Categories Filter Tabs */}
-      <section className="sticky top-16 md:top-20 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 py-3 shadow-xs">
-        <div className="container-custom px-4 flex items-center justify-between gap-3">
-          <div className="overflow-x-auto no-scrollbar flex items-center gap-2 flex-1">
+      <section className="bg-white border-b border-gray-200 sticky top-16 md:top-20 z-30 shadow-xs">
+        <div className="container-custom py-3 px-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
             {[
-              { id: 'all', label: `Semua (${allProducts.length})` },
-              { id: 'subscribe-ai', label: 'Subscribe AI' },
-              { id: 'apple', label: 'Apple TV & Music' },
-              { id: 'robux', label: 'Roblox & Gamepass' },
-              { id: 'nokos', label: 'Nokos & Gmail' },
+              { id: 'all', label: 'Semua Kategori' },
+              { id: 'nokos', label: 'Nokos / OTP & Gmail' },
+              { id: 'ai', label: 'AI Premium' },
               { id: 'netflix', label: 'Netflix' },
               { id: 'youtube', label: 'YouTube' },
               { id: 'editing', label: 'Editing Apps' },
               { id: 'asian-drama', label: 'Asian Drama' },
               { id: 'vpn', label: 'VPN Premium' },
-              { id: 'canva', label: 'Canva Pro' },
-              { id: 'grammarly', label: 'Grammarly' },
-              { id: 'zoom', label: 'Zoom Pro' },
-              { id: 'spotify', label: 'Spotify' },
-              { id: 'viu', label: 'Viu' },
-              { id: 'vidio', label: 'Vidio' },
-              { id: 'disney', label: 'Disney+' },
-              { id: 'hbo', label: 'HBO Max' },
-              { id: 'vision', label: 'Vision+' },
-              { id: 'getcontact', label: 'Get Contact' },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -1399,6 +1422,9 @@ export default function PremiumPage() {
                       </p>
                       {product.options.map((opt) => {
                         const sellingPrice = getOptionSellingPrice(opt);
+                        const rawPriceStr = formatRupiah(sellingPrice);
+                        const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
+
                         return (
                           <div
                             key={opt.duration}
@@ -1408,10 +1434,26 @@ export default function PremiumPage() {
                               <CheckCircle2 className="w-4 h-4 text-[#00C853] shrink-0" />
                               {opt.duration}
                             </span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm font-extrabold text-[#0B1527]">
-                                {formatRupiah(sellingPrice)}
-                              </span>
+                            <div className="flex items-center gap-2.5">
+                              {priceInfo.isDiscounted ? (
+                                <div className="flex flex-col items-end">
+                                  <span className="text-[10px] text-gray-400 line-through">
+                                    {priceInfo.originalPriceStr}
+                                  </span>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-sm font-black text-emerald-600">
+                                      {priceInfo.discountedPriceStr}
+                                    </span>
+                                    <span className="text-[8px] bg-emerald-100 text-emerald-800 font-extrabold px-1 py-0.5 rounded">
+                                      -5%
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-sm font-extrabold text-[#0B1527]">
+                                  {rawPriceStr}
+                                </span>
+                              )}
                               <button
                                 onClick={() =>
                                   handleOrderWhatsApp(product.title, opt.duration, sellingPrice)
@@ -1439,6 +1481,7 @@ export default function PremiumPage() {
                     className="w-full py-3 px-4 rounded-xl bg-[#0F1E36] hover:bg-[#162A4A] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
                   >
                     <MessageCircle className="w-4 h-4 fill-white" />
+                    <span>Order via WhatsApp</span>
                   </button>
                 </motion.div>
               );

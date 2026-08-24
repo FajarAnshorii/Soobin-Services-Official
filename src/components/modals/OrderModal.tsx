@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   X, Lock, CreditCard, QrCode, FileText, Send, CheckCircle2, Info,
-  UploadCloud, Paperclip, Trash2, CheckCircle, File
+  UploadCloud, Paperclip, Trash2, CheckCircle, File, Tag, Sparkles
 } from 'lucide-react';
 import QrisPaymentModal from './QrisPaymentModal';
 import { useAuth } from '@/context/AuthContext';
+import { getPriceWithMemberDiscount } from '@/lib/priceUtils';
 
 interface ServiceItem {
   id: number;
@@ -98,13 +99,16 @@ function FileUploadCard({
               <UploadCloud className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-bold text-dark-800">Upload Dokumen / File Tugas</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Drag & drop atau klik browse dari perangkat</p>
+              <p className="text-xs font-bold text-dark-800">
+                Klik atau Tarik File ke Sini
+              </p>
+              <p className="text-[10px] text-gray-500 mt-0.5">
+                Mendukung Word (DOCX/DOC), PDF, PPT, Excel, ZIP/RAR (Maks. 25MB)
+              </p>
             </div>
-            <span className="inline-block bg-white border border-gray-300 text-dark-700 font-semibold text-[11px] px-3.5 py-1.5 rounded-lg shadow-2xs group-hover:border-primary-800 group-hover:text-primary-800 transition-colors">
-              Browse File
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary-800 bg-primary-50 px-2.5 py-1 rounded-full border border-primary-100">
+              <Paperclip className="w-3 h-3" /> Pilih Dokumen
             </span>
-            <p className="text-[9px] text-gray-400">Mendukung Word, PDF, PPT, ZIP, RAR, TXT, Gambar (Maks 25MB)</p>
           </div>
         )}
       </div>
@@ -145,6 +149,10 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
   }, [isOpen, user]);
 
   if (!isOpen || !service) return null;
+
+  const isMember = Boolean(user);
+  const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
+  const effectivePrice = priceInfo.isDiscounted ? priceInfo.discountedPriceStr : service.price;
 
   const handleInputChange = (fieldKey: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldKey]: value }));
@@ -191,7 +199,9 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
       serviceId: service.id,
       serviceName: service.name,
       category: service.category,
-      price: service.price,
+      price: effectivePrice,
+      originalPrice: service.price,
+      isMemberDiscountApplied: priceInfo.isDiscounted,
       uploadedFileData: uploadedFile?.fileData || null,
       uploadedFileName: uploadedFile?.name || null,
       paymentMethod: isChatAdminPrice
@@ -213,7 +223,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
       let detailsText = `*KONSULTASI & DISKUSI HARGA LAYANAN*\n`;
       detailsText += `🆔 ID Order: ${orderPayload.id}\n`;
-      detailsText += `👤 Nama Pemesan: ${customerName}\n`;
+      detailsText += `👤 Nama Pemesan: ${customerName}${isMember ? ' (Member Resmi SOOBIN 👑)' : ''}\n`;
       detailsText += `📌 Jenis Jasa: ${service.name}\n`;
       detailsText += `💰 Total Harga: Chat Admin (Diskusi Kebutuhan)\n\n`;
 
@@ -245,9 +255,17 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
       let detailsText = `*DETAIL PESANAN BARU*\n`;
       detailsText += `🆔 ID Order: ${orderPayload.id}\n`;
-      detailsText += `👤 Nama: ${customerName}\n`;
+      detailsText += `👤 Nama: ${customerName}${isMember ? ' (Member Resmi SOOBIN 👑)' : ''}\n`;
       detailsText += `📌 Jenis Jasa: ${service.name}\n`;
-      detailsText += `💰 Harga: ${service.price}\n`;
+      
+      if (priceInfo.isDiscounted) {
+        detailsText += `🏷️ Harga Normal: ${priceInfo.originalPriceStr}\n`;
+        detailsText += `🎁 Diskon Member (5%): -${priceInfo.discountAmountStr}\n`;
+        detailsText += `💰 Total Bayar: ${priceInfo.discountedPriceStr}\n`;
+      } else {
+        detailsText += `💰 Harga: ${service.price}\n`;
+      }
+
       detailsText += `💳 Metode Pembayaran: Transfer Bank / E-Wallet\n`;
       detailsText += `STATUS: Menunggu Transfer (Check Admin)\n\n`;
 
@@ -577,11 +595,32 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
           {/* Modal Header */}
           <div className="bg-primary-800 text-white p-5 flex items-center justify-between">
             <div>
-              <span className="bg-amber-400 text-dark-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">
-                Form Pemesanan
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="bg-amber-400 text-dark-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">
+                  Form Pemesanan
+                </span>
+                {priceInfo.isDiscounted && (
+                  <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                    <Sparkles className="w-3 h-3" /> Diskon Member 5%
+                  </span>
+                )}
+              </div>
               <h3 className="font-bold text-lg mt-1 leading-snug">{service.name}</h3>
-              <p className="text-xs text-primary-200 font-semibold">{service.price}</p>
+              {priceInfo.isDiscounted ? (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-primary-200 line-through font-medium opacity-80">
+                    {priceInfo.originalPriceStr}
+                  </span>
+                  <span className="text-sm text-amber-300 font-extrabold">
+                    {priceInfo.discountedPriceStr}
+                  </span>
+                  <span className="text-[10px] text-emerald-300 font-bold">
+                    (Hemat {priceInfo.discountAmountStr})
+                  </span>
+                </div>
+              ) : (
+                <p className="text-xs text-primary-200 font-semibold">{service.price}</p>
+              )}
             </div>
             <button
               onClick={onClose}
@@ -618,9 +657,20 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
               </label>
               <div className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-primary-900 flex items-center justify-between select-none">
                 <span>{service.name}</span>
-                <span className="text-[10px] bg-primary-800/10 text-primary-800 font-bold px-2 py-0.5 rounded">
-                  {service.price}
-                </span>
+                {priceInfo.isDiscounted ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-gray-400 line-through font-normal">
+                      {priceInfo.originalPriceStr}
+                    </span>
+                    <span className="text-xs bg-emerald-600 text-white font-black px-2 py-0.5 rounded shadow-xs">
+                      {priceInfo.discountedPriceStr}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[10px] bg-primary-800/10 text-primary-800 font-bold px-2 py-0.5 rounded">
+                    {service.price}
+                  </span>
+                )}
               </div>
             </div>
 
