@@ -42,8 +42,8 @@ export default function TestimonialModal({ isOpen, onClose, onSuccess }: Testimo
       return;
     }
 
-    if (!comment.trim() || comment.trim().length < 10) {
-      setErrorMsg('Ulasan terlalu singkat. Tuliskan minimal 10 karakter.');
+    if (!comment.trim() || comment.trim().length < 2) {
+      setErrorMsg('Mohon tuliskan pesan ulasan testimoni Anda.');
       return;
     }
 
