@@ -96,31 +96,10 @@ export default function PosterCarouselSection() {
   };
 
   return (
-    <section className="py-8 sm:py-12 bg-gradient-to-b from-gray-50/80 via-white to-gray-50/50 border-b border-gray-100 overflow-hidden relative group/section">
+    <section className="py-5 sm:py-7 bg-gradient-to-b from-gray-50/80 via-white to-gray-50/50 border-b border-gray-100 overflow-hidden relative group/section">
       {/* Background subtle accents */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-100/25 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-100/20 rounded-full blur-3xl pointer-events-none -z-10" />
-
-      <div className="container-custom mb-5 sm:mb-7">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary-100/80 text-primary-800 border border-primary-200/60 shadow-xs mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-            <span>INFO & PROMO EKSKLUSIF</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-            Update Resmi & Penawaran Spesial
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500 max-w-xl mx-auto mt-1 px-4">
-            Klik poster untuk memperbesar dan melihat info promo lebih jelas
-          </p>
-        </motion.div>
-      </div>
 
       {/* Carousel Track with Left & Right Manual Control Arrows */}
       <div className="relative w-full max-w-7xl mx-auto px-2 sm:px-4">
