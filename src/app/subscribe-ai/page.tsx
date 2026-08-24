@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
+import { RefreshCw } from 'lucide-react';
 import { MarqueeLogoScroller } from '@/components/ui/marquee-logo-scroller';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
@@ -117,6 +118,14 @@ interface PriceOption {
   duration: string;
   supplierPrice: number;
   customMargin?: number;
+  sellingPrice?: number;
+}
+
+function getOptionSellingPrice(opt: PriceOption): number {
+  if (opt.sellingPrice !== undefined) {
+    return opt.sellingPrice;
+  }
+  return calculateSellingPrice(opt.supplierPrice, opt.customMargin);
 }
 
 interface AIProduct {
@@ -489,7 +498,7 @@ const aiProducts: AIProduct[] = [
 ];
 
 export default function SubscribeAIPage() {
-  const { services: realtimeDbServices } = useRealtimeServices('subscribe-ai');
+  const { services: realtimeDbServices, isSyncing, refetch } = useRealtimeServices('subscribe-ai');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
@@ -499,13 +508,32 @@ export default function SubscribeAIPage() {
       return aiProducts.map((p) => {
         const matched = realtimeDbServices.find((db: any) =>
           db.name?.toLowerCase() === p.title.toLowerCase() ||
-          db.name?.toLowerCase().includes(p.title.toLowerCase())
+          db.name?.toLowerCase().includes(p.title.toLowerCase()) ||
+          p.title.toLowerCase().includes(db.name?.toLowerCase())
         );
         if (matched) {
+          let updatedOptions = p.options;
+          if (matched.price) {
+            const rawDigits = matched.price.replace(/[^\d]/g, '');
+            const parsedBasePrice = rawDigits ? parseInt(rawDigits, 10) : null;
+            if (parsedBasePrice && parsedBasePrice > 0) {
+              const defaultBase = calculateSellingPrice(p.options[0].supplierPrice, p.options[0].customMargin);
+              const ratio = defaultBase > 0 ? (parsedBasePrice / defaultBase) : 1;
+              updatedOptions = p.options.map((opt, idx) => {
+                if (idx === 0) {
+                  return { ...opt, sellingPrice: parsedBasePrice };
+                }
+                const defaultOptPrice = calculateSellingPrice(opt.supplierPrice, opt.customMargin);
+                const scaledPrice = Math.round((defaultOptPrice * ratio) / 100) * 100;
+                return { ...opt, sellingPrice: scaledPrice };
+              });
+            }
+          }
           return {
             ...p,
             description: matched.description || p.description,
             badge: (matched.badge !== undefined && matched.badge !== null) ? matched.badge : p.badge,
+            options: updatedOptions,
           };
         }
         return p;
@@ -523,7 +551,7 @@ export default function SubscribeAIPage() {
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchQuery;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [productsList, searchQuery, selectedCategory]);
 
   const handleOptionChange = (productId: string, optionIndex: number) => {
     setSelectedOptions((prev) => ({
@@ -534,8 +562,8 @@ export default function SubscribeAIPage() {
 
   const getWhatsAppUrl = (product: AIProduct) => {
     const selectedIndex = selectedOptions[product.id] || 0;
-    const option = product.options[selectedIndex];
-    const finalPrice = calculateSellingPrice(option.supplierPrice, option.customMargin);
+    const option = product.options[selectedIndex] || product.options[0];
+    const finalPrice = getOptionSellingPrice(option);
     const message = `Halo SOOBIN Services, saya ingin memesan *${product.title}*\n\n📌 Paket: *${option.duration}*\n💰 Harga: *${formatRupiah(finalPrice)}*\n\nApakah stok masih tersedia? Terima kasih!`;
     return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
   };
@@ -588,8 +616,8 @@ export default function SubscribeAIPage() {
 
       {/* Category Pills Filter - B&W */}
       <section className="bg-white border-b border-neutral-200 sticky top-16 md:top-20 z-30 shadow-xs">
-        <div className="container-custom py-4 px-4 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-max justify-center">
+        <div className="container-custom py-3 px-4 flex items-center justify-between gap-3">
+          <div className="overflow-x-auto no-scrollbar flex items-center gap-2 sm:gap-3 flex-1">
             {[
               { id: 'all', label: 'Semua AI' },
               { id: 'claude', label: 'Claude AI' },
@@ -609,7 +637,7 @@ export default function SubscribeAIPage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold transition-all border ${
+                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-bold transition-all border whitespace-nowrap shrink-0 ${
                   selectedCategory === cat.id
                     ? 'bg-black text-white border-black shadow-md'
                     : 'bg-neutral-100 text-neutral-800 border-neutral-300 hover:bg-neutral-200'
@@ -619,6 +647,19 @@ export default function SubscribeAIPage() {
               </button>
             ))}
           </div>
+
+          {/* Realtime Synchronize Indicator */}
+          <button
+            onClick={() => refetch()}
+            title="Sinkronisasi harga database realtime"
+            className="px-3 py-2 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-xl text-neutral-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-xs"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline text-[11px] font-black text-neutral-900">
+              {isSyncing ? 'Menyinkronkan...' : 'Realtime Sync'}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
         </div>
       </section>
 
@@ -638,7 +679,7 @@ export default function SubscribeAIPage() {
           {filteredProducts.map((product) => {
             const selectedIndex = selectedOptions[product.id] || 0;
             const currentOption = product.options[selectedIndex] || product.options[0];
-            const finalPrice = calculateSellingPrice(currentOption.supplierPrice, currentOption.customMargin);
+            const finalPrice = getOptionSellingPrice(currentOption);
 
             return (
               <motion.div
@@ -699,7 +740,7 @@ export default function SubscribeAIPage() {
                       >
                         {product.options.map((opt, idx) => (
                           <option key={idx} value={idx}>
-                            {opt.duration} - {formatRupiah(calculateSellingPrice(opt.supplierPrice, opt.customMargin))}
+                            {opt.duration} - {formatRupiah(getOptionSellingPrice(opt))}
                           </option>
                         ))}
                       </select>

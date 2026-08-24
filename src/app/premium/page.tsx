@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, RefreshCw } from 'lucide-react';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 
 // Pricing Calculation Rule (User Profit Margin):
@@ -43,6 +43,14 @@ interface PriceOption {
   duration: string;
   supplierPrice: number;
   customMargin?: number;
+  sellingPrice?: number;
+}
+
+function getOptionSellingPrice(opt: PriceOption): number {
+  if (opt.sellingPrice !== undefined) {
+    return opt.sellingPrice;
+  }
+  return calculateSellingPrice(opt.supplierPrice, opt.customMargin);
 }
 
 interface ProductVariant {
@@ -1174,7 +1182,7 @@ const allProducts: ProductVariant[] = [
 ];
 
 export default function PremiumPage() {
-  const { services: realtimeDbServices } = useRealtimeServices('premium');
+  const { services: realtimeDbServices, isSyncing, refetch } = useRealtimeServices('premium');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -1183,13 +1191,32 @@ export default function PremiumPage() {
       return allProducts.map((p) => {
         const matched = realtimeDbServices.find((db: any) =>
           db.name?.toLowerCase() === p.title.toLowerCase() ||
-          db.name?.toLowerCase().includes(p.title.toLowerCase())
+          db.name?.toLowerCase().includes(p.title.toLowerCase()) ||
+          p.title.toLowerCase().includes(db.name?.toLowerCase())
         );
         if (matched) {
+          let updatedOptions = p.options;
+          if (matched.price) {
+            const rawDigits = matched.price.replace(/[^\d]/g, '');
+            const parsedBasePrice = rawDigits ? parseInt(rawDigits, 10) : null;
+            if (parsedBasePrice && parsedBasePrice > 0) {
+              const defaultBase = calculateSellingPrice(p.options[0].supplierPrice, p.options[0].customMargin);
+              const ratio = defaultBase > 0 ? (parsedBasePrice / defaultBase) : 1;
+              updatedOptions = p.options.map((opt, idx) => {
+                if (idx === 0) {
+                  return { ...opt, sellingPrice: parsedBasePrice };
+                }
+                const defaultOptPrice = calculateSellingPrice(opt.supplierPrice, opt.customMargin);
+                const scaledPrice = Math.round((defaultOptPrice * ratio) / 100) * 100;
+                return { ...opt, sellingPrice: scaledPrice };
+              });
+            }
+          }
           return {
             ...p,
             description: matched.description || p.description,
-            badge: matched.badge !== undefined ? matched.badge : p.badge,
+            badge: (matched.badge !== undefined && matched.badge !== null) ? matched.badge : p.badge,
+            options: updatedOptions,
           };
         }
         return p;
@@ -1210,7 +1237,7 @@ export default function PremiumPage() {
         product.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchQuery;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [productsList, selectedCategory, searchQuery]);
 
   const handleOrderWhatsApp = (
     productTitle: string,
@@ -1233,49 +1260,37 @@ export default function PremiumPage() {
 
       {/* Hero Section Header */}
       <section className="bg-[#0B1527] pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 text-center">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">
-              Layanan Aplikasi Premium
-            </h1>
-            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-              Katalog terlengkap Apple TV, Apple Music, Robux, Nokos, Netflix, YouTube, Canva, & puluhan aplikasi resmi termurah
-            </p>
-          </motion.div>
-        </div>
-      </section>
+        <div className="container-custom max-w-4xl mx-auto space-y-4">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary-800/40 text-primary-200 border border-primary-700/50">
+            <Sparkles className="w-3.5 h-3.5" /> PUSAT AKUN PREMIUM INDONESIA
+          </span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            Langganan Akun Premium Resmi & Bergaransi
+          </h1>
+          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            Akses ribuan hiburan streaming, tools produktivitas, AI, editing, hingga gamepass dengan harga termurah & legal 100%.
+          </p>
 
-      {/* Search & Category Navigation Section */}
-      <section className="py-8 px-4 border-b border-gray-200 bg-white">
-        <div className="container-custom">
-          {/* Search Input Bar */}
-          <div className="max-w-2xl mx-auto mb-6">
+          {/* Search Box */}
+          <div className="pt-4 max-w-xl mx-auto relative">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari aplikasi (Apple TV, Apple Music, Robux, Nokos, Netflix, Canva)..."
+                placeholder="Cari akun (misal: Netflix, Spotify, ChatGPT, Canva)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0F1E36] focus:ring-2 focus:ring-[#0F1E36]/10 text-sm transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white/15 backdrop-blur-md transition-all text-sm sm:text-base shadow-inner"
               />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 hover:text-gray-600"
-                >
-                  Clear
-                </button>
-              )}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Filter Pills */}
-          <div className="flex items-center justify-center gap-2 sm:gap-2 flex-wrap">
+      {/* Categories Filter Tabs */}
+      <section className="sticky top-16 md:top-20 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 py-3 shadow-xs">
+        <div className="container-custom px-4 flex items-center justify-between gap-3">
+          <div className="overflow-x-auto no-scrollbar flex items-center gap-2 flex-1">
             {[
               { id: 'all', label: `Semua (${allProducts.length})` },
               { id: 'subscribe-ai', label: 'Subscribe AI' },
@@ -1301,7 +1316,7 @@ export default function PremiumPage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all border ${
+                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all border whitespace-nowrap shrink-0 ${
                   selectedCategory === cat.id
                     ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
                     : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
@@ -1311,6 +1326,19 @@ export default function PremiumPage() {
               </button>
             ))}
           </div>
+
+          {/* Realtime Synchronize Indicator */}
+          <button
+            onClick={() => refetch()}
+            title="Sinkronisasi harga database realtime"
+            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-slate-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-xs"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline text-[11px] font-black text-slate-900">
+              {isSyncing ? 'Menyinkronkan...' : 'Realtime Sync'}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
         </div>
       </section>
 
@@ -1371,7 +1399,7 @@ export default function PremiumPage() {
                         Pricelist Durasi:
                       </p>
                       {product.options.map((opt) => {
-                        const sellingPrice = calculateSellingPrice(opt.supplierPrice, opt.customMargin);
+                        const sellingPrice = getOptionSellingPrice(opt);
                         return (
                           <div
                             key={opt.duration}
@@ -1406,7 +1434,7 @@ export default function PremiumPage() {
                       handleOrderWhatsApp(
                         product.title,
                         product.options[0].duration,
-                        calculateSellingPrice(product.options[0].supplierPrice)
+                        getOptionSellingPrice(product.options[0])
                       )
                     }
                     className="w-full py-3 px-4 rounded-xl bg-[#0F1E36] hover:bg-[#162A4A] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
