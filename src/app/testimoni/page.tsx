@@ -178,8 +178,7 @@ export default function TestimoniPage() {
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold backdrop-blur-md hover:bg-emerald-500/30 transition-all cursor-pointer"
                 title="Sinkronisasi Data Realtime"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>Realtime Sync</span>
               </button>
             </div>

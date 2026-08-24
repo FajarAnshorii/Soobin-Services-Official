@@ -1337,7 +1337,6 @@ export default function PremiumPage() {
             <span className="hidden sm:inline text-[11px] font-black text-slate-900">
               {isSyncing ? 'Menyinkronkan...' : 'Realtime Sync'}
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           </button>
         </div>
       </section>
