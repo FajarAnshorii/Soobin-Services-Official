@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FramerCarousel } from '@/components/ui/framer-carousel';
-import { Megaphone, ExternalLink, Sparkles } from 'lucide-react';
+import { Megaphone, ExternalLink } from 'lucide-react';
 
 export default function PosterCarouselSection() {
   return (
@@ -31,9 +31,8 @@ export default function PosterCarouselSection() {
             </div>
 
             {/* Judul: INFO PENGUMUMAN */}
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
-              <span>INFO PENGUMUMAN</span>
-              <Sparkles className="w-5 h-5 text-amber-500 shrink-0 hidden sm:inline-block" />
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+              INFO PENGUMUMAN
             </h2>
 
             {/* Subtitle / Penjelasan Singkat */}
