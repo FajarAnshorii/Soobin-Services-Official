@@ -109,7 +109,7 @@ export default function Hero() {
             {/* Main Heading - WordsPullUp Animation */}
             <div className="mb-2">
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black text-white tracking-tight [text-shadow:_0_4px_20px_rgba(0,0,0,1),_0_2px_10px_rgba(0,0,0,0.9)]">
-                <WordsPullUp text="SOOBIN" showAsterisk />
+                <WordsPullUp text="SOOBIN" />
               </h1>
             </div>
 
