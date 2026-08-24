@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const runtime = 'edge';
+
 function parseIsoDate(val: any): string {
   if (val && typeof val === 'string' && val.includes('T')) {
     const d = new Date(val);

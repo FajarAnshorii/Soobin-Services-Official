@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const runtime = 'edge';
+
 const MEMBERS_BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/SoobinMembersList';
 
 const DEFAULT_MEMBERS = [
