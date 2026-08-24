@@ -463,7 +463,11 @@ export default function AdminPage() {
         const data = await res.json();
         if (data && Array.isArray(data.services) && data.services.length > 0) {
           setCmsServices(data.services);
-          localStorage.setItem('soobin_cms_services', JSON.stringify(data.services));
+          try {
+            localStorage.setItem('soobin_cms_services', JSON.stringify(data.services));
+          } catch (e) {
+            // Ignore localStorage quota errors
+          }
         }
       }
     } catch (e) {
@@ -764,8 +768,11 @@ export default function AdminPage() {
         const result = await res.json();
         const created = result.service || { ...newService, id: Date.now() };
         const updated = [...cmsServices, created];
-        setCmsServices(updated);
-        localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        try {
+          localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        } catch (e) {
+          // Ignore localStorage quota errors - memory state & Supabase are primary
+        }
         setIsCreateServiceOpen(false);
         setNewService({
           category: 'turnitin',
@@ -803,10 +810,14 @@ export default function AdminPage() {
       });
 
       if (res.ok) {
-        // Update local state and cache
+        // Update local React memory state
         const updatedList = cmsServices.map((s) => (s.id === id ? updatedItem : s));
         setCmsServices(updatedList);
-        localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
+        try {
+          localStorage.setItem('soobin_cms_services', JSON.stringify(updatedList));
+        } catch (e) {
+          // Ignore localStorage quota errors
+        }
         setEditingServiceId(null);
         setSaveSuccessMsg(`✓ Layanan "${updatedItem.name}" berhasil disimpan ke Database (${updatedItem.price})!`);
         setTimeout(() => setSaveSuccessMsg(''), 5000);
@@ -836,7 +847,11 @@ export default function AdminPage() {
       if (res.ok) {
         const updated = cmsServices.filter((s) => s.id !== id);
         setCmsServices(updated);
-        localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        try {
+          localStorage.setItem('soobin_cms_services', JSON.stringify(updated));
+        } catch (e) {
+          // Ignore localStorage quota errors
+        }
         setSaveSuccessMsg(`Layanan "${name}" berhasil dihapus dari database!`);
         setTimeout(() => setSaveSuccessMsg(''), 4000);
       }
