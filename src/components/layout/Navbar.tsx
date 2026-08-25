@@ -1,13 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, LogOut, ChevronDown, Zap, ShoppingCart, History } from 'lucide-react';
+import {
+  Menu,
+  X,
+  LogOut,
+  ChevronDown,
+  ShoppingCart,
+  History,
+  Wrench,
+  BookMarked,
+  FileText,
+  Sparkles,
+  ExternalLink
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -19,10 +31,31 @@ const navLinks = [
   { href: '/faq', label: 'FAQ' },
 ];
 
+const toolLinks = [
+  {
+    href: '/tools/daftar-pustaka',
+    label: 'Daftar Pustaka Generator',
+    desc: 'Format sitasi APA, MLA, IEEE, Harvard & auto lookup DOI',
+    icon: BookMarked,
+    badge: 'Gratis',
+  },
+  {
+    href: '/tools/word-counter',
+    label: 'Hitung Kata & Waktu Baca',
+    desc: 'Cek total kata, karakter, dan estimasi waktu membaca',
+    icon: FileText,
+    badge: 'Baru',
+  },
+];
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showToolsDropdown, setShowToolsDropdown] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(true);
+  const toolsDropdownRef = useRef<HTMLDivElement>(null);
+
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const router = useRouter();
@@ -35,6 +68,19 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close tools dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target as Node)) {
+        setShowToolsDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const isToolsActive = pathname.startsWith('/tools');
 
   return (
     <nav
@@ -57,7 +103,7 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Navigation with Animated Lamp Pill */}
+          {/* Desktop Navigation with Animated Lamp Pill & Tools Dropdown */}
           <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-slate-50/90 p-1 rounded-full border border-slate-200/80 shadow-2xs backdrop-blur-md">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -93,18 +139,109 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <a
-              href="https://wa.me/6287815797525"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative px-2.5 xl:px-3 py-1.5 text-[11px] xl:text-xs font-semibold whitespace-nowrap text-slate-600 hover:text-slate-950 transition-colors duration-200 rounded-full"
+
+            {/* Tools Dropdown Trigger (Desktop) */}
+            <div
+              className="relative"
+              ref={toolsDropdownRef}
+              onMouseEnter={() => setShowToolsDropdown(true)}
+              onMouseLeave={() => setShowToolsDropdown(false)}
             >
-              Hubungi Kami
-            </a>
+              <button
+                type="button"
+                onClick={() => setShowToolsDropdown(!showToolsDropdown)}
+                className={`relative px-2.5 xl:px-3 py-1.5 text-[11px] xl:text-xs font-semibold whitespace-nowrap transition-colors duration-200 rounded-full flex items-center gap-1 cursor-pointer ${
+                  isToolsActive
+                    ? 'text-primary-850 font-bold'
+                    : 'text-slate-600 hover:text-slate-950'
+                }`}
+              >
+                <span className="relative z-10 flex items-center gap-1">
+                  <Wrench className="w-3 h-3 text-slate-500" />
+                  <span>Tools</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showToolsDropdown ? 'rotate-180 text-primary-750' : 'text-slate-400'}`} />
+                </span>
+                {isToolsActive && (
+                  <motion.div
+                    layoutId="navbar-lamp"
+                    className="absolute inset-0 bg-white rounded-full shadow-xs border border-slate-200/80 z-0"
+                    initial={false}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 350,
+                      damping: 30,
+                    }}
+                  >
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-primary-700">
+                      <div className="absolute w-10 h-5 rounded-full blur-xs -top-2 -left-1 bg-primary-500/30" />
+                      <div className="absolute w-6 h-4 rounded-full blur-xs -top-1 left-1 bg-primary-500/30" />
+                    </div>
+                  </motion.div>
+                )}
+              </button>
+
+              {/* Pop-up Card for Tools */}
+              <AnimatePresence>
+                {showToolsDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-1/2 -translate-x-1/2 mt-1.5 w-72 bg-white rounded-2xl border border-slate-200 shadow-xl p-2.5 z-50"
+                  >
+                    <div className="px-2.5 py-1.5 mb-1 border-b border-slate-100 flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                        Academic Mini Tools
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                        100% Free
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      {toolLinks.map((tool) => {
+                        const Icon = tool.icon;
+                        const isCurrent = pathname === tool.href;
+
+                        return (
+                          <Link
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={() => setShowToolsDropdown(false)}
+                            className={`flex items-start gap-2.5 p-2.5 rounded-xl transition-all ${
+                              isCurrent
+                                ? 'bg-primary-50 text-primary-900'
+                                : 'hover:bg-slate-50 text-slate-800'
+                            }`}
+                          >
+                            <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                              <Icon className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-bold truncate">{tool.label}</span>
+                                {tool.badge && (
+                                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200/60">
+                                    {tool.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-slate-500 line-clamp-1 leading-tight mt-0.5">
+                                {tool.desc}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
-
             {/* Cart Button */}
             {user && (
               <Link
@@ -154,7 +291,7 @@ export default function Navbar() {
                       <Link
                         href="/member?tab=history"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 py-1.5 cursor-pointer hover:text-primary-800"
                       >
                         <History className="w-3.5 h-3.5" />
                         Riwayat Pembelian
@@ -163,10 +300,10 @@ export default function Navbar() {
                       <Link
                         href="/member?tab=cart"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-gray-700 py-1.5 cursor-pointer hover:text-primary-800"
                       >
                         <ShoppingCart className="w-3.5 h-3.5" />
-                        Keranjang Belanja
+                        Keranjang Belanja ({cart.length})
                       </Link>
 
                       <button
@@ -174,10 +311,10 @@ export default function Navbar() {
                           logout();
                           setShowDropdown(false);
                         }}
-                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer mt-1 pt-2 border-t border-gray-100"
+                        className="flex items-center gap-2 w-full text-left text-xs font-semibold text-red-600 pt-2 border-t border-gray-100 mt-1 cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        Keluar
+                        Keluar dari Akun
                       </button>
                     </div>
                   </>
@@ -186,9 +323,9 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/auth"
-                className="text-dark-600 hover:text-primary-800 font-semibold text-sm border border-primary-800/20 hover:border-primary-800 rounded-full px-4 py-1.5 transition-all duration-200"
+                className="font-bold text-xs bg-primary-800 hover:bg-primary-750 text-white rounded-full px-4 py-2 transition-all shadow-md shadow-primary-900/10 cursor-pointer"
               >
-                Masuk / Daftar
+                Masuk Member
               </Link>
             )}
           </div>
@@ -196,7 +333,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-primary-800"
+            className="lg:hidden p-2 text-dark-600 hover:text-primary-800 focus:outline-none cursor-pointer"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -213,25 +350,51 @@ export default function Navbar() {
         }`}
       >
         <div className="bg-white border-t border-gray-100 shadow-xl pb-8">
-          <div className="container-custom py-4 flex flex-col gap-4">
+          <div className="container-custom py-4 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="text-dark-600 hover:text-primary-800 font-medium transition-colors duration-200 py-2"
+                className={`font-medium transition-colors duration-200 py-2 text-sm ${
+                  pathname === link.href ? 'text-primary-800 font-bold' : 'text-slate-700'
+                }`}
               >
                 {link.label}
               </Link>
             ))}
-            <a
-              href="https://wa.me/6287815797525"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-dark-600 hover:text-primary-800 font-medium transition-colors duration-200 py-2"
-            >
-              Hubungi Kami
-            </a>
+
+            {/* Mobile Tools Accordion */}
+            <div className="py-2 border-t border-b border-slate-100 my-1">
+              <button
+                type="button"
+                onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
+                className="flex items-center justify-between w-full font-bold text-sm text-slate-800 py-1"
+              >
+                <div className="flex items-center gap-2">
+                  <Wrench className="w-4 h-4 text-primary-700" />
+                  <span>Academic Tools (Gratis)</span>
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileToolsOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileToolsOpen && (
+                <div className="pl-6 pt-2 space-y-2">
+                  {toolLinks.map((tool) => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`block py-1 text-xs font-semibold ${
+                        pathname === tool.href ? 'text-primary-800' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      ✨ {tool.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {user ? (
               <div className="flex flex-col gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100 mt-2">
@@ -245,7 +408,7 @@ export default function Navbar() {
                   <span className="text-[10px] text-gray-500 truncate mt-0.5">{user.university}</span>
                   <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                 </div>
-                
+
                 <Link
                   href="/member?tab=history"
                   onClick={() => setIsOpen(false)}

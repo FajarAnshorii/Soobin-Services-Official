@@ -47,9 +47,9 @@ const footerLinks = {
   info: [
     { href: '/', label: 'Tentang Kami' },
     { href: '/kalkulator-order', label: 'Kalkulator Order' },
-    { href: '/', label: 'Cara Pemesanan' },
+    { href: '/tools/daftar-pustaka', label: 'Daftar Pustaka Generator' },
+    { href: '/tools/word-counter', label: 'Hitung Kata & Waktu Baca' },
     { href: '/faq', label: 'FAQ' },
-    { href: '/', label: 'Kebijakan Privasi' },
   ],
 };
 
