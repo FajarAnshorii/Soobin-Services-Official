@@ -202,74 +202,37 @@ export default function SkripsiSection() {
 
           {/* Service Rows */}
           <div className="divide-y divide-gray-100">
-            {visibleServices.map((service, index) => {
-              const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
+            {visibleServices.map((service, index) => (
+              <motion.div
+                key={service.num}
+                className="grid grid-cols-[45px_1fr] md:grid-cols-[60px_1fr_180px] gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 transition-colors duration-200 items-center"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                {/* Number Badge */}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-800/10 rounded-lg flex items-center justify-center">
+                  <span className="text-primary-800 font-bold text-xs sm:text-sm">{service.num}</span>
+                </div>
 
-              return (
-                <motion.div
-                  key={service.num}
-                  className="grid grid-cols-[45px_1fr] md:grid-cols-[60px_1fr_180px] gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 transition-colors duration-200 items-center"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  {/* Number Badge */}
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-800/10 rounded-lg flex items-center justify-center">
-                    <span className="text-primary-800 font-bold text-xs sm:text-sm">{service.num}</span>
-                  </div>
+                {/* Title */}
+                <div className="flex flex-col">
+                  <span className="font-semibold text-dark-800 text-xs sm:text-sm md:text-base">
+                    {service.title}
+                  </span>
+                  <span className="md:hidden text-primary-800 font-bold text-xs sm:text-sm mt-1">
+                    {service.price}
+                  </span>
+                </div>
 
-                  {/* Title */}
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-dark-800 text-xs sm:text-sm md:text-base">
-                      {service.title}
-                    </span>
-                    {/* Mobile Price */}
-                    <div className="md:hidden mt-1">
-                      {priceInfo.isDiscounted ? (
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[11px] text-gray-400 line-through">
-                            {priceInfo.originalPriceStr}
-                          </span>
-                          <span className="text-emerald-600 font-extrabold text-xs">
-                            {priceInfo.discountedPriceStr}
-                          </span>
-                          <span className="text-[8px] bg-emerald-100 text-emerald-800 font-extrabold px-1 rounded">
-                            -5%
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-primary-800 font-bold text-xs sm:text-sm">
-                          {service.price}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Price - desktop */}
-                  <div className="hidden md:flex flex-col items-end justify-center">
-                    {priceInfo.isDiscounted ? (
-                      <div className="text-right">
-                        <span className="text-xs text-gray-400 line-through block">
-                          {priceInfo.originalPriceStr}
-                        </span>
-                        <div className="flex items-center justify-end gap-1.5">
-                          <span className="text-emerald-600 font-extrabold text-sm whitespace-nowrap">
-                            {priceInfo.discountedPriceStr}
-                          </span>
-                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded">
-                            -5%
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-primary-800 font-bold whitespace-nowrap">
-                        {service.price}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
+                {/* Price - desktop */}
+                <div className="hidden md:flex justify-end">
+                  <span className="text-primary-800 font-bold whitespace-nowrap">
+                    {service.price}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
           </div>
 
           {/* Pagination Controls */}

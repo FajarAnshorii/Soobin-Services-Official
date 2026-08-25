@@ -37,7 +37,7 @@ export default function PosterCarouselSection() {
 
             {/* Subtitle / Penjelasan Singkat */}
             <p className="text-xs sm:text-sm text-gray-600 mt-2 max-w-md leading-relaxed">
-              Dapatkan informasi promo menarik, klaim <strong>diskon 5%</strong> all layanan untuk member baru, serta cek ulasan harian di <strong>Channel WhatsApp Resmi</strong> kami.
+              Dapatkan informasi promo menarik, klaim <strong>diskon 5% Cek Turnitin & Cek AI</strong> untuk member baru, serta cek ulasan harian di <strong>Channel WhatsApp Resmi</strong> kami.
             </p>
 
             {/* Double Arrow Animasi Menunjuk ke Kiri (ke arah Carousel) */}

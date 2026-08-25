@@ -197,7 +197,7 @@ Mohon segera diproses kak, terima kasih!`;
               <div className="flex flex-col">
                 <span className="text-xs font-black text-emerald-900">Hak Istimewa Member</span>
                 <p className="text-[11px] text-emerald-700 leading-relaxed mt-0.5">
-                  Diskon 5% otomatis aktif di seluruh layanan joki skripsi, tugas, dan akun premium!
+                  Diskon 5% otomatis aktif untuk seluruh layanan Cek Turnitin & Cek AI!
                 </p>
               </div>
             </div>

@@ -1242,17 +1242,11 @@ export default function PremiumPage() {
     sellingPrice: number
   ) => {
     const rawPriceStr = formatRupiah(sellingPrice);
-    const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
-
     const message =
       `Halo Kak, saya ingin pesan Akun Premium:\n\n` +
       `📌 *Produk*: ${productTitle}\n` +
       `⏱️ *Durasi*: ${duration}\n` +
-      (priceInfo.isDiscounted
-        ? `🏷️ *Harga Normal*: ${priceInfo.originalPriceStr}\n` +
-          `🎁 *Diskon Member (5%)*: -${priceInfo.discountAmountStr}\n` +
-          `💰 *Total Bayar*: ${priceInfo.discountedPriceStr} (Member Resmi SOOBIN 👑)\n\n`
-        : `💰 *Harga*: ${rawPriceStr}\n\n`) +
+      `💰 *Harga*: ${rawPriceStr}\n\n` +
       `Mohon diproses ya kak, terima kasih!`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/6285156550742?text=${encoded}`, '_blank');
@@ -1274,37 +1268,6 @@ export default function PremiumPage() {
           <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Akses ribuan hiburan streaming, tools produktivitas, AI, editing, hingga gamepass dengan harga termurah & legal 100%.
           </p>
-
-          {/* Member Banner */}
-          {user ? (
-            <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-sm shrink-0">
-                  👑
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-emerald-200">Member Aktif: {user.name}</p>
-                  <p className="text-[11px] text-gray-300">Diskon 5% otomatis aktif untuk seluruh pricelist akun premium!</p>
-                </div>
-              </div>
-              <span className="bg-emerald-500 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg shrink-0">
-                -5% ALL
-              </span>
-            </div>
-          ) : (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 backdrop-blur-md">
-              <div>
-                <p className="text-xs font-bold text-white">✨ Mau diskon 5% untuk semua akun?</p>
-                <p className="text-[11px] text-gray-300">Daftar member gratis & nikmati harga khusus member sekarang.</p>
-              </div>
-              <a
-                href="/auth"
-                className="bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition-colors shrink-0 shadow-sm"
-              >
-                Daftar Member
-              </a>
-            </div>
-          )}
 
           {/* Search Box */}
           <div className="pt-4 max-w-xl mx-auto relative">
@@ -1335,6 +1298,16 @@ export default function PremiumPage() {
               { id: 'editing', label: 'Editing Apps' },
               { id: 'asian-drama', label: 'Asian Drama' },
               { id: 'vpn', label: 'VPN Premium' },
+              { id: 'canva', label: 'Canva Pro' },
+              { id: 'grammarly', label: 'Grammarly' },
+              { id: 'zoom', label: 'Zoom Pro' },
+              { id: 'spotify', label: 'Spotify' },
+              { id: 'viu', label: 'Viu' },
+              { id: 'vidio', label: 'Vidio' },
+              { id: 'disney', label: 'Disney+' },
+              { id: 'hbo', label: 'HBO Max' },
+              { id: 'vision', label: 'Vision+' },
+              { id: 'getcontact', label: 'Get Contact' },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -1423,7 +1396,6 @@ export default function PremiumPage() {
                       {product.options.map((opt) => {
                         const sellingPrice = getOptionSellingPrice(opt);
                         const rawPriceStr = formatRupiah(sellingPrice);
-                        const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
 
                         return (
                           <div
@@ -1434,26 +1406,10 @@ export default function PremiumPage() {
                               <CheckCircle2 className="w-4 h-4 text-[#00C853] shrink-0" />
                               {opt.duration}
                             </span>
-                            <div className="flex items-center gap-2.5">
-                              {priceInfo.isDiscounted ? (
-                                <div className="flex flex-col items-end">
-                                  <span className="text-[10px] text-gray-400 line-through">
-                                    {priceInfo.originalPriceStr}
-                                  </span>
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-sm font-black text-emerald-600">
-                                      {priceInfo.discountedPriceStr}
-                                    </span>
-                                    <span className="text-[8px] bg-emerald-100 text-emerald-800 font-extrabold px-1 py-0.5 rounded">
-                                      -5%
-                                    </span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-sm font-extrabold text-[#0B1527]">
-                                  {rawPriceStr}
-                                </span>
-                              )}
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-extrabold text-[#0B1527]">
+                                {rawPriceStr}
+                              </span>
                               <button
                                 onClick={() =>
                                   handleOrderWhatsApp(product.title, opt.duration, sellingPrice)

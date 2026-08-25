@@ -562,16 +562,11 @@ export default function SubscribeAIPage() {
     const option = product.options[selectedIndex] || product.options[0];
     const finalPrice = getOptionSellingPrice(option);
     const rawPriceStr = formatRupiah(finalPrice);
-    const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
 
     const message =
       `Halo SOOBIN Services, saya ingin memesan *${product.title}*\n\n` +
       `📌 Paket: *${option.duration}*\n` +
-      (priceInfo.isDiscounted
-        ? `🏷️ *Harga Normal*: ${priceInfo.originalPriceStr}\n` +
-          `🎁 *Diskon Member (5%)*: -${priceInfo.discountAmountStr}\n` +
-          `💰 *Total Bayar*: *${priceInfo.discountedPriceStr}* (Member Resmi SOOBIN 👑)\n\n`
-        : `💰 *Harga*: *${rawPriceStr}*\n\n`) +
+      `💰 *Harga*: *${rawPriceStr}*\n\n` +
       `Apakah stok masih tersedia? Terima kasih!`;
     return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
   };
@@ -602,37 +597,6 @@ export default function SubscribeAIPage() {
             <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto leading-relaxed mb-6">
               Akses cepat tanpa batas ke ChatGPT Plus (GPT-4o), ChatGPT Go, Google Gemini Advanced, Perplexity Pro, & QuillBot Premium dengan jaminan garansi resmi.
             </p>
-
-            {/* Member Banner */}
-            {user ? (
-              <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3.5 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 shadow-lg mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-sm shrink-0">
-                    👑
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-emerald-200">Member Aktif: {user.name}</p>
-                    <p className="text-[11px] text-gray-300">Diskon 5% otomatis aktif untuk seluruh paket langganan AI!</p>
-                  </div>
-                </div>
-                <span className="bg-emerald-500 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg shrink-0">
-                  -5% ALL AI
-                </span>
-              </div>
-            ) : (
-              <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto text-left flex items-center justify-between gap-3 mb-6">
-                <div>
-                  <p className="text-xs font-bold text-white">✨ Mau diskon 5% untuk semua akun AI?</p>
-                  <p className="text-[11px] text-gray-400">Daftar member gratis & nikmati harga khusus member sekarang.</p>
-                </div>
-                <a
-                  href="/auth"
-                  className="bg-white text-black hover:bg-neutral-200 font-bold text-xs px-3.5 py-1.5 rounded-xl transition-colors shrink-0 shadow-sm"
-                >
-                  Daftar Member
-                </a>
-              </div>
-            )}
           </motion.div>
 
           {/* Search Bar - B&W */}
@@ -669,17 +633,22 @@ export default function SubscribeAIPage() {
               { id: 'jenni', label: 'Jenni AI' },
               { id: 'scispace', label: 'SciSpace' },
               { id: 'chatgpt', label: 'ChatGPT' },
-              { id: 'gemini', label: 'Google Gemini' },
+              { id: 'gemini', label: 'Gemini' },
               { id: 'perplexity', label: 'Perplexity' },
               { id: 'quillbot', label: 'QuillBot' },
+              { id: 'turnitin', label: 'Turnitin' },
+              { id: 'elevenlabs', label: 'ElevenLabs' },
+              { id: 'suno', label: 'Suno AI' },
+              { id: 'runway', label: 'Runway ML' },
+              { id: 'cursor', label: 'Cursor AI' },
             ].map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-bold transition-all border whitespace-nowrap shrink-0 ${
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all whitespace-nowrap shrink-0 ${
                   selectedCategory === cat.id
-                    ? 'bg-black text-white border-black shadow-md'
-                    : 'bg-neutral-100 text-neutral-800 border-neutral-300 hover:bg-neutral-200'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-black'
                 }`}
               >
                 {cat.label}
@@ -701,42 +670,31 @@ export default function SubscribeAIPage() {
         </div>
       </section>
 
-      {/* Marquee Logo Scroller AI Partners */}
-      <section className="pt-8 pb-2 px-4 container-custom">
-        <MarqueeLogoScroller
-          title="EKOSISTEM AI TERLENGKAP"
-          description="Platform kecerdasan buatan resmi yang tersedia di SOOBIN Services dengan akses instan & garansi penuh."
-          logos={aiLogos}
-          speed="normal"
-        />
-      </section>
-
-      {/* Product Cards Grid - B&W Clean */}
-      <section className="py-12 sm:py-16 px-4 container-custom flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      {/* Main Content Product Grid - B&W Aesthetic */}
+      <section className="py-12 md:py-16 flex-1">
+        <div className="container-custom px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => {
             const selectedIndex = selectedOptions[product.id] || 0;
             const currentOption = product.options[selectedIndex] || product.options[0];
-            const finalPrice = getOptionSellingPrice(currentOption);
-            const rawPriceStr = formatRupiah(finalPrice);
-            const priceInfo = getPriceWithMemberDiscount(rawPriceStr, isMember);
+            const finalSellingPrice = getOptionSellingPrice(currentOption);
+            const rawPriceStr = formatRupiah(finalSellingPrice);
 
             return (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-3xl border border-neutral-300 shadow-md hover:shadow-xl transition-all flex flex-col overflow-hidden relative"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white border border-neutral-300 rounded-3xl overflow-hidden hover:border-black transition-all flex flex-col justify-between shadow-xs hover:shadow-xl"
               >
-                {/* Header Card - Solid Black */}
-                <div className="p-6 bg-black text-white border-b border-neutral-800">
+                {/* Header Card */}
+                <div className="bg-black text-white p-6 border-b border-neutral-800">
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <div className="bg-white rounded-xl px-3 py-1.5 h-10 border border-neutral-300 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center p-2 border border-neutral-200 shrink-0">
                       <Image
                         src={product.logo}
                         alt={product.title}
-                        width={90}
+                        width={28}
                         height={28}
                         className="h-6 w-auto object-contain"
                         priority={false}
@@ -768,7 +726,7 @@ export default function SubscribeAIPage() {
                     ))}
                   </div>
 
-                  {/* Options Dropdown / Selector */}
+                  {/* Options Dropdown */}
                   <div className="space-y-3 pt-4 border-t border-neutral-200">
                     <label className="block text-xs font-black text-neutral-900 uppercase tracking-wider">
                       PILIH DURASI / PAKET:
@@ -782,10 +740,9 @@ export default function SubscribeAIPage() {
                         {product.options.map((opt, idx) => {
                           const optSellingPrice = getOptionSellingPrice(opt);
                           const optRawStr = formatRupiah(optSellingPrice);
-                          const optPriceInfo = getPriceWithMemberDiscount(optRawStr, isMember);
                           return (
                             <option key={idx} value={idx}>
-                              {opt.duration} - {optPriceInfo.isDiscounted ? `${optPriceInfo.discountedPriceStr} (Diskon 5%)` : optRawStr}
+                              {opt.duration} - {optRawStr}
                             </option>
                           );
                         })}
@@ -801,32 +758,15 @@ export default function SubscribeAIPage() {
                     <div className="bg-neutral-100 border border-neutral-300 rounded-2xl p-4 flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
-                          {priceInfo.isDiscounted ? 'HARGA MEMBER (DISC 5%):' : 'HARGA RESMI:'}
+                          HARGA RESMI:
                         </p>
-                        {priceInfo.isDiscounted ? (
-                          <div>
-                            <p className="text-xs text-neutral-400 line-through">
-                              {priceInfo.originalPriceStr}
-                            </p>
-                            <p className="text-2xl font-black text-emerald-700">
-                              {priceInfo.discountedPriceStr}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-2xl font-black text-neutral-900">
-                            {rawPriceStr}
-                          </p>
-                        )}
+                        <p className="text-2xl font-black text-neutral-900">
+                          {rawPriceStr}
+                        </p>
                       </div>
-                      {priceInfo.isDiscounted ? (
-                        <span className="text-xs font-mono font-bold px-2.5 py-1 bg-emerald-600 text-white rounded-md">
-                          -5% MEMBER
-                        </span>
-                      ) : (
-                        <span className="text-xs font-mono font-bold px-2.5 py-1 bg-black text-white rounded-md">
-                          GARANSI
-                        </span>
-                      )}
+                      <span className="text-xs font-mono font-bold px-2.5 py-1 bg-black text-white rounded-md">
+                        GARANSI
+                      </span>
                     </div>
 
                     {/* WhatsApp Action Button */}

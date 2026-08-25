@@ -1175,16 +1175,16 @@ export default function LayananPage() {
                       <span className="bg-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                         👑 Member Resmi Aktif
                       </span>
-                      <h4 className="text-xs sm:text-sm font-semibold text-emerald-300">Diskon Otomatis 5% All Layanan</h4>
+                      <h4 className="text-xs sm:text-sm font-semibold text-emerald-300">Diskon Otomatis 5% Cek Turnitin & Cek AI</h4>
                     </div>
                     <h3 className="text-lg sm:text-xl font-bold">Selamat Datang, {user.name}!</h3>
                     <p className="text-gray-300 text-xs mt-1">
-                      Terdaftar dari <span className="font-semibold text-white">{user.university}</span> ({user.prodi}). Potongan harga <strong>5% otomatis diterapkan</strong> pada seluruh katalog harga layanan di bawah ini.
+                      Terdaftar dari <span className="font-semibold text-white">{user.university}</span> ({user.prodi}). Potongan harga <strong>5% khusus layanan Cek Turnitin & Cek AI</strong> telah diterapkan otomatis.
                     </p>
                   </div>
                   <div className="shrink-0 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 rounded-xl px-5 py-3 text-center shadow-inner">
                     <span className="block text-2xl font-black">5% OFF</span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-200">Semua Layanan</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-200">Cek Turnitin & AI</span>
                   </div>
                 </div>
               </div>
@@ -1193,9 +1193,9 @@ export default function LayananPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl"></div>
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold">✨ Dapatkan Diskon Otomatis 5% untuk Semua Layanan!</h3>
+                    <h3 className="text-base sm:text-lg font-bold">✨ Dapatkan Diskon 5% untuk Cek Turnitin & Cek AI!</h3>
                     <p className="text-gray-400 text-xs mt-1">
-                      Daftarkan akun member Anda sekarang untuk menikmati potongan harga langsung 5% di seluruh layanan SOOBIN Services.
+                      Daftarkan akun member Anda sekarang untuk menikmati potongan harga langsung 5% pada layanan Cek Turnitin & Cek AI.
                     </p>
                   </div>
                   <Link
@@ -1218,7 +1218,12 @@ export default function LayananPage() {
             {visibleServices.map((service, index) => {
               const displayBadge = getDisplayBadge(service);
               const isMember = Boolean(user);
-              const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
+              const isTurnitinService =
+                service.category === 'turnitin' ||
+                service.name.toLowerCase().includes('turnitin') ||
+                service.name.toLowerCase().includes('cek ai');
+              const isDiscountEligible = isMember && isTurnitinService;
+              const priceInfo = getPriceWithMemberDiscount(service.price, isDiscountEligible);
 
               return (
                 <motion.div

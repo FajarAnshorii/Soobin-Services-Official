@@ -151,7 +151,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
   if (!isOpen || !service) return null;
 
   const isMember = Boolean(user);
-  const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
+  const isTurnitinService =
+    service.category === 'turnitin' ||
+    service.name?.toLowerCase().includes('turnitin') ||
+    service.name?.toLowerCase().includes('cek ai');
+  const isDiscountEligible = isMember && isTurnitinService;
+  const priceInfo = getPriceWithMemberDiscount(service.price, isDiscountEligible);
   const effectivePrice = priceInfo.isDiscounted ? priceInfo.discountedPriceStr : service.price;
 
   const handleInputChange = (fieldKey: string, value: string) => {

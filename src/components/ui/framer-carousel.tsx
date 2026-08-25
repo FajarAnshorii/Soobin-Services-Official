@@ -20,8 +20,8 @@ export const defaultItems: CarouselItem[] = [
   {
     id: 2,
     url: '/images/posters/poster-diskon-member.png',
-    title: 'Diskon 5% Member Baru All Layanan',
-    link: 'https://wa.me/628990415500?text=Halo%20Admin%20Soobin%2C%20saya%20member%20baru%20mau%20klaim%20diskon%205%25'
+    title: 'Diskon 5% Cek Turnitin & Cek AI',
+    link: 'https://wa.me/628990415500?text=Halo%20Admin%20Soobin%2C%20saya%20member%20baru%20mau%20klaim%20diskon%205%25%20Cek%20Turnitin%20dan%20Cek%20AI'
   },
   {
     id: 3,
