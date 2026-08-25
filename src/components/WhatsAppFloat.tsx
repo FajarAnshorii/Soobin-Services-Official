@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Headphones, Send, X, Sun, Moon, Check, CheckCheck, MessageSquare, Lock, UserCheck } from 'lucide-react';
+import { Send, X, Sun, Moon, Check, CheckCheck, MessageSquare, Lock, UserCheck } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 
 interface Message {
@@ -257,8 +258,15 @@ export default function WhatsAppFloat() {
             >
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-primary-800 text-white flex items-center justify-center font-bold">
-                    <Headphones className="w-5 h-5 text-white animate-pulse" />
+                  <div className="w-10 h-10 rounded-full bg-white border border-slate-200 overflow-hidden flex items-center justify-center p-1.5 shadow-2xs">
+                    <Image
+                      src="/favicon.png"
+                      alt="Admin SOOBIN"
+                      width={28}
+                      height={28}
+                      className="object-contain"
+                      priority
+                    />
                   </div>
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
                 </div>
@@ -413,8 +421,15 @@ export default function WhatsAppFloat() {
         <span className="absolute inset-0 bg-primary-800 rounded-full animate-ping opacity-25" />
 
         {/* Button */}
-        <div className="relative bg-white border border-gray-150 text-primary-800 hover:text-primary-750 p-4 rounded-full shadow-2xl shadow-primary-950/20 transition-colors duration-300">
-          <Headphones className="w-6.5 h-6.5" />
+        <div className="relative bg-white border border-gray-200 hover:border-primary-600 p-3.5 rounded-full shadow-2xl shadow-primary-950/20 hover:shadow-primary-900/30 transition-all duration-300 flex items-center justify-center">
+          <Image
+            src="/favicon.png"
+            alt="Chat Admin SOOBIN"
+            width={28}
+            height={28}
+            className="object-contain drop-shadow-2xs"
+            priority
+          />
           
           {/* Unread Count Badge */}
           {unreadCount > 0 && user && (
