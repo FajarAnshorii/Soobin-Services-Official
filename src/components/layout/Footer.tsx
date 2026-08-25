@@ -46,6 +46,7 @@ const footerLinks = {
   ],
   info: [
     { href: '/', label: 'Tentang Kami' },
+    { href: '/kalkulator-order', label: 'Kalkulator Order' },
     { href: '/', label: 'Cara Pemesanan' },
     { href: '/faq', label: 'FAQ' },
     { href: '/', label: 'Kebijakan Privasi' },

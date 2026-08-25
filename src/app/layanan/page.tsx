@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import OrderModal from '@/components/modals/OrderModal';
-import PriceCalculatorSection from '@/components/sections/PriceCalculatorSection';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 import { getPriceWithMemberDiscount } from '@/lib/priceUtils';
 
@@ -1399,9 +1398,6 @@ export default function LayananPage() {
           <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
         </motion.button>
       </motion.div>
-
-      {/* Kalkulator Estimasi Harga Instan */}
-      <PriceCalculatorSection />
 
       <Footer />
       <WhatsAppFloat />

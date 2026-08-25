@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/layanan', label: 'Layanan' },
+  { href: '/kalkulator-order', label: 'Kalkulator Order' },
   { href: '/premium', label: 'Premium' },
   { href: '/subscribe-ai', label: 'Subscribe AI' },
   { href: '/testimoni', label: 'Testimoni' },
