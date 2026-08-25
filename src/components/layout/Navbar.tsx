@@ -13,6 +13,8 @@ import {
   History,
   BookMarked,
   FileText,
+  Calculator,
+  GraduationCap,
   ExternalLink
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -38,14 +40,28 @@ const toolLinks = [
     label: 'Daftar Pustaka Generator',
     desc: 'Format sitasi APA, MLA, IEEE, Harvard & auto lookup DOI',
     icon: BookMarked,
-    badge: 'Gratis',
+    badge: 'Populer',
+  },
+  {
+    href: '/tools/kalkulator-sampel',
+    label: 'Kalkulator Sampel (Slovin & Lemeshow)',
+    desc: 'Hitung sampel minimal & uraian rumus Bab 3 skripsi',
+    icon: Calculator,
+    badge: 'Baru',
+  },
+  {
+    href: '/tools/kalkulator-ipk',
+    label: 'Kalkulator IPK & Simulasi Cumlaude',
+    desc: 'Hitung IPS & simulasi target nilai sisa semester',
+    icon: GraduationCap,
+    badge: 'Baru',
   },
   {
     href: '/tools/word-counter',
     label: 'Hitung Kata & Waktu Baca',
     desc: 'Cek total kata, karakter, dan estimasi waktu membaca',
     icon: FileText,
-    badge: 'Baru',
+    badge: 'Mini Tool',
   },
 ];
 

@@ -8,6 +8,8 @@ import Link from 'next/link';
 import {
   BookMarked,
   FileText,
+  Calculator,
+  GraduationCap,
   ArrowRight,
   ShieldCheck
 } from 'lucide-react';
@@ -20,6 +22,22 @@ const tools = [
     badge: 'Paling Populer',
     icon: BookMarked,
     color: 'from-primary-900 to-primary-700',
+  },
+  {
+    href: '/tools/kalkulator-sampel',
+    title: 'Kalkulator Sampel (Slovin & Lemeshow)',
+    desc: 'Hitung jumlah sampel minimal penelitian secara otomatis dengan Rumus Slovin & Lemeshow lengkap beserta uraian teks Bab 3.',
+    badge: 'Baru & Lengkap',
+    icon: Calculator,
+    color: 'from-emerald-900 to-emerald-700',
+  },
+  {
+    href: '/tools/kalkulator-ipk',
+    title: 'Kalkulator IPK & Simulasi Cumlaude',
+    desc: 'Hitung IPK semester dan simulasikan nilai minimal yang dibutuhkan di sisa SKS untuk meraih predikat Cumlaude sesuai skala kampus.',
+    badge: 'Kustom Skala',
+    icon: GraduationCap,
+    color: 'from-blue-900 to-blue-700',
   },
   {
     href: '/tools/word-counter',
