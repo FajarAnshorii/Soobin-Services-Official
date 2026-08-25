@@ -3,12 +3,39 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'edge';
 
+const EXPIRATION_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 function parseIsoDate(val: any): string {
   if (val && typeof val === 'string' && val.includes('T')) {
     const d = new Date(val);
     if (!isNaN(d.getTime())) return d.toISOString();
   }
   return new Date().toISOString();
+}
+
+/**
+ * Otomatis membersihkan payload media foto yang sudah melewati batas 24 jam
+ * agar kapasitas database Supabase tetap sangat hemat dan loading cepat.
+ */
+function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boolean } {
+  if (!Array.isArray(messages)) return { messages: [], hasPruned: false };
+  const now = Date.now();
+  let hasPruned = false;
+
+  const cleaned = messages.map((msg) => {
+    const timestampMs = msg.createdAt || (msg.timestamp ? new Date(msg.timestamp).getTime() : 0);
+    const isExpired = timestampMs > 0 && now - timestampMs > EXPIRATION_MS;
+
+    if (isExpired && (msg.mediaUrl || !msg.isExpired)) {
+      hasPruned = true;
+      const copy = { ...msg, isExpired: true };
+      delete copy.mediaUrl;
+      return copy;
+    }
+    return msg;
+  });
+
+  return { messages: cleaned, hasPruned };
 }
 
 // GET all active chat sessions or a single session from Supabase
@@ -32,6 +59,17 @@ export async function GET(request: Request) {
         return NextResponse.json(null);
       }
 
+      const { messages: cleanedMessages, hasPruned } = pruneExpiredMedia(data.messages || []);
+
+      // Simpan pembersihan jika ada foto yang baru saja kadaluarsa
+      if (hasPruned) {
+        supabaseAdmin
+          .from('chats')
+          .update({ messages: cleanedMessages })
+          .eq('id', sessionId)
+          .then(() => {});
+      }
+
       return NextResponse.json({
         id: data.id,
         name: data.name,
@@ -41,7 +79,7 @@ export async function GET(request: Request) {
         unreadCount: data.unread_count || 0,
         userUnreadCount: 0,
         lastUpdated: data.updated_at,
-        messages: data.messages || [],
+        messages: cleanedMessages,
       });
     }
 
@@ -59,6 +97,7 @@ export async function GET(request: Request) {
     const chatsMap: Record<string, any> = {};
     if (data && Array.isArray(data)) {
       data.forEach((row) => {
+        const { messages: cleanedMessages } = pruneExpiredMedia(row.messages || []);
         chatsMap[row.id] = {
           id: row.id,
           name: row.name,
@@ -68,7 +107,7 @@ export async function GET(request: Request) {
           unreadCount: row.unread_count || 0,
           userUnreadCount: 0,
           lastUpdated: row.updated_at,
-          messages: row.messages || [],
+          messages: cleanedMessages,
         };
       });
     }
@@ -87,6 +126,7 @@ export async function POST(request: Request) {
 
     // Single session upsert
     if (body && body.id && body.name) {
+      const { messages: cleanedMessages } = pruneExpiredMedia(body.messages || []);
       const { error } = await supabaseAdmin.from('chats').upsert({
         id: body.id,
         name: body.name,
@@ -94,7 +134,7 @@ export async function POST(request: Request) {
         university: body.university || '',
         prodi: body.prodi || '',
         unread_count: body.unreadCount || 0,
-        messages: body.messages || [],
+        messages: cleanedMessages,
         updated_at: parseIsoDate(body.lastUpdated),
       });
 
@@ -106,16 +146,19 @@ export async function POST(request: Request) {
     if (body && typeof body === 'object' && !Array.isArray(body)) {
       const rows = Object.values(body)
         .filter((session: any) => session && session.id && session.name)
-        .map((session: any) => ({
-          id: session.id,
-          name: session.name || 'Member',
-          email: session.email || '',
-          university: session.university || '',
-          prodi: session.prodi || '',
-          unread_count: session.unreadCount || 0,
-          messages: session.messages || [],
-          updated_at: parseIsoDate(session.lastUpdated),
-        }));
+        .map((session: any) => {
+          const { messages: cleanedMessages } = pruneExpiredMedia(session.messages || []);
+          return {
+            id: session.id,
+            name: session.name || 'Member',
+            email: session.email || '',
+            university: session.university || '',
+            prodi: session.prodi || '',
+            unread_count: session.unreadCount || 0,
+            messages: cleanedMessages,
+            updated_at: parseIsoDate(session.lastUpdated),
+          };
+        });
 
       if (rows.length > 0) {
         const { error } = await supabaseAdmin.from('chats').upsert(rows);

@@ -11,8 +11,9 @@ import {
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, Plus,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
   Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon,
-  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2
+  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, ImagePlus, Loader2
 } from 'lucide-react';
+import { compressChatImage } from '@/lib/imageCompressor';
 
 interface Message {
   id: string;
@@ -21,6 +22,10 @@ interface Message {
   timestamp: string;
   read: boolean;
   createdAt?: number;
+  mediaUrl?: string;
+  mediaName?: string;
+  mediaSize?: string;
+  isExpired?: boolean;
 }
 
 interface ChatSession {
@@ -237,6 +242,9 @@ export default function AdminPage() {
   const [chats, setChats] = useState<{ [id: string]: ChatSession }>({});
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [adminReplyText, setAdminReplyText] = useState('');
+  const [adminChatPreview, setAdminChatPreview] = useState<{ url: string; name?: string } | null>(null);
+  const [isAdminChatUploading, setIsAdminChatUploading] = useState(false);
+  const adminFileInputRef = useRef<HTMLInputElement>(null);
 
   // Orders states
   const [orders, setOrders] = useState<OrderItem[]>(() => {
@@ -606,6 +614,70 @@ export default function AdminPage() {
       localStorage.setItem('soobin_chats', JSON.stringify(updatedChats));
     } catch (err) {
       console.error('Failed saving admin reply', err);
+    }
+  };
+
+  // Send admin photo reply
+  const handleAdminSelectImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !selectedSessionId) return;
+
+    const session = chats[selectedSessionId];
+    if (!session) return;
+
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Mohon pilih file gambar (.png, .jpg, .jpeg, .webp)');
+      return;
+    }
+
+    setIsAdminChatUploading(true);
+    try {
+      const { dataUrl, fileName, fileSize } = await compressChatImage(file);
+
+      const newMsg: Message = {
+        id: `msg-${Date.now()}`,
+        sender: 'admin',
+        text: adminReplyText.trim() || '📷 Mengirim foto',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        read: true,
+        createdAt: Date.now(),
+        mediaUrl: dataUrl,
+        mediaName: fileName,
+        mediaSize: fileSize,
+      };
+
+      setAdminReplyText('');
+
+      const updatedSession: ChatSession = {
+        ...session,
+        messages: [...(session.messages || []), newMsg],
+        lastUpdated: new Date().toISOString(),
+        userUnreadCount: (session.userUnreadCount || 0) + 1,
+        unreadCount: 0,
+      };
+
+      const updatedChats = {
+        ...chats,
+        [selectedSessionId]: updatedSession,
+      };
+
+      setChats(updatedChats);
+
+      await fetch(BUCKET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedSession),
+      });
+      localStorage.setItem('soobin_chats', JSON.stringify(updatedChats));
+    } catch (err) {
+      console.error('Failed sending admin photo reply', err);
+      alert('Gagal mengirim foto');
+    } finally {
+      setIsAdminChatUploading(false);
+      if (adminFileInputRef.current) {
+        adminFileInputRef.current.value = '';
+      }
     }
   };
 
@@ -1831,34 +1903,105 @@ export default function AdminPage() {
 
                     {/* Messages Stream */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-                      {selectedSession.messages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
-                        >
+                      {selectedSession.messages.map((msg) => {
+                        const isExpired = msg.isExpired || (msg.createdAt ? (Date.now() - msg.createdAt > 24 * 60 * 60 * 1000) : false);
+                        const hasMedia = Boolean(msg.mediaUrl || msg.mediaName || isExpired);
+
+                        return (
                           <div
-                            className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed font-bold ${
-                              msg.sender === 'admin'
-                                ? 'bg-slate-900 text-white rounded-tr-none shadow-xs'
-                                : 'bg-white text-slate-900 border border-slate-300 rounded-tl-none shadow-xs'
-                            }`}
+                            key={msg.id}
+                            className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}
                           >
-                            <p className="whitespace-pre-wrap">{msg.text}</p>
-                            <span
-                              className={`block text-[9px] mt-1 text-right font-black ${
-                                msg.sender === 'admin' ? 'text-slate-300' : 'text-slate-500'
+                            <div
+                              className={`max-w-[80%] p-3 rounded-2xl text-xs leading-relaxed font-bold ${
+                                msg.sender === 'admin'
+                                  ? 'bg-slate-900 text-white rounded-tr-none shadow-xs'
+                                  : 'bg-white text-slate-900 border border-slate-300 rounded-tl-none shadow-xs'
                               }`}
                             >
-                              {formatChatDate(msg.createdAt || msg.timestamp)}
-                            </span>
+                              {/* Media Photo Section */}
+                              {hasMedia && (
+                                <div className="mb-2">
+                                  {isExpired ? (
+                                    <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-900 text-xs flex items-center gap-2">
+                                      <Clock className="w-4 h-4 shrink-0 text-amber-600" />
+                                      <div className="flex flex-col text-left">
+                                        <span className="font-black text-[11px]">Foto Telah Kadaluarsa</span>
+                                        <span className="text-[10px] font-semibold opacity-90 leading-tight">
+                                          Melewati 1x24 jam demi efisiensi sistem. Silakan kirim ulang jika diperlukan.
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : msg.mediaUrl ? (
+                                    <div className="flex flex-col gap-1">
+                                      <div
+                                        onClick={() =>
+                                          setAdminChatPreview({ url: msg.mediaUrl!, name: msg.mediaName })
+                                        }
+                                        className="relative group rounded-xl overflow-hidden cursor-pointer border border-slate-300 bg-black/5 max-h-48"
+                                      >
+                                        <img
+                                          src={msg.mediaUrl}
+                                          alt={msg.mediaName || 'Foto'}
+                                          className="w-full h-auto object-cover max-h-48 group-hover:scale-105 transition-transform duration-200"
+                                          loading="lazy"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-black backdrop-blur-2xs">
+                                          <Eye className="w-4 h-4" />
+                                          <span>Lihat Foto</span>
+                                        </div>
+                                      </div>
+                                      {msg.mediaName && (
+                                        <div className="flex items-center justify-between text-[10px] opacity-80 px-1 pt-0.5 font-medium">
+                                          <span className="truncate max-w-[140px]">{msg.mediaName}</span>
+                                          {msg.mediaSize && <span>{msg.mediaSize}</span>}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : null}
+                                </div>
+                              )}
+
+                              {msg.text && (
+                                <p className="whitespace-pre-wrap">{msg.text}</p>
+                              )}
+                              <span
+                                className={`block text-[9px] mt-1 text-right font-black ${
+                                  msg.sender === 'admin' ? 'text-slate-300' : 'text-slate-500'
+                                }`}
+                              >
+                                {formatChatDate(msg.createdAt || msg.timestamp)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                       <div ref={chatEndRef} />
                     </div>
 
                     {/* Reply Input Box */}
-                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-300 bg-white flex gap-2">
+                    <form onSubmit={handleSendAdminReply} className="p-3 border-t border-slate-300 bg-white flex gap-2 items-center">
+                      <input
+                        type="file"
+                        ref={adminFileInputRef}
+                        onChange={handleAdminSelectImage}
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        disabled={isAdminChatUploading}
+                        onClick={() => adminFileInputRef.current?.click()}
+                        className="p-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                        title="Kirim Foto Lampiran"
+                      >
+                        {isAdminChatUploading ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
+                        ) : (
+                          <ImagePlus className="w-4 h-4" />
+                        )}
+                      </button>
+
                       <input
                         type="text"
                         placeholder="Tulis balasan untuk pengguna..."
@@ -2945,6 +3088,53 @@ export default function AdminPage() {
                 >
                   Tutup Pratonton
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Zoom Preview Foto Live Chat Admin */}
+      <AnimatePresence>
+        {adminChatPreview && (
+          <div
+            className="fixed inset-0 z-100 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={() => setAdminChatPreview(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              className="relative max-w-2xl w-full max-h-[90vh] bg-slate-900 rounded-2xl overflow-hidden border border-white/20 shadow-2xl flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-4 py-3 bg-black/50 border-b border-white/10 flex items-center justify-between">
+                <span className="text-white text-xs font-bold truncate max-w-[240px]">
+                  {adminChatPreview.name || 'Preview Foto Live Chat'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={adminChatPreview.url}
+                    download={adminChatPreview.name || 'foto_livechat.jpg'}
+                    className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs flex items-center gap-1.5 font-semibold transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Unduh</span>
+                  </a>
+                  <button
+                    onClick={() => setAdminChatPreview(null)}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="p-3 flex items-center justify-center overflow-auto max-h-[calc(90vh-60px)] bg-black/30">
+                <img
+                  src={adminChatPreview.url}
+                  alt={adminChatPreview.name || 'Preview'}
+                  className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
+                />
               </div>
             </motion.div>
           </div>
