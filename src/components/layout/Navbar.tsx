@@ -20,12 +20,15 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const navLinks = [
+const navLinksBeforeTools = [
   { href: '/', label: 'Beranda' },
   { href: '/layanan', label: 'Layanan' },
   { href: '/kalkulator-order', label: 'Kalkulator Order' },
   { href: '/premium', label: 'Premium' },
   { href: '/subscribe-ai', label: 'Subscribe AI' },
+];
+
+const navLinksAfterTools = [
   { href: '/testimoni', label: 'Testimoni' },
   { href: '/faq', label: 'FAQ' },
 ];
@@ -104,7 +107,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation with Animated Lamp Pill & Tools Dropdown */}
           <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-slate-50/90 p-1 rounded-full border border-slate-200/80 shadow-2xs backdrop-blur-md">
-            {navLinks.map((link) => {
+            {navLinksBeforeTools.map((link) => {
               const isActive = pathname === link.href;
 
               return (
@@ -139,7 +142,7 @@ export default function Navbar() {
               );
             })}
 
-            {/* Tools Dropdown Trigger (Desktop) */}
+            {/* Tools Dropdown Trigger (Desktop - Next to Subscribe AI) */}
             <div
               className="relative"
               ref={toolsDropdownRef}
@@ -218,16 +221,12 @@ export default function Navbar() {
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold truncate">{tool.label}</span>
-                                {tool.badge && (
-                                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200/60">
-                                    {tool.badge}
-                                  </span>
-                                )}
+                                <span className="text-xs font-bold text-slate-900">{tool.label}</span>
+                                <span className="text-[9px] font-extrabold text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
+                                  {tool.badge}
+                                </span>
                               </div>
-                              <p className="text-[10px] text-slate-500 line-clamp-1 leading-tight mt-0.5">
-                                {tool.desc}
-                              </p>
+                              <p className="text-[10px] text-slate-500 truncate mt-0.5">{tool.desc}</p>
                             </div>
                           </Link>
                         );
@@ -237,6 +236,41 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
             </div>
+
+            {navLinksAfterTools.map((link) => {
+              const isActive = pathname === link.href;
+
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`relative px-2.5 xl:px-3 py-1.5 text-[11px] xl:text-xs font-semibold whitespace-nowrap transition-colors duration-200 rounded-full ${
+                    isActive
+                      ? 'text-primary-850 font-bold'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-lamp"
+                      className="absolute inset-0 bg-white rounded-full shadow-xs border border-slate-200/80 z-0"
+                      initial={false}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 350,
+                        damping: 30,
+                      }}
+                    >
+                      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-primary-700">
+                        <div className="absolute w-10 h-5 rounded-full blur-xs -top-2 -left-1 bg-primary-500/30" />
+                        <div className="absolute w-6 h-4 rounded-full blur-xs -top-1 left-1 bg-primary-500/30" />
+                      </div>
+                    </motion.div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
@@ -349,7 +383,7 @@ export default function Navbar() {
       >
         <div className="bg-white border-t border-gray-100 shadow-xl pb-8">
           <div className="container-custom py-4 flex flex-col gap-2">
-            {navLinks.map((link) => (
+            {navLinksBeforeTools.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
@@ -362,7 +396,7 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Mobile Tools Accordion */}
+            {/* Mobile Tools Accordion (Between Subscribe AI & Testimoni) */}
             <div className="py-2 border-t border-b border-slate-100 my-1">
               <button
                 type="button"
@@ -392,6 +426,19 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            {navLinksAfterTools.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`font-medium transition-colors duration-200 py-2 text-sm ${
+                  pathname === link.href ? 'text-primary-800 font-bold' : 'text-slate-700'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
 
             {user ? (
               <div className="flex flex-col gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100 mt-2">
