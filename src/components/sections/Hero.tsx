@@ -173,7 +173,7 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
-              <AnimatedStat value={10000} label="Customer" suffix="+" />
+              <AnimatedStat value={20000} label="Customer" suffix="+" />
               <AnimatedStat value={30000} label="Tugas Selesai" suffix="+" />
               <AnimatedStat value={4.9} decimals={1} decimalSeparator="." label="Rating" suffix="★" />
             </motion.div>
