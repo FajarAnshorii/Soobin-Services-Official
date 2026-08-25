@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { useAuth } from '@/context/AuthContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calculator,
   RefreshCw,
@@ -22,7 +22,11 @@ import {
   Minus,
   Info,
   Layers,
-  GraduationCap
+  GraduationCap,
+  Trash2,
+  ShoppingCart,
+  PlusCircle,
+  ArrowRight
 } from 'lucide-react';
 
 interface ServiceItem {
@@ -38,7 +42,16 @@ interface ServiceItem {
   defaultQty: number;
   step: number;
   description: string;
-  isPackage?: boolean;
+}
+
+interface CartItem {
+  cartId: string;
+  serviceId: string;
+  name: string;
+  unitPrice: number;
+  unitLabel: string;
+  quantity: number;
+  subtotal: number;
 }
 
 const ACADEMIC_SERVICES: ServiceItem[] = [
@@ -51,7 +64,7 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Halaman',
     basePrice: 2000,
     minQty: 1,
-    maxQty: 200,
+    maxQty: 500,
     defaultQty: 10,
     step: 1,
     description: 'Pengerjaan parafrase manual akademik per halaman untuk menurunkan similarity Turnitin secara efektif.',
@@ -65,11 +78,10 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Dokumen',
     basePrice: 8000,
     minQty: 1,
-    maxQty: 10,
+    maxQty: 20,
     defaultQty: 1,
     step: 1,
     description: 'Pemeriksaan similarity index Turnitin resmi akun No-Repository (bebas tersimpan di database kampus/global).',
-    isPackage: true,
   },
   {
     id: 'turnitin_3x',
@@ -80,11 +92,10 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Paket (3x Cek)',
     basePrice: 24000,
     minQty: 1,
-    maxQty: 5,
+    maxQty: 10,
     defaultQty: 1,
     step: 1,
     description: 'Paket 3 kali pengecekan similarity Turnitin No-Repository untuk pemantauan hasil revisi naskah.',
-    isPackage: true,
   },
   {
     id: 'cek_ai',
@@ -95,11 +106,10 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Dokumen',
     basePrice: 5000,
     minQty: 1,
-    maxQty: 10,
+    maxQty: 20,
     defaultQty: 1,
     step: 1,
     description: 'Pengecekan indikasi persentase Artificial Intelligence (AI) pada naskah artikel atau tugas ilmiah.',
-    isPackage: true,
   },
   {
     id: 'ppt',
@@ -109,8 +119,8 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unit: 'slide',
     unitLabel: 'Slide',
     basePrice: 3000,
-    minQty: 5,
-    maxQty: 100,
+    minQty: 1,
+    maxQty: 200,
     defaultQty: 10,
     step: 1,
     description: 'Penyusunan slide presentasi profesional untuk seminar proposal, sidang skripsi, dan presentasi perkuliahan.',
@@ -123,8 +133,8 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unit: 'halaman',
     unitLabel: 'Halaman',
     basePrice: 1500,
-    minQty: 5,
-    maxQty: 300,
+    minQty: 1,
+    maxQty: 500,
     defaultQty: 25,
     step: 1,
     description: 'Perapian layout, margin, spasi, penomoran romawi/angka, daftar isi, tabel, dan gambar otomatis sesuai pedoman kampus.',
@@ -138,11 +148,10 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Dokumen Lengkap',
     basePrice: 35000,
     minQty: 1,
-    maxQty: 3,
+    maxQty: 10,
     defaultQty: 1,
     step: 1,
     description: 'Formatting lengkap seluruh naskah dari Cover, Bab 1 hingga Lampiran sampai siap cetak & ACC dosen.',
-    isPackage: true,
   },
   {
     id: 'pengetikan',
@@ -152,8 +161,8 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unit: 'halaman',
     unitLabel: 'Halaman',
     basePrice: 1000,
-    minQty: 5,
-    maxQty: 200,
+    minQty: 1,
+    maxQty: 500,
     defaultQty: 10,
     step: 1,
     description: 'Pengetikan ulang materi dari tulisan tangan, dokumen cetak fisik, atau PDF hasil pemindaian ke format Microsoft Word.',
@@ -167,11 +176,10 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Paket Uji',
     basePrice: 100000,
     minQty: 1,
-    maxQty: 5,
+    maxQty: 10,
     defaultQty: 1,
     step: 1,
     description: 'Pengolahan data statistik meliputi uji instrumen, regresi, uji hipotesis, dan interpretasi output Bab 4.',
-    isPackage: true,
   },
   {
     id: 'review_jurnal',
@@ -182,7 +190,7 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Artikel Jurnal',
     basePrice: 25000,
     minQty: 1,
-    maxQty: 10,
+    maxQty: 20,
     defaultQty: 1,
     step: 1,
     description: 'Pembuatan matriks review dan telaah kritis artikel jurnal ilmiah nasional (SINTA) maupun internasional.',
@@ -196,18 +204,19 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     unitLabel: 'Naskah Makalah',
     basePrice: 40000,
     minQty: 1,
-    maxQty: 5,
+    maxQty: 10,
     defaultQty: 1,
     step: 1,
     description: 'Penyusunan naskah makalah akademik sistematis dengan referensi rujukan ilmiah primer yang valid.',
-    isPackage: true,
   },
 ];
 
 export default function KalkulatorOrderPage() {
   const { user } = useAuth();
   const [selectedServiceId, setSelectedServiceId] = useState<string>('parafrase');
-  const [quantity, setQuantity] = useState<number>(10);
+  const [inputQuantity, setInputQuantity] = useState<number | string>(10);
+  const [orderCart, setOrderCart] = useState<CartItem[]>([]);
+  const [justAddedNotice, setJustAddedNotice] = useState<string | null>(null);
 
   // Active selected service
   const activeService = useMemo(() => {
@@ -215,22 +224,86 @@ export default function KalkulatorOrderPage() {
     return found || ACADEMIC_SERVICES[0];
   }, [selectedServiceId]);
 
-  // Handle service switch
+  // Handle service selection
   const handleSelectService = (service: ServiceItem) => {
     setSelectedServiceId(service.id);
-    setQuantity(service.defaultQty);
+    setInputQuantity(service.defaultQty);
   };
 
-  // Price calculations
-  const rawSubtotal = useMemo(() => {
-    return activeService.basePrice * quantity;
-  }, [activeService, quantity]);
+  // Safe parsed quantity for the active current selection
+  const currentNumericQty = useMemo(() => {
+    const n = typeof inputQuantity === 'string' ? parseInt(inputQuantity, 10) : inputQuantity;
+    return isNaN(n) || n <= 0 ? 1 : n;
+  }, [inputQuantity]);
+
+  // Current single item calculation
+  const currentSubtotal = useMemo(() => {
+    return activeService.basePrice * currentNumericQty;
+  }, [activeService, currentNumericQty]);
+
+  // Add current configured service to order cart
+  const handleAddToCart = () => {
+    const existingIndex = orderCart.findIndex((item) => item.serviceId === activeService.id);
+    let updatedCart: CartItem[];
+
+    if (existingIndex > -1) {
+      // Update existing item quantity
+      const existing = orderCart[existingIndex];
+      const newQty = existing.quantity + currentNumericQty;
+      const updatedItem: CartItem = {
+        ...existing,
+        quantity: newQty,
+        subtotal: existing.unitPrice * newQty,
+      };
+      updatedCart = [...orderCart];
+      updatedCart[existingIndex] = updatedItem;
+    } else {
+      // Add new item
+      const newItem: CartItem = {
+        cartId: `cart_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        serviceId: activeService.id,
+        name: activeService.name,
+        unitPrice: activeService.basePrice,
+        unitLabel: activeService.unitLabel,
+        quantity: currentNumericQty,
+        subtotal: currentSubtotal,
+      };
+      updatedCart = [...orderCart, newItem];
+    }
+
+    setOrderCart(updatedCart);
+    setJustAddedNotice(`Berhasil menambahkan: ${activeService.name} (${currentNumericQty} ${activeService.unitLabel})`);
+    setTimeout(() => setJustAddedNotice(null), 3000);
+  };
+
+  // Remove item from cart
+  const handleRemoveFromCart = (cartId: string) => {
+    setOrderCart((prev) => prev.filter((item) => item.cartId !== cartId));
+  };
+
+  // Clear all cart
+  const handleClearCart = () => {
+    if (orderCart.length === 0) return;
+    if (confirm('Kosongkan semua daftar pesanan?')) {
+      setOrderCart([]);
+    }
+  };
+
+  // Determine items to calculate (if cart is empty, preview current single item; otherwise calculate whole cart)
+  const isCartEmpty = orderCart.length === 0;
+
+  const totalRawSubtotal = useMemo(() => {
+    if (isCartEmpty) {
+      return currentSubtotal;
+    }
+    return orderCart.reduce((sum, item) => sum + item.subtotal, 0);
+  }, [isCartEmpty, currentSubtotal, orderCart]);
 
   // Member discount (5% for logged-in member)
   const isMember = Boolean(user);
   const memberDiscountRate = isMember ? 0.05 : 0;
-  const memberDiscountAmount = Math.round(rawSubtotal * memberDiscountRate);
-  const finalTotal = rawSubtotal - memberDiscountAmount;
+  const memberDiscountAmount = Math.round(totalRawSubtotal * memberDiscountRate);
+  const finalGrandTotal = totalRawSubtotal - memberDiscountAmount;
 
   // Currency formatter
   const formatRupiah = (val: number) => {
@@ -246,21 +319,29 @@ export default function KalkulatorOrderPage() {
     const memberStatus = isMember ? `Member (${user?.name || 'Aktif'})` : 'Reguler';
     const discountText = isMember ? `\nPotongan Diskon Member (5%): -${formatRupiah(memberDiscountAmount)}` : '';
 
+    let itemsBreakdown = '';
+    if (isCartEmpty) {
+      itemsBreakdown = `1. ${activeService.name} (${currentNumericQty} ${activeService.unitLabel}) - ${formatRupiah(currentSubtotal)}`;
+    } else {
+      itemsBreakdown = orderCart
+        .map((item, idx) => `${idx + 1}. ${item.name} (${item.quantity} ${item.unitLabel}) - ${formatRupiah(item.subtotal)}`)
+        .join('\n');
+    }
+
     const text = `Halo Admin SOOBIN Services! 👋
 Saya ingin melakukan pemesanan via Kalkulator Order Website:
 
-Rincian Estimasi:
-• Layanan: ${activeService.name}
-• Jumlah / Volume: ${quantity} ${activeService.unitLabel}
-• Tarif Dasar: ${formatRupiah(activeService.basePrice)} / ${activeService.unitLabel}
-• Subtotal: ${formatRupiah(rawSubtotal)}${discountText}
-• Estimasi Total Biaya: ${formatRupiah(finalTotal)}
-• Status Pemesan: ${memberStatus}
+📋 DAFTAR PESANAN SAYA:
+${itemsBreakdown}
 
-Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
+💵 Subtotal: ${formatRupiah(totalRawSubtotal)}${discountText}
+✨ ESTIMASI TOTAL ORDER: ${formatRupiah(finalGrandTotal)}
+👤 Status Klien: ${memberStatus}
+
+Mohon bantuannya untuk konfirmasi dan proses pesanan ini ya Kak. Terima kasih! 🙏`;
 
     return `https://wa.me/6287815797525?text=${encodeURIComponent(text)}`;
-  }, [activeService, quantity, rawSubtotal, isMember, memberDiscountAmount, finalTotal, user]);
+  }, [isCartEmpty, activeService, currentNumericQty, currentSubtotal, orderCart, totalRawSubtotal, isMember, memberDiscountAmount, finalGrandTotal, user]);
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col">
@@ -274,10 +355,10 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
             <span>Kalkulator Order Akademik</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
-            Kalkulator Estimasi Biaya
+            Kalkulator & Total Order
           </h1>
           <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Hitung perkiraan biaya pengerjaan tugas dan layanan akademik secara transparan, akurat, dan sesuai dengan volume naskah Anda.
+            Pilih layanan, ketik jumlah halaman/unit secara manual, dan tambahkan beberapa layanan sekaligus untuk menghitung total biaya secara instan dan transparan.
           </p>
         </div>
       </section>
@@ -286,7 +367,7 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
       <section className="py-10 sm:py-14 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Service Selection & Volume Configuration (7 Cols) */}
+            {/* Left Column: Service Selection & Manual Input (7 Cols) */}
             <div className="lg:col-span-7 space-y-6">
               {/* Step 1: Select Service */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
@@ -335,17 +416,16 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
                 </div>
               </div>
 
-              {/* Step 2: Volume & Quantity Adjustment */}
+              {/* Step 2: Manual Number Input & Add to Order */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] flex items-center justify-center font-bold">2</span>
-                    Jumlah / Volume {activeService.unitLabel}
+                    Input Manual Jumlah {activeService.unitLabel}
                   </h2>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-bold text-slate-900">{quantity}</span>
-                    <span className="text-xs text-slate-600 font-medium">{activeService.unitLabel}</span>
-                  </div>
+                  <span className="text-xs text-slate-500 font-semibold">
+                    Tarif: {formatRupiah(activeService.basePrice)} / {activeService.unitLabel}
+                  </span>
                 </div>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-5 flex items-start gap-2.5">
@@ -355,74 +435,110 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
                   </p>
                 </div>
 
-                {/* Stepper Buttons & Slider */}
+                {/* Direct Manual Number Input Form */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => Math.max(activeService.minQty, prev - activeService.step))}
-                      disabled={quantity <= activeService.minQty}
-                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-800 transition-colors cursor-pointer"
-                      title="Kurangi"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
+                      Masukkan Jumlah {activeService.unitLabel} yang Diinginkan:
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setInputQuantity((prev) => Math.max(1, (typeof prev === 'number' ? prev : parseInt(prev, 10) || 1) - activeService.step))}
+                        className="w-12 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-800 transition-colors cursor-pointer shrink-0"
+                        title="Kurangi"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
 
-                    <input
-                      type="range"
-                      min={activeService.minQty}
-                      max={activeService.maxQty}
-                      step={activeService.step}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                    />
+                      <div className="relative flex-1">
+                        <input
+                          type="number"
+                          min="1"
+                          max={activeService.maxQty}
+                          value={inputQuantity}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '') {
+                              setInputQuantity('');
+                            } else {
+                              const parsed = parseInt(val, 10);
+                              setInputQuantity(isNaN(parsed) ? 1 : Math.max(1, parsed));
+                            }
+                          }}
+                          placeholder={`Contoh: 15`}
+                          className="w-full h-12 bg-white border-2 border-slate-300 focus:border-slate-900 rounded-xl px-4 text-base font-bold text-slate-900 text-center outline-none transition-all shadow-2xs"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-semibold pointer-events-none">
+                          {activeService.unitLabel}
+                        </span>
+                      </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => Math.min(activeService.maxQty, prev + activeService.step))}
-                      disabled={quantity >= activeService.maxQty}
-                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-800 transition-colors cursor-pointer"
-                      title="Tambah"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => setInputQuantity((prev) => (typeof prev === 'number' ? prev : parseInt(prev, 10) || 1) + activeService.step)}
+                        className="w-12 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-800 transition-colors cursor-pointer shrink-0"
+                        title="Tambah"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Preset Buttons */}
-                  {!activeService.isPackage && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <span className="text-[11px] text-slate-500 font-medium mr-1">Preset Cepat:</span>
-                      {[5, 10, 20, 35, 50, 75, 100]
-                        .filter((q) => q >= activeService.minQty && q <= activeService.maxQty)
-                        .map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            onClick={() => setQuantity(q)}
-                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border ${
-                              quantity === q
-                                ? 'bg-slate-900 text-white border-slate-900'
-                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                            }`}
-                          >
-                            {q} {activeService.unitLabel}
-                          </button>
-                        ))}
-                    </div>
-                  )}
+                  {/* Subtotal Preview for this selected item */}
+                  <div className="p-3.5 bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <span className="text-xs text-slate-600 font-medium">
+                      Subtotal ({currentNumericQty} {activeService.unitLabel} × {formatRupiah(activeService.basePrice)}):
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {formatRupiah(currentSubtotal)}
+                    </span>
+                  </div>
+
+                  {/* Button: Add to Order Cart */}
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-99"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>+ Tambahkan Layanan Ini ke Daftar Order</span>
+                  </button>
+
+                  {/* Notice feedback */}
+                  <AnimatePresence>
+                    {justAddedNotice && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>{justAddedNotice}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Formal Price Quotation Card (5 Cols) */}
+            {/* Right Column: Multi-Item Order Cart & Grand Total (5 Cols) */}
             <div className="lg:col-span-5">
               <div className="sticky top-24 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                 <div className="pb-4 border-b border-slate-200 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Ringkasan Estimasi Order</h3>
-                    <p className="text-[11px] text-slate-500">SOOBIN Services Official</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
+                      <ShoppingCart className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Daftar Pesanan Anda</h3>
+                      <p className="text-[11px] text-slate-500">
+                        {orderCart.length === 0 ? '1 Layanan Aktif' : `${orderCart.length} Layanan Ditambahkan`}
+                      </p>
+                    </div>
                   </div>
+
                   {isMember ? (
                     <span className="px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
                       Member Aktif
@@ -434,30 +550,57 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
                   )}
                 </div>
 
-                {/* Line Items */}
-                <div className="py-4 space-y-3 text-xs border-b border-slate-200">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-slate-600">Layanan:</span>
-                    <span className="font-bold text-slate-900 text-right">{activeService.name}</span>
-                  </div>
+                {/* Items List */}
+                <div className="py-4 space-y-3 text-xs border-b border-slate-200 max-h-[300px] overflow-y-auto pr-1">
+                  {orderCart.length === 0 ? (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-bold text-slate-900">{activeService.name}</span>
+                        <span className="font-bold text-slate-900">{formatRupiah(currentSubtotal)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <span>{currentNumericQty} {activeService.unitLabel} × {formatRupiah(activeService.basePrice)}</span>
+                        <span className="text-[10px] text-slate-400">(Item aktif)</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-200">
+                        💡 Klik <b>&quot;+ Tambahkan Layanan Ini&quot;</b> untuk mengombinasikan dengan layanan lain.
+                      </p>
+                    </div>
+                  ) : (
+                    orderCart.map((item, index) => (
+                      <div
+                        key={item.cartId}
+                        className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start justify-between gap-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold shrink-0">
+                              {index + 1}
+                            </span>
+                            <h4 className="font-bold text-slate-900 truncate">{item.name}</h4>
+                          </div>
+                          <p className="text-[11px] text-slate-600 pl-5.5">
+                            {item.quantity} {item.unitLabel} × {formatRupiah(item.unitPrice)} = <span className="font-bold text-slate-900">{formatRupiah(item.subtotal)}</span>
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFromCart(item.cartId)}
+                          className="p-1 text-slate-400 hover:text-red-600 transition-colors cursor-pointer shrink-0"
+                          title="Hapus Layanan Ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
 
+                {/* Subtotal & Member Discount Breakdown */}
+                <div className="py-4 space-y-2.5 text-xs border-b border-slate-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-600">Tarif Satuan:</span>
-                    <span className="font-semibold text-slate-800">
-                      {formatRupiah(activeService.basePrice)} / {activeService.unitLabel}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-600">Volume Jumlah:</span>
-                    <span className="font-semibold text-slate-800">
-                      {quantity} {activeService.unitLabel}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-dashed border-slate-200">
-                    <span className="text-slate-600">Subtotal:</span>
-                    <span className="font-bold text-slate-900">{formatRupiah(rawSubtotal)}</span>
+                    <span className="text-slate-600">Subtotal Semua Pesanan:</span>
+                    <span className="font-bold text-slate-900">{formatRupiah(totalRawSubtotal)}</span>
                   </div>
 
                   {isMember ? (
@@ -473,20 +616,20 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
                   )}
                 </div>
 
-                {/* Total Box */}
+                {/* Grand Total Display */}
                 <div className="py-4 text-center bg-slate-50 rounded-xl border border-slate-200 my-4">
                   <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                    Estimasi Total Biaya
+                    Estimasi Grand Total
                   </span>
                   <div className="text-3xl font-extrabold text-slate-900">
-                    {formatRupiah(finalTotal)}
+                    {formatRupiah(finalGrandTotal)}
                   </div>
                   <span className="text-[10px] text-slate-500 mt-1 block">
-                    *Harga final transparan tanpa biaya tersembunyi
+                    {orderCart.length > 0 ? `Total untuk ${orderCart.length} jenis layanan` : 'Total 1 layanan terpilih'}
                   </span>
                 </div>
 
-                {/* Order Button */}
+                {/* Total Order WhatsApp CTA */}
                 <div className="space-y-3">
                   <a
                     href={whatsappUrl}
@@ -495,11 +638,21 @@ Mohon bantuannya untuk konfirmasi dan proses order ini ya Kak. Terima kasih.`;
                     className="w-full py-3.5 px-5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Lanjutkan Pesanan ke WhatsApp</span>
+                    <span>Total Order via WhatsApp</span>
                   </a>
 
+                  {orderCart.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearCart}
+                      className="w-full py-2 text-center text-xs text-slate-500 hover:text-red-600 font-medium transition-colors cursor-pointer"
+                    >
+                      Kosongkan Daftar Pesanan
+                    </button>
+                  )}
+
                   {/* Standard Academic Guarantees */}
-                  <div className="pt-2 space-y-1.5 text-[11px] text-slate-600">
+                  <div className="pt-2 space-y-1.5 text-[11px] text-slate-600 border-t border-slate-100">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       <span>Garansi pengerjaan sesuai pedoman & instruksi kampus</span>
