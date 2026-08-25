@@ -11,7 +11,6 @@ import {
   ChevronDown,
   ShoppingCart,
   History,
-  Wrench,
   BookMarked,
   FileText,
   Sparkles,
@@ -157,7 +156,6 @@ export default function Navbar() {
                 }`}
               >
                 <span className="relative z-10 flex items-center gap-1">
-                  <Wrench className="w-3 h-3 text-slate-500" />
                   <span>Tools</span>
                   <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showToolsDropdown ? 'rotate-180 text-primary-750' : 'text-slate-400'}`} />
                 </span>
@@ -372,8 +370,7 @@ export default function Navbar() {
                 className="flex items-center justify-between w-full font-bold text-sm text-slate-800 py-1"
               >
                 <div className="flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-primary-700" />
-                  <span>Academic Tools (Gratis)</span>
+                  <span>Tools (Gratis)</span>
                 </div>
                 <ChevronDown className={`w-4 h-4 transition-transform ${mobileToolsOpen ? 'rotate-180' : ''}`} />
               </button>
