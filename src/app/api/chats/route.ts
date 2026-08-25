@@ -35,8 +35,22 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
       return msg;
     }
 
-    const timestampMs = msg.createdAt || (msg.timestamp ? new Date(msg.timestamp).getTime() : 0);
-    const isExpired = timestampMs > 0 && now - timestampMs > EXPIRATION_MS;
+    // Must have a VALID positive createdAt timestamp (number or ISO string)
+    let createdAtMs = 0;
+    if (typeof msg.createdAt === 'number' && msg.createdAt > 0) {
+      createdAtMs = msg.createdAt;
+    } else if (typeof msg.createdAt === 'string') {
+      const parsed = new Date(msg.createdAt).getTime();
+      if (!isNaN(parsed) && parsed > 0) createdAtMs = parsed;
+    }
+
+    // If createdAt is missing or invalid, do NOT expire it immediately
+    if (createdAtMs <= 0) {
+      return msg;
+    }
+
+    // Only expire if really older than 24 hours
+    const isExpired = now - createdAtMs > EXPIRATION_MS;
 
     if (isExpired) {
       if (msg.mediaUrl || !msg.isExpired) {

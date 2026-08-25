@@ -418,7 +418,7 @@ export default function AdminPage() {
   // Sync Chats API
   const syncChatsWithCloud = async () => {
     try {
-      const res = await fetch(BUCKET_URL);
+      const res = await fetch(BUCKET_URL, { cache: 'no-store' });
       if (!res.ok) return;
       const cloudChats = await res.json();
 
