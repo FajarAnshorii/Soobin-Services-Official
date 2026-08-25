@@ -10,7 +10,8 @@ import {
   School, Send, CircleAlert, Headphones,
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, Plus,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
-  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon
+  Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon,
+  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2
 } from 'lucide-react';
 
 interface Message {
@@ -252,6 +253,10 @@ export default function AdminPage() {
   const [selectedProofImage, setSelectedProofImage] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  // Responsive Sidebar States
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
   // Revenue & Calendar Date State
   const [selectedRevenueDate, setSelectedRevenueDate] = useState<Date>(new Date());
@@ -1007,185 +1012,470 @@ export default function AdminPage() {
   // MAIN DASHBOARD - ALL TEXT BLACK MONOCHROME UI (LIGHT THEME)
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex w-full font-sans antialiased" style={{ backgroundColor: '#f8fafc' }}>
-      {/* LEFT VERTICAL SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-white border-r border-slate-300 flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30 shadow-xs">
+      {/* MOBILE DRAWER OVERLAY (SLIDE-OVER ON PHONES) */}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <>
+            {/* Dark Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 lg:hidden"
+            />
+
+            {/* Slide-In Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-50 flex flex-col justify-between shadow-2xl border-r border-slate-300 lg:hidden"
+            >
+              <div>
+                {/* Brand Header & Close Button */}
+                <div className="p-4 border-b border-slate-300 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+                      <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="font-black text-sm text-slate-900 tracking-tight leading-none">SOOBIN</h1>
+                      <p className="text-[9px] text-slate-700 font-black mt-0.5 uppercase tracking-wider">Services Admin</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                    className="p-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-900 transition-colors"
+                    title="Tutup Menu"
+                  >
+                    <X className="w-5 h-5 text-slate-900" />
+                  </button>
+                </div>
+
+                {/* Nav Items Mobile */}
+                <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-170px)]">
+                  <p className="text-[10px] font-black text-slate-900 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utama</p>
+
+                  <button
+                    onClick={() => { setActiveTab('overview'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'overview'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <LayoutDashboard className={`w-4 h-4 ${activeTab === 'overview' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Overview Dasbor</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('chat'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'chat'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <MessageSquare className={`w-4 h-4 ${activeTab === 'chat' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Live Chat</span>
+                    </div>
+                    {unreadChatsCount > 0 && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'chat' ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'}`}>
+                        {unreadChatsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('orders'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'orders'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <ShoppingBag className={`w-4 h-4 ${activeTab === 'orders' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Pesanan & Pembayaran</span>
+                    </div>
+                    {pendingOrdersCount > 0 && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'orders' ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'}`}>
+                        {pendingOrdersCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('members'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'members'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Users className={`w-4 h-4 ${activeTab === 'members' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Data Member</span>
+                    </div>
+                    <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
+                      {members.length}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('revenue'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'revenue'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <DollarSign className={`w-4 h-4 ${activeTab === 'revenue' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Pendapatan & Export</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('services'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'services'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Edit3 className={`w-4 h-4 ${activeTab === 'services' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Kelola Layanan (CMS)</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('testimonials'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'testimonials'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+                      <span>Testimoni & Rating</span>
+                    </div>
+                    <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-amber-300">
+                      {testimonialsList.length}
+                    </span>
+                  </button>
+                </nav>
+              </div>
+
+              {/* Drawer Footer Admin Profile */}
+              <div className="p-3 border-t border-slate-300 bg-slate-50 space-y-2">
+                <div className="p-2.5 bg-white border border-slate-300 rounded-xl flex items-center justify-between shadow-xs">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <div className="w-8 h-8 rounded-lg bg-slate-900 text-white font-black flex items-center justify-center text-xs shrink-0">
+                      AD
+                    </div>
+                    <div className="truncate">
+                      <p className="text-xs font-black text-slate-900 truncate">Administrator</p>
+                      <p className="text-[10px] text-slate-900 font-bold truncate">admin@soobin.com</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-xs font-black text-slate-900 hover:text-black flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-300"
+                >
+                  <LogOut className="w-4 h-4 text-slate-900" />
+                  <span>Keluar Sesi</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* DESKTOP VERTICAL SIDEBAR NAVIGATION (COLLAPSIBLE & EXPANDABLE) */}
+      <aside
+        className={`bg-white border-r border-slate-300 hidden lg:flex flex-col justify-between shrink-0 min-h-screen sticky top-0 h-screen z-30 shadow-xs transition-all duration-300 ${
+          isSidebarCollapsed ? 'w-20' : 'w-64'
+        }`}
+      >
         <div>
-          {/* Brand Header */}
-          <div className="p-5 border-b border-slate-300 flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Shield className="w-5 h-5 text-white" />
+          {/* Brand Header & Toggle */}
+          <div className={`border-b border-slate-300 flex items-center justify-between ${isSidebarCollapsed ? 'p-3 flex-col gap-2 text-center' : 'p-4'}`}>
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              {!isSidebarCollapsed && (
+                <div className="min-w-0">
+                  <h1 className="font-black text-base text-slate-900 tracking-tight leading-none">SOOBIN</h1>
+                  <p className="text-[10px] text-slate-900 font-black mt-1 uppercase tracking-wider truncate">Services Admin</p>
+                </div>
+              )}
             </div>
-            <div>
-              <h1 className="font-black text-base text-slate-900 tracking-tight leading-none">SOOBIN</h1>
-              <p className="text-[10px] text-slate-900 font-black mt-1 uppercase tracking-wider">Services Admin</p>
-            </div>
+
+            {/* Desktop Minimize/Maximize Button */}
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 transition-colors border border-slate-300"
+              title={isSidebarCollapsed ? 'Perlebar Sidebar (Maximize)' : 'Perkecil Sidebar (Minimize)'}
+            >
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="w-4 h-4 text-slate-900" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4 text-slate-900" />
+              )}
+            </button>
           </div>
 
-          {/* Nav Items - ALL BLACK TEXT */}
+          {/* Nav Items Desktop */}
           <nav className="p-3 space-y-1.5">
-            <p className="text-[10px] font-black text-slate-900 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utam</p>
+            {!isSidebarCollapsed && (
+              <p className="text-[10px] font-black text-slate-900 px-3 pt-2 pb-1 uppercase tracking-wider">Menu Utama</p>
+            )}
 
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Overview Dasbor"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'overview'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <LayoutDashboard className="w-4 h-4 text-slate-900" />
-                <span>Overview Dasbor</span>
+                <LayoutDashboard className={`w-4 h-4 ${activeTab === 'overview' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Overview Dasbor</span>}
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('chat')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Live Chat"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3 relative' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'chat'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <MessageSquare className="w-4 h-4 text-slate-900" />
-                <span>Live Chat</span>
+                <MessageSquare className={`w-4 h-4 ${activeTab === 'chat' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Live Chat</span>}
               </div>
               {unreadChatsCount > 0 && (
-                <span className="bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
-                  {unreadChatsCount}
-                </span>
+                isSidebarCollapsed ? (
+                  <span className="absolute top-1.5 right-1.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
+                ) : (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'chat' ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'}`}>
+                    {unreadChatsCount}
+                  </span>
+                )
               )}
             </button>
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Pesanan & Pembayaran"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3 relative' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'orders'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <ShoppingBag className="w-4 h-4 text-slate-900" />
-                <span>Pesanan & Pembayaran</span>
+                <ShoppingBag className={`w-4 h-4 ${activeTab === 'orders' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Pesanan & Pembayaran</span>}
               </div>
               {pendingOrdersCount > 0 && (
-                <span className="bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
-                  {pendingOrdersCount}
-                </span>
+                isSidebarCollapsed ? (
+                  <span className="absolute top-1.5 right-1.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
+                ) : (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'orders' ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'}`}>
+                    {pendingOrdersCount}
+                  </span>
+                )
               )}
             </button>
 
             <button
               onClick={() => setActiveTab('members')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Data Member"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'members'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Users className="w-4 h-4 text-slate-900" />
-                <span>Data Member</span>
+                <Users className={`w-4 h-4 ${activeTab === 'members' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Data Member</span>}
               </div>
-              <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
-                {members.length}
-              </span>
+              {!isSidebarCollapsed && (
+                <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
+                  {members.length}
+                </span>
+              )}
             </button>
 
             <button
               onClick={() => setActiveTab('revenue')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Pendapatan & Export"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'revenue'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <DollarSign className="w-4 h-4 text-slate-900" />
-                <span>Pendapatan & Export</span>
+                <DollarSign className={`w-4 h-4 ${activeTab === 'revenue' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Pendapatan & Export</span>}
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('services')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Kelola Layanan (CMS)"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'services'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Edit3 className="w-4 h-4 text-slate-900" />
-                <span>Kelola Layanan (CMS)</span>
+                <Edit3 className={`w-4 h-4 ${activeTab === 'services' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Kelola Layanan (CMS)</span>}
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('testimonials')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+              title="Testimoni & Rating"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
                 activeTab === 'testimonials'
                   ? 'bg-slate-900 text-white border-slate-900 shadow-md'
                   : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                <span>Testimoni & Rating</span>
+                <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
+                {!isSidebarCollapsed && <span>Testimoni & Rating</span>}
               </div>
-              <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-amber-300">
-                {testimonialsList.length}
-              </span>
+              {!isSidebarCollapsed && (
+                <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-amber-300">
+                  {testimonialsList.length}
+                </span>
+              )}
             </button>
           </nav>
         </div>
 
-        {/* Footer Admin Profile */}
-        <div className="p-3 border-t border-slate-300 bg-slate-50 space-y-2">
-          <div className="p-2.5 bg-white border border-slate-300 rounded-xl flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-lg bg-slate-900 text-white font-black flex items-center justify-center text-xs shrink-0">
-                AD
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-black text-slate-900 truncate">Administrator</p>
-                <p className="text-[10px] text-slate-900 font-bold truncate">admin@soobin.com</p>
+        {/* Footer Desktop Admin Profile */}
+        <div className={`border-t border-slate-300 bg-slate-50 ${isSidebarCollapsed ? 'p-2 space-y-2 text-center' : 'p-3 space-y-2'}`}>
+          {!isSidebarCollapsed ? (
+            <div className="p-2.5 bg-white border border-slate-300 rounded-xl flex items-center justify-between shadow-xs">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-slate-900 text-white font-black flex items-center justify-center text-xs shrink-0">
+                  AD
+                </div>
+                <div className="truncate">
+                  <p className="text-xs font-black text-slate-900 truncate">Administrator</p>
+                  <p className="text-[10px] text-slate-900 font-bold truncate">admin@soobin.com</p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="w-10 h-10 mx-auto rounded-lg bg-slate-900 text-white font-black flex items-center justify-center text-xs shadow-xs" title="Administrator">
+              AD
+            </div>
+          )}
 
           <button
             onClick={handleLogout}
-            className="w-full text-xs font-black text-slate-900 hover:text-black flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-300"
+            title="Keluar Sesi Admin"
+            className={`w-full text-xs font-black text-slate-900 hover:text-black flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-300 ${
+              isSidebarCollapsed ? 'p-2.5' : 'px-3 py-2'
+            }`}
           >
             <LogOut className="w-4 h-4 text-slate-900" />
-            <span>Keluar Sesi</span>
+            {!isSidebarCollapsed && <span>Keluar Sesi</span>}
           </button>
         </div>
       </aside>
 
-      {/* RIGHT MAIN CONTAINER */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* RIGHT MAIN CONTAINER (TAKES 100% FULL WIDTH ON MOBILE) */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden w-full">
         {/* TOP HEADER BAR */}
-        <header className="bg-white border-b border-slate-300 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
-          {/* Global Search Bar */}
-          <div className="relative max-w-md w-full">
-            <Search className="w-4 h-4 text-slate-900 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              placeholder="Cari pesanan, nama member, atau layanan..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
-            />
+        <header className="bg-white border-b border-slate-300 px-3.5 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4 sticky top-0 z-20 shadow-xs">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            {/* Mobile Hamburger Menu Toggle */}
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 flex items-center gap-1.5 font-bold shadow-xs cursor-pointer shrink-0"
+              title="Buka Menu Admin"
+            >
+              <Menu className="w-5 h-5 text-slate-900" />
+              <span className="text-xs font-black hidden sm:inline">Menu</span>
+            </button>
+
+            {/* Desktop Minimize/Maximize Button */}
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 text-xs font-black transition-colors cursor-pointer shrink-0"
+              title={isSidebarCollapsed ? 'Perlebar Sidebar (Maximize)' : 'Perkecil Sidebar (Minimize)'}
+            >
+              {isSidebarCollapsed ? (
+                <>
+                  <PanelLeftOpen className="w-4 h-4 text-slate-900" />
+                  <span>Perlebar Menu</span>
+                </>
+              ) : (
+                <>
+                  <PanelLeftClose className="w-4 h-4 text-slate-900" />
+                  <span>Kecilkan Menu</span>
+                </>
+              )}
+            </button>
+
+            {/* Global Search Bar */}
+            <div className="relative flex-1 max-w-xs sm:max-w-md">
+              <Search className="w-4 h-4 text-slate-900 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Cari pesanan, member, layanan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 font-black placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
+              />
+            </div>
           </div>
 
           {/* Quick Actions & Realtime Status */}
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-slate-900 flex items-center gap-2 font-black bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-slate-900 animate-pulse" />
-              Sistem Online Realtime (WIB)
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <span className="hidden md:flex text-xs text-slate-900 items-center gap-2 font-black bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+              Realtime (WIB)
             </span>
 
             <button
@@ -1195,24 +1485,25 @@ export default function AdminPage() {
                 syncChatsWithCloud();
               }}
               disabled={ordersLoading}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
               title="Refresh Data Realtime"
             >
               <RefreshCw className={`w-4 h-4 text-slate-900 ${ordersLoading ? 'animate-spin' : ''}`} />
+              <span className="text-xs font-black hidden sm:inline">Sync</span>
             </button>
           </div>
         </header>
 
         {/* MAIN WORKSPACE CONTENT */}
-        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-4 sm:space-y-6">
           {/* OVERVIEW TAB */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* TOP KPI STAT CARDS GRID - ALL INTERACTIVE & CONNECTED */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
                 <div
                   onClick={() => setActiveTab('revenue')}
-                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                  className="bg-white border border-slate-300 hover:border-slate-900 rounded-2xl p-4 sm:p-5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between text-slate-900">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-900 group-hover:text-black">Total Pendapatan</span>
@@ -1438,9 +1729,9 @@ export default function AdminPage() {
 
           {/* TAB 1: LIVE CHAT */}
           {activeTab === 'chat' && (
-            <div className="flex gap-6 h-[calc(100vh-140px)] overflow-hidden">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-[calc(100vh-120px)] lg:h-[calc(100vh-140px)] overflow-hidden">
               {/* Sidebar Chat Sessions */}
-              <div className="w-80 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs">
+              <div className={`w-full lg:w-80 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shrink-0 shadow-xs ${selectedSessionId ? 'hidden lg:flex' : 'flex'}`}>
                 <div className="p-4 border-b border-slate-300 flex items-center justify-between bg-slate-50">
                   <div>
                     <h2 className="font-black text-xs text-slate-900 uppercase tracking-wider">Antrean Percakapan</h2>
@@ -1505,26 +1796,36 @@ export default function AdminPage() {
               </div>
 
               {/* Chat Room Area */}
-              <div className="flex-1 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shadow-xs">
+              <div className={`flex-1 bg-white border border-slate-300 rounded-2xl flex flex-col overflow-hidden shadow-xs ${!selectedSessionId ? 'hidden lg:flex' : 'flex'}`}>
                 {selectedSession ? (
                   <>
-                    {/* Session Header */}
-                    <div className="p-4 border-b border-slate-300 bg-slate-50 flex items-center justify-between">
-                      <div>
-                        <h2 className="font-black text-sm text-slate-900">{selectedSession.name}</h2>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-900 mt-0.5 font-bold">
-                          <span className="flex items-center gap-1">
-                            <Mail className="w-3.5 h-3.5 text-slate-900" /> {selectedSession.email}
-                          </span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <School className="w-3.5 h-3.5 text-slate-900" /> {selectedSession.university}
-                          </span>
+                    {/* Session Header with Mobile Back Button */}
+                    <div className="p-3.5 sm:p-4 border-b border-slate-300 bg-slate-50 flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <button
+                          onClick={() => setSelectedSessionId(null)}
+                          className="lg:hidden p-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-900 font-bold text-xs flex items-center gap-1 shrink-0 cursor-pointer"
+                          title="Kembali ke Antrean"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          <span className="text-[11px] font-black">Antrean</span>
+                        </button>
+                        <div className="min-w-0">
+                          <h2 className="font-black text-sm text-slate-900 truncate">{selectedSession.name}</h2>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-slate-900 mt-0.5 font-bold">
+                            <span className="flex items-center gap-1 truncate">
+                              <Mail className="w-3.5 h-3.5 text-slate-900 shrink-0" /> <span className="truncate">{selectedSession.email}</span>
+                            </span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="flex items-center gap-1 truncate">
+                              <School className="w-3.5 h-3.5 text-slate-900 shrink-0" /> <span className="truncate">{selectedSession.university}</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      <span className="text-[10px] bg-slate-200 text-slate-900 border border-slate-400 px-2.5 py-1 rounded-full font-black">
-                        Session Active
+                      <span className="text-[10px] bg-slate-200 text-slate-900 border border-slate-400 px-2 sm:px-2.5 py-1 rounded-full font-black shrink-0">
+                        Active
                       </span>
                     </div>
 
