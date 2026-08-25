@@ -26,13 +26,23 @@ import {
   Trash2,
   ShoppingCart,
   PlusCircle,
-  ArrowRight
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Unlock,
+  FileSpreadsheet,
+  DownloadCloud,
+  FileCode,
+  FileSearch,
+  BookMarked,
+  Sparkles
 } from 'lucide-react';
 
 interface ServiceItem {
   id: string;
   name: string;
   category: string;
+  categoryLabel: string;
   icon: any;
   unit: string;
   unitLabel: string;
@@ -42,37 +52,40 @@ interface ServiceItem {
   defaultQty: number;
   step: number;
   description: string;
+  isTurnitinOrAi?: boolean;
 }
 
 interface CartItem {
   cartId: string;
   serviceId: string;
   name: string;
+  category: string;
   unitPrice: number;
   unitLabel: string;
   quantity: number;
   subtotal: number;
+  isTurnitinOrAi?: boolean;
 }
 
-const ACADEMIC_SERVICES: ServiceItem[] = [
-  {
-    id: 'parafrase',
-    name: 'Parafrase Dokumen',
-    category: 'Parafrase',
-    icon: RefreshCw,
-    unit: 'halaman',
-    unitLabel: 'Halaman',
-    basePrice: 2000,
-    minQty: 1,
-    maxQty: 500,
-    defaultQty: 10,
-    step: 1,
-    description: 'Pengerjaan parafrase manual akademik per halaman untuk menurunkan similarity Turnitin secara efektif.',
-  },
+const CATEGORIES = [
+  { id: 'all', label: 'Semua Layanan' },
+  { id: 'turnitin', label: 'Turnitin & AI' },
+  { id: 'parafrase', label: 'Parafrase' },
+  { id: 'ppt', label: 'Desain PPT' },
+  { id: 'formatting', label: 'Formatting & Sitasi' },
+  { id: 'pengetikan', label: 'Pengetikan & PDF' },
+  { id: 'unlock', label: 'Unlock Dokumen' },
+  { id: 'olah_data', label: 'Olah Data' },
+  { id: 'tugas', label: 'Tugas Kuliah' },
+];
+
+const ALL_ACADEMIC_SERVICES: ServiceItem[] = [
+  // --- 1. TURNITIN & AI (Diskon Member 5% Aktif) ---
   {
     id: 'turnitin_1x',
     name: 'Cek Turnitin (1x Pemeriksaan)',
-    category: 'Turnitin & AI',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
     icon: FileCheck,
     unit: 'dokumen',
     unitLabel: 'Dokumen',
@@ -81,12 +94,14 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 20,
     defaultQty: 1,
     step: 1,
-    description: 'Pemeriksaan similarity index Turnitin resmi akun No-Repository (bebas tersimpan di database kampus/global).',
+    description: 'Pemeriksaan similarity index Turnitin resmi akun No-Repository (tidak tersimpan di database global/kampus).',
+    isTurnitinOrAi: true,
   },
   {
     id: 'turnitin_3x',
     name: 'Cek Turnitin (Paket 3x Pemeriksaan)',
-    category: 'Turnitin & AI',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
     icon: FileCheck,
     unit: 'paket',
     unitLabel: 'Paket (3x Cek)',
@@ -95,12 +110,46 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 10,
     defaultQty: 1,
     step: 1,
-    description: 'Paket 3 kali pengecekan similarity Turnitin No-Repository untuk pemantauan hasil revisi naskah.',
+    description: 'Paket hemat 3 kali pengecekan similarity Turnitin No-Repository untuk memantau progress revisi naskah.',
+    isTurnitinOrAi: true,
+  },
+  {
+    id: 'turnitin_5x',
+    name: 'Cek Turnitin (Paket 5x Pemeriksaan)',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
+    icon: FileCheck,
+    unit: 'paket',
+    unitLabel: 'Paket (5x Cek)',
+    basePrice: 35000,
+    minQty: 1,
+    maxQty: 10,
+    defaultQty: 1,
+    step: 1,
+    description: 'Paket hemat 5 kali pengecekan similarity Turnitin No-Repository untuk bimbingan skripsi berkala.',
+    isTurnitinOrAi: true,
+  },
+  {
+    id: 'turnitin_10x',
+    name: 'Cek Turnitin (Paket 10x Pemeriksaan)',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
+    icon: FileCheck,
+    unit: 'paket',
+    unitLabel: 'Paket (10x Cek)',
+    basePrice: 60000,
+    minQty: 1,
+    maxQty: 10,
+    defaultQty: 1,
+    step: 1,
+    description: 'Paket 10 kali pengecekan Turnitin No-Repository cocok untuk pengerjaan kelompok atau bimbingan intensif.',
+    isTurnitinOrAi: true,
   },
   {
     id: 'cek_ai',
     name: 'Cek AI Detector (ZeroGPT)',
-    category: 'Turnitin & AI',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
     icon: Layers,
     unit: 'dokumen',
     unitLabel: 'Dokumen',
@@ -109,12 +158,94 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 20,
     defaultQty: 1,
     step: 1,
-    description: 'Pengecekan indikasi persentase Artificial Intelligence (AI) pada naskah artikel atau tugas ilmiah.',
+    description: 'Pengecekan indikasi skor persentase Artificial Intelligence (AI) pada naskah artikel atau tugas kuliah.',
+    isTurnitinOrAi: true,
   },
   {
-    id: 'ppt',
-    name: 'Jasa Desain PPT Presentasi',
-    category: 'Desain Presentasi',
+    id: 'turnitin_combo',
+    name: 'Paket Combo: Turnitin + Cek AI',
+    category: 'turnitin',
+    categoryLabel: 'Turnitin & AI',
+    icon: Sparkles,
+    unit: 'dokumen',
+    unitLabel: 'Dokumen',
+    basePrice: 12000,
+    minQty: 1,
+    maxQty: 20,
+    defaultQty: 1,
+    step: 1,
+    description: 'Pemeriksaan lengkap 1x Turnitin No-Repository sekaligus verifikasi skor AI Detector dalam 1 kali order.',
+    isTurnitinOrAi: true,
+  },
+
+  // --- 2. PARAFRASE DOKUMEN ---
+  {
+    id: 'parafrase_standar',
+    name: 'Parafrase Dokumen Standar',
+    category: 'parafrase',
+    categoryLabel: 'Parafrase',
+    icon: RefreshCw,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 2000,
+    minQty: 1,
+    maxQty: 500,
+    defaultQty: 10,
+    step: 1,
+    description: 'Parafrase manual per halaman untuk menurunkan similarity Turnitin dengan tetap menjaga substansi materi.',
+  },
+  {
+    id: 'parafrase_jurnal',
+    name: 'Parafrase Jurnal / Artikel Ilmiah',
+    category: 'parafrase',
+    categoryLabel: 'Parafrase',
+    icon: BookOpen,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 3000,
+    minQty: 1,
+    maxQty: 200,
+    defaultQty: 8,
+    step: 1,
+    description: 'Parafrase khusus artikel ilmiah dengan pemilihan kosakata akademik baku sesuai standar publikasi jurnal.',
+  },
+  {
+    id: 'parafrase_skripsi',
+    name: 'Parafrase Naskah Skripsi / Tesis',
+    category: 'parafrase',
+    categoryLabel: 'Parafrase',
+    icon: GraduationCap,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 2500,
+    minQty: 1,
+    maxQty: 500,
+    defaultQty: 20,
+    step: 1,
+    description: 'Parafrase komprehensif Bab 1, 2, 3, 4, dan 5 skripsi untuk memastikan bebas plagiasi dan lolos uji similarity.',
+  },
+  {
+    id: 'parafrase_low_turnitin',
+    name: 'Parafrase Target Similarity Rendah (< 15%)',
+    category: 'parafrase',
+    categoryLabel: 'Parafrase',
+    icon: ShieldCheck,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 3500,
+    minQty: 1,
+    maxQty: 500,
+    defaultQty: 15,
+    step: 1,
+    description: 'Parafrase ekstra mendalam dengan restrukturisasi kalimat total untuk mencapai target similarity di bawah 15%.',
+  },
+
+  // --- 3. DESAIN PRESENTASI & VISUAL (PPT) ---
+  {
+    id: 'ppt_standar',
+    name: 'Jasa Desain PPT Standar',
+    category: 'ppt',
+    categoryLabel: 'Desain PPT',
     icon: Presentation,
     unit: 'slide',
     unitLabel: 'Slide',
@@ -123,12 +254,60 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 200,
     defaultQty: 10,
     step: 1,
-    description: 'Penyusunan slide presentasi profesional untuk seminar proposal, sidang skripsi, dan presentasi perkuliahan.',
+    description: 'Penyusunan slide presentasi rapi dan clean untuk tugas kuliah, seminar proposal, maupun sidang skripsi.',
   },
   {
-    id: 'formatting',
-    name: 'Formatting Dokumen & Skripsi',
-    category: 'Formatting',
+    id: 'ppt_animasi',
+    name: 'Jasa Desain PPT Animasi & Infografis',
+    category: 'ppt',
+    categoryLabel: 'Desain PPT',
+    icon: Presentation,
+    unit: 'slide',
+    unitLabel: 'Slide',
+    basePrice: 5000,
+    minQty: 1,
+    maxQty: 150,
+    defaultQty: 12,
+    step: 1,
+    description: 'Desain presentasi tingkat lanjut dengan transisi morph, diagram visual, dan infografis modern yang memukau penguji.',
+  },
+  {
+    id: 'ppt_redesign',
+    name: 'Redesain / Merapikan Slide PPT Mahasiswa',
+    category: 'ppt',
+    categoryLabel: 'Desain PPT',
+    icon: Presentation,
+    unit: 'slide',
+    unitLabel: 'Slide',
+    basePrice: 2000,
+    minQty: 1,
+    maxQty: 200,
+    defaultQty: 15,
+    step: 1,
+    description: 'Merapikan materi slide yang sudah ada menjadi lebih proporsional, estetis, dan mudah dibaca audiens.',
+  },
+  {
+    id: 'poster_ilmiah',
+    name: 'Desain Poster Ilmiah / Banner Sidang',
+    category: 'ppt',
+    categoryLabel: 'Desain PPT',
+    icon: FileSpreadsheet,
+    unit: 'poster',
+    unitLabel: 'Desain Poster',
+    basePrice: 35000,
+    minQty: 1,
+    maxQty: 10,
+    defaultQty: 1,
+    step: 1,
+    description: 'Pembuatan poster ilmiah resolusi tinggi siap cetak untuk pameran riset, konferensi, atau luaran publikasi skripsi.',
+  },
+
+  // --- 4. FORMATTING DOKUMEN & SITASI ---
+  {
+    id: 'formatting_standar',
+    name: 'Formatting Layout & Margin Standar',
+    category: 'formatting',
+    categoryLabel: 'Formatting & Sitasi',
     icon: FileText,
     unit: 'halaman',
     unitLabel: 'Halaman',
@@ -137,26 +316,60 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 500,
     defaultQty: 25,
     step: 1,
-    description: 'Perapian layout, margin, spasi, penomoran romawi/angka, daftar isi, tabel, dan gambar otomatis sesuai pedoman kampus.',
+    description: 'Penataan margin 4-4-3-3, spasi paragraf, indentasi, dan penomoran romawi/angka sesuai pedoman penulisan kampus.',
   },
   {
     id: 'formatting_full',
-    name: 'Paket Full Formatting Skripsi/Tesis',
-    category: 'Formatting',
+    name: 'Paket Full Formatting Skripsi/Tesis Siap Cetak',
+    category: 'formatting',
+    categoryLabel: 'Formatting & Sitasi',
     icon: GraduationCap,
     unit: 'dokumen',
-    unitLabel: 'Dokumen Lengkap',
+    unitLabel: 'Naskah Lengkap',
     basePrice: 35000,
     minQty: 1,
     maxQty: 10,
     defaultQty: 1,
     step: 1,
-    description: 'Formatting lengkap seluruh naskah dari Cover, Bab 1 hingga Lampiran sampai siap cetak & ACC dosen.',
+    description: 'Formatting lengkap seluruh naskah dari Cover, Lembar Pengesahan, Bab 1 hingga Lampiran sampai siap cetak & ACC.',
   },
   {
-    id: 'pengetikan',
-    name: 'Jasa Pengetikan Dokumen',
-    category: 'Pengetikan',
+    id: 'mendeley_sitasi',
+    name: 'Perapian Daftar Pustaka (Mendeley / Zotero)',
+    category: 'formatting',
+    categoryLabel: 'Formatting & Sitasi',
+    icon: BookMarked,
+    unit: 'sumber',
+    unitLabel: 'Sumber Rujukan',
+    basePrice: 1000,
+    minQty: 1,
+    maxQty: 300,
+    defaultQty: 20,
+    step: 1,
+    description: 'Integrasi dan sinkronisasi rujukan sitasi otomatis menggunakan Mendeley/Zotero dengan format APA, IEEE, atau Harvard.',
+  },
+  {
+    id: 'daftar_isi_otomatis',
+    name: 'Pembuatan Daftar Isi, Gambar & Tabel Otomatis',
+    category: 'formatting',
+    categoryLabel: 'Formatting & Sitasi',
+    icon: FileCode,
+    unit: 'dokumen',
+    unitLabel: 'Dokumen',
+    basePrice: 10000,
+    minQty: 1,
+    maxQty: 10,
+    defaultQty: 1,
+    step: 1,
+    description: 'Pembuatan heading otomatis Microsoft Word untuk Daftar Isi, Daftar Tabel, dan Daftar Gambar sekali klik.',
+  },
+
+  // --- 5. PENGETIKAN & KONVERSI FILE ---
+  {
+    id: 'pengetikan_standar',
+    name: 'Jasa Pengetikan Tulisan Tangan / Foto ke Word',
+    category: 'pengetikan',
+    categoryLabel: 'Pengetikan & PDF',
     icon: PenTool,
     unit: 'halaman',
     unitLabel: 'Halaman',
@@ -165,26 +378,154 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 500,
     defaultQty: 10,
     step: 1,
-    description: 'Pengetikan ulang materi dari tulisan tangan, dokumen cetak fisik, atau PDF hasil pemindaian ke format Microsoft Word.',
+    description: 'Pengetikan ulang materi dari catatan tulisan tangan, kertas foto, atau buku fisik ke format Microsoft Word rapi.',
   },
   {
-    id: 'olah_data',
-    name: 'Olah Data Statistik (SPSS / SEM / R)',
-    category: 'Analisis Data',
+    id: 'konversi_pdf_word',
+    name: 'Konversi PDF Scan ke Word Rapih',
+    category: 'pengetikan',
+    categoryLabel: 'Pengetikan & PDF',
+    icon: FileText,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 1000,
+    minQty: 1,
+    maxQty: 500,
+    defaultQty: 15,
+    step: 1,
+    description: 'Mengonversi file PDF hasil scan menjadi dokumen Word yang dapat diedit tanpa teks miring atau tata letak berantakan.',
+  },
+  {
+    id: 'pengetikan_rumus',
+    name: 'Pengetikan Rumus Matematika / LaTeX / Kimia',
+    category: 'pengetikan',
+    categoryLabel: 'Pengetikan & PDF',
+    icon: FileCode,
+    unit: 'halaman',
+    unitLabel: 'Halaman',
+    basePrice: 2500,
+    minQty: 1,
+    maxQty: 200,
+    defaultQty: 10,
+    step: 1,
+    description: 'Pengetikan persamaan matematika rumit (Equation/LaTeX), struktur kimia, dan tabel matriks perhitungan ilmiah.',
+  },
+
+  // --- 6. UNLOCK DOKUMEN AKADEMIK ---
+  {
+    id: 'unlock_scribd',
+    name: 'Unlock Dokumen Scribd',
+    category: 'unlock',
+    categoryLabel: 'Unlock Dokumen',
+    icon: Unlock,
+    unit: 'file',
+    unitLabel: 'File Dokumen',
+    basePrice: 2000,
+    minQty: 1,
+    maxQty: 50,
+    defaultQty: 1,
+    step: 1,
+    description: 'Download dokumen referensi lengkap dari Scribd tanpa watermark dan siap diunduh dalam format PDF/Word.',
+  },
+  {
+    id: 'unlock_studocu',
+    name: 'Unlock Dokumen Studocu',
+    category: 'unlock',
+    categoryLabel: 'Unlock Dokumen',
+    icon: Unlock,
+    unit: 'file',
+    unitLabel: 'File Dokumen',
+    basePrice: 2500,
+    minQty: 1,
+    maxQty: 50,
+    defaultQty: 1,
+    step: 1,
+    description: 'Membuka kunci akses dokumen rangkuman kuliah, tugas, dan materi premium Studocu secara instan.',
+  },
+  {
+    id: 'unlock_coursehero',
+    name: 'Unlock Dokumen CourseHero',
+    category: 'unlock',
+    categoryLabel: 'Unlock Dokumen',
+    icon: Unlock,
+    unit: 'file',
+    unitLabel: 'File Dokumen',
+    basePrice: 3000,
+    minQty: 1,
+    maxQty: 30,
+    defaultQty: 1,
+    step: 1,
+    description: 'Unlock dokumen pembelajaran dan latihan soal terkunci di platform CourseHero dengan proses cepat.',
+  },
+  {
+    id: 'download_jurnal',
+    name: 'Download Jurnal Internasional Berbayar',
+    category: 'unlock',
+    categoryLabel: 'Unlock Dokumen',
+    icon: DownloadCloud,
+    unit: 'artikel',
+    unitLabel: 'Artikel Jurnal',
+    basePrice: 5000,
+    minQty: 1,
+    maxQty: 30,
+    defaultQty: 1,
+    step: 1,
+    description: 'Unduh full-text artikel jurnal ilmiah internasional berbayar dari ScienceDirect, IEEE Xplore, Springer, atau Wiley.',
+  },
+
+  // --- 7. OLAH DATA & STATISTIK ---
+  {
+    id: 'olah_data_spss',
+    name: 'Olah Data SPSS (Validitas, Reliabilitas, Regresi)',
+    category: 'olah_data',
+    categoryLabel: 'Olah Data',
     icon: BarChart3,
-    unit: 'uji',
+    unit: 'paket',
     unitLabel: 'Paket Uji',
     basePrice: 100000,
     minQty: 1,
     maxQty: 10,
     defaultQty: 1,
     step: 1,
-    description: 'Pengolahan data statistik meliputi uji instrumen, regresi, uji hipotesis, dan interpretasi output Bab 4.',
+    description: 'Pengolahan data statistik kuesioner/kuantitatif meliputi uji instrumen, asumsi klasik, regresi, dan interpretasi output Bab 4.',
   },
   {
-    id: 'review_jurnal',
-    name: 'Review Jurnal Ilmiah',
-    category: 'Tugas Akademik',
+    id: 'olah_data_pls',
+    name: 'Olah Data SEM-PLS (SmartPLS / AMOS)',
+    category: 'olah_data',
+    categoryLabel: 'Olah Data',
+    icon: BarChart3,
+    unit: 'model',
+    unitLabel: 'Model Jalur',
+    basePrice: 15000,
+    minQty: 1,
+    maxQty: 5,
+    defaultQty: 1,
+    step: 1,
+    description: 'Analisis pemodelan jalur persamaan struktural (outer model, inner model, bootstrapping, dan mediasi/moderasi).',
+  },
+  {
+    id: 'olah_data_eviews',
+    name: 'Olah Data EViews / STATA (Panel & Time Series)',
+    category: 'olah_data',
+    categoryLabel: 'Olah Data',
+    icon: BarChart3,
+    unit: 'uji',
+    unitLabel: 'Paket Analisis',
+    basePrice: 120000,
+    minQty: 1,
+    maxQty: 5,
+    defaultQty: 1,
+    step: 1,
+    description: 'Analisis regresi data panel (Common/Fixed/Random Effect), uji stasioneritas, kointegrasi, dan uji diagnostik model.',
+  },
+
+  // --- 8. TUGAS KULIAH & PENULISAN ILMIAH ---
+  {
+    id: 'review_jurnal_ilmiah',
+    name: 'Review Jurnal Ilmiah (SINTA / Scopus)',
+    category: 'tugas',
+    categoryLabel: 'Tugas Kuliah',
     icon: BookOpen,
     unit: 'jurnal',
     unitLabel: 'Artikel Jurnal',
@@ -193,36 +534,105 @@ const ACADEMIC_SERVICES: ServiceItem[] = [
     maxQty: 20,
     defaultQty: 1,
     step: 1,
-    description: 'Pembuatan matriks review dan telaah kritis artikel jurnal ilmiah nasional (SINTA) maupun internasional.',
+    description: 'Penyusunan matriks telaah kritis artikel jurnal ilmiah mencakup latar belakang, metode, hasil temuan, dan kritik riset.',
   },
   {
-    id: 'makalah',
-    name: 'Penyusunan Makalah / Essay',
-    category: 'Tugas Akademik',
-    icon: FileText,
-    unit: 'tugas',
-    unitLabel: 'Naskah Makalah',
+    id: 'makalah_essay',
+    name: 'Penyusunan Naskah Makalah / Essay Ilmiah',
+    category: 'tugas',
+    categoryLabel: 'Tugas Kuliah',
+    icon: FileSearch,
+    unit: 'naskah',
+    unitLabel: 'Naskah Tugas',
     basePrice: 40000,
     minQty: 1,
     maxQty: 10,
     defaultQty: 1,
     step: 1,
-    description: 'Penyusunan naskah makalah akademik sistematis dengan referensi rujukan ilmiah primer yang valid.',
+    description: 'Penyusunan naskah makalah kuliah terstruktur dengan referensi ilmiah primer dan format sitasi standar.',
+  },
+  {
+    id: 'abstrak_bilingual',
+    name: 'Pembuatan Abstrak Bilingual (Indo + English)',
+    category: 'tugas',
+    categoryLabel: 'Tugas Kuliah',
+    icon: FileText,
+    unit: 'abstrak',
+    unitLabel: 'Naskah Abstrak',
+    basePrice: 15000,
+    minQty: 1,
+    maxQty: 10,
+    defaultQty: 1,
+    step: 1,
+    description: 'Penyusunan dan penerjemahan abstrak skripsi/jurnal ke bahasa Inggris akademik (IMRaD) yang natural dan tepat kaidah.',
+  },
+  {
+    id: 'resume_buku',
+    name: 'Pembuatan Resume / Rangkuman Bab Buku',
+    category: 'tugas',
+    categoryLabel: 'Tugas Kuliah',
+    icon: BookOpen,
+    unit: 'bab',
+    unitLabel: 'Bab / Materi',
+    basePrice: 15000,
+    minQty: 1,
+    maxQty: 20,
+    defaultQty: 1,
+    step: 1,
+    description: 'Merangkum intisari poin penting dari bab buku teks perkuliahan atau artikel modul ajar secara padat dan jelas.',
   },
 ];
 
+const ITEMS_PER_PAGE = 6; // 2 cols x 3 rows = max 3 rows
+
 export default function KalkulatorOrderPage() {
   const { user } = useAuth();
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('parafrase');
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('parafrase_standar');
   const [inputQuantity, setInputQuantity] = useState<number | string>(10);
   const [orderCart, setOrderCart] = useState<CartItem[]>([]);
   const [justAddedNotice, setJustAddedNotice] = useState<string | null>(null);
 
-  // Active selected service
+  // Search and Category states
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Filter services by category and search query
+  const filteredServices = useMemo(() => {
+    return ALL_ACADEMIC_SERVICES.filter((service) => {
+      const matchCategory = selectedCategory === 'all' || service.category === selectedCategory;
+      const matchSearch =
+        searchQuery.trim() === '' ||
+        service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchSearch;
+    });
+  }, [selectedCategory, searchQuery]);
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredServices.length / ITEMS_PER_PAGE) || 1;
+  const paginatedServices = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredServices.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredServices, currentPage]);
+
+  // Active selected service object
   const activeService = useMemo(() => {
-    const found = ACADEMIC_SERVICES.find((s) => s.id === selectedServiceId);
-    return found || ACADEMIC_SERVICES[0];
+    const found = ALL_ACADEMIC_SERVICES.find((s) => s.id === selectedServiceId);
+    return found || ALL_ACADEMIC_SERVICES[0];
   }, [selectedServiceId]);
+
+  // Reset page when category or search changes
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCategory(catId);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
+    setCurrentPage(1);
+  };
 
   // Handle service selection
   const handleSelectService = (service: ServiceItem) => {
@@ -230,7 +640,7 @@ export default function KalkulatorOrderPage() {
     setInputQuantity(service.defaultQty);
   };
 
-  // Safe parsed quantity for the active current selection
+  // Safe parsed quantity for current active selection
   const currentNumericQty = useMemo(() => {
     const n = typeof inputQuantity === 'string' ? parseInt(inputQuantity, 10) : inputQuantity;
     return isNaN(n) || n <= 0 ? 1 : n;
@@ -263,10 +673,12 @@ export default function KalkulatorOrderPage() {
         cartId: `cart_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
         serviceId: activeService.id,
         name: activeService.name,
+        category: activeService.category,
         unitPrice: activeService.basePrice,
         unitLabel: activeService.unitLabel,
         quantity: currentNumericQty,
         subtotal: currentSubtotal,
+        isTurnitinOrAi: activeService.isTurnitinOrAi,
       };
       updatedCart = [...orderCart, newItem];
     }
@@ -289,12 +701,6 @@ export default function KalkulatorOrderPage() {
     }
   };
 
-  // Helper: Member discount (5%) applies strictly to Turnitin & Cek AI services only
-  const isTurnitinOrAi = (serviceId: string) => {
-    return serviceId === 'turnitin_1x' || serviceId === 'turnitin_3x' || serviceId === 'cek_ai';
-  };
-
-  // Determine items to calculate (if cart is empty, preview current single item; otherwise calculate whole cart)
   const isCartEmpty = orderCart.length === 0;
 
   const totalRawSubtotal = useMemo(() => {
@@ -309,15 +715,15 @@ export default function KalkulatorOrderPage() {
   const memberDiscountAmount = useMemo(() => {
     if (!isMember) return 0;
     if (isCartEmpty) {
-      return isTurnitinOrAi(activeService.id) ? Math.round(currentSubtotal * 0.05) : 0;
+      return activeService.isTurnitinOrAi ? Math.round(currentSubtotal * 0.05) : 0;
     }
     return orderCart.reduce((sum, item) => {
-      if (isTurnitinOrAi(item.serviceId)) {
+      if (item.isTurnitinOrAi) {
         return sum + Math.round(item.subtotal * 0.05);
       }
       return sum;
     }, 0);
-  }, [isMember, isCartEmpty, activeService.id, currentSubtotal, orderCart]);
+  }, [isMember, isCartEmpty, activeService.isTurnitinOrAi, currentSubtotal, orderCart]);
 
   const finalGrandTotal = totalRawSubtotal - memberDiscountAmount;
 
@@ -364,72 +770,167 @@ Mohon bantuannya untuk konfirmasi dan proses pesanan ini ya Kak. Terima kasih! ð
       <Navbar />
 
       {/* Hero / Header Section */}
-      <section className="pt-28 sm:pt-36 pb-10 sm:pb-14 bg-white border-b border-slate-200">
+      <section className="pt-28 sm:pt-36 pb-8 sm:pb-12 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-3">
             <Calculator className="w-3.5 h-3.5 text-slate-700" />
-            <span>Kalkulator Order Akademik</span>
+            <span>Kalkulator Order Tugas & Dokumen Akademik</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
             Kalkulator & Total Order
           </h1>
           <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Pilih layanan, ketik jumlah halaman/unit secara manual, dan tambahkan beberapa layanan sekaligus untuk menghitung total biaya secara instan dan transparan.
+            Cari layanan tugas kuliah Anda, input jumlah halaman atau unit secara manual, dan gabungkan beberapa layanan ke dalam satu total pesanan resmi.
           </p>
         </div>
       </section>
 
       {/* Main Content Area */}
-      <section className="py-10 sm:py-14 flex-1">
+      <section className="py-8 sm:py-12 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Service Selection & Manual Input (7 Cols) */}
+            {/* Left Column: Service Selection, Search, Categories, & Manual Input (7 Cols) */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Step 1: Select Service */}
+              {/* Step 1: Select Service with Search & Category Tabs */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                   <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] flex items-center justify-center font-bold">1</span>
-                    Pilih Jenis Layanan
+                    Pilih Jenis Layanan Tugas
                   </h2>
-                  <span className="text-[11px] text-slate-500 font-medium">11 Pilihan Layanan</span>
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    Menampilkan {filteredServices.length} dari {ALL_ACADEMIC_SERVICES.length} Layanan
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
-                  {ACADEMIC_SERVICES.map((srv) => {
-                    const Icon = srv.icon;
-                    const isSelected = selectedServiceId === srv.id;
+                {/* Search Bar Input */}
+                <div className="relative mb-3.5">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder="Cari layanan... (misal: SPSS, Mendeley, Scribd, Turnitin, PPT)"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-slate-800 rounded-xl text-xs font-medium text-slate-900 outline-none transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => handleSearchChange('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                    >
+                      âœ•
+                    </button>
+                  )}
+                </div>
 
+                {/* Category Filter Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-2.5 mb-3.5 scrollbar-none no-scrollbar">
+                  {CATEGORIES.map((cat) => {
+                    const isActive = selectedCategory === cat.id;
                     return (
                       <button
-                        key={srv.id}
+                        key={cat.id}
                         type="button"
-                        onClick={() => handleSelectService(srv)}
-                        className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
-                          isSelected
-                            ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                            : 'bg-white border-slate-200 text-slate-900 hover:border-slate-400 hover:bg-slate-50'
+                        onClick={() => handleCategoryChange(cat.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-slate-900 text-white shadow-2xs'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                         }`}
                       >
-                        <div
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                            isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-                            {srv.name}
-                          </h3>
-                          <p className={`text-[11px] font-semibold mt-0.5 ${isSelected ? 'text-slate-200' : 'text-slate-600'}`}>
-                            {formatRupiah(srv.basePrice)} <span className="text-[10px] opacity-80">/{srv.unit}</span>
-                          </p>
-                        </div>
+                        {cat.label}
                       </button>
                     );
                   })}
                 </div>
+
+                {/* Services Grid (Strictly 2 Columns x Max 3 Rows = 6 Cards) */}
+                {paginatedServices.length === 0 ? (
+                  <div className="py-10 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+                    <Search className="w-6 h-6 mx-auto mb-2 text-slate-400" />
+                    <p className="text-xs font-semibold text-slate-700">Layanan tidak ditemukan</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Coba kata kunci lain atau pilih tab Semua Layanan</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-h-[220px]">
+                    {paginatedServices.map((srv) => {
+                      const Icon = srv.icon;
+                      const isSelected = selectedServiceId === srv.id;
+
+                      return (
+                        <button
+                          key={srv.id}
+                          type="button"
+                          onClick={() => handleSelectService(srv)}
+                          className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 h-[68px] ${
+                            isSelected
+                              ? 'bg-slate-900 border-slate-900 text-white shadow-2xs'
+                              : 'bg-white border-slate-200 text-slate-900 hover:border-slate-400 hover:bg-slate-50/80'
+                          }`}
+                        >
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                              isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-slate-900'}`} title={srv.name}>
+                              {srv.name}
+                            </h3>
+                            <p className={`text-[11px] font-semibold mt-0.5 ${isSelected ? 'text-slate-200' : 'text-slate-600'}`}>
+                              {formatRupiah(srv.basePrice)} <span className="text-[10px] opacity-80">/{srv.unit}</span>
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Pagination Controls (Max 3 Rows Height Guard) */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-3.5 mt-3 border-t border-slate-200">
+                    <button
+                      type="button"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            currentPage === pageNum
+                              ? 'bg-slate-900 text-white'
+                              : 'text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Step 2: Manual Number Input & Add to Order */}
@@ -447,7 +948,7 @@ Mohon bantuannya untuk konfirmasi dan proses pesanan ini ya Kak. Terima kasih! ð
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-5 flex items-start gap-2.5">
                   <Info className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    {activeService.description}
+                    <b>{activeService.name}</b> â€” {activeService.description}
                   </p>
                 </div>
 
