@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, MessageCircle, UserCheck, Sparkles, RefreshCw } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 
 interface TestimonialData {
@@ -181,11 +181,6 @@ export default function TestimonialCarousel() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary-50 text-primary-800 border border-primary-200 text-xs font-black tracking-wide mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-            <span>ULASAN REALTIME MEMBER SOOBIN</span>
-          </div>
-
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
             Testimoni & Pengalaman Mahasiswa
           </h2>
