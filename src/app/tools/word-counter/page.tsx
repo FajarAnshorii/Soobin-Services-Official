@@ -12,8 +12,6 @@ import {
   Copy,
   Check,
   RotateCcw,
-  Sparkles,
-  Zap,
   ArrowRight
 } from 'lucide-react';
 

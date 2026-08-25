@@ -7,13 +7,13 @@ import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookMarked,
+  BookOpen,
   Search,
   Copy,
   Check,
   Plus,
   Trash2,
   Download,
-  Sparkles,
   FileText,
   Book,
   Globe,
@@ -21,7 +21,6 @@ import {
   Users,
   ExternalLink,
   HelpCircle,
-  Zap,
   Info,
   RefreshCw,
   Share2
@@ -330,7 +329,7 @@ export default function DaftarPustakaGeneratorPage() {
                         </>
                       ) : (
                         <>
-                          <Zap className="w-3.5 h-3.5" />
+                          <Search className="w-3.5 h-3.5" />
                           <span>Auto Fill</span>
                         </>
                       )}
@@ -634,8 +633,8 @@ export default function DaftarPustakaGeneratorPage() {
               <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm sticky top-24">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-800">
-                      <Sparkles className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                      <BookOpen className="w-4 h-4" />
                     </div>
                     <div>
                       <h3 className="text-xs font-bold text-slate-900">Hasil Format Daftar Pustaka</h3>

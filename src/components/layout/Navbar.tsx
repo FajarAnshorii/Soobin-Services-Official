@@ -13,7 +13,6 @@ import {
   History,
   BookMarked,
   FileText,
-  Sparkles,
   ExternalLink
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -420,7 +419,7 @@ export default function Navbar() {
                         pathname === tool.href ? 'text-primary-800' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      ✨ {tool.label}
+                      {tool.label}
                     </Link>
                   ))}
                 </div>
