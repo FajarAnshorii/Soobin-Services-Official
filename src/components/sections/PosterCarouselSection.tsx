@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FramerCarousel } from '@/components/ui/framer-carousel';
-import { Megaphone, ExternalLink } from 'lucide-react';
+import { Megaphone, ExternalLink, ChevronDown } from 'lucide-react';
 
 export default function PosterCarouselSection() {
   return (
@@ -40,10 +40,11 @@ export default function PosterCarouselSection() {
               Dapatkan informasi promo menarik, klaim <strong>diskon 5% Cek Turnitin & Cek AI</strong> untuk member baru, serta cek ulasan harian di <strong>Channel WhatsApp Resmi</strong> kami.
             </p>
 
-            {/* Double Arrow Animasi Menunjuk ke Kiri (ke arah Carousel) */}
-            <div className="my-4 sm:my-5 flex items-center gap-3">
+            {/* Double Arrow Animasi Menunjuk ke Carousel: Bawah di Mobile, Kiri di Desktop */}
+            {/* Tampilan Desktop (Menunjuk ke Kiri) */}
+            <div className="hidden lg:flex items-center gap-3 my-4 sm:my-5">
               <motion.div
-                animate={{ x: [0, -10, 0] }}
+                animate={{ x: [0, -8, 0] }}
                 transition={{
                   repeat: Infinity,
                   duration: 1.4,
@@ -59,8 +60,26 @@ export default function PosterCarouselSection() {
                   priority
                 />
               </motion.div>
-              <span className="text-xs font-semibold text-primary-800 bg-primary-100/70 px-3 py-1 rounded-lg border border-primary-200/60 shadow-xs">
-                Geser / Klik Poster Disamping 👈
+              <span className="text-xs font-semibold text-primary-800 bg-primary-100/70 px-3.5 py-1.5 rounded-xl border border-primary-200/60 shadow-xs">
+                Geser / Klik Poster di Samping 👈
+              </span>
+            </div>
+
+            {/* Tampilan Mobile (Menunjuk ke Bawah dengan Animasi Halus) */}
+            <div className="flex lg:hidden items-center justify-center gap-2 my-3.5 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-800 shadow-2xs">
+              <motion.div
+                animate={{ y: [0, 4, 0] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.2,
+                  ease: "easeInOut"
+                }}
+                className="flex items-center justify-center text-primary-700"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </motion.div>
+              <span className="text-xs font-bold">
+                Geser / Ketuk Poster di Bawah 👇
               </span>
             </div>
 
@@ -69,7 +88,7 @@ export default function PosterCarouselSection() {
               href="https://wa.me/628990415500?text=Halo%20Admin%20Soobin%2C%20mau%20tanya%20info%20promo%20dan%20layanan%20dong"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-800 text-white hover:bg-primary-700 font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-800 text-white hover:bg-primary-700 font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 mb-1 lg:mb-0"
             >
               <span>Hubungi Admin WhatsApp</span>
               <ExternalLink className="w-4 h-4" />
