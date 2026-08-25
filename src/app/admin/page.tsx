@@ -1933,36 +1933,32 @@ export default function AdminPage() {
                         key={order.id}
                         className="bg-slate-50/90 hover:bg-slate-50 border border-slate-300 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-slate-400 transition-colors space-y-2.5 sm:space-y-3 shadow-xs"
                       >
-                        {/* Top Header of Card */}
-                        <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-[9px] sm:text-xs shrink-0 shadow-2xs">
-                              ORD
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-                                <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate leading-none">
-                                  {order.customerName}
-                                </h3>
-                                <span className="text-[9px] sm:text-[10px] bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded font-mono font-black shrink-0">
-                                  {order.id}
-                                </span>
+                        {/* Top Header of Card (Cleanly Separated Rows on Mobile) */}
+                        <div className="border-b border-slate-200 pb-2.5 space-y-1.5">
+                          {/* Row 1: Avatar, Customer Name, ID & Status Badge */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-[10px] shrink-0 shadow-2xs">
+                                ORD
                               </div>
-                              <p className="text-[10px] sm:text-[11px] text-slate-600 font-semibold truncate mt-0.5">
-                                {order.customerEmail}
-                              </p>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate leading-tight">
+                                    {order.customerName || 'Pelanggan'}
+                                  </h3>
+                                  <span className="text-[9px] sm:text-[10px] bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded font-mono font-black shrink-0">
+                                    {order.id}
+                                  </span>
+                                </div>
+                                <p className="text-[10px] sm:text-[11px] text-slate-600 font-semibold truncate mt-0.5">
+                                  {order.customerEmail}
+                                </p>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                            <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-300 flex items-center gap-1 shadow-2xs">
-                              <CalendarIcon className="w-3 h-3 text-slate-700 shrink-0" />
-                              <span className="hidden sm:inline">{formatFullDateIndonesian(order.createdAt, order.id)}</span>
-                              <span className="sm:hidden">{formatChatDate(order.createdAt || order.id)}</span>
-                            </span>
-
+                            {/* Status Badge */}
                             <span
-                              className={`text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
+                              className={`text-[9px] sm:text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0 text-center ${
                                 isLunas
                                   ? 'bg-slate-900 text-white'
                                   : isCancel
@@ -1972,6 +1968,12 @@ export default function AdminPage() {
                             >
                               {order.paymentStatus || 'Menunggu'}
                             </span>
+                          </div>
+
+                          {/* Row 2: Date Calendar Timestamp */}
+                          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-600 font-bold pl-10.5">
+                            <CalendarIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                            <span>{formatFullDateIndonesian(order.createdAt, order.id)}</span>
                           </div>
                         </div>
 
