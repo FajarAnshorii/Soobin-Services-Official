@@ -1904,8 +1904,8 @@ export default function AdminPage() {
                     {/* Messages Stream */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
                       {selectedSession.messages.map((msg) => {
-                        const isExpired = msg.isExpired || (msg.createdAt ? (Date.now() - msg.createdAt > 24 * 60 * 60 * 1000) : false);
-                        const hasMedia = Boolean(msg.mediaUrl || msg.mediaName || isExpired);
+                        const isMedia = Boolean(msg.mediaUrl || (msg.mediaName && msg.isExpired));
+                        const isExpired = isMedia && (msg.isExpired || (msg.createdAt ? (Date.now() - msg.createdAt > 24 * 60 * 60 * 1000) : false));
 
                         return (
                           <div
@@ -1920,7 +1920,7 @@ export default function AdminPage() {
                               }`}
                             >
                               {/* Media Photo Section */}
-                              {hasMedia && (
+                              {isMedia && (
                                 <div className="mb-2">
                                   {isExpired ? (
                                     <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-900 text-xs flex items-center gap-2">

@@ -334,6 +334,8 @@ export default function WhatsAppFloat() {
   };
 
   const checkIsExpired = (msg: Message) => {
+    const isMedia = Boolean(msg.mediaUrl || (msg.mediaName && msg.isExpired));
+    if (!isMedia) return false;
     if (msg.isExpired) return true;
     if (!msg.createdAt) return false;
     return Date.now() - msg.createdAt > EXPIRATION_MS;
@@ -447,8 +449,8 @@ export default function WhatsAppFloat() {
                     ) : (
                       messages.map((msg) => {
                         const isAdmin = msg.sender === 'admin';
-                        const isExpired = checkIsExpired(msg);
-                        const hasMedia = Boolean(msg.mediaUrl || msg.mediaName || isExpired);
+                        const isMedia = Boolean(msg.mediaUrl || (msg.mediaName && msg.isExpired));
+                        const isExpired = isMedia && (msg.isExpired || (msg.createdAt ? Date.now() - msg.createdAt > EXPIRATION_MS : false));
 
                         return (
                           <div
@@ -469,7 +471,7 @@ export default function WhatsAppFloat() {
                               }`}
                             >
                               {/* Media Photo Section */}
-                              {hasMedia && (
+                              {isMedia && (
                                 <div className="mb-2">
                                   {isExpired ? (
                                     <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2">

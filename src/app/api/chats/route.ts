@@ -23,12 +23,26 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
   let hasPruned = false;
 
   const cleaned = messages.map((msg) => {
+    // If it's a regular text message (no mediaUrl, no mediaName, no hasMedia)
+    const isMediaMessage = Boolean(msg.mediaUrl || msg.mediaName || msg.hasMedia);
+    if (!isMediaMessage) {
+      if (msg.isExpired) {
+        hasPruned = true;
+        const copy = { ...msg };
+        delete copy.isExpired;
+        return copy;
+      }
+      return msg;
+    }
+
     const timestampMs = msg.createdAt || (msg.timestamp ? new Date(msg.timestamp).getTime() : 0);
     const isExpired = timestampMs > 0 && now - timestampMs > EXPIRATION_MS;
 
-    if (isExpired && (msg.mediaUrl || !msg.isExpired)) {
-      hasPruned = true;
-      const copy = { ...msg, isExpired: true };
+    if (isExpired) {
+      if (msg.mediaUrl || !msg.isExpired) {
+        hasPruned = true;
+      }
+      const copy = { ...msg, isExpired: true, hasMedia: true };
       delete copy.mediaUrl;
       return copy;
     }
