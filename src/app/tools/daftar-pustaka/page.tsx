@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -14,6 +15,7 @@ import {
   Plus,
   Trash2,
   Download,
+  MessageCircle,
   FileText,
   Book,
   Globe,
@@ -768,26 +770,48 @@ export default function DaftarPustakaGeneratorPage() {
                   </div>
                 )}
 
-                {/* Promo Banner: SOOBIN Mendeley & Turnitin Service */}
-                <div className="mt-5 p-3.5 rounded-xl bg-linear-to-br from-primary-950 to-primary-900 text-white border border-primary-800 relative overflow-hidden">
-                  <div className="relative z-10 flex items-start justify-between gap-3">
+                {/* Promo Card: SOOBIN Mendeley & Reference Service (Clean Minimalist Hotel Card Style) */}
+                <div className="mt-5 rounded-2xl bg-[#121824] border border-slate-800 text-white overflow-hidden shadow-sm flex flex-col sm:flex-row items-stretch">
+                  {/* Left Side: Logo Container */}
+                  <div className="sm:w-36 md:w-40 bg-white flex items-center justify-center p-4 shrink-0 relative min-h-30 sm:min-h-auto">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+                      <Image
+                        src="/soobin-icon.png"
+                        alt="SOOBIN Services Logo"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Side: Information */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <span className="text-[9px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30 inline-block mb-1">
+                      <span className="text-[11px] font-medium text-slate-400 block tracking-wide">
                         Jasa Mendeley & Skripsi
                       </span>
-                      <h4 className="text-xs font-bold text-white">Butuh Rapikan Ratusan Referensi?</h4>
-                      <p className="text-[11px] text-slate-300 mt-0.5 leading-snug">
-                        Admin SOOBIN siap bantu input Mendeley, format Zotero, dan cek Turnitin No Repository mulai <b>Rp 1.000/sumber</b>.
+                      <h4 className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5">
+                        Butuh Rapikan Ratusan Referensi?
+                      </h4>
+                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                        Admin SOOBIN siap bantu input Mendeley, format Zotero, dan cek Turnitin No Repository mulai <span className="font-semibold text-emerald-400">Rp 1.000/sumber</span>.
                       </p>
                     </div>
-                    <a
-                      href="https://wa.me/6287815797525?text=Halo%20Admin%20SOOBIN%2C%20mau%20jasa%20rapikan%20daftar%20pustaka%20dan%20mendeley%20dong"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-[11px] shrink-0 transition-all shadow-sm"
-                    >
-                      Chat Admin
-                    </a>
+
+                    <div className="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        ⭐ 4.9 (1.000+ Mahasiswa)
+                      </span>
+                      <a
+                        href="https://wa.me/6287815797525?text=Halo%20Admin%20SOOBIN%2C%20mau%20jasa%20rapikan%20daftar%20pustaka%20dan%20mendeley%20dong"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-xs"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Chat Admin</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
