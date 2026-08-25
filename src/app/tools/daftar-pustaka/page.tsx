@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -54,6 +55,25 @@ const sourceTypes: { id: CitationData['sourceType']; label: string; icon: any }[
 export default function DaftarPustakaGeneratorPage() {
   const [activeStyle, setActiveStyle] = useState<CitationStyle>('apa');
   const [sourceType, setSourceType] = useState<CitationData['sourceType']>('journal');
+
+  // Live Testimonials Data from Database
+  const [testiStats, setTestiStats] = useState<{ rating: number; count: number }>({ rating: 4.9, count: 6 });
+
+  useEffect(() => {
+    fetch('/api/testimonials')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const total = data.reduce((acc: number, item: { rating?: number }) => acc + (Number(item.rating) || 5), 0);
+          const avg = total / data.length;
+          setTestiStats({
+            rating: Number(avg.toFixed(1)),
+            count: data.length,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Auto search by DOI / Title
   const [searchQuery, setSearchQuery] = useState('');
@@ -799,9 +819,16 @@ export default function DaftarPustakaGeneratorPage() {
                     </div>
 
                     <div className="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-400 font-medium">
-                        ⭐ 4.9 (1.000+ Mahasiswa)
-                      </span>
+                      <Link
+                        href="/testimoni"
+                        title="Buka Halaman Testimoni & Review Mahasiswa"
+                        className="text-[10.5px] text-slate-300 hover:text-emerald-400 font-bold flex items-center gap-1 transition-colors cursor-pointer group"
+                      >
+                        <span className="text-amber-400 text-xs">★</span>
+                        <span className="group-hover:underline underline-offset-2">
+                          {testiStats.rating} ({testiStats.count} Ulasan Mahasiswa)
+                        </span>
+                      </Link>
                       <a
                         href="https://wa.me/6287815797525?text=Halo%20Admin%20SOOBIN%2C%20mau%20jasa%20rapikan%20daftar%20pustaka%20dan%20mendeley%20dong"
                         target="_blank"
