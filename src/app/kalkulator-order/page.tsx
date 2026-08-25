@@ -289,6 +289,11 @@ export default function KalkulatorOrderPage() {
     }
   };
 
+  // Helper: Member discount (5%) applies strictly to Turnitin & Cek AI services only
+  const isTurnitinOrAi = (serviceId: string) => {
+    return serviceId === 'turnitin_1x' || serviceId === 'turnitin_3x' || serviceId === 'cek_ai';
+  };
+
   // Determine items to calculate (if cart is empty, preview current single item; otherwise calculate whole cart)
   const isCartEmpty = orderCart.length === 0;
 
@@ -299,10 +304,21 @@ export default function KalkulatorOrderPage() {
     return orderCart.reduce((sum, item) => sum + item.subtotal, 0);
   }, [isCartEmpty, currentSubtotal, orderCart]);
 
-  // Member discount (5% for logged-in member)
+  // Member discount (5% ONLY for Turnitin & Cek AI services)
   const isMember = Boolean(user);
-  const memberDiscountRate = isMember ? 0.05 : 0;
-  const memberDiscountAmount = Math.round(totalRawSubtotal * memberDiscountRate);
+  const memberDiscountAmount = useMemo(() => {
+    if (!isMember) return 0;
+    if (isCartEmpty) {
+      return isTurnitinOrAi(activeService.id) ? Math.round(currentSubtotal * 0.05) : 0;
+    }
+    return orderCart.reduce((sum, item) => {
+      if (isTurnitinOrAi(item.serviceId)) {
+        return sum + Math.round(item.subtotal * 0.05);
+      }
+      return sum;
+    }, 0);
+  }, [isMember, isCartEmpty, activeService.id, currentSubtotal, orderCart]);
+
   const finalGrandTotal = totalRawSubtotal - memberDiscountAmount;
 
   // Currency formatter
@@ -317,7 +333,7 @@ export default function KalkulatorOrderPage() {
   // WhatsApp order link
   const whatsappUrl = useMemo(() => {
     const memberStatus = isMember ? `Member (${user?.name || 'Aktif'})` : 'Reguler';
-    const discountText = isMember ? `\nPotongan Diskon Member (5%): -${formatRupiah(memberDiscountAmount)}` : '';
+    const discountText = memberDiscountAmount > 0 ? `\nPotongan Diskon Member Turnitin & AI (5%): -${formatRupiah(memberDiscountAmount)}` : '';
 
     let itemsBreakdown = '';
     if (isCartEmpty) {
@@ -604,14 +620,21 @@ Mohon bantuannya untuk konfirmasi dan proses pesanan ini ya Kak. Terima kasih! ð
                   </div>
 
                   {isMember ? (
-                    <div className="flex items-center justify-between text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 font-semibold">
-                      <span>Diskon Khusus Member (5%):</span>
-                      <span>-{formatRupiah(memberDiscountAmount)}</span>
-                    </div>
+                    memberDiscountAmount > 0 ? (
+                      <div className="flex items-center justify-between text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 font-semibold">
+                        <span>Diskon Member Turnitin & AI (5%):</span>
+                        <span>-{formatRupiah(memberDiscountAmount)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-[11px]">
+                        <span>Diskon Member (5%):</span>
+                        <span className="font-medium text-slate-700">Khusus Layanan Turnitin & Cek AI</span>
+                      </div>
+                    )
                   ) : (
                     <div className="flex items-center justify-between text-slate-600 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-[11px]">
                       <span>Benefit Akun Member:</span>
-                      <span className="font-semibold text-slate-800">Diskon 5% Tiap Order</span>
+                      <span className="font-semibold text-slate-800">Diskon 5% Turnitin & Cek AI</span>
                     </div>
                   )}
                 </div>
