@@ -58,7 +58,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation with Animated Lamp Pill */}
-          <div className="hidden lg:flex items-center gap-1 bg-slate-50/90 p-1.5 rounded-full border border-slate-200/80 shadow-2xs backdrop-blur-md">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-slate-50/90 p-1 rounded-full border border-slate-200/80 shadow-2xs backdrop-blur-md">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
 
@@ -66,7 +66,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`relative px-3.5 py-1.5 text-xs xl:text-sm font-semibold transition-colors duration-300 rounded-full ${
+                  className={`relative px-2.5 xl:px-3 py-1.5 text-[11px] xl:text-xs font-semibold whitespace-nowrap transition-colors duration-200 rounded-full ${
                     isActive
                       ? 'text-primary-850 font-bold'
                       : 'text-slate-600 hover:text-slate-950'
@@ -97,7 +97,7 @@ export default function Navbar() {
               href="https://wa.me/6287815797525"
               target="_blank"
               rel="noopener noreferrer"
-              className="relative px-3.5 py-1.5 text-xs xl:text-sm font-semibold text-slate-600 hover:text-slate-950 transition-colors duration-300 rounded-full"
+              className="relative px-2.5 xl:px-3 py-1.5 text-[11px] xl:text-xs font-semibold whitespace-nowrap text-slate-600 hover:text-slate-950 transition-colors duration-200 rounded-full"
             >
               Hubungi Kami
             </a>
