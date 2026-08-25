@@ -90,21 +90,21 @@ export default function LayananBannerCarousel({
 
   return (
     <div
-      className="w-full mb-8 relative group select-none"
+      className="w-full max-w-4xl mx-auto mb-6 sm:mb-7 relative group select-none px-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 16:9 Aspect Ratio Container (1280x720 Youtube Thumbnail Ratio) */}
-      <div className="relative w-full aspect-video sm:aspect-16/9 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/90 shadow-xl bg-slate-900">
+      {/* Sleek Compact Banner Container (Not too tall, well-proportioned) */}
+      <div className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-slate-950">
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 1.02 }}
+            initial={{ opacity: 0, scale: 1.01 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            exit={{ opacity: 0, scale: 0.99 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
             className="absolute inset-0 w-full h-full"
           >
             {banners[currentIndex].link ? (
