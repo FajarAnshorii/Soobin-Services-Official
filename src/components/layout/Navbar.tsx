@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Menu, X, LogOut, ChevronDown, Zap, ShoppingCart, History } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -25,6 +25,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,25 +56,53 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-dark-600 hover:text-primary-800 font-medium transition-colors duration-200 text-sm"
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Desktop Navigation with Animated Lamp Pill */}
+          <div className="hidden lg:flex items-center gap-1 bg-slate-50/90 p-1.5 rounded-full border border-slate-200/80 shadow-2xs backdrop-blur-md">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`relative px-3.5 py-1.5 text-xs xl:text-sm font-semibold transition-colors duration-300 rounded-full ${
+                    isActive
+                      ? 'text-primary-850 font-bold'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-lamp"
+                      className="absolute inset-0 bg-white rounded-full shadow-xs border border-slate-200/80 z-0"
+                      initial={false}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 350,
+                        damping: 30,
+                      }}
+                    >
+                      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-primary-700">
+                        <div className="absolute w-10 h-5 rounded-full blur-xs -top-2 -left-1 bg-primary-500/30" />
+                        <div className="absolute w-6 h-4 rounded-full blur-xs -top-1 left-1 bg-primary-500/30" />
+                      </div>
+                    </motion.div>
+                  )}
+                </Link>
+              );
+            })}
             <a
               href="https://wa.me/6287815797525"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-dark-600 hover:text-primary-800 font-medium transition-colors duration-200 text-sm"
+              className="relative px-3.5 py-1.5 text-xs xl:text-sm font-semibold text-slate-600 hover:text-slate-950 transition-colors duration-300 rounded-full"
             >
               Hubungi Kami
             </a>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-4">
 
             {/* Cart Button */}
             {user && (
