@@ -126,10 +126,14 @@ export default function DaftarPustakaGeneratorPage() {
         if (data.doi) setDoi(data.doi);
         if (data.publisher) setPublisher(data.publisher);
       } else {
-        setSearchError('Data artikel tidak ditemukan. Pastikan DOI atau Judul benar, atau isi formulir manual di bawah.');
+        setSearchError('Data artikel tidak ditemukan. Pastikan memasukkan DOI lengkap (contoh: 10.15294/jpii.v15i1.21243) atau judul jurnal, atau isi formulir manual di bawah.');
       }
-    } catch {
-      setSearchError('Terjadi kesalahan koneksi saat mencari metadata. Silakan gunakan formulir manual.');
+    } catch (err: any) {
+      if (err?.message === 'DOI_INCOMPLETE') {
+        setSearchError('Format DOI belum lengkap! Masukkan nomor DOI artikel lengkap beserta suffix-nya (contoh: 10.15294/jpii.v15i1.21243).');
+      } else {
+        setSearchError('Terjadi kesalahan koneksi saat mencari metadata. Silakan gunakan formulir manual.');
+      }
     } finally {
       setIsSearching(false);
     }
@@ -310,7 +314,7 @@ export default function DaftarPustakaGeneratorPage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Tempelkan link DOI (misal: 10.1016/...) atau judul jurnal ilmiah..."
+                        placeholder="Tempelkan link/nomor DOI lengkap (contoh: 10.15294/jpii.v15i1.21243) atau judul jurnal..."
                         className="w-full h-11 pl-10 pr-4 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-slate-800 rounded-xl text-xs font-medium text-slate-900 outline-none transition-all"
                       />
                     </div>

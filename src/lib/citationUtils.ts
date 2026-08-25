@@ -166,31 +166,39 @@ export function generateCitation(data: CitationData, style: CitationStyle): Form
       const pgStr = pages ? `, ${pages}` : '';
       const linkStr = doiUrl ? ` <a href="${doiUrl}" target="_blank" class="text-primary-700 underline">${doiUrl}</a>` : (webUrl ? ` <a href="${webUrl}" target="_blank" class="text-primary-700 underline">${webUrl}</a>` : '');
       const linkPlain = doiUrl || webUrl ? ` ${doiUrl || webUrl}` : '';
+      const titleStr = title ? ` ${title}.` : '';
 
-      html = `${authStr} ${yrStr} ${title}. <i>${journalName || 'Nama Jurnal'}</i>${volIss ? `, ${volIss}` : ''}${pgStr}.${linkStr}`;
-      plainText = `${authStr} ${yrStr} ${title}. ${journalName || 'Nama Jurnal'}${volIssPlain ? `, ${volIssPlain}` : ''}${pgStr}.${linkPlain}`;
+      html = `${authStr} ${yrStr}${titleStr} <i>${journalName || 'Nama Jurnal'}</i>${volIss ? `, ${volIss}` : ''}${pgStr}.${linkStr}`;
+      plainText = `${authStr} ${yrStr}${titleStr} ${journalName || 'Nama Jurnal'}${volIssPlain ? `, ${volIssPlain}` : ''}${pgStr}.${linkPlain}`;
     } else if (sourceType === 'book') {
       const edStr = edition ? ` (${edition})` : '';
       const linkStr = doiUrl ? ` <a href="${doiUrl}" target="_blank" class="text-primary-700 underline">${doiUrl}</a>` : '';
       const linkPlain = doiUrl ? ` ${doiUrl}` : '';
+      const titleStr = title ? ` <i>${title}</i>` : '';
+      const titlePlain = title ? ` ${title}` : '';
 
-      html = `${authStr} ${yrStr} <i>${title}</i>${edStr}. ${publisher || 'Penerbit'}.${linkStr}`;
-      plainText = `${authStr} ${yrStr} ${title}${edStr}. ${publisher || 'Penerbit'}.${linkPlain}`;
+      html = `${authStr} ${yrStr}${titleStr}${edStr}. ${publisher || 'Penerbit'}.${linkStr}`;
+      plainText = `${authStr} ${yrStr}${titlePlain}${edStr}. ${publisher || 'Penerbit'}.${linkPlain}`;
     } else if (sourceType === 'website') {
       const siteStr = websiteName ? ` ${websiteName}.` : '';
       const linkStr = webUrl ? ` <a href="${webUrl}" target="_blank" class="text-primary-700 underline">${webUrl}</a>` : '';
       const linkPlain = webUrl ? ` ${webUrl}` : '';
+      const titleStr = title ? ` <i>${title}</i>.` : '';
+      const titlePlain = title ? ` ${title}.` : '';
 
-      html = `${authStr} ${yrStr} <i>${title}</i>.${siteStr}${linkStr}`;
-      plainText = `${authStr} ${yrStr} ${title}.${siteStr}${linkPlain}`;
+      html = `${authStr} ${yrStr}${titleStr}${siteStr}${linkStr}`;
+      plainText = `${authStr} ${yrStr}${titlePlain}${siteStr}${linkPlain}`;
     } else if (sourceType === 'thesis') {
       const univStr = university ? ` [${degree}, ${university}]` : ` [${degree}]`;
-      html = `${authStr} ${yrStr} <i>${title}</i>${univStr}.${doiUrl ? ` <a href="${doiUrl}" class="text-primary-700 underline">${doiUrl}</a>` : ''}`;
-      plainText = `${authStr} ${yrStr} ${title}${univStr}.${doiUrl ? ` ${doiUrl}` : ''}`;
+      const titleStr = title ? ` <i>${title}</i>` : '';
+      const titlePlain = title ? ` ${title}` : '';
+      html = `${authStr} ${yrStr}${titleStr}${univStr}.${doiUrl ? ` <a href="${doiUrl}" class="text-primary-700 underline">${doiUrl}</a>` : ''}`;
+      plainText = `${authStr} ${yrStr}${titlePlain}${univStr}.${doiUrl ? ` ${doiUrl}` : ''}`;
     } else {
       // conference
-      html = `${authStr} ${yrStr} ${title}. <i>${conferenceName || 'Nama Konferensi'}</i>.${doiUrl ? ` <a href="${doiUrl}" class="text-primary-700 underline">${doiUrl}</a>` : ''}`;
-      plainText = `${authStr} ${yrStr} ${title}. ${conferenceName || 'Nama Konferensi'}.${doiUrl ? ` ${doiUrl}` : ''}`;
+      const titleStr = title ? ` ${title}.` : '';
+      html = `${authStr} ${yrStr}${titleStr} <i>${conferenceName || 'Nama Konferensi'}</i>.${doiUrl ? ` <a href="${doiUrl}" class="text-primary-700 underline">${doiUrl}</a>` : ''}`;
+      plainText = `${authStr} ${yrStr}${titleStr} ${conferenceName || 'Nama Konferensi'}.${doiUrl ? ` ${doiUrl}` : ''}`;
     }
   }
 
@@ -314,16 +322,20 @@ export async function fetchCrossRefMetadata(doiOrTitle: string): Promise<Partial
     const cleanQuery = doiOrTitle.trim();
     if (!cleanQuery) return null;
 
-    // Check if input is a DOI
-    const isDoi = cleanQuery.includes('10.') || cleanQuery.startsWith('http');
+    // Check if input is an incomplete DOI prefix without a slash (e.g. "10.15294")
+    if (/^10\.\d{4,9}$/.test(cleanQuery)) {
+      throw new Error('DOI_INCOMPLETE');
+    }
+
+    // Check if input is a complete DOI (contains 10.xxxx/...)
+    const doiMatch = cleanQuery.match(/10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/);
     let endpoint = '';
 
-    if (isDoi) {
-      const match = cleanQuery.match(/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i);
-      const doi = match ? match[0] : cleanQuery.replace(/^https?:\/\/doi\.org\//i, '');
+    if (doiMatch) {
+      const doi = doiMatch[0];
       endpoint = `https://api.crossref.org/works/${encodeURIComponent(doi)}`;
     } else {
-      endpoint = `https://api.crossref.org/works?query=${encodeURIComponent(cleanQuery)}&rows=1`;
+      endpoint = `https://api.crossref.org/works?query.title=${encodeURIComponent(cleanQuery)}&rows=1`;
     }
 
     const res = await fetch(endpoint, {
@@ -334,6 +346,7 @@ export async function fetchCrossRefMetadata(doiOrTitle: string): Promise<Partial
 
     if (!res.ok) return null;
     const json = await res.json();
+    const isDoi = Boolean(doiMatch);
     const item = isDoi ? json.message : json.message?.items?.[0];
 
     if (!item) return null;
