@@ -305,9 +305,15 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
     let detailsText = `*DETAIL PESANAN (PEMBAYARAN QRIS LUNAS)*\n`;
     detailsText += `🆔 ID Order: ${finalOrder.id}\n`;
-    detailsText += `👤 Nama Pemesan: ${customerName}\n`;
+    detailsText += `👤 Nama Pemesan: ${customerName}${isMember ? ' (Member Resmi SOOBIN 👑)' : ''}\n`;
     detailsText += `📌 Jenis Jasa: ${service.name}\n`;
-    detailsText += `💰 Total Harga: ${service.price}\n`;
+    if (priceInfo.isDiscounted) {
+      detailsText += `🏷️ Harga Normal: ${priceInfo.originalPriceStr}\n`;
+      detailsText += `🎁 Diskon Member (5%): -${priceInfo.discountAmountStr}\n`;
+      detailsText += `💰 Total Harga: ${priceInfo.discountedPriceStr}\n`;
+    } else {
+      detailsText += `💰 Total Harga: ${service.price}\n`;
+    }
     detailsText += `💳 Metode Pembayaran: QRIS (Scan Barcode)\n`;
     detailsText += `✅ *STATUS PEMBAYARAN: QRIS - LUNAS*\n\n`;
 

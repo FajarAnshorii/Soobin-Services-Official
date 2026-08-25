@@ -7,7 +7,9 @@ import {
   Target, BookMarked, FlaskConical, Route, Sparkles, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
+import { getPriceWithMemberDiscount } from '@/lib/priceUtils';
 
 const DEFAULT_CATEGORIES = [
   {
@@ -122,8 +124,11 @@ export default function SkripsiSection() {
     setCurrentPage(0);
   };
 
+  const { user } = useAuth();
+  const isMember = Boolean(user);
+
   return (
-    <section id="joki-skripsi" className="bg-gradient-to-br from-gray-50 to-gray-100 section-padding">
+    <section id="joki-skripsi" className="bg-linear-to-br from-gray-50 to-gray-100 section-padding">
       <div className="container-custom">
         {/* Header */}
         <motion.div
@@ -158,34 +163,38 @@ export default function SkripsiSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          {categoriesList.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => handleTabChange(cat.id)}
-              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 border-2 ${
-                activeTab === cat.id
-                  ? 'bg-primary-800 text-white border-primary-800 shadow-lg shadow-primary-800/30'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-800 hover:text-primary-800'
-              }`}
-            >
-              <cat.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{cat.label}</span>
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Services List with Pagination */}
-        <motion.div
-          key={activeTab}
-          className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 overflow-hidden mb-8 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {/* Table Header - Hidden on mobile */}
-          <div className="hidden md:grid grid-cols-[60px_1fr_120px] gap-4 px-6 py-4 bg-primary-800 text-white text-sm font-semibold">
+          {categoriesList.map((cat) => {
+            const Icon = cat.icon;
+            const isActive = cat.id === activeTab;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleTabChange(cat.id)}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                  isActive
+                    ? 'bg-primary-800 text-white shadow-lg shadow-primary-800/25 scale-105'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-dark-800 shadow-xs'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-primary-800'}`} />
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+        </motion.div>
+
+        {/* Active Category Services Table/List */}
+        <motion.div
+          className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-12 sm:mb-16"
+          key={activeTab}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Table Header */}
+          <div className="hidden md:grid grid-cols-[60px_1fr_180px] gap-4 px-6 py-4 bg-primary-800 text-white text-sm font-semibold">
             <span>No</span>
             <span>Layanan</span>
             <span className="text-right">Harga</span>
@@ -193,37 +202,74 @@ export default function SkripsiSection() {
 
           {/* Service Rows */}
           <div className="divide-y divide-gray-100">
-            {visibleServices.map((service, index) => (
-              <motion.div
-                key={service.num}
-                className="grid grid-cols-[45px_1fr] md:grid-cols-[60px_1fr_120px] gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 transition-colors duration-200 items-center"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                {/* Number Badge */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-800/10 rounded-lg flex items-center justify-center">
-                  <span className="text-primary-800 font-bold text-xs sm:text-sm">{service.num}</span>
-                </div>
+            {visibleServices.map((service, index) => {
+              const priceInfo = getPriceWithMemberDiscount(service.price, isMember);
 
-                {/* Title */}
-                <div className="flex flex-col">
-                  <span className="font-semibold text-dark-800 text-xs sm:text-sm md:text-base">
-                    {service.title}
-                  </span>
-                  <span className="md:hidden text-primary-800 font-bold text-xs sm:text-sm mt-1">
-                    {service.price}
-                  </span>
-                </div>
+              return (
+                <motion.div
+                  key={service.num}
+                  className="grid grid-cols-[45px_1fr] md:grid-cols-[60px_1fr_180px] gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 transition-colors duration-200 items-center"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  {/* Number Badge */}
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-800/10 rounded-lg flex items-center justify-center">
+                    <span className="text-primary-800 font-bold text-xs sm:text-sm">{service.num}</span>
+                  </div>
 
-                {/* Price - desktop */}
-                <div className="hidden md:flex justify-end">
-                  <span className="text-primary-800 font-bold whitespace-nowrap">
-                    {service.price}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                  {/* Title */}
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-dark-800 text-xs sm:text-sm md:text-base">
+                      {service.title}
+                    </span>
+                    {/* Mobile Price */}
+                    <div className="md:hidden mt-1">
+                      {priceInfo.isDiscounted ? (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[11px] text-gray-400 line-through">
+                            {priceInfo.originalPriceStr}
+                          </span>
+                          <span className="text-emerald-600 font-extrabold text-xs">
+                            {priceInfo.discountedPriceStr}
+                          </span>
+                          <span className="text-[8px] bg-emerald-100 text-emerald-800 font-extrabold px-1 rounded">
+                            -5%
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-primary-800 font-bold text-xs sm:text-sm">
+                          {service.price}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Price - desktop */}
+                  <div className="hidden md:flex flex-col items-end justify-center">
+                    {priceInfo.isDiscounted ? (
+                      <div className="text-right">
+                        <span className="text-xs text-gray-400 line-through block">
+                          {priceInfo.originalPriceStr}
+                        </span>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span className="text-emerald-600 font-extrabold text-sm whitespace-nowrap">
+                            {priceInfo.discountedPriceStr}
+                          </span>
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded">
+                            -5%
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-primary-800 font-bold whitespace-nowrap">
+                        {service.price}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Pagination Controls */}
