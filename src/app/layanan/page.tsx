@@ -19,6 +19,7 @@ import { useCart } from '@/context/CartContext';
 import OrderModal from '@/components/modals/OrderModal';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 import { getPriceWithMemberDiscount } from '@/lib/priceUtils';
+import LayananBannerCarousel from '@/components/sections/LayananBannerCarousel';
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Filter },
@@ -1157,8 +1158,11 @@ export default function LayananPage() {
         </div>
       </section>
 
-      <section className="pt-10 pb-8 sm:pt-14 sm:pb-12">
+      <section className="pt-8 pb-8 sm:pt-10 sm:pb-12">
         <div className="container-custom px-4">
+          {/* Running Promo Banner Carousel (16:9 aspect ratio, 1280x720) */}
+          <LayananBannerCarousel />
+
           {/* Welcome / Member Banner */}
           <motion.div
             className="mb-8 overflow-hidden rounded-2xl"
