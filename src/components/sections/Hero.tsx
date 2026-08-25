@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, FileText, Shield, Zap, ArrowRight } from 'lucide-react';
 import { useCounterAnimation } from '@/hooks/useCounterAnimation';
@@ -66,6 +67,32 @@ function AnimatedStat({
 }
 
 export default function Hero() {
+  const [ratingValue, setRatingValue] = useState<number>(4.8);
+
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await fetch('/api/testimonials', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const sum = data.reduce((acc: number, curr: { rating?: number }) => acc + (curr.rating || 5), 0);
+            const avg = Number((sum / data.length).toFixed(1));
+            if (!isNaN(avg) && avg > 0) {
+              setRatingValue(avg);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch rating for hero:', err);
+      }
+    };
+
+    fetchRating();
+    const interval = setInterval(fetchRating, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative min-h-screen w-full overflow-hidden pt-20 flex items-center justify-center bg-black">
       {/* Background Video */}
@@ -175,7 +202,7 @@ export default function Hero() {
             >
               <AnimatedStat value={20000} label="Customer" suffix="+" />
               <AnimatedStat value={30000} label="Tugas Selesai" suffix="+" />
-              <AnimatedStat value={4.9} decimals={1} decimalSeparator="." label="Rating" suffix="★" />
+              <AnimatedStat key={ratingValue} value={ratingValue} decimals={1} decimalSeparator="." label="Rating" suffix="★" />
             </motion.div>
           </motion.div>
 
