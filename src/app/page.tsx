@@ -7,6 +7,7 @@ import PosterCarouselSection from '@/components/sections/PosterCarouselSection';
 import PartnerSection from '@/components/sections/PartnerSection';
 import HowItWorksSection from '@/components/sections/HowItWorksSection';
 import TurnitinSection from '@/components/sections/TurnitinSection';
+import PriceCalculatorSection from '@/components/sections/PriceCalculatorSection';
 import TestimonialCarousel from '@/components/sections/TestimonialCarousel';
 import ParafraseSection from '@/components/sections/ParafraseSection';
 import JokiTugasSection from '@/components/sections/JokiTugasSection';
@@ -45,6 +46,7 @@ export default function Home() {
       <PosterCarouselSection />
       <PartnerSection />
       <HowItWorksSection />
+      <PriceCalculatorSection />
       <TurnitinSection />
       <TestimonialCarousel />
       <ParafraseSection />
