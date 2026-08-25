@@ -1892,14 +1892,14 @@ export default function AdminPage() {
 
           {/* TAB 2: ORDERS & PAYMENTS */}
           {activeTab === 'orders' && (
-            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
+            <div className="bg-white border border-slate-300 rounded-2xl p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 shadow-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 border-b border-slate-300 pb-3 sm:pb-4">
                 <div>
-                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5 text-slate-900" />
-                    Daftar Pesanan & Pembayaran QRIS / Transfer
+                  <h2 className="font-black text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-slate-900" />
+                    Daftar Pesanan & Pembayaran QRIS
                   </h2>
-                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
+                  <p className="text-[11px] sm:text-xs text-slate-600 font-bold mt-0.5">
                     Pantau bukti transfer screenshot QRIS, unduh file dokumen ter-upload, dan verifikasi status lunas.
                   </p>
                 </div>
@@ -1907,7 +1907,7 @@ export default function AdminPage() {
                 <button
                   onClick={syncOrdersWithCloud}
                   disabled={ordersLoading}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center gap-2 cursor-pointer transition-colors"
+                  className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center justify-center gap-2 cursor-pointer transition-colors"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 text-slate-900 ${ordersLoading ? 'animate-spin' : ''}`} />
                   <span>Refresh Pesanan</span>
@@ -1915,15 +1915,15 @@ export default function AdminPage() {
               </div>
 
               {filteredOrders.length === 0 ? (
-                <div className="p-12 text-center text-slate-900 bg-slate-50 rounded-2xl border border-slate-300">
-                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-slate-900" />
-                  <p className="font-black text-base text-slate-900">Belum Ada Pesanan Masuk</p>
-                  <p className="text-xs text-slate-900 mt-1 font-bold">
+                <div className="p-8 sm:p-12 text-center text-slate-900 bg-slate-50 rounded-2xl border border-slate-300">
+                  <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2.5 text-slate-900" />
+                  <p className="font-black text-sm sm:text-base text-slate-900">Belum Ada Pesanan Masuk</p>
+                  <p className="text-[11px] sm:text-xs text-slate-600 mt-1 font-bold">
                     Setiap pesanan yang dibuat oleh pelanggan melalui form kustom dan QRIS akan ditampilkan otomatis di sini.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {filteredOrders.map((order) => {
                     const isLunas = order.paymentStatus?.toLowerCase().includes('lunas');
                     const isCancel = order.paymentStatus?.toLowerCase().includes('batal');
@@ -1931,86 +1931,99 @@ export default function AdminPage() {
                     return (
                       <div
                         key={order.id}
-                        className="bg-slate-50 border border-slate-300 rounded-2xl p-5 hover:border-slate-400 transition-colors space-y-4 shadow-xs"
+                        className="bg-slate-50/90 hover:bg-slate-50 border border-slate-300 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-slate-400 transition-colors space-y-2.5 sm:space-y-3 shadow-xs"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-300 pb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                        {/* Top Header of Card */}
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-[9px] sm:text-xs shrink-0 shadow-2xs">
                               ORD
                             </div>
-                            <div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-black text-sm text-slate-900">{order.customerName}</h3>
-                                <span className="text-[10px] bg-slate-200 text-slate-900 px-2 py-0.5 rounded font-mono border border-slate-400 font-black">
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+                                <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate leading-none">
+                                  {order.customerName}
+                                </h3>
+                                <span className="text-[9px] sm:text-[10px] bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded font-mono font-black shrink-0">
                                   {order.id}
                                 </span>
-                                <span className="text-[11px] font-black text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-slate-300 flex items-center gap-1.5 shadow-2xs">
-                                  <CalendarIcon className="w-3.5 h-3.5 text-slate-900" />
-                                  {formatFullDateIndonesian(order.createdAt, order.id)}
-                                </span>
                               </div>
-                              <p className="text-xs text-slate-900 font-bold mt-0.5">{order.customerEmail}</p>
+                              <p className="text-[10px] sm:text-[11px] text-slate-600 font-semibold truncate mt-0.5">
+                                {order.customerEmail}
+                              </p>
                             </div>
                           </div>
 
-                          {/* Status Badge */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                            <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-300 flex items-center gap-1 shadow-2xs">
+                              <CalendarIcon className="w-3 h-3 text-slate-700 shrink-0" />
+                              <span className="hidden sm:inline">{formatFullDateIndonesian(order.createdAt, order.id)}</span>
+                              <span className="sm:hidden">{formatChatDate(order.createdAt || order.id)}</span>
+                            </span>
+
                             <span
-                              className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider ${
+                              className={`text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
                                 isLunas
-                                  ? 'bg-slate-900 text-white border border-slate-900'
+                                  ? 'bg-slate-900 text-white'
                                   : isCancel
-                                  ? 'bg-slate-200 text-slate-900 border border-slate-400'
-                                  : 'bg-slate-200 text-slate-900 border border-slate-400'
+                                  ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                  : 'bg-amber-100 text-amber-900 border border-amber-300'
                               }`}
                             >
-                              {order.paymentStatus}
+                              {order.paymentStatus || 'Menunggu'}
                             </span>
                           </div>
                         </div>
 
                         {/* Main Details Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                          <div className="bg-white p-3.5 rounded-xl border border-slate-300 space-y-1.5 shadow-xs">
-                            <p className="text-slate-900 font-bold">Jasa Layanan:</p>
-                            <p className="font-black text-slate-900 text-sm">{order.serviceName}</p>
-                            <p className="text-slate-900 font-black">{order.price}</p>
-                            <div className="pt-1 text-[11px] space-y-0.5 border-t border-slate-100">
-                              <p className="text-slate-900 font-bold">
-                                Metode: <span className="text-slate-900 font-black">{order.paymentMethod || 'QRIS / Transfer'}</span>
-                              </p>
-                              <p className="text-slate-700 font-bold flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-slate-600" />
-                                <span>Tanggal: {formatFullDateIndonesian(order.createdAt, order.id)}</span>
-                              </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                          {/* Service Box */}
+                          <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1">
+                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-500">
+                              Jasa Layanan
+                            </p>
+                            <p className="font-black text-xs sm:text-sm text-slate-900 leading-tight">
+                              {order.serviceName}
+                            </p>
+                            <div className="flex items-center justify-between pt-0.5">
+                              <span className="font-black text-xs sm:text-sm text-slate-900">{order.price}</span>
+                              <span className="text-[9px] sm:text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                {order.paymentMethod || 'QRIS'}
+                              </span>
                             </div>
                           </div>
 
-                          <div className="md:col-span-2 bg-white p-3.5 rounded-xl border border-slate-300 space-y-2 shadow-xs">
-                            <p className="text-slate-900 font-bold">Detail Formulir Kustom:</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                              {order.customFields &&
+                          {/* Custom Form Fields Box */}
+                          <div className="sm:col-span-2 bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1">
+                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-500">
+                              Detail Formulir Kustom
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[10px] sm:text-[11px]">
+                              {order.customFields && Object.keys(order.customFields).length > 0 ? (
                                 Object.entries(order.customFields).map(([k, v]) => (
-                                  <div key={k} className="bg-slate-50 p-2.5 rounded-lg border border-slate-300">
-                                    <span className="text-slate-900 block font-black">{k}:</span>
-                                    <span className="text-slate-900 font-bold break-words">{v}</span>
+                                  <div key={k} className="bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 leading-tight">
+                                    <span className="text-slate-500 block text-[8px] sm:text-[9px] font-black uppercase truncate">{k}</span>
+                                    <span className="text-slate-900 font-bold text-[10px] sm:text-[11px] break-words line-clamp-2">{v}</span>
                                   </div>
-                                ))}
+                                ))
+                              ) : (
+                                <p className="text-[10px] text-slate-400 italic">Tidak ada formulir khusus</p>
+                              )}
                             </div>
                           </div>
                         </div>
 
-                        {/* Actions Footer */}
-                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                          <div className="flex flex-wrap items-center gap-2">
+                        {/* Actions Toolbar Footer */}
+                        <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1.5 border-t border-slate-200">
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
                             {/* Screenshot Proof Button */}
                             {order.proofImage && (
                               <button
                                 onClick={() => setSelectedProofImage(order.proofImage || null)}
-                                className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors"
+                                className="px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-[10px] sm:text-xs font-black flex items-center gap-1 cursor-pointer transition-colors"
                               >
-                                <Eye className="w-4 h-4 text-slate-900" />
-                                <span>Lihat Bukti Bayar (Screenshot)</span>
+                                <Eye className="w-3.5 h-3.5 text-slate-900" />
+                                <span>Bukti Bayar</span>
                               </button>
                             )}
 
@@ -2018,48 +2031,48 @@ export default function AdminPage() {
                             {(order.uploadedFileData || order.customFields?.['File Ter-upload']) && (
                               <button
                                 onClick={() => handleDownloadFile(order)}
-                                className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+                                className="px-2 sm:px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-black text-white text-[10px] sm:text-xs font-black flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                               >
-                                <Download className="w-4 h-4" />
-                                <span>Unduh Dokumen File</span>
+                                <Download className="w-3.5 h-3.5 text-white" />
+                                <span>Unduh Dokumen</span>
                               </button>
                             )}
 
-                            {/* Peringatan Status File Kedaluwarsa (> 2 Hari) */}
+                            {/* Expired Warning Badge */}
                             {isOrderFileExpired(order) && (
-                              <span className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px] font-black flex items-center gap-1.5 shadow-2xs" title="Peringatan: Pesanan ini sudah lebih dari 2 hari (48 jam).">
-                                <Clock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                                <span>Peringatan: File Kedaluwarsa (&gt; 2 Hari)</span>
+                              <span className="px-2 py-0.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[9px] sm:text-[10px] font-bold flex items-center gap-1" title="File > 2 hari">
+                                <Clock className="w-3 h-3 text-amber-700 shrink-0" />
+                                <span>&gt; 2 Hari</span>
                               </span>
                             )}
                           </div>
 
                           {/* Status Toggle Buttons */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-1.5 ml-auto sm:ml-0">
                             <button
                               disabled={updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, 'Dibatalkan')}
-                              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border ${
+                              className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-black flex items-center gap-1 cursor-pointer transition-all border ${
                                 isCancel
-                                  ? 'bg-rose-100 text-rose-900 border-rose-400 shadow-xs ring-2 ring-rose-300'
-                                  : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'
+                                  ? 'bg-rose-100 text-rose-900 border-rose-300 ring-1 ring-rose-400'
+                                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
                               } ${updatingOrderId === order.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                              <XCircle className="w-4 h-4 text-slate-900" />
-                              <span>{isCancel ? '✕ Dibatalkan' : 'Batalkan'}</span>
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>{isCancel ? '✕ Batal' : 'Batalkan'}</span>
                             </button>
 
                             <button
                               disabled={updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, 'LUNAS (Terverifikasi Admin)')}
-                              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border shadow-xs ${
+                              className={`px-2.5 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-black flex items-center gap-1 cursor-pointer transition-all border shadow-2xs ${
                                 isLunas
-                                  ? 'bg-slate-900 text-white border-slate-900 ring-2 ring-slate-400'
+                                  ? 'bg-slate-900 text-white border-slate-900'
                                   : 'bg-slate-900 hover:bg-black text-white border-transparent'
                               } ${updatingOrderId === order.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                              <CheckCircle className="w-4 h-4 text-white" />
-                              <span>{isLunas ? '✓ Lunas (Terverifikasi)' : 'Verifikasi Lunas'}</span>
+                              <CheckCircle className="w-3.5 h-3.5 text-white" />
+                              <span>{isLunas ? '✓ Lunas' : 'Verifikasi Lunas'}</span>
                             </button>
                           </div>
                         </div>
@@ -2160,58 +2173,63 @@ export default function AdminPage() {
 
           {/* TAB 4: REVENUE & EXCEL REPORT */}
           {activeTab === 'revenue' && (
-            <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
+            <div className="bg-white border border-slate-300 rounded-2xl p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 shadow-xs">
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 border-b border-slate-300 pb-3 sm:pb-4">
                 <div>
-                  <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-slate-900" />
-                    Dasbor Pendapatan & Export Laporan Excel
+                  <h2 className="font-black text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-slate-900" />
+                    Dasbor Pendapatan & Export Excel
                   </h2>
-                  <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Pilih tanggal pada kalender untuk melihat pendapatan dan riwayat orderan per hari secara realtime.
+                  <p className="text-[11px] sm:text-xs text-slate-600 font-bold mt-0.5">
+                    Pilih tanggal pada kalender untuk melihat pendapatan & riwayat orderan harian realtime.
                   </p>
                 </div>
 
                 <button
                   onClick={handleExportDailyExcel}
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                  className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors shrink-0"
                 >
                   <FileSpreadsheet className="w-4 h-4 text-white" />
                   <span>Export Laporan Excel (.xlsx)</span>
                 </button>
               </div>
 
-              {/* 3 Top KPI Stat Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                    Total Pendapatan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
+              {/* 3 Top KPI Stat Cards - Sleek Compact Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                {/* Total Pendapatan */}
+                <div className="bg-slate-50 border border-slate-300 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-1 shadow-2xs">
+                  <p className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider truncate">
+                    Pendapatan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })})
                   </p>
-                  <p className="text-3xl font-black text-slate-900">
+                  <p className="text-base sm:text-2xl font-black text-slate-900 truncate">
                     Rp {revenueForSelectedDate.toLocaleString('id-ID')}
                   </p>
-                  <p className="text-[11px] text-slate-900 font-bold">Otomatis dihitung dari order status Lunas</p>
+                  <p className="text-[9px] sm:text-[10px] text-slate-500 font-semibold truncate">Status Lunas</p>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                    Total Pesanan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
+                {/* Total Pesanan */}
+                <div className="bg-slate-50 border border-slate-300 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-1 shadow-2xs">
+                  <p className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider truncate">
+                    Pesanan ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })})
                   </p>
-                  <p className="text-3xl font-black text-slate-900">
+                  <p className="text-base sm:text-2xl font-black text-slate-900 truncate">
                     {ordersForSelectedDate.length} Order
                   </p>
-                  <p className="text-[11px] text-slate-900 font-bold">
-                    {lunasOrdersSelectedDate.length} Terverifikasi Lunas
+                  <p className="text-[9px] sm:text-[10px] text-slate-500 font-semibold truncate">
+                    {lunasOrdersSelectedDate.length} Terverifikasi
                   </p>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-6 space-y-2">
-                  <p className="text-xs font-black text-slate-900 uppercase tracking-wider">Waktu Sistem Realtime</p>
-                  <p className="text-base font-black text-slate-900 capitalize">
-                    {selectedRevenueDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                {/* Waktu Realtime */}
+                <div className="col-span-2 sm:col-span-1 bg-slate-50 border border-slate-300 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-1 shadow-2xs">
+                  <p className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider truncate">
+                    Waktu Realtime
                   </p>
-                  <p className="text-[11px] text-slate-900 font-bold">Zona Waktu: Asia/Jakarta (WIB)</p>
+                  <p className="text-xs sm:text-base font-black text-slate-900 capitalize truncate">
+                    {selectedRevenueDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] text-slate-500 font-semibold truncate">Asia/Jakarta (WIB)</p>
                 </div>
               </div>
 
@@ -2224,62 +2242,66 @@ export default function AdminPage() {
               </div>
 
               {/* Itemized Table */}
-              <div className="border border-slate-300 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-slate-100 border-b border-slate-300 flex items-center justify-between font-black text-xs text-slate-900">
-                  <span>
-                    Rincian Transaksi Pendapatan Masuk ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })})
+              <div className="border border-slate-300 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xs">
+                <div className="p-3 sm:p-4 bg-slate-100 border-b border-slate-300 flex items-center justify-between font-black text-xs text-slate-900">
+                  <span className="truncate">
+                    Rincian Transaksi ({selectedRevenueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
                   </span>
-                  <span className="text-[11px] text-slate-600 font-bold">
+                  <span className="text-[10px] sm:text-[11px] text-slate-600 font-bold bg-white px-2 py-0.5 rounded border border-slate-200 shrink-0 ml-2">
                     {ordersForSelectedDate.length} Pesanan
                   </span>
                 </div>
-                <table className="w-full text-left text-xs text-slate-900">
-                  <thead className="bg-white text-slate-900 font-black text-[10px] uppercase border-b border-slate-300">
-                    <tr>
-                      <th className="p-3.5">ID Order</th>
-                      <th className="p-3.5">Tanggal, Bulan, Tahun & Jam (WIB)</th>
-                      <th className="p-3.5">Pelanggan</th>
-                      <th className="p-3.5">Layanan</th>
-                      <th className="p-3.5">Harga</th>
-                      <th className="p-3.5">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
-                    {ordersForSelectedDate.length === 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-[11px] sm:text-xs text-slate-900">
+                    <thead className="bg-white text-slate-900 font-black text-[9px] sm:text-[10px] uppercase border-b border-slate-300">
                       <tr>
-                        <td colSpan={6} className="p-8 text-center text-slate-500 font-bold">
-                          Tidak ada pesanan masuk pada tanggal ini.
-                        </td>
+                        <th className="p-2.5 sm:p-3.5">ID Order</th>
+                        <th className="p-2.5 sm:p-3.5">Waktu (WIB)</th>
+                        <th className="p-2.5 sm:p-3.5">Pelanggan</th>
+                        <th className="p-2.5 sm:p-3.5">Layanan</th>
+                        <th className="p-2.5 sm:p-3.5">Harga</th>
+                        <th className="p-2.5 sm:p-3.5">Status</th>
                       </tr>
-                    ) : (
-                      ordersForSelectedDate.map((o) => (
-                        <tr key={o.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
-                          <td className="p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
-                            {formatFullDateIndonesian(o.createdAt, o.id)}
-                          </td>
-                          <td className="p-3.5">
-                            <p className="font-black text-slate-900">{o.customerName}</p>
-                            <p className="text-[10px] text-slate-600 font-bold">{o.customerEmail}</p>
-                          </td>
-                          <td className="p-3.5 text-slate-900 font-bold">{o.serviceName}</td>
-                          <td className="p-3.5 font-black text-slate-900">{o.price}</td>
-                          <td className="p-3.5">
-                            <span
-                              className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                                o.paymentStatus?.toLowerCase().includes('lunas')
-                                  ? 'bg-slate-900 text-white'
-                                  : 'bg-slate-200 text-slate-900 border border-slate-400'
-                              }`}
-                            >
-                              {o.paymentStatus}
-                            </span>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 bg-white">
+                      {ordersForSelectedDate.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-6 sm:p-8 text-center text-slate-500 font-bold">
+                            Tidak ada pesanan masuk pada tanggal ini.
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : (
+                        ordersForSelectedDate.map((o) => (
+                          <tr key={o.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-2.5 sm:p-3.5 font-mono text-slate-900 font-black">{o.id}</td>
+                            <td className="p-2.5 sm:p-3.5 text-slate-900 font-extrabold whitespace-nowrap">
+                              {formatFullDateIndonesian(o.createdAt, o.id)}
+                            </td>
+                            <td className="p-2.5 sm:p-3.5">
+                              <p className="font-black text-slate-900 truncate max-w-[120px] sm:max-w-none">{o.customerName}</p>
+                              <p className="text-[10px] text-slate-500 truncate max-w-[120px] sm:max-w-none">{o.customerEmail}</p>
+                            </td>
+                            <td className="p-2.5 sm:p-3.5 font-bold text-slate-900">{o.serviceName}</td>
+                            <td className="p-2.5 sm:p-3.5 font-black text-slate-900">{o.price}</td>
+                            <td className="p-2.5 sm:p-3.5">
+                              <span
+                                className={`text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                  o.paymentStatus?.toLowerCase().includes('lunas')
+                                    ? 'bg-slate-900 text-white'
+                                    : o.paymentStatus?.toLowerCase().includes('batal')
+                                    ? 'bg-rose-100 text-rose-800'
+                                    : 'bg-amber-100 text-amber-900'
+                                }`}
+                              >
+                                {o.paymentStatus}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
