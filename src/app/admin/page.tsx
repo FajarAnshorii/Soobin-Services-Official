@@ -391,10 +391,25 @@ export default function AdminPage() {
   const [redeemSearchTerm, setRedeemSearchTerm] = useState<string>('');
   const [redeemSubTab, setRedeemSubTab] = useState<'members_table' | 'submissions'>('members_table');
 
-  // Set body background to clean LIGHT slate #f8fafc on mount
+  // Set body background & check server-side authenticated session on mount
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
-    setIsAdminLoggedIn(isLoggedIn);
+    const checkServerAuth = async () => {
+      try {
+        const res = await fetch('/api/admin/auth', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            setIsAdminLoggedIn(true);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Admin session check error:', err);
+      }
+      setIsAdminLoggedIn(false);
+    };
+
+    checkServerAuth();
 
     document.body.style.backgroundColor = '#f8fafc';
     return () => {
@@ -635,28 +650,45 @@ export default function AdminPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedSessionId, chats]);
 
-  // Login handler
-  const handleLogin = (e: React.FormEvent) => {
+  // Server-side Login handler
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      if (email === 'admin@soobin.com' && password === 'adminsoobin123') {
-        setIsAdminLoggedIn(true);
-        localStorage.setItem('soobin_admin_logged_in', 'true');
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Email atau password administrator salah!');
       } else {
-        setError('Email atau password admin salah!');
+        setIsAdminLoggedIn(true);
+        localStorage.setItem('soobin_admin_active', 'true');
       }
+    } catch (err: any) {
+      setError(err.message || 'Gagal terhubung ke server autentikasi');
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
-  // Logout handler
-  const handleLogout = () => {
-    setIsAdminLoggedIn(false);
-    localStorage.removeItem('soobin_admin_logged_in');
-    localStorage.setItem('soobin_admin_active', 'false');
+  // Server-side Logout handler
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+    } catch (e) {
+      console.error('Logout error:', e);
+    } finally {
+      setIsAdminLoggedIn(false);
+      localStorage.removeItem('soobin_admin_logged_in');
+      localStorage.setItem('soobin_admin_active', 'false');
+    }
   };
 
   // Reset all chats in Supabase & state
