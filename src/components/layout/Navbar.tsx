@@ -205,13 +205,13 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.96 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute left-1/2 -translate-x-1/2 mt-1.5 w-72 bg-white rounded-2xl border border-slate-200 shadow-xl p-2.5 z-50"
+                    className="absolute left-1/2 -translate-x-1/2 mt-2 w-88 sm:w-96 bg-white rounded-2xl border border-slate-200 shadow-2xl p-2.5 z-50"
                   >
-                    <div className="px-2.5 py-1.5 mb-1 border-b border-slate-100 flex items-center justify-between">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    <div className="px-3 py-2 mb-1.5 border-b border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
                         Academic Mini Tools
                       </span>
-                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                         100% Free
                       </span>
                     </div>
@@ -226,23 +226,27 @@ export default function Navbar() {
                             key={tool.href}
                             href={tool.href}
                             onClick={() => setShowToolsDropdown(false)}
-                            className={`flex items-start gap-2.5 p-2.5 rounded-xl transition-all ${
+                            className={`group flex items-start gap-3 p-2.5 rounded-xl transition-all ${
                               isCurrent
-                                ? 'bg-primary-50 text-primary-900'
-                                : 'hover:bg-slate-50 text-slate-800'
+                                ? 'bg-primary-50 text-primary-950 border border-primary-200/80 shadow-2xs'
+                                : 'hover:bg-slate-50 text-slate-800 border border-transparent hover:border-slate-200/60'
                             }`}
                           >
-                            <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 mt-0.5">
-                              <Icon className="w-3.5 h-3.5" />
+                            <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-primary-100 text-slate-700 group-hover:text-primary-800 flex items-center justify-center shrink-0 mt-0.5 border border-slate-200 transition-colors">
+                              <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold text-slate-900">{tool.label}</span>
-                                <span className="text-[9px] font-extrabold text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-bold text-slate-900 group-hover:text-primary-800 transition-colors leading-snug">
+                                  {tool.label}
+                                </span>
+                                <span className="text-[9px] font-black text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 shrink-0 whitespace-nowrap">
                                   {tool.badge}
                                 </span>
                               </div>
-                              <p className="text-[10px] text-slate-500 truncate mt-0.5">{tool.desc}</p>
+                              <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 leading-tight">
+                                {tool.desc}
+                              </p>
                             </div>
                           </Link>
                         );
