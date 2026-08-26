@@ -217,16 +217,26 @@ export default function MemberPage() {
         throw new Error(errMsg);
       }
 
+      const resData = await res.json();
+      
+      // Update local state immediately so UI transitions to "Menunggu Verifikasi" instantly
+      if (resData && resData.redeem) {
+        setRedeems((prev) => [resData.redeem, ...prev.filter((r) => r.id !== resData.redeem.id)]);
+      }
+
       // Reset form
       setRedeemProofImage('');
       setRedeemAgreed(false);
+      setRedeemSubmitError('');
       
-      // Refresh list immediately
+      // Refresh list from server
       try {
         const refreshed = await fetch(`/api/redeems?email=${encodeURIComponent(user.email)}`, { cache: 'no-store' });
         if (refreshed.ok) {
           const data = await refreshed.json();
-          if (Array.isArray(data)) setRedeems(data);
+          if (Array.isArray(data) && data.length > 0) {
+            setRedeems(data);
+          }
         }
       } catch (refErr) {
         console.warn('Failed to refresh redeems:', refErr);
