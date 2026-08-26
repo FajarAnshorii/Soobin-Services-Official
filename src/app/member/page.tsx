@@ -229,6 +229,9 @@ export default function MemberPage() {
       setRedeemAgreed(false);
       setRedeemSubmitError('');
       
+      alert('✅ Pengajuan klaim Free Turnitin berhasil dikirim! Admin akan segera memeriksa bukti share Anda.');
+      window.scrollTo({ top: 150, behavior: 'smooth' });
+      
       // Refresh list from server
       try {
         const refreshed = await fetch(`/api/redeems?email=${encodeURIComponent(user.email)}`, { cache: 'no-store' });
@@ -901,7 +904,6 @@ Mohon segera diproses kak, terima kasih!`;
                               <input
                                 type="file"
                                 accept="image/*"
-                                required
                                 onChange={handleRedeemFileChange}
                                 className="hidden"
                               />
