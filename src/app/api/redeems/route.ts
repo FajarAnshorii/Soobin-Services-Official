@@ -186,7 +186,7 @@ export async function PATCH(request: Request) {
     const approvedAt = isApprove ? new Date().toISOString() : null;
     const adminNote = isApprove ? null : reason || 'Bukti status/story tidak memenuhi syarat publik (privat/dikecualikan).';
 
-    // 1. Update in dedicated 'turnitin_redeems' table if exists
+    // 1. Update in dedicated 'turnitin_redeems' table if exists (automatically purge proof_image to free storage)
     try {
       await supabaseAdmin
         .from('turnitin_redeems')
@@ -195,11 +195,12 @@ export async function PATCH(request: Request) {
           voucher_code: voucherCode,
           approved_at: approvedAt,
           admin_note: adminNote,
+          proof_image: null,
         })
         .eq('id', id);
     } catch (e) {}
 
-    // 2. Update in Supabase 'orders' table
+    // 2. Update in Supabase 'orders' table (automatically purge proof_image to free storage)
     const { data: existingOrder } = await supabaseAdmin.from('orders').select('*').eq('id', id).single();
     const currentCustom = (existingOrder && existingOrder.custom_fields) || {};
 
@@ -215,6 +216,7 @@ export async function PATCH(request: Request) {
       .update({
         payment_status: newStatus,
         custom_fields: updatedCustom,
+        proof_image: null,
       })
       .eq('id', id);
 

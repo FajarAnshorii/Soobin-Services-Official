@@ -2864,20 +2864,28 @@ export default function AdminPage() {
                             >
                               <div className="flex items-start gap-3">
                                 {/* Thumbnail */}
-                                <button
-                                  onClick={() => setRedeemZoomImage(r.proofImage)}
-                                  className="w-16 h-20 rounded-lg overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer"
-                                  title="Klik untuk memperbesar screenshot bukti"
-                                >
-                                  <img
-                                    src={r.proofImage}
-                                    alt="Bukti Share"
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                  />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
-                                    <Eye className="w-4 h-4" />
+                                {r.proofImage ? (
+                                  <button
+                                    onClick={() => setRedeemZoomImage(r.proofImage)}
+                                    className="w-16 h-20 rounded-lg overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer shadow-xs"
+                                    title="Klik untuk memperbesar screenshot bukti"
+                                  >
+                                    <img
+                                      src={r.proofImage}
+                                      alt="Bukti Share"
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                      <Eye className="w-4 h-4" />
+                                    </div>
+                                  </button>
+                                ) : (
+                                  <div className="w-16 h-20 rounded-lg border border-dashed border-slate-300 bg-slate-100 flex flex-col items-center justify-center text-center p-1 shrink-0 text-slate-400">
+                                    <CheckCircle className="w-4 h-4 text-emerald-600 mb-0.5" />
+                                    <span className="text-[8px] font-bold text-slate-600 leading-tight">Foto Dihapus</span>
+                                    <span className="text-[7px] text-slate-400">(Hemat DB)</span>
                                   </div>
-                                </button>
+                                )}
 
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2 flex-wrap">
@@ -3877,20 +3885,28 @@ export default function AdminPage() {
                                 className="bg-slate-50 border border-slate-300 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center"
                               >
                                 <div className="flex items-start gap-3.5">
-                                  <button
-                                    onClick={() => setRedeemZoomImage(sub.proofImage)}
-                                    className="w-20 h-24 rounded-xl overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer shadow-xs"
-                                    title="Klik untuk melihat foto bukti ukuran penuh"
-                                  >
-                                    <img
-                                      src={sub.proofImage}
-                                      alt="Bukti Share"
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                    />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
-                                      <Eye className="w-5 h-5" />
+                                  {sub.proofImage ? (
+                                    <button
+                                      onClick={() => setRedeemZoomImage(sub.proofImage)}
+                                      className="w-20 h-24 rounded-xl overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer shadow-xs"
+                                      title="Klik untuk melihat foto bukti ukuran penuh"
+                                    >
+                                      <img
+                                        src={sub.proofImage}
+                                        alt="Bukti Share"
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                      />
+                                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                        <Eye className="w-5 h-5" />
+                                      </div>
+                                    </button>
+                                  ) : (
+                                    <div className="w-20 h-24 rounded-xl border border-dashed border-slate-300 bg-slate-100 flex flex-col items-center justify-center text-center p-1.5 shrink-0 text-slate-400 shadow-xs">
+                                      <CheckCircle className="w-6 h-6 text-emerald-500 mb-1" />
+                                      <span className="text-[9px] font-black text-slate-600 leading-tight">Diverifikasi & Dihapus</span>
+                                      <span className="text-[8px] text-slate-400 mt-0.5">(Hemat Memori)</span>
                                     </div>
-                                  </button>
+                                  )}
 
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 flex-wrap">
