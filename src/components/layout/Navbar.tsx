@@ -41,28 +41,24 @@ const toolLinks = [
     label: 'Daftar Pustaka Generator',
     desc: 'Format sitasi APA, MLA, IEEE, Harvard & auto lookup DOI',
     icon: BookMarked,
-    badge: 'Populer',
   },
   {
     href: '/tools/kalkulator-sampel',
     label: 'Kalkulator Sampel (Slovin & Lemeshow)',
     desc: 'Hitung sampel minimal & uraian rumus Bab 3 skripsi',
     icon: Calculator,
-    badge: 'Baru',
   },
   {
     href: '/tools/kalkulator-ipk',
     label: 'Kalkulator IPK',
     desc: 'Hitung IPS & IPK sesuai skala dan bobot nilai kampus',
     icon: GraduationCap,
-    badge: 'Baru',
   },
   {
     href: '/tools/word-counter',
     label: 'Hitung Kata & Waktu Baca',
     desc: 'Cek total kata, karakter, dan estimasi waktu membaca',
     icon: FileText,
-    badge: 'Mini Tool',
   },
 ];
 
@@ -236,14 +232,9 @@ export default function Navbar() {
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="text-xs font-bold text-slate-900 group-hover:text-primary-800 transition-colors leading-snug">
-                                  {tool.label}
-                                </span>
-                                <span className="text-[9px] font-black text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 shrink-0 whitespace-nowrap">
-                                  {tool.badge}
-                                </span>
-                              </div>
+                              <span className="text-xs font-bold text-slate-900 group-hover:text-primary-800 transition-colors leading-snug block">
+                                {tool.label}
+                              </span>
                               <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 leading-tight">
                                 {tool.desc}
                               </p>
@@ -467,9 +458,6 @@ export default function Navbar() {
                           </div>
                           <span className="text-xs font-semibold truncate">{tool.label}</span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">
-                          {tool.badge}
-                        </span>
                       </Link>
                     );
                   })}
