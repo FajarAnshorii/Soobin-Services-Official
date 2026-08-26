@@ -30,6 +30,7 @@ import {
   Copy,
   Check
 } from 'lucide-react';
+import { compressChatImage } from '@/lib/imageCompressor';
 
 export default function MemberPage() {
   const { user, loading } = useAuth();
@@ -148,48 +149,27 @@ export default function MemberPage() {
     return () => clearInterval(timerInterval);
   }, [latestApproved, isCooldownActive]);
 
-  // Handle Proof Image File Upload with compression to base64
-  const handleRedeemFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle Proof Image File Upload with lightweight compression to base64
+  const handleRedeemFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 8 * 1024 * 1024) {
-      alert('Ukuran file terlalu besar! Maksimal 8 MB.');
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Ukuran file terlalu besar! Maksimal 15 MB.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new (window as any).Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200;
-        const MAX_HEIGHT = 1600;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        setRedeemProofImage(dataUrl);
+    try {
+      const compressed = await compressChatImage(file, 900, 1200, 0.75);
+      setRedeemProofImage(compressed.dataUrl);
+    } catch (err) {
+      console.error('Image compression failed, fallback to reader:', err);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setRedeemProofImage(event.target?.result as string);
       };
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
   };
 
   // Submit Redeem Claim
@@ -226,8 +206,15 @@ export default function MemberPage() {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Gagal mengirim pengajuan klaim');
+        let errMsg = 'Gagal mengirim pengajuan klaim';
+        try {
+          const errData = await res.json();
+          errMsg = errData.error || errMsg;
+        } catch {
+          const text = await res.text();
+          errMsg = text || errMsg;
+        }
+        throw new Error(errMsg);
       }
 
       // Reset form
@@ -235,10 +222,14 @@ export default function MemberPage() {
       setRedeemAgreed(false);
       
       // Refresh list immediately
-      const refreshed = await fetch(`/api/redeems?email=${encodeURIComponent(user.email)}`, { cache: 'no-store' });
-      if (refreshed.ok) {
-        const data = await refreshed.json();
-        if (Array.isArray(data)) setRedeems(data);
+      try {
+        const refreshed = await fetch(`/api/redeems?email=${encodeURIComponent(user.email)}`, { cache: 'no-store' });
+        if (refreshed.ok) {
+          const data = await refreshed.json();
+          if (Array.isArray(data)) setRedeems(data);
+        }
+      } catch (refErr) {
+        console.warn('Failed to refresh redeems:', refErr);
       }
     } catch (err: any) {
       setRedeemSubmitError(err.message || 'Terjadi kesalahan saat mengirim pengajuan');
