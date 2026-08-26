@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { ArrowLeft, Mail, Lock, User as UserIcon, GraduationCap, School, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User as UserIcon, GraduationCap, School, AlertCircle, CheckCircle, ShieldCheck } from 'lucide-react';
 import UniversityCombobox from '@/components/UniversityCombobox';
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LdkeN8sAAAAAECiWedvyA2TQfTtvD6iEg19fo4I';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -26,6 +29,8 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Form states
   const [email, setEmail] = useState('');
@@ -42,7 +47,24 @@ export default function AuthPage() {
 
   const handleTabChange = (tab: 'login' | 'register' | 'forgot') => {
     clearMessages();
+    setCaptchaToken('');
+    recaptchaRef.current?.reset();
     setActiveTab(tab);
+  };
+
+  // Helper to verify captcha token via server API
+  const verifyCaptcha = async (token: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/auth/verify-captcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      return !!data.success;
+    } catch {
+      return false;
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -53,8 +75,20 @@ export default function AuthPage() {
       addToast('Harap isi semua kolom', 'warning');
       return;
     }
+
+    if (!captchaToken) {
+      setError('Harap centang verifikasi "Saya bukan robot" terlebih dahulu!');
+      addToast('Harap centang verifikasi reCAPTCHA!', 'warning');
+      return;
+    }
+
     setLoading(true);
     try {
+      const isCaptchaValid = await verifyCaptcha(captchaToken);
+      if (!isCaptchaValid) {
+        throw new Error('Verifikasi reCAPTCHA tidak valid atau telah kedaluwarsa. Silakan centang ulang.');
+      }
+
       await login(email, password);
       addToast('Login berhasil! Selamat datang kembali.', 'success');
       setSuccess('Login berhasil! Mengalihkan...');
@@ -65,6 +99,8 @@ export default function AuthPage() {
       const errMsg = err.message || 'Login gagal, periksa email dan password Anda';
       setError(errMsg);
       addToast(errMsg, 'error');
+      setCaptchaToken('');
+      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -86,8 +122,19 @@ export default function AuthPage() {
       return;
     }
 
+    if (!captchaToken) {
+      setError('Harap centang verifikasi "Saya bukan robot" terlebih dahulu!');
+      addToast('Harap centang verifikasi reCAPTCHA!', 'warning');
+      return;
+    }
+
     setLoading(true);
     try {
+      const isCaptchaValid = await verifyCaptcha(captchaToken);
+      if (!isCaptchaValid) {
+        throw new Error('Verifikasi reCAPTCHA tidak valid atau telah kedaluwarsa. Silakan centang ulang.');
+      }
+
       await register({ email, password, name, university, prodi });
       addToast('Registrasi berhasil! Selamat bergabung menjadi member.', 'success');
       setSuccess('Registrasi berhasil! Selamat bergabung...');
@@ -98,6 +145,8 @@ export default function AuthPage() {
       const errMsg = err.message || 'Registrasi gagal';
       setError(errMsg);
       addToast(errMsg, 'error');
+      setCaptchaToken('');
+      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -125,8 +174,19 @@ export default function AuthPage() {
       return;
     }
 
+    if (!captchaToken) {
+      setError('Harap centang verifikasi "Saya bukan robot" terlebih dahulu!');
+      addToast('Harap centang verifikasi reCAPTCHA!', 'warning');
+      return;
+    }
+
     setLoading(true);
     try {
+      const isCaptchaValid = await verifyCaptcha(captchaToken);
+      if (!isCaptchaValid) {
+        throw new Error('Verifikasi reCAPTCHA tidak valid atau telah kedaluwarsa. Silakan centang ulang.');
+      }
+
       await forgotPassword(email, password);
       addToast('Password berhasil diubah! Silakan login kembali.', 'success');
       setSuccess('Password berhasil diubah! Silakan login kembali.');
@@ -134,11 +194,15 @@ export default function AuthPage() {
         setActiveTab('login');
         setPassword('');
         setConfirmPassword('');
+        setCaptchaToken('');
+        recaptchaRef.current?.reset();
       }, 2000);
     } catch (err: any) {
       const errMsg = err.message || 'Gagal menyetel ulang password';
       setError(errMsg);
       addToast(errMsg, 'error');
+      setCaptchaToken('');
+      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -291,6 +355,17 @@ export default function AuthPage() {
                 </div>
               </div>
 
+              {/* Google reCAPTCHA v2 */}
+              <div className="flex justify-center my-3 overflow-hidden rounded-xl bg-black/25 p-2 border border-white/10">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onChange={(token) => setCaptchaToken(token || '')}
+                  onExpired={() => setCaptchaToken('')}
+                />
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
@@ -376,6 +451,17 @@ export default function AuthPage() {
                 </div>
               </div>
 
+              {/* Google reCAPTCHA v2 */}
+              <div className="flex justify-center my-3 overflow-hidden rounded-xl bg-black/25 p-2 border border-white/10">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onChange={(token) => setCaptchaToken(token || '')}
+                  onExpired={() => setCaptchaToken('')}
+                />
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
@@ -431,6 +517,17 @@ export default function AuthPage() {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Google reCAPTCHA v2 */}
+              <div className="flex justify-center my-3 overflow-hidden rounded-xl bg-black/25 p-2 border border-white/10">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onChange={(token) => setCaptchaToken(token || '')}
+                  onExpired={() => setCaptchaToken('')}
+                />
               </div>
 
               <div className="flex gap-3 pt-2">
