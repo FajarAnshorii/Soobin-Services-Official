@@ -118,6 +118,10 @@ export default function KalkulatorSampelPage() {
     if (activeFormula === 'slovin') {
       if (!slovinResult.isValid) return 'Masukkan data populasi dan margin of error yang valid untuk melihat uraian Bab 3.';
       const percentageE = (slovinResult.e * 100).toFixed(0);
+      const eSquared = parseFloat(Math.pow(slovinResult.e, 2).toFixed(6));
+      const nTimesESquared = parseFloat((slovinResult.N * eSquared).toFixed(4));
+      const denominator = parseFloat((1 + nTimesESquared).toFixed(4));
+
       return `Penentuan jumlah sampel dalam penelitian ini dihitung menggunakan Rumus Slovin dengan rumus sebagai berikut:
 
 n = N / (1 + N(e)²)
@@ -129,9 +133,9 @@ e = Batas toleransi kesalahan / margin of error (${percentageE}% atau ${slovinRe
 
 Perhitungan:
 n = ${slovinResult.N.toLocaleString('id-ID')} / (1 + ${slovinResult.N.toLocaleString('id-ID')}(${slovinResult.e})²)
-n = ${slovinResult.N.toLocaleString('id-ID')} / (1 + ${slovinResult.N.toLocaleString('id-ID')}(${Math.pow(slovinResult.e, 2)}))
-n = ${slovinResult.N.toLocaleString('id-ID')} / (1 + ${(slovinResult.N * Math.pow(slovinResult.e, 2)).toFixed(4)})
-n = ${slovinResult.N.toLocaleString('id-ID')} / ${(1 + slovinResult.N * Math.pow(slovinResult.e, 2)).toFixed(4)}
+n = ${slovinResult.N.toLocaleString('id-ID')} / (1 + ${slovinResult.N.toLocaleString('id-ID')}(${eSquared}))
+n = ${slovinResult.N.toLocaleString('id-ID')} / (1 + ${nTimesESquared})
+n = ${slovinResult.N.toLocaleString('id-ID')} / ${denominator}
 n = ${slovinResult.sampleExact.toFixed(4)}
 
 Berdasarkan perhitungan di atas, diperoleh jumlah sampel sebesar ${slovinResult.sampleExact.toFixed(2)}. Untuk menghindari kekurangan data dan menjaga presisi penelitian, maka jumlah sampel dibulatkan ke atas menjadi sebanyak ${slovinResult.sampleCeil} responden.`;
@@ -139,6 +143,11 @@ Berdasarkan perhitungan di atas, diperoleh jumlah sampel sebesar ${slovinResult.
       if (!lemeshowResult.isValid) return 'Masukkan parameter tingkat kepercayaan dan presisi yang valid untuk melihat uraian Bab 3.';
       const percentageD = (lemeshowResult.d * 100).toFixed(0);
       const confLevel = zScoreType === '99' ? '99%' : '95%';
+      const zSquared = parseFloat(Math.pow(lemeshowResult.Z, 2).toFixed(4));
+      const pQ = parseFloat((lemeshowResult.P * (1 - lemeshowResult.P)).toFixed(4));
+      const numerator = parseFloat((zSquared * pQ).toFixed(4));
+      const dSquared = parseFloat(Math.pow(lemeshowResult.d, 2).toFixed(6));
+
       return `Karena populasi dalam penelitian ini tidak diketahui jumlah pastinya (populasi tidak terhingga / unknown population), maka penentuan jumlah sampel dihitung menggunakan Rumus Lemeshow:
 
 n = (Z² × P(1 - P)) / d²
@@ -151,8 +160,8 @@ d = Tingkat presisi mutlak / margin of error (${percentageD}% atau ${lemeshowRes
 
 Perhitungan:
 n = (${lemeshowResult.Z}² × ${lemeshowResult.P}(1 - ${lemeshowResult.P})) / (${lemeshowResult.d})²
-n = (${Math.pow(lemeshowResult.Z, 2).toFixed(4)} × ${(lemeshowResult.P * (1 - lemeshowResult.P)).toFixed(4)}) / ${Math.pow(lemeshowResult.d, 4)}
-n = ${(Math.pow(lemeshowResult.Z, 2) * lemeshowResult.P * (1 - lemeshowResult.P)).toFixed(4)} / ${Math.pow(lemeshowResult.d, 2)}
+n = (${zSquared} × ${pQ}) / ${dSquared}
+n = ${numerator} / ${dSquared}
 n = ${lemeshowResult.sampleExact.toFixed(4)}
 
 Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal sebesar ${lemeshowResult.sampleExact.toFixed(2)} yang dibulatkan menjadi ${lemeshowResult.sampleCeil} responden.`;
