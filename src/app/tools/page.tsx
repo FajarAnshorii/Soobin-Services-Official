@@ -54,16 +54,16 @@ export default function ToolsHubPage() {
     <main className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <section className="pt-28 sm:pt-36 pb-10 sm:pb-16 bg-white border-b border-slate-200">
+      <section className="pt-24 sm:pt-32 pb-6 sm:pb-10 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3">
             <BookMarked className="w-3.5 h-3.5 text-primary-700" />
             <span>Academic Tools Hub</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kumpulan Mini Tools Akademik Gratis
           </h1>
-          <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Berbagai alat bantu praktis gratis yang dirancang khusus untuk mempercepat penulisan tugas, makalah, jurnal, dan skripsi mahasiswa Indonesia.
           </p>
         </div>

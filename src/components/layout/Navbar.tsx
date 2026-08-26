@@ -419,25 +419,40 @@ export default function Navbar() {
                 className="flex items-center justify-between w-full font-bold text-sm text-slate-800 py-1"
               >
                 <div className="flex items-center gap-2">
-                  <span>Tools (Gratis)</span>
+                  <span>Tools Akademik Gratis</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    Free
+                  </span>
                 </div>
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileToolsOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileToolsOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {mobileToolsOpen && (
-                <div className="pl-6 pt-2 space-y-2">
-                  {toolLinks.map((tool) => (
-                    <Link
-                      key={tool.href}
-                      href={tool.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`block py-1 text-xs font-semibold ${
-                        pathname === tool.href ? 'text-primary-800' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      {tool.label}
-                    </Link>
-                  ))}
+                <div className="pt-2 pb-1 space-y-1.5">
+                  {toolLinks.map((tool) => {
+                    const Icon = tool.icon;
+                    const isCurrent = pathname === tool.href;
+                    return (
+                      <Link
+                        key={tool.href}
+                        href={tool.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center justify-between p-2 rounded-xl transition-all ${
+                          isCurrent ? 'bg-primary-50 text-primary-900 font-bold' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 shrink-0">
+                            <Icon className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="text-xs font-semibold truncate">{tool.label}</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">
+                          {tool.badge}
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>

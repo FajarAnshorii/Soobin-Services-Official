@@ -180,41 +180,41 @@ export default function KalkulatorIPKPage() {
       <Navbar />
 
       {/* Header Section */}
-      <section className="pt-28 sm:pt-36 pb-8 bg-white border-b border-slate-200">
+      <section className="pt-24 sm:pt-32 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
             <GraduationCap className="w-3.5 h-3.5 text-primary-700" />
             <span>Mini Tool Akademik</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kalkulator IPK
           </h1>
-          <p className="mt-3 text-xs sm:text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Hitung Indeks Prestasi Semester (IPS) dan IPK kumulatif secara akurat dengan pengaturan batas skala maksimal dan sistem bobot nilai huruf sesuai kampus Anda.
           </p>
         </div>
       </section>
 
       {/* Main Workspace */}
-      <section className="py-8 sm:py-12 flex-1">
+      <section className="py-6 sm:py-12 flex-1">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
           {/* Settings Bar: Skala IPK Maksimal & Bobot Huruf Custom */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
                 <Settings2 className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-900">Pengaturan Sistem Nilai Kampus</h4>
-                <p className="text-[11px] text-slate-500">Sesuaikan batas skala maksimal dan bobot huruf agar perhitungan 100% presisi.</p>
+                <p className="text-[11px] text-slate-500">Sesuaikan batas skala maksimal dan bobot huruf agar presisi.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
               {/* Max Scale Input */}
-              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5">
-                <span className="text-[11px] font-bold text-slate-600">Skala Maks:</span>
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5">
+                <span className="text-[11px] font-bold text-slate-600">Skala:</span>
                 <input
                   type="number"
                   step="0.1"
@@ -222,7 +222,7 @@ export default function KalkulatorIPKPage() {
                   max="10"
                   value={customMaxScale}
                   onChange={(e) => handleMaxScaleChange(e.target.value)}
-                  className="w-14 bg-white border border-slate-300 text-center rounded text-xs font-extrabold text-slate-900 py-0.5 outline-none"
+                  className="w-12 bg-white border border-slate-300 text-center rounded text-xs font-extrabold text-slate-900 py-0.5 outline-none"
                 />
               </div>
 
@@ -230,21 +230,21 @@ export default function KalkulatorIPKPage() {
               <button
                 type="button"
                 onClick={() => setShowGradeSettings(!showGradeSettings)}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <Sliders className="w-3.5 h-3.5" />
-                <span>Atur Bobot Huruf ({gradeScales.length})</span>
+                <span>Atur Bobot Huruf</span>
               </button>
             </div>
           </div>
 
           {/* Collapsible Grade Scale Configuration */}
           {showGradeSettings && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">Daftar Bobot Nilai Huruf Kampus</h4>
-                  <p className="text-[10px] text-slate-500">Ubah angka bobot di bawah ini jika kampus Anda memiliki standar berbeda (contoh: A = 4.0, B+ = 3.5, dst).</p>
+                  <p className="text-[10px] text-slate-500">Ubah angka bobot jika kampus Anda memiliki standar berbeda.</p>
                 </div>
                 <button
                   type="button"
@@ -256,10 +256,10 @@ export default function KalkulatorIPKPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
                 {gradeScales.map((item) => (
-                  <div key={item.letter} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
-                    <span className="text-xs font-extrabold text-slate-900 w-8">{item.letter}</span>
+                  <div key={item.letter} className="p-2 sm:p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-1">
+                    <span className="text-xs font-extrabold text-slate-900 w-7">{item.letter}</span>
                     <div className="flex items-center gap-1">
                       <span className="text-[10px] font-semibold text-slate-400">=</span>
                       <input
@@ -269,7 +269,7 @@ export default function KalkulatorIPKPage() {
                         max={maxScale}
                         value={item.weight}
                         onChange={(e) => handleUpdateGradeWeight(item.letter, parseFloat(e.target.value) || 0)}
-                        className="w-14 h-7 px-1 bg-white border border-slate-300 rounded text-center text-xs font-bold text-slate-900 outline-none"
+                        className="w-12 sm:w-14 h-7 px-1 bg-white border border-slate-300 rounded text-center text-xs font-bold text-slate-900 outline-none"
                       />
                     </div>
                   </div>
@@ -279,10 +279,10 @@ export default function KalkulatorIPKPage() {
           )}
 
           {/* CALCULATOR WORKSPACE */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             
             {/* Left Column: Course Table Form (7 Cols) */}
-            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
+            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
@@ -290,7 +290,7 @@ export default function KalkulatorIPKPage() {
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-slate-900">Daftar Mata Kuliah</h3>
-                    <p className="text-[10px] text-slate-500">Masukkan nama matkul, bobot SKS, dan nilai huruf yang didapat.</p>
+                    <p className="text-[10px] text-slate-500">Masukkan nama matkul, SKS, dan nilai huruf.</p>
                   </div>
                 </div>
 
@@ -313,22 +313,23 @@ export default function KalkulatorIPKPage() {
                 </div>
               </div>
 
-              {/* Table Header */}
-              <div className="grid grid-cols-12 gap-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 pb-2 px-2 border-b border-slate-100">
-                <div className="col-span-6 sm:col-span-7">Nama Mata Kuliah</div>
-                <div className="col-span-3 sm:col-span-2 text-center">SKS</div>
-                <div className="col-span-2 sm:col-span-2 text-center">Nilai</div>
+              {/* Table Header (Visible on Desktop) */}
+              <div className="hidden sm:grid grid-cols-12 gap-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 pb-2 px-2 border-b border-slate-100">
+                <div className="col-span-7">Nama Mata Kuliah</div>
+                <div className="col-span-2 text-center">SKS</div>
+                <div className="col-span-2 text-center">Nilai</div>
                 <div className="col-span-1 text-right">Aksi</div>
               </div>
 
-              {/* Course List */}
-              <div className="space-y-2 mt-2 max-h-96 overflow-y-auto pr-1">
+              {/* Course List (Responsive Desktop & Mobile) */}
+              <div className="space-y-2.5 sm:space-y-2 mt-2 max-h-[420px] overflow-y-auto pr-1">
                 {courses.map((course, idx) => (
                   <div
                     key={course.id}
-                    className="grid grid-cols-12 gap-2 items-center p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
+                    className="p-3 sm:p-2 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:items-center text-xs"
                   >
-                    <div className="col-span-6 sm:col-span-7">
+                    {/* Course Name + Delete (Mobile Row 1 / Desktop Col 7) */}
+                    <div className="sm:col-span-7 flex items-center justify-between gap-2">
                       <input
                         type="text"
                         value={course.name}
@@ -336,34 +337,52 @@ export default function KalkulatorIPKPage() {
                         placeholder={`Mata Kuliah ${idx + 1}`}
                         className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none"
                       />
-                    </div>
-                    <div className="col-span-3 sm:col-span-2">
-                      <select
-                        value={course.sks}
-                        onChange={(e) => handleUpdateCourse(course.id, 'sks', parseInt(e.target.value) || 1)}
-                        className="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-900 outline-none"
+                      <button
+                        type="button"
+                        disabled={courses.length <= 1}
+                        onClick={() => handleRemoveCourse(course.id)}
+                        className="sm:hidden text-slate-400 hover:text-red-600 disabled:opacity-30 p-1 cursor-pointer shrink-0"
+                        title="Hapus Mata Kuliah"
                       >
-                        {[1, 2, 3, 4, 5, 6].map((s) => (
-                          <option key={s} value={s}>
-                            {s} SKS
-                          </option>
-                        ))}
-                      </select>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="col-span-2 sm:col-span-2">
-                      <select
-                        value={course.gradeLetter}
-                        onChange={(e) => handleUpdateCourse(course.id, 'gradeLetter', e.target.value)}
-                        className="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-900 outline-none"
-                      >
-                        {gradeScales.map((g) => (
-                          <option key={g.letter} value={g.letter}>
-                            {g.letter} ({g.weight})
-                          </option>
-                        ))}
-                      </select>
+
+                    {/* SKS & Grade Selects (Mobile Row 2 / Desktop Col 2+2) */}
+                    <div className="grid grid-cols-2 sm:contents gap-2">
+                      <div className="sm:col-span-2">
+                        <span className="sm:hidden text-[10px] font-bold text-slate-400 block mb-0.5">SKS:</span>
+                        <select
+                          value={course.sks}
+                          onChange={(e) => handleUpdateCourse(course.id, 'sks', parseInt(e.target.value) || 1)}
+                          className="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-900 outline-none"
+                        >
+                          {[1, 2, 3, 4, 5, 6].map((s) => (
+                            <option key={s} value={s}>
+                              {s} SKS
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <span className="sm:hidden text-[10px] font-bold text-slate-400 block mb-0.5">Nilai:</span>
+                        <select
+                          value={course.gradeLetter}
+                          onChange={(e) => handleUpdateCourse(course.id, 'gradeLetter', e.target.value)}
+                          className="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-900 outline-none"
+                        >
+                          {gradeScales.map((g) => (
+                            <option key={g.letter} value={g.letter}>
+                              {g.letter} ({g.weight})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <div className="col-span-1 text-right">
+
+                    {/* Desktop Delete button */}
+                    <div className="hidden sm:block sm:col-span-1 text-right">
                       <button
                         type="button"
                         disabled={courses.length <= 1}

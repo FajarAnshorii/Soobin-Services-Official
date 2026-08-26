@@ -179,25 +179,25 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
       <Navbar />
 
       {/* Header Section */}
-      <section className="pt-28 sm:pt-36 pb-8 bg-white border-b border-slate-200">
+      <section className="pt-24 sm:pt-32 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
             <Calculator className="w-3.5 h-3.5 text-primary-700" />
             <span>Mini Tool Metodologi Penelitian</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kalkulator Sampel Rumus Slovin & Lemeshow
           </h1>
-          <p className="mt-3 text-xs sm:text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Hitung jumlah sampel minimal skripsi dan karya ilmiah secara otomatis berdasarkan ukuran populasi dan tingkat margin of error, lengkap dengan uraian rumus langkah demi langkah untuk Bab 3.
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Hitung jumlah sampel minimal skripsi secara otomatis berdasarkan ukuran populasi dan tingkat margin error, lengkap dengan uraian rumus langkah demi langkah untuk Bab 3.
           </p>
 
           {/* Formula Selector Tabs */}
-          <div className="mt-8 inline-flex p-1.5 bg-slate-100 border border-slate-300/80 rounded-2xl max-w-md w-full">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 p-1.5 bg-slate-100 border border-slate-300/80 rounded-2xl max-w-lg w-full mx-auto gap-1.5">
             <button
               type="button"
               onClick={() => setActiveFormula('slovin')}
-              className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeFormula === 'slovin'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -209,7 +209,7 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
             <button
               type="button"
               onClick={() => setActiveFormula('lemeshow')}
-              className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeFormula === 'lemeshow'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'

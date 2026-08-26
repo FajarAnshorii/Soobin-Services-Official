@@ -264,42 +264,42 @@ export default function DaftarPustakaGeneratorPage() {
       <Navbar />
 
       {/* Header Section */}
-      <section className="pt-28 sm:pt-36 pb-8 sm:pb-12 bg-white border-b border-slate-200">
+      <section className="pt-24 sm:pt-32 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3">
             <BookMarked className="w-3.5 h-3.5 text-primary-700" />
             <span>Mini Tool Akademik Gratis</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Generator Sitasi & Daftar Pustaka
           </h1>
-          <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Buat format sitasi dan daftar pustaka otomatis berstandar <b>APA, Harvard, IEEE, MLA & Chicago</b>. Mendukung pencarian otomatis via link DOI dan multi-penulis.
           </p>
         </div>
       </section>
 
       {/* Main Tool Content Area */}
-      <section className="py-8 sm:py-12 flex-1">
+      <section className="py-6 sm:py-12 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             
             {/* Left Column: Form & Style Controls (7 Cols) */}
             <div className="lg:col-span-7 space-y-6">
               
               {/* Step 1: Style Selection Tabs */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-xs">
                 <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] flex items-center justify-center font-bold">1</span>
                   Pilih Format Gaya Sitasi
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1.5 sm:gap-2">
                   {styleOptions.map((style) => (
                     <button
                       key={style.id}
                       type="button"
                       onClick={() => setActiveStyle(style.id)}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all cursor-pointer ${
                         activeStyle === style.id
                           ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                           : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
@@ -315,34 +315,34 @@ export default function DaftarPustakaGeneratorPage() {
               </div>
 
               {/* Step 2: Auto Search via DOI or Manual Source Type */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] flex items-center justify-center font-bold">2</span>
                     Cari Otomatis atau Isi Manual
                   </label>
-                  <span className="text-[11px] text-primary-700 font-bold bg-primary-50 px-2 py-0.5 rounded-full">
-                    Auto CrossRef Database
+                  <span className="text-[10px] sm:text-[11px] text-primary-700 font-bold bg-primary-50 px-2 py-0.5 rounded-full">
+                    Auto CrossRef
                   </span>
                 </div>
 
                 {/* Auto DOI / Title Search Bar */}
                 <form onSubmit={handleAutoSearch} className="relative">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <div className="relative flex-1">
                       <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Tempelkan link/nomor DOI lengkap (contoh: 10.15294/jpii.v15i1.21243) atau judul jurnal..."
+                        placeholder="Nomor DOI (contoh: 10.15294/jpii.v15i1.21243) atau judul jurnal..."
                         className="w-full h-11 pl-10 pr-4 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-slate-800 rounded-xl text-xs font-medium text-slate-900 outline-none transition-all"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={isSearching || !searchQuery.trim()}
-                      className="h-11 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer transition-all shadow-xs"
+                      className="h-11 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer transition-all shadow-xs"
                     >
                       {isSearching ? (
                         <>
