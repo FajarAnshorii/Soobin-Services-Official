@@ -51,8 +51,8 @@ const toolLinks = [
   },
   {
     href: '/tools/kalkulator-ipk',
-    label: 'Kalkulator IPK & Simulasi Cumlaude',
-    desc: 'Hitung IPS & simulasi target nilai sisa semester',
+    label: 'Kalkulator IPK',
+    desc: 'Hitung IPS & IPK sesuai skala dan bobot nilai kampus',
     icon: GraduationCap,
     badge: 'Baru',
   },

@@ -33,8 +33,8 @@ const tools = [
   },
   {
     href: '/tools/kalkulator-ipk',
-    title: 'Kalkulator IPK & Simulasi Cumlaude',
-    desc: 'Hitung IPK semester dan simulasikan nilai minimal yang dibutuhkan di sisa SKS untuk meraih predikat Cumlaude sesuai skala kampus.',
+    title: 'Kalkulator IPK',
+    desc: 'Hitung Indeks Prestasi Semester (IPS) dan IPK kumulatif secara akurat sesuai batas skala maksimal dan sistem bobot huruf kampus Anda.',
     badge: 'Kustom Skala',
     icon: GraduationCap,
     color: 'from-blue-900 to-blue-700',
