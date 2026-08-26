@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const runtime = 'edge';
+
 // Helper to generate a unique, cryptographically-secure, tamper-proof random voucher code
 const generateUniqueVoucherCode = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid ambiguous chars (O, 0, 1, I)
