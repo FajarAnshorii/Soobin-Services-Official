@@ -1,15 +1,33 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Fetch from Supabase Orders Table (100% Realtime Cloud Database)
-    const { data: supaOrders, error } = await supabaseAdmin
+    const { searchParams } = new URL(request.url);
+    const filterEmail = searchParams.get('email')?.toLowerCase()?.trim();
+
+    // If fetching all customer orders without email filter, require admin authentication
+    if (!filterEmail) {
+      const auth = await verifyAdminRequest(request);
+      if (!auth.isAdmin) {
+        return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+      }
+    }
+
+    // Build Supabase Query
+    let query = supabaseAdmin
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false });
+
+    if (filterEmail) {
+      query = query.eq('customer_email', filterEmail);
+    }
+
+    const { data: supaOrders, error } = await query;
 
     if (error) {
       console.error('API GET Supabase error:', error);
@@ -51,6 +69,10 @@ export async function POST(request: Request) {
   try {
     const newOrder = await request.json();
 
+    if (!newOrder || !newOrder.customerEmail || !newOrder.serviceName) {
+      return NextResponse.json({ error: 'Data pesanan tidak lengkap' }, { status: 400 });
+    }
+
     // Save directly to Supabase Cloud Database Table
     const { data, error } = await supabaseAdmin.from('orders').upsert({
       id: newOrder.id,
@@ -81,6 +103,12 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    // Updating order status requires admin authentication
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     const { orderId, status } = await request.json();
 
     if (!orderId || !status) {

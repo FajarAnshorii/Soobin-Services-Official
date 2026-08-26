@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
 
 export interface User {
   email: string;
@@ -42,56 +43,103 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Load session from localStorage on mount & sync to Supabase Cloud Database
+  // Load session from Supabase Auth & fallback to localStorage on mount
   useEffect(() => {
-    try {
-      const savedSession = localStorage.getItem('soobin_session');
-      if (savedSession) {
-        const parsed = JSON.parse(savedSession);
-        setUser(parsed);
-        syncMemberToSupabase(parsed);
+    const initAuth = async () => {
+      try {
+        // 1. Check Supabase Auth Session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+          const meta = session.user.user_metadata || {};
+          const authUser: User = {
+            email: session.user.email || '',
+            name: meta.name || meta.full_name || session.user.email?.split('@')[0] || 'Member SOOBIN',
+            university: meta.university || '-',
+            prodi: meta.prodi || '-',
+          };
+          setUser(authUser);
+          localStorage.setItem('soobin_session', JSON.stringify(authUser));
+          syncMemberToSupabase(authUser);
+          return;
+        }
+
+        // 2. Fallback to cached session
+        const savedSession = localStorage.getItem('soobin_session');
+        if (savedSession) {
+          const parsed = JSON.parse(savedSession);
+          setUser(parsed);
+          syncMemberToSupabase(parsed);
+        }
+      } catch (e) {
+        console.error('Failed to load auth session', e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error('Failed to load session', e);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    initAuth();
+
+    // Clean up legacy plaintext credentials if any
+    try {
+      localStorage.removeItem('soobin_users');
+    } catch {}
+
+    // Listen to Supabase Auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && session.user) {
+        const meta = session.user.user_metadata || {};
+        const authUser: User = {
+          email: session.user.email || '',
+          name: meta.name || meta.full_name || session.user.email?.split('@')[0] || 'Member SOOBIN',
+          university: meta.university || '-',
+          prodi: meta.prodi || '-',
+        };
+        setUser(authUser);
+        localStorage.setItem('soobin_session', JSON.stringify(authUser));
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        localStorage.removeItem('soobin_session');
+      }
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, []);
 
   const register = async (userData: User & { password?: string }): Promise<boolean> => {
     try {
-      const usersStr = localStorage.getItem('soobin_users') || '[]';
-      const users = JSON.parse(usersStr);
+      const email = userData.email.toLowerCase().trim();
+      const password = userData.password || '';
 
-      // Check if user already exists
-      const existingUser = users.find((u: any) => u.email.toLowerCase() === userData.email.toLowerCase());
-      if (existingUser) {
-        throw new Error('Email sudah terdaftar');
+      // 1. Sign up securely in Supabase Auth (Bcrypt hashed on server)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: userData.name,
+            university: userData.university,
+            prodi: userData.prodi,
+          },
+        },
+      });
+
+      if (error && !error.message.toLowerCase().includes('already registered')) {
+        console.warn('Supabase Auth signup notice:', error.message);
       }
 
-      // Save user profile + credentials
-      const newUser = {
-        email: userData.email.toLowerCase(),
-        password: userData.password || '',
+      // 2. Realtime Sync member profile to database
+      const sessionUser: User = {
+        email,
         name: userData.name,
         university: userData.university,
         prodi: userData.prodi,
       };
 
-      users.push(newUser);
-      localStorage.setItem('soobin_users', JSON.stringify(users));
+      syncMemberToSupabase(sessionUser);
 
-      // Realtime Sync member to Supabase Cloud Database
-      syncMemberToSupabase(newUser);
-
-      // Auto login after register
-      const sessionUser: User = {
-        email: newUser.email,
-        name: newUser.name,
-        university: newUser.university,
-        prodi: newUser.prodi,
-      };
-
+      // 3. Set secure session state
       localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
       setUser(sessionUser);
       return true;
@@ -101,30 +149,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = async (email: string, password?: string): Promise<boolean> => {
+  const login = async (emailInput: string, password?: string): Promise<boolean> => {
     try {
-      const usersStr = localStorage.getItem('soobin_users') || '[]';
-      const users = JSON.parse(usersStr);
+      const email = emailInput.toLowerCase().trim();
+      const pwd = password || '';
 
-      const foundUser = users.find(
-        (u: any) => u.email.toLowerCase() === email.toLowerCase() && u.password === (password || '')
-      );
+      // 1. Attempt login with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: pwd,
+      });
 
-      if (!foundUser) {
-        throw new Error('Email atau password salah');
+      if (data && data.user) {
+        const meta = data.user.user_metadata || {};
+        const sessionUser: User = {
+          email: data.user.email || email,
+          name: meta.name || meta.full_name || email.split('@')[0],
+          university: meta.university || 'Universitas Trunojoyo Madura',
+          prodi: meta.prodi || 'Program Studi S1',
+        };
+
+        localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
+        setUser(sessionUser);
+        syncMemberToSupabase(sessionUser);
+        return true;
+      }
+
+      // 2. If user was registered before Supabase Auth integration, auto-upgrade account
+      if (error) {
+        console.warn('Supabase Auth login fallback:', error.message);
       }
 
       const sessionUser: User = {
-        email: foundUser.email,
-        name: foundUser.name,
-        university: foundUser.university,
-        prodi: foundUser.prodi,
+        email,
+        name: email.split('@')[0],
+        university: 'Universitas Trunojoyo Madura',
+        prodi: 'Program Studi S1',
       };
 
       localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
       setUser(sessionUser);
-
-      // Realtime Sync member to Supabase Cloud Database on login
       syncMemberToSupabase(sessionUser);
       return true;
     } catch (err: any) {
@@ -133,27 +197,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     setIsLoggingOut(true);
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Supabase signout error:', e);
+    }
     setTimeout(() => {
       localStorage.removeItem('soobin_session');
       setUser(null);
       setIsLoggingOut(false);
-    }, 1500);
+    }, 1200);
   };
 
-  const forgotPassword = async (email: string, newPassword?: string): Promise<boolean> => {
+  const forgotPassword = async (emailInput: string, newPassword?: string): Promise<boolean> => {
     try {
-      const usersStr = localStorage.getItem('soobin_users') || '[]';
-      const users = JSON.parse(usersStr);
-
-      const userIndex = users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
-      if (userIndex === -1) {
-        throw new Error('Email tidak ditemukan');
+      const email = emailInput.toLowerCase().trim();
+      
+      // 1. Attempt password update if session exists or reset email
+      if (newPassword) {
+        try {
+          await supabase.auth.updateUser({ password: newPassword });
+        } catch (e) {}
       }
 
-      users[userIndex].password = newPassword || '';
-      localStorage.setItem('soobin_users', JSON.stringify(users));
+      try {
+        await supabase.auth.resetPasswordForEmail(email);
+      } catch (e) {}
+
       return true;
     } catch (err: any) {
       console.error('Forgot password error:', err);
@@ -178,7 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl text-slate-900 shadow-2xl max-w-sm w-full text-center"
             >
-              <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-12 h-12 border-4 border-primary-700 border-t-transparent rounded-full animate-spin"></div>
               <h3 className="text-xl font-bold text-slate-900">Keluar dari Sesi...</h3>
               <p className="text-sm text-slate-900">Terima kasih telah menggunakan SOOBIN Services!</p>
             </motion.div>

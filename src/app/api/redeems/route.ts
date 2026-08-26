@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
 
@@ -16,7 +17,15 @@ const generateUniqueVoucherCode = (): string => {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const filterEmail = searchParams.get('email')?.toLowerCase();
+    const filterEmail = searchParams.get('email')?.toLowerCase()?.trim();
+
+    // If fetching all redeems without email filter, require admin authentication
+    if (!filterEmail) {
+      const auth = await verifyAdminRequest(request);
+      if (!auth.isAdmin) {
+        return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+      }
+    }
 
     let redeemsList: any[] = [];
 
@@ -44,11 +53,17 @@ export async function GET(request: Request) {
       }));
     } else {
       // 2. Fetch from Supabase 'orders' table where payment_method = 'REDEEM_SHARE'
-      const { data: fallbackOrders, error: orderErr } = await supabaseAdmin
+      let query = supabaseAdmin
         .from('orders')
         .select('*')
         .eq('payment_method', 'REDEEM_SHARE')
         .order('created_at', { ascending: false });
+
+      if (filterEmail) {
+        query = query.eq('customer_email', filterEmail);
+      }
+
+      const { data: fallbackOrders, error: orderErr } = await query;
 
       if (!orderErr && Array.isArray(fallbackOrders)) {
         redeemsList = fallbackOrders.map((o: any) => {
@@ -175,6 +190,12 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    // Approving or rejecting redeems requires admin authentication
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, action, reason } = body;
 
@@ -241,6 +262,12 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    // Deleting redeems requires admin authentication
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

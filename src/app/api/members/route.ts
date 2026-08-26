@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
 
@@ -24,8 +25,14 @@ const DEFAULT_MEMBERS = [
   },
 ];
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Member list contains student PII and requires admin authentication
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     // 1. Fetch directly from Supabase PostgreSQL Database using Service Role Client
     const { data: supaMembers, error } = await supabaseAdmin
       .from('members')

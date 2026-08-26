@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
 
@@ -23,7 +24,6 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
   let hasPruned = false;
 
   const cleaned = messages.map((msg) => {
-    // If it's a regular text message (no mediaUrl, no mediaName, no hasMedia)
     const isMediaMessage = Boolean(msg.mediaUrl || msg.mediaName || msg.hasMedia);
     if (!isMediaMessage) {
       if (msg.isExpired) {
@@ -35,7 +35,6 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
       return msg;
     }
 
-    // Must have a VALID positive createdAt timestamp (number or ISO string)
     let createdAtMs = 0;
     if (typeof msg.createdAt === 'number' && msg.createdAt > 0) {
       createdAtMs = msg.createdAt;
@@ -44,12 +43,10 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
       if (!isNaN(parsed) && parsed > 0) createdAtMs = parsed;
     }
 
-    // If createdAt is missing or invalid, do NOT expire it immediately
     if (createdAtMs <= 0) {
       return msg;
     }
 
-    // Only expire if really older than 24 hours
     const isExpired = now - createdAtMs > EXPIRATION_MS;
 
     if (isExpired) {
@@ -89,7 +86,6 @@ export async function GET(request: Request) {
 
       const { messages: cleanedMessages, hasPruned } = pruneExpiredMedia(data.messages || []);
 
-      // Simpan pembersihan jika ada foto yang baru saja kadaluarsa
       if (hasPruned) {
         supabaseAdmin
           .from('chats')
@@ -111,7 +107,12 @@ export async function GET(request: Request) {
       });
     }
 
-    // Fetch all chats for admin dashboard
+    // Fetch all chats requires admin authentication
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     const { data, error } = await supabaseAdmin
       .from('chats')
       .select('*')
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Single session upsert
+    // Single session upsert from user
     if (body && body.id && body.name) {
       const { messages: cleanedMessages } = pruneExpiredMedia(body.messages || []);
       const { error } = await supabaseAdmin.from('chats').upsert({
@@ -170,8 +171,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // Map of sessions upsert (e.g. from Admin dashboard)
+    // Map of sessions upsert (Admin bulk response)
     if (body && typeof body === 'object' && !Array.isArray(body)) {
+      const auth = await verifyAdminRequest(request);
+      if (!auth.isAdmin) {
+        return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+      }
+
       const rows = Object.values(body)
         .filter((session: any) => session && session.id && session.name)
         .map((session: any) => {
@@ -203,8 +209,13 @@ export async function POST(request: Request) {
 }
 
 // DELETE reset all chats (Admin action)
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
+    const auth = await verifyAdminRequest(request);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
+    }
+
     const { error } = await supabaseAdmin.from('chats').delete().neq('id', 'non_existent_id');
     if (error) throw error;
     return NextResponse.json({ success: true, message: 'All chats reset successfully' });
