@@ -179,7 +179,7 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
       <Navbar />
 
       {/* Header Section */}
-      <section className="pt-24 sm:pt-32 pb-6 sm:pb-8 bg-white border-b border-slate-200">
+      <section className="pt-28 sm:pt-36 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
             <Calculator className="w-3.5 h-3.5 text-primary-700" />
@@ -223,13 +223,13 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
       </section>
 
       {/* Main Calculator Workspace */}
-      <section className="py-8 sm:py-12 flex-1">
+      <section className="py-6 sm:py-12 pb-24 sm:pb-12 flex-1">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             
             {/* Left Form: Inputs (5 Cols) */}
-            <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
+            <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4 sm:mb-5">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
                     <Calculator className="w-4 h-4" />
@@ -275,7 +275,7 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
                       Batas Toleransi Kesalahan (Margin of Error, e)
                     </label>
-                    <div className="grid grid-cols-4 gap-2 mb-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                       {[
                         { label: '1% (0.01)', val: 0.01 },
                         { label: '5% (0.05)', val: 0.05 },
@@ -330,25 +330,25 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Z-Score / Tingkat Kepercayaan */}
+                  {/* Tingkat Kepercayaan (Z) */}
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Tingkat Kepercayaan (Confidence Level / Z-Score)
+                      Tingkat Kepercayaan (Confidence Level, Z)
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => {
-                          setZScoreType('95');
-                          setZValue(1.96);
-                        }}
-                        className={`py-2 px-2 text-center rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
+                        onClick={() => setZScoreType('95')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                           zScoreType === '95'
                             ? 'bg-slate-900 border-slate-900 text-white'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        95% (Z = 1.96)
+                        <span className="block text-xs font-bold">95% (Z = 1.96)</span>
+                        <span className={`text-[10px] block mt-0.5 ${zScoreType === '95' ? 'text-slate-300' : 'text-slate-500'}`}>
+                          Standar Skripsi
+                        </span>
                       </button>
                       <button
                         type="button"
@@ -356,24 +356,30 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
                           setZScoreType('99');
                           setZValue(2.576);
                         }}
-                        className={`py-2 px-2 text-center rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                           zScoreType === '99'
                             ? 'bg-slate-900 border-slate-900 text-white'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        99% (Z = 2.58)
+                        <span className="block text-xs font-bold">99% (Z = 2.58)</span>
+                        <span className={`text-[10px] block mt-0.5 ${zScoreType === '99' ? 'text-slate-300' : 'text-slate-500'}`}>
+                          Tinggi / Medis
+                        </span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setZScoreType('custom')}
-                        className={`py-2 px-2 text-center rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer col-span-2 sm:col-span-1 ${
                           zScoreType === 'custom'
                             ? 'bg-slate-900 border-slate-900 text-white'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        Custom Z
+                        <span className="block text-xs font-bold">Custom Z</span>
+                        <span className={`text-[10px] block mt-0.5 ${zScoreType === 'custom' ? 'text-slate-300' : 'text-slate-500'}`}>
+                          Manual
+                        </span>
                       </button>
                     </div>
 

@@ -280,7 +280,7 @@ export default function DaftarPustakaGeneratorPage() {
       </section>
 
       {/* Main Tool Content Area */}
-      <section className="py-6 sm:py-12 flex-1">
+      <section className="py-6 sm:py-12 pb-28 sm:pb-12 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             
@@ -385,7 +385,7 @@ export default function DaftarPustakaGeneratorPage() {
                           }`}
                         >
                           <Icon className="w-4 h-4 shrink-0" />
-                          <span className="text-xs truncate">{st.label}</span>
+                          <span className="text-xs font-semibold leading-tight">{st.label}</span>
                         </button>
                       );
                     })}
@@ -405,38 +405,43 @@ export default function DaftarPustakaGeneratorPage() {
                         onClick={handleAddAuthor}
                         className="text-[11px] font-bold text-primary-700 hover:text-primary-900 flex items-center gap-1 cursor-pointer"
                       >
-                        <Plus className="w-3 h-3" />
-                        <span>+ Tambah Penulis</span>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Tambah Penulis</span>
                       </button>
                     </div>
 
                     <div className="space-y-2">
                       {authors.map((author, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
+                        <div
+                          key={idx}
+                          className="p-2 sm:p-0 bg-slate-50 sm:bg-transparent border border-slate-200 sm:border-0 rounded-xl space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2"
+                        >
                           <input
                             type="text"
-                            placeholder="Nama Depan / Inisial (e.g. Muhammad)"
+                            placeholder="Nama Depan / Inisial (opsional)"
                             value={author.firstName}
                             onChange={(e) => handleUpdateAuthor(idx, 'firstName', e.target.value)}
-                            className="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
+                            className="w-full sm:flex-1 h-10 px-3 bg-white sm:bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                           />
-                          <input
-                            type="text"
-                            placeholder="Nama Belakang / Fam (e.g. Anshori)"
-                            value={author.lastName}
-                            onChange={(e) => handleUpdateAuthor(idx, 'lastName', e.target.value)}
-                            className="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
-                          />
-                          {authors.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveAuthor(idx)}
-                              className="p-2 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
-                              title="Hapus Penulis"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
+                          <div className="flex items-center gap-2 w-full sm:flex-1">
+                            <input
+                              type="text"
+                              placeholder="Nama Belakang / Fam *"
+                              value={author.lastName}
+                              onChange={(e) => handleUpdateAuthor(idx, 'lastName', e.target.value)}
+                              className="flex-1 h-10 px-3 bg-white sm:bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
+                            />
+                            {authors.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveAuthor(idx)}
+                                className="p-2 text-slate-400 hover:text-red-600 transition-colors cursor-pointer shrink-0"
+                                title="Hapus Penulis"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -452,7 +457,7 @@ export default function DaftarPustakaGeneratorPage() {
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Contoh: Penerapan Algoritma Deep Learning dalam Analisis Sentimen"
+                        placeholder="Contoh: Penerapan Algoritma Deep Learning"
                         className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                       />
                     </div>
@@ -464,7 +469,7 @@ export default function DaftarPustakaGeneratorPage() {
                         type="text"
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
-                        placeholder="2024"
+                        placeholder="2026"
                         className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                       />
                     </div>
@@ -485,35 +490,35 @@ export default function DaftarPustakaGeneratorPage() {
                           className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Volume</label>
+                          <label className="block text-[11px] sm:text-xs font-bold text-slate-700 mb-1">Volume</label>
                           <input
                             type="text"
                             value={volume}
                             onChange={(e) => setVolume(e.target.value)}
-                            placeholder="Contoh: 11"
-                            className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
+                            placeholder="11"
+                            className="w-full h-10 px-2.5 sm:px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Nomor / Issue</label>
+                          <label className="block text-[11px] sm:text-xs font-bold text-slate-700 mb-1 truncate">No / Issue</label>
                           <input
                             type="text"
                             value={issue}
                             onChange={(e) => setIssue(e.target.value)}
-                            placeholder="Contoh: 2"
-                            className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
+                            placeholder="2"
+                            className="w-full h-10 px-2.5 sm:px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Halaman</label>
+                          <label className="block text-[11px] sm:text-xs font-bold text-slate-700 mb-1">Halaman</label>
                           <input
                             type="text"
                             value={pages}
                             onChange={(e) => setPages(e.target.value)}
-                            placeholder="Contoh: 145-156"
-                            className="w-full h-10 px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
+                            placeholder="145-156"
+                            className="w-full h-10 px-2.5 sm:px-3 bg-slate-50 border border-slate-200 focus:border-slate-800 rounded-xl text-xs outline-none"
                           />
                         </div>
                       </div>
