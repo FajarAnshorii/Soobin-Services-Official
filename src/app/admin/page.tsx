@@ -11,9 +11,25 @@ import {
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, Plus,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
   Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon,
-  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, ImagePlus, Loader2
+  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, ImagePlus, Loader2, Gift, Sparkles, Award, ExternalLink, Copy
 } from 'lucide-react';
 import { compressChatImage } from '@/lib/imageCompressor';
+
+export interface TurnitinRedeemItem {
+  id: string;
+  memberEmail: string;
+  memberName: string;
+  memberUniversity?: string;
+  memberProdi?: string;
+  memberPhone?: string;
+  platform: string;
+  proofImage: string;
+  status: 'MENUNGGU_VERIFIKASI' | 'DISETUJUI' | 'DITOLAK';
+  voucherCode?: string | null;
+  adminNote?: string | null;
+  approvedAt?: string | null;
+  createdAt: string;
+}
 
 interface Message {
   id: string;
@@ -199,7 +215,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
 
   // Tab & Search state
-  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'orders' | 'members' | 'revenue' | 'services' | 'testimonials'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'orders' | 'members' | 'redeems' | 'revenue' | 'services' | 'testimonials'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Testimonials state
@@ -360,6 +376,21 @@ export default function AdminPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevChatsRef = useRef<{ [id: string]: ChatSession }>({});
 
+  // REDEEM FREE TURNITIN STATES
+  const [redeems, setRedeems] = useState<TurnitinRedeemItem[]>([]);
+  const [redeemsLoading, setRedeemsLoading] = useState(false);
+  const [selectedMemberForRedeemDetail, setSelectedMemberForRedeemDetail] = useState<MemberUser | null>(null);
+  const [redeemZoomImage, setRedeemZoomImage] = useState<string | null>(null);
+  const [rejectReasonModal, setRejectReasonModal] = useState<{ isOpen: boolean; redeemId: string; reason: string }>({
+    isOpen: false,
+    redeemId: '',
+    reason: '',
+  });
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [redeemStatusFilter, setRedeemStatusFilter] = useState<string>('all');
+  const [redeemSearchTerm, setRedeemSearchTerm] = useState<string>('');
+  const [redeemSubTab, setRedeemSubTab] = useState<'members_table' | 'submissions'>('members_table');
+
   // Set body background to clean LIGHT slate #f8fafc on mount
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('soobin_admin_logged_in') === 'true';
@@ -404,6 +435,94 @@ export default function AdminPage() {
       }
     } catch (e) {
       console.error('Failed to sync members', e);
+    }
+  };
+
+  // Sync Redeems API
+  const syncRedeemsWithCloud = async () => {
+    try {
+      setRedeemsLoading(true);
+      const res = await fetch('/api/redeems', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setRedeems(data);
+          try {
+            localStorage.setItem('soobin_redeems_list', JSON.stringify(data));
+          } catch (e) {}
+        }
+      }
+    } catch (e) {
+      console.error('Failed to sync redeems', e);
+    } finally {
+      setRedeemsLoading(false);
+    }
+  };
+
+  const handleApproveRedeem = async (redeemId: string) => {
+    setActionLoadingId(redeemId);
+    try {
+      const res = await fetch('/api/redeems', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: redeemId, action: 'approve' }),
+      });
+      if (res.ok) {
+        await syncRedeemsWithCloud();
+      }
+    } catch (err) {
+      console.error('Gagal menyetujui klaim:', err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleOpenRejectModal = (redeemId: string) => {
+    setRejectReasonModal({
+      isOpen: true,
+      redeemId,
+      reason: 'Status/Story WA/IG tidak berstatus publik atau dikecualikan (hanya untuk admin). Mohon share ulang secara publik ke semua kontak.',
+    });
+  };
+
+  const handleConfirmRejectRedeem = async () => {
+    if (!rejectReasonModal.redeemId) return;
+    setActionLoadingId(rejectReasonModal.redeemId);
+    try {
+      const res = await fetch('/api/redeems', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: rejectReasonModal.redeemId,
+          action: 'reject',
+          reason: rejectReasonModal.reason || 'Bukti share tidak memenuhi syarat publik.',
+        }),
+      });
+      if (res.ok) {
+        setRejectReasonModal({ isOpen: false, redeemId: '', reason: '' });
+        await syncRedeemsWithCloud();
+      }
+    } catch (err) {
+      console.error('Gagal menolak klaim:', err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDeleteRedeem = async (redeemId: string) => {
+    if (!window.confirm('Hapus riwayat pengajuan redeem ini?')) return;
+    setActionLoadingId(redeemId);
+    try {
+      const res = await fetch(`/api/redeems?id=${encodeURIComponent(redeemId)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        await syncRedeemsWithCloud();
+      }
+    } catch (err) {
+      console.error('Gagal menghapus klaim:', err);
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -452,7 +571,6 @@ export default function AdminPage() {
       if (res.ok) {
         const cloudOrders: OrderItem[] = await res.json();
         if (Array.isArray(cloudOrders)) {
-          // Pure 100% Supabase Database: sort descending by timestamp
           const sorted = cloudOrders.sort((a, b) => {
             const timeA = new Date(a.createdAt || '').getTime() || parseInt(a.id?.replace(/\D/g, '') || '0', 10);
             const timeB = new Date(b.createdAt || '').getTime() || parseInt(b.id?.replace(/\D/g, '') || '0', 10);
@@ -500,11 +618,13 @@ export default function AdminPage() {
     syncOrdersWithCloud();
     syncMembersWithCloud();
     syncServicesWithCloud();
+    syncRedeemsWithCloud();
 
     const interval = setInterval(() => {
       syncChatsWithCloud();
       syncOrdersWithCloud();
       syncMembersWithCloud();
+      syncRedeemsWithCloud();
     }, 4000);
 
     return () => clearInterval(interval);
@@ -1005,6 +1125,73 @@ export default function AdminPage() {
 
   const unreadChatsCount = Object.values(chats).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
+  const pendingRedeemsCount = useMemo(() => {
+    return redeems.filter((r) => r.status === 'MENUNGGU_VERIFIKASI').length;
+  }, [redeems]);
+
+  const approvedRedeemsCount = useMemo(() => {
+    return redeems.filter((r) => r.status === 'DISETUJUI').length;
+  }, [redeems]);
+
+  const rejectedRedeemsCount = useMemo(() => {
+    return redeems.filter((r) => r.status === 'DITOLAK').length;
+  }, [redeems]);
+
+  // Aggregate stats per member email (Total, Disetujui, Ditolak, List)
+  const memberRedeemStats = useMemo(() => {
+    const map: Record<string, { total: number; approved: number; rejected: number; pending: number; list: TurnitinRedeemItem[] }> = {};
+
+    redeems.forEach((r) => {
+      const email = (r.memberEmail || '').toLowerCase().trim();
+      if (!email) return;
+      if (!map[email]) {
+        map[email] = { total: 0, approved: 0, rejected: 0, pending: 0, list: [] };
+      }
+      map[email].total += 1;
+      map[email].list.push(r);
+      if (r.status === 'DISETUJUI') map[email].approved += 1;
+      if (r.status === 'DITOLAK') map[email].rejected += 1;
+      if (r.status === 'MENUNGGU_VERIFIKASI') map[email].pending += 1;
+    });
+
+    return map;
+  }, [redeems]);
+
+  // Monthly top sharer calculation
+  const topSharerMember = useMemo<{ member: MemberUser; count: number } | null>(() => {
+    if (members.length === 0) return null;
+    let topMbr: MemberUser | null = null;
+    let maxApproved = 0;
+
+    members.forEach((m) => {
+      const email = (m.email || '').toLowerCase().trim();
+      const stats = memberRedeemStats[email];
+      const count = stats?.approved || 0;
+      if (count > maxApproved) {
+        maxApproved = count;
+        topMbr = m;
+      }
+    });
+
+    if (maxApproved === 0 || !topMbr) return null;
+    return { member: topMbr, count: maxApproved };
+  }, [members, memberRedeemStats]);
+
+  // Filtered redeems for the Submissions sub-tab
+  const filteredSubmissions = useMemo(() => {
+    return redeems.filter((r) => {
+      const matchesStatus = redeemStatusFilter === 'all' || r.status === redeemStatusFilter;
+      const q = redeemSearchTerm.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (r.memberName || '').toLowerCase().includes(q) ||
+        (r.memberEmail || '').toLowerCase().includes(q) ||
+        (r.voucherCode || '').toLowerCase().includes(q) ||
+        (r.id || '').toLowerCase().includes(q);
+      return matchesStatus && matchesSearch;
+    });
+  }, [redeems, redeemStatusFilter, redeemSearchTerm]);
+
   // LOGIN SCREEN - ALL TEXT BLACK MONOCHROME
   if (!isAdminLoggedIn) {
     return (
@@ -1197,6 +1384,29 @@ export default function AdminPage() {
                     <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
                       {members.length}
                     </span>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('redeems'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'redeems'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Gift className={`w-4 h-4 ${activeTab === 'redeems' ? 'text-white' : 'text-amber-600'}`} />
+                      <span>Klaim Free Turnitin</span>
+                    </div>
+                    {pendingRedeemsCount > 0 ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-black bg-amber-400 text-slate-950 border border-amber-500">
+                        {pendingRedeemsCount} Baru
+                      </span>
+                    ) : (
+                      <span className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold border border-slate-300">
+                        {redeems.length}
+                      </span>
+                    )}
                   </button>
 
                   <button
@@ -1402,6 +1612,38 @@ export default function AdminPage() {
                 <span className="bg-slate-200 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-slate-300">
                   {members.length}
                 </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('redeems')}
+              title="Klaim Free Turnitin"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3 relative' : 'justify-between px-3.5 py-2.5'
+              } ${
+                activeTab === 'redeems'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Gift className={`w-4 h-4 ${activeTab === 'redeems' ? 'text-white' : 'text-amber-600'}`} />
+                {!isSidebarCollapsed && <span>Klaim Free Turnitin</span>}
+              </div>
+              {pendingRedeemsCount > 0 ? (
+                isSidebarCollapsed ? (
+                  <span className="absolute top-1.5 right-1.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white" />
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-black bg-amber-400 text-slate-950 border border-amber-500">
+                    {pendingRedeemsCount} Baru
+                  </span>
+                )
+              ) : (
+                !isSidebarCollapsed && (
+                  <span className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold border border-slate-300">
+                    {redeems.length}
+                  </span>
+                )
               )}
             </button>
 
@@ -2232,14 +2474,14 @@ export default function AdminPage() {
           {/* TAB 3: DATA MEMBER (50 per page, MBR-0001 format) */}
           {activeTab === 'members' && (
             <div className="bg-white border border-slate-300 rounded-2xl p-6 space-y-6 shadow-xs">
-              <div className="flex items-center justify-between border-b border-slate-300 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-300 pb-4">
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
                     <Users className="w-5 h-5 text-slate-900" />
-                    Daftar Member Terdaftar
+                    Daftar Member Terdaftar (Database Supabase)
                   </h2>
                   <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Total {filteredMembers.length} member terdaftar. Menampilkan 50 member per halaman.
+                    Total {filteredMembers.length} member terdaftar. Kolom statistik share terhubung langsung secara realtime.
                   </p>
                 </div>
 
@@ -2265,7 +2507,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Members Table */}
+              {/* Members Table with 8 Columns */}
               <div className="overflow-x-auto border border-slate-300 rounded-2xl">
                 <table className="w-full text-left text-xs text-slate-900">
                   <thead className="bg-slate-100 text-slate-900 font-black uppercase tracking-wider text-[10px] border-b border-slate-300">
@@ -2275,18 +2517,65 @@ export default function AdminPage() {
                       <th className="p-3.5">Email</th>
                       <th className="p-3.5">Kampus / Universitas</th>
                       <th className="p-3.5">Program Studi</th>
+                      <th className="p-3.5 text-center">Total Redeem</th>
+                      <th className="p-3.5 text-center">Disetujui</th>
+                      <th className="p-3.5 text-center">Ditolak</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 bg-white">
-                    {currentMembers.map((mbr, idx) => (
-                      <tr key={mbr.id || idx} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-3.5 font-mono text-slate-900 font-black">{mbr.id}</td>
-                        <td className="p-3.5 font-black text-slate-900">{mbr.name}</td>
-                        <td className="p-3.5 text-slate-900 font-bold">{mbr.email}</td>
-                        <td className="p-3.5 text-slate-900 font-bold">{mbr.university || '-'}</td>
-                        <td className="p-3.5 text-slate-900 font-bold">{mbr.prodi || '-'}</td>
-                      </tr>
-                    ))}
+                    {currentMembers.map((mbr, idx) => {
+                      const mbrEmail = (mbr.email || '').toLowerCase().trim();
+                      const stats = memberRedeemStats[mbrEmail] || { total: 0, approved: 0, rejected: 0, pending: 0, list: [] };
+
+                      return (
+                        <tr key={mbr.id || idx} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-3.5 font-mono text-slate-900 font-black">{mbr.id}</td>
+                          <td className="p-3.5 font-black text-slate-900">{mbr.name}</td>
+                          <td className="p-3.5 text-slate-900 font-bold">{mbr.email}</td>
+                          <td className="p-3.5 text-slate-900 font-bold">{mbr.university || '-'}</td>
+                          <td className="p-3.5 text-slate-900 font-bold">{mbr.prodi || '-'}</td>
+                          <td className="p-3.5 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                                stats.total > 0
+                                  ? 'bg-slate-900 text-white border-slate-900'
+                                  : 'bg-slate-100 text-slate-400 border-slate-200'
+                              }`}>
+                                {stats.total}
+                              </span>
+                              {stats.total > 0 && (
+                                <button
+                                  onClick={() => setSelectedMemberForRedeemDetail(mbr)}
+                                  className="px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-black flex items-center gap-1 cursor-pointer transition-colors"
+                                  title="Lihat Detail Bukti Share"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>Detail</span>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-3.5 text-center">
+                            <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                              stats.approved > 0
+                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                : 'bg-slate-100 text-slate-400 border-slate-200'
+                            }`}>
+                              {stats.approved}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-center">
+                            <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                              stats.rejected > 0
+                                ? 'bg-rose-100 text-rose-900 border-rose-300'
+                                : 'bg-slate-100 text-slate-400 border-slate-200'
+                            }`}>
+                              {stats.rejected}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -2312,6 +2601,372 @@ export default function AdminPage() {
                     Selanjutnya
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: KLAIM FREE TURNITIN 1X (SISTEM REWARD SHARE 3 HARI COOLDOWN) */}
+          {activeTab === 'redeems' && (
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="bg-white border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-xs">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                        <Gift className="w-5 h-5" />
+                      </div>
+                      <h2 className="font-black text-lg text-slate-900">
+                        Kelola Klaim Free Turnitin 1x (Share Status WA / Story IG)
+                      </h2>
+                    </div>
+                    <p className="text-xs text-slate-600 font-bold mt-1 max-w-3xl">
+                      Syarat verifikasi: Bukti screenshot WA/IG wajib berstatus publik ke semua orang (tidak boleh private/custom). Cooldown member 3 hari 1x klaim. Member terbanyak per bulan mendapatkan reward 1x Cek AI Gratis!
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={syncRedeemsWithCloud}
+                      disabled={redeemsLoading}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 text-xs font-black flex items-center gap-2 cursor-pointer transition-colors"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${redeemsLoading ? 'animate-spin' : ''}`} />
+                      <span>{redeemsLoading ? 'Sinkron...' : 'Refresh Data'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Top Metrics 4 Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-5">
+                  <div className="bg-slate-50 border border-slate-300 rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Total Pengajuan</p>
+                    <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1">{redeems.length}</p>
+                    <p className="text-[10px] text-slate-500 font-bold mt-0.5">Semua riwayat pengajuan</p>
+                  </div>
+
+                  <div className="bg-amber-50/80 border border-amber-300 rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] font-black text-amber-800 uppercase tracking-wider flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-amber-600" />
+                      <span>Menunggu Verifikasi</span>
+                    </p>
+                    <p className="text-xl sm:text-2xl font-black text-amber-900 mt-1">{pendingRedeemsCount}</p>
+                    <p className="text-[10px] text-amber-700 font-bold mt-0.5">Perlu dicek admin</p>
+                  </div>
+
+                  <div className="bg-emerald-50/80 border border-emerald-300 rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3 text-emerald-600" />
+                      <span>Disetujui (ACC)</span>
+                    </p>
+                    <p className="text-xl sm:text-2xl font-black text-emerald-900 mt-1">{approvedRedeemsCount}</p>
+                    <p className="text-[10px] text-emerald-700 font-bold mt-0.5">Voucher aktif diterbitkan</p>
+                  </div>
+
+                  <div className="bg-linear-to-br from-purple-50 to-indigo-50 border border-indigo-200 rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] font-black text-indigo-900 uppercase tracking-wider flex items-center gap-1">
+                      <Award className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Top Sharer Bulan Ini</span>
+                    </p>
+                    {topSharerMember && topSharerMember.member ? (
+                      <div className="mt-1">
+                        <p className="text-xs sm:text-sm font-black text-indigo-950 truncate">
+                          {topSharerMember.member.name || 'Member'}
+                        </p>
+                        <p className="text-[10px] font-black text-indigo-700 mt-0.5">
+                          {topSharerMember.count}x Share Disetujui • Gratis 1x Cek AI
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs font-bold text-slate-500 mt-1">Belum ada data share disetujui</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sub-Tab Navigation Bar */}
+              <div className="bg-white border border-slate-300 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setRedeemSubTab('members_table')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer border ${
+                        redeemSubTab === 'members_table'
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      Daftar Member & Statistik ({members.length} Database)
+                    </button>
+                    <button
+                      onClick={() => setRedeemSubTab('submissions')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer border flex items-center gap-1.5 ${
+                        redeemSubTab === 'submissions'
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      <span>Antrean Pengajuan</span>
+                      {pendingRedeemsCount > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full font-black bg-amber-400 text-slate-950">
+                          {pendingRedeemsCount}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="relative w-full sm:w-72">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Cari nama, email, voucher..."
+                      value={redeemSearchTerm}
+                      onChange={(e) => setRedeemSearchTerm(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 font-bold focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                    {redeemSearchTerm && (
+                      <button
+                        onClick={() => setRedeemSearchTerm('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* VIEW 1: 14 MEMBER DATABASE TABLE (8 COLUMNS) */}
+                {redeemSubTab === 'members_table' && (
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto border border-slate-300 rounded-xl">
+                      <table className="w-full text-left text-xs text-slate-900">
+                        <thead className="bg-slate-100 text-slate-900 font-black uppercase tracking-wider text-[10px] border-b border-slate-300">
+                          <tr>
+                            <th className="p-3.5">Kode ID Member</th>
+                            <th className="p-3.5">Nama Lengkap</th>
+                            <th className="p-3.5">Email</th>
+                            <th className="p-3.5">Kampus / Universitas</th>
+                            <th className="p-3.5">Program Studi</th>
+                            <th className="p-3.5 text-center">Total Redeem</th>
+                            <th className="p-3.5 text-center">Disetujui</th>
+                            <th className="p-3.5 text-center">Ditolak</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 bg-white">
+                          {members.filter((m) => {
+                            if (!redeemSearchTerm) return true;
+                            const q = redeemSearchTerm.toLowerCase();
+                            return (
+                              (m.name || '').toLowerCase().includes(q) ||
+                              (m.email || '').toLowerCase().includes(q) ||
+                              (m.id || '').toLowerCase().includes(q) ||
+                              (m.university || '').toLowerCase().includes(q)
+                            );
+                          }).map((mbr, idx) => {
+                            const mbrEmail = (mbr.email || '').toLowerCase().trim();
+                            const stats = memberRedeemStats[mbrEmail] || { total: 0, approved: 0, rejected: 0, pending: 0, list: [] };
+
+                            return (
+                              <tr key={mbr.id || idx} className="hover:bg-slate-50 transition-colors">
+                                <td className="p-3.5 font-mono text-slate-900 font-black">{mbr.id}</td>
+                                <td className="p-3.5 font-black text-slate-900">{mbr.name}</td>
+                                <td className="p-3.5 text-slate-900 font-bold">{mbr.email}</td>
+                                <td className="p-3.5 text-slate-900 font-bold">{mbr.university || '-'}</td>
+                                <td className="p-3.5 text-slate-900 font-bold">{mbr.prodi || '-'}</td>
+                                <td className="p-3.5 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                                      stats.total > 0
+                                        ? 'bg-slate-900 text-white border-slate-900'
+                                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                                    }`}>
+                                      {stats.total}
+                                    </span>
+                                    {stats.total > 0 && (
+                                      <button
+                                        onClick={() => setSelectedMemberForRedeemDetail(mbr)}
+                                        className="px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-black flex items-center gap-1 cursor-pointer transition-colors"
+                                        title="Lihat Detail Bukti Pengajuan"
+                                      >
+                                        <Eye className="w-3.5 h-3.5" />
+                                        <span>Detail</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                                    stats.approved > 0
+                                      ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                      : 'bg-slate-100 text-slate-400 border-slate-200'
+                                  }`}>
+                                    {stats.approved}
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
+                                    stats.rejected > 0
+                                      ? 'bg-rose-100 text-rose-900 border-rose-300'
+                                      : 'bg-slate-100 text-slate-400 border-slate-200'
+                                  }`}>
+                                    {stats.rejected}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* VIEW 2: ALL SUBMISSIONS STREAM / TABLE */}
+                {redeemSubTab === 'submissions' && (
+                  <div className="space-y-4">
+                    {/* Filter Status Pills */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-black text-slate-500">Status:</span>
+                      {(['all', 'MENUNGGU_VERIFIKASI', 'DISETUJUI', 'DITOLAK'] as const).map((st) => (
+                        <button
+                          key={st}
+                          onClick={() => setRedeemStatusFilter(st)}
+                          className={`px-3 py-1 rounded-xl text-xs font-black transition-all border cursor-pointer ${
+                            redeemStatusFilter === st
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                          }`}
+                        >
+                          {st === 'all' && `Semua (${redeems.length})`}
+                          {st === 'MENUNGGU_VERIFIKASI' && `Menunggu ACC (${pendingRedeemsCount})`}
+                          {st === 'DISETUJUI' && `Disetujui (${approvedRedeemsCount})`}
+                          {st === 'DITOLAK' && `Ditolak (${rejectedRedeemsCount})`}
+                        </button>
+                      ))}
+                    </div>
+
+                    {filteredSubmissions.length === 0 ? (
+                      <div className="p-8 text-center text-slate-600 bg-slate-50 rounded-xl border border-slate-300 font-bold text-xs">
+                        Tidak ada pengajuan redeem yang sesuai filter.
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {filteredSubmissions.map((r) => {
+                          const isPending = r.status === 'MENUNGGU_VERIFIKASI';
+                          const isApproved = r.status === 'DISETUJUI';
+                          const isRejected = r.status === 'DITOLAK';
+
+                          return (
+                            <div
+                              key={r.id}
+                              className="bg-slate-50 border border-slate-300 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-400 transition-colors"
+                            >
+                              <div className="flex items-start gap-3">
+                                {/* Thumbnail */}
+                                <button
+                                  onClick={() => setRedeemZoomImage(r.proofImage)}
+                                  className="w-16 h-20 rounded-lg overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer"
+                                  title="Klik untuk memperbesar screenshot bukti"
+                                >
+                                  <img
+                                    src={r.proofImage}
+                                    alt="Bukti Share"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                    <Eye className="w-4 h-4" />
+                                  </div>
+                                </button>
+
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <h4 className="font-black text-sm text-slate-900">{r.memberName}</h4>
+                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-200 text-slate-800 border border-slate-300">
+                                      {r.platform}
+                                    </span>
+                                    {/* Status Badge */}
+                                    <span
+                                      className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                        isPending
+                                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                          : isApproved
+                                          ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                          : 'bg-rose-100 text-rose-900 border border-rose-300'
+                                      }`}
+                                    >
+                                      {isPending ? '⏳ Menunggu Verifikasi' : isApproved ? '✓ Disetujui' : '✕ Ditolak'}
+                                    </span>
+                                  </div>
+
+                                  <p className="text-xs text-slate-600 font-bold">
+                                    {r.memberEmail} {r.memberUniversity ? `• ${r.memberUniversity}` : ''} {r.memberProdi ? `(${r.memberProdi})` : ''}
+                                  </p>
+
+                                  <p className="text-[11px] text-slate-500 font-semibold">
+                                    Diajukan: {new Date(r.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                  </p>
+
+                                  {isApproved && r.voucherCode && (
+                                    <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1 text-xs font-black text-emerald-950 mt-1">
+                                      <span>Kode Voucher:</span>
+                                      <code className="font-mono bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-800">
+                                        {r.voucherCode}
+                                      </code>
+                                    </div>
+                                  )}
+
+                                  {isRejected && r.adminNote && (
+                                    <p className="text-xs text-rose-800 bg-rose-50 border border-rose-200 p-2 rounded-lg font-bold mt-1">
+                                      Alasan Penolakan: {r.adminNote}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                                {isPending && (
+                                  <>
+                                    <button
+                                      disabled={actionLoadingId === r.id}
+                                      onClick={() => handleOpenRejectModal(r.id)}
+                                      className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-300 text-xs font-black flex items-center gap-1 cursor-pointer transition-colors"
+                                    >
+                                      <XCircle className="w-3.5 h-3.5" />
+                                      <span>Tolak</span>
+                                    </button>
+
+                                    <button
+                                      disabled={actionLoadingId === r.id}
+                                      onClick={() => handleApproveRedeem(r.id)}
+                                      className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                                    >
+                                      {actionLoadingId === r.id ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                                      )}
+                                      <span>Setujui (ACC)</span>
+                                    </button>
+                                  </>
+                                )}
+
+                                <button
+                                  onClick={() => handleDeleteRedeem(r.id)}
+                                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+                                  title="Hapus riwayat pengajuan"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -3109,7 +3764,7 @@ export default function AdminPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="px-4 py-3 bg-black/50 border-b border-white/10 flex items-center justify-between">
-                <span className="text-white text-xs font-bold truncate max-w-[240px]">
+                <span className="text-white text-xs font-bold truncate max-w-60">
                   {adminChatPreview.name || 'Preview Foto Live Chat'}
                 </span>
                 <div className="flex items-center gap-2">
@@ -3135,6 +3790,329 @@ export default function AdminPage() {
                   alt={adminChatPreview.name || 'Preview'}
                   className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
                 />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL DETAIL PENGALAMAN & RIWAYAT REDEEM MEMBER */}
+      <AnimatePresence>
+        {selectedMemberForRedeemDetail && (
+          <div
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
+            onClick={() => setSelectedMemberForRedeemDetail(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white border border-slate-300 rounded-3xl p-5 sm:p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative space-y-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white font-black flex items-center justify-center text-sm shadow-xs">
+                    {selectedMemberForRedeemDetail.name?.charAt(0) || 'M'}
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-slate-900">{selectedMemberForRedeemDetail.name}</h3>
+                    <p className="text-xs text-slate-600 font-bold">
+                      {selectedMemberForRedeemDetail.email} • {selectedMemberForRedeemDetail.university || '-'} ({selectedMemberForRedeemDetail.prodi || '-'})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedMemberForRedeemDetail(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-900 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Member Stats Summary */}
+              {(() => {
+                const mbrEmail = (selectedMemberForRedeemDetail.email || '').toLowerCase().trim();
+                const stats = memberRedeemStats[mbrEmail] || { total: 0, approved: 0, rejected: 0, pending: 0, list: [] };
+                const memberSubmissions = redeems.filter((r) => (r.memberEmail || '').toLowerCase().trim() === mbrEmail);
+
+                return (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-slate-50 border border-slate-300 rounded-xl p-3 text-center">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Total Pengajuan</p>
+                        <p className="text-xl font-black text-slate-900 mt-0.5">{stats.total}</p>
+                      </div>
+                      <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-3 text-center">
+                        <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">Disetujui (ACC)</p>
+                        <p className="text-xl font-black text-emerald-900 mt-0.5">{stats.approved}</p>
+                      </div>
+                      <div className="bg-rose-50 border border-rose-300 rounded-xl p-3 text-center">
+                        <p className="text-[10px] font-black text-rose-800 uppercase tracking-wider">Ditolak</p>
+                        <p className="text-xl font-black text-rose-900 mt-0.5">{stats.rejected}</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-200 pt-3">
+                      <h4 className="font-black text-sm text-slate-900 mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-slate-700" />
+                        <span>Riwayat Pengajuan & Bukti Screenshot ({memberSubmissions.length})</span>
+                      </h4>
+
+                      {memberSubmissions.length === 0 ? (
+                        <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-500 text-xs font-bold">
+                          Member ini belum pernah mengajukan klaim free turnitin.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {memberSubmissions.map((sub) => {
+                            const isPending = sub.status === 'MENUNGGU_VERIFIKASI';
+                            const isApproved = sub.status === 'DISETUJUI';
+                            const isRejected = sub.status === 'DITOLAK';
+
+                            return (
+                              <div
+                                key={sub.id}
+                                className="bg-slate-50 border border-slate-300 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center"
+                              >
+                                <div className="flex items-start gap-3.5">
+                                  <button
+                                    onClick={() => setRedeemZoomImage(sub.proofImage)}
+                                    className="w-20 h-24 rounded-xl overflow-hidden border border-slate-300 bg-slate-200 shrink-0 relative group cursor-pointer shadow-xs"
+                                    title="Klik untuk melihat foto bukti ukuran penuh"
+                                  >
+                                    <img
+                                      src={sub.proofImage}
+                                      alt="Bukti Share"
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                      <Eye className="w-5 h-5" />
+                                    </div>
+                                  </button>
+
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="text-xs font-black text-slate-900">
+                                        Platform: {sub.platform}
+                                      </span>
+                                      <span
+                                        className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                          isPending
+                                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                            : isApproved
+                                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                            : 'bg-rose-100 text-rose-900 border border-rose-300'
+                                        }`}
+                                      >
+                                        {isPending ? '⏳ Menunggu Verifikasi' : isApproved ? '✓ Disetujui' : '✕ Ditolak'}
+                                      </span>
+                                    </div>
+
+                                    <p className="text-[11px] text-slate-600 font-semibold">
+                                      Diajukan: {new Date(sub.createdAt).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}
+                                    </p>
+
+                                    {isApproved && sub.voucherCode && (
+                                      <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-2.5 text-xs text-emerald-950 space-y-1">
+                                        <div className="flex items-center gap-2 font-mono font-black">
+                                          <span>Kode Voucher:</span>
+                                          <span className="bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-900 text-xs">
+                                            {sub.voucherCode}
+                                          </span>
+                                        </div>
+                                        {sub.approvedAt && (
+                                          <p className="text-[10px] text-emerald-700 font-bold">
+                                            Disetujui pada: {new Date(sub.approvedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                          </p>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {isRejected && sub.adminNote && (
+                                      <div className="bg-rose-50 border border-rose-200 rounded-xl p-2.5 text-xs text-rose-900 font-bold">
+                                        Alasan: {sub.adminNote}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Actions in Detail Modal */}
+                                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                                  {isPending && (
+                                    <>
+                                      <button
+                                        disabled={actionLoadingId === sub.id}
+                                        onClick={() => handleOpenRejectModal(sub.id)}
+                                        className="px-3.5 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 text-xs font-black flex items-center gap-1 cursor-pointer transition-colors"
+                                      >
+                                        <XCircle className="w-4 h-4" />
+                                        <span>Tolak</span>
+                                      </button>
+
+                                      <button
+                                        disabled={actionLoadingId === sub.id}
+                                        onClick={() => handleApproveRedeem(sub.id)}
+                                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                                      >
+                                        {actionLoadingId === sub.id ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <CheckCircle className="w-4 h-4 text-emerald-400" />
+                                        )}
+                                        <span>Setujui (ACC)</span>
+                                      </button>
+                                    </>
+                                  )}
+
+                                  <button
+                                    onClick={() => handleDeleteRedeem(sub.id)}
+                                    className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-600 hover:text-rose-700 transition-colors cursor-pointer"
+                                    title="Hapus riwayat pengajuan ini"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="flex justify-end pt-2 border-t border-slate-200">
+                <button
+                  onClick={() => setSelectedMemberForRedeemDetail(null)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-black text-xs cursor-pointer shadow-xs"
+                >
+                  Tutup Rincian
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL FULLSCREEN ZOOM BUKTI SCREENSHOT */}
+      <AnimatePresence>
+        {redeemZoomImage && (
+          <div
+            className="fixed inset-0 z-100 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={() => setRedeemZoomImage(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-3xl w-full max-h-[90vh] bg-slate-900 rounded-3xl overflow-hidden border border-white/20 shadow-2xl flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-5 py-3.5 bg-black/60 border-b border-white/10 flex items-center justify-between text-white">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-black">Inspeksi Screenshot Bukti Share (Pastikan Status Publik)</span>
+                </div>
+                <button
+                  onClick={() => setRedeemZoomImage(null)}
+                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4 flex items-center justify-center overflow-auto max-h-[calc(90vh-70px)] bg-black/40">
+                <img
+                  src={redeemZoomImage}
+                  alt="Bukti Share Fullsize"
+                  className="max-h-[75vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL INPUT ALASAN PENOLAKAN KLAIM */}
+      <AnimatePresence>
+        {rejectReasonModal.isOpen && (
+          <div
+            className="fixed inset-0 z-100 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4"
+            onClick={() => setRejectReasonModal({ isOpen: false, redeemId: '', reason: '' })}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white border border-slate-300 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2 text-rose-700">
+                  <XCircle className="w-5 h-5" />
+                  <h3 className="font-black text-sm text-slate-900">Alasan Penolakan Klaim</h3>
+                </div>
+                <button
+                  onClick={() => setRejectReasonModal({ isOpen: false, redeemId: '', reason: '' })}
+                  className="p-1 text-slate-400 hover:text-slate-900 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs text-slate-600 font-bold leading-relaxed">
+                  Tuliskan alasan penolakan agar member dapat memperbaiki dan mengupload ulang bukti share publik yang valid:
+                </p>
+
+                <textarea
+                  rows={4}
+                  value={rejectReasonModal.reason}
+                  onChange={(e) => setRejectReasonModal((prev) => ({ ...prev, reason: e.target.value }))}
+                  placeholder="Contoh: Status/Story di-private atau hanya dibagikan ke kontak admin. Mohon share publik ke semua kontak..."
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 font-bold focus:bg-white focus:outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+                />
+
+                {/* Quick Templates */}
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Template Cepat:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      'Status/Story di-private atau kontak dikecualikan.',
+                      'Screenshot buram / tidak menampilkan jumlah tayangan/status.',
+                      'Bukan status/story tentang Soobin Services.',
+                    ].map((tpl, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setRejectReasonModal((prev) => ({ ...prev, reason: tpl }))}
+                        className="text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 px-2 py-1 rounded-lg border border-slate-300 transition-colors text-left"
+                      >
+                        {tpl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setRejectReasonModal({ isOpen: false, redeemId: '', reason: '' })}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmRejectRedeem}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition-colors shadow-xs"
+                >
+                  Konfirmasi Tolak
+                </button>
               </div>
             </motion.div>
           </div>
