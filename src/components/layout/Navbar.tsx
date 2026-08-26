@@ -15,7 +15,8 @@ import {
   FileText,
   Calculator,
   GraduationCap,
-  ExternalLink
+  ExternalLink,
+  Gift
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -335,6 +336,21 @@ export default function Navbar() {
                         <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                       </div>
 
+                      {/* Free Turnitin 1x Menu Item with Gold Styling */}
+                      <Link
+                        href="/member?tab=redeem"
+                        onClick={() => setShowDropdown(false)}
+                        className="flex items-center justify-between w-full text-left text-xs font-black text-amber-950 bg-gradient-to-r from-amber-100/90 via-yellow-100 to-amber-200/90 hover:from-amber-200 hover:to-amber-300 px-2.5 py-2 rounded-xl border border-amber-300 shadow-2xs cursor-pointer transition-all my-1 group"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Gift className="w-4 h-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                          <span className="font-extrabold text-amber-950">Free Turnitin 1x</span>
+                        </div>
+                        <span className="bg-amber-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                          Gratis
+                        </span>
+                      </Link>
+
                       <Link
                         href="/member?tab=history"
                         onClick={() => setShowDropdown(false)}
@@ -482,6 +498,21 @@ export default function Navbar() {
                   <span className="text-[10px] text-gray-500 truncate mt-0.5">{user.university}</span>
                   <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                 </div>
+
+                {/* Free Turnitin 1x Menu Item with Gold Styling */}
+                <Link
+                  href="/member?tab=redeem"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between w-full text-left text-xs font-black text-amber-950 bg-gradient-to-r from-amber-100/90 via-yellow-100 to-amber-200/90 hover:from-amber-200 hover:to-amber-300 px-3 py-2.5 rounded-xl border border-amber-300 shadow-2xs cursor-pointer transition-all my-1 group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                    <span className="font-extrabold text-amber-950">Free Turnitin 1x</span>
+                  </div>
+                  <span className="bg-amber-500 text-white font-black text-[9px] px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                    Gratis
+                  </span>
+                </Link>
 
                 <Link
                   href="/member?tab=history"

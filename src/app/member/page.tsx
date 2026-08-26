@@ -39,6 +39,13 @@ export default function MemberPage() {
   const activeTabParam = searchParams.get('tab') || 'history';
   const [activeTab, setActiveTab] = useState<string>(activeTabParam);
 
+  // Sync tab state when URL search params change
+  useEffect(() => {
+    if (activeTabParam) {
+      setActiveTab(activeTabParam);
+    }
+  }, [activeTabParam]);
+
   const [dbOrders, setDbOrders] = useState<any[]>([]);
   const [fetchingOrders, setFetchingOrders] = useState<boolean>(true);
 
@@ -643,17 +650,12 @@ Mohon segera diproses kak, terima kasih!`;
                   </div>
 
                   {/* Monthly Top Sharer Incentive Notice */}
-                  <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-lg shrink-0 shadow-sm">
-                        🏆
-                      </div>
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-black text-amber-300">Reward Bulanan: Gratis 1x Cek AI!</h4>
-                        <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5">
-                          Member dengan frekuensi share terbanyak tiap bulan akan otomatis mendapatkan voucher <strong>Gratis 1x Cek AI ZeroGPT</strong>.
-                        </p>
-                      </div>
+                  <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 shadow-sm border border-slate-800">
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-black text-amber-300">Reward Bulanan: Gratis 1x Cek AI!</h4>
+                      <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5">
+                        Member dengan frekuensi share terbanyak tiap bulan akan otomatis mendapatkan voucher <strong>Gratis 1x Cek AI ZeroGPT</strong>.
+                      </p>
                     </div>
                   </div>
 
