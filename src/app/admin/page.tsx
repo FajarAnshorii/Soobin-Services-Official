@@ -2530,10 +2530,10 @@ export default function AdminPage() {
                 <div>
                   <h2 className="font-black text-base text-slate-900 flex items-center gap-2">
                     <Users className="w-5 h-5 text-slate-900" />
-                    Daftar Member Terdaftar (Database Supabase)
+                    Daftar Member Terdaftar (Database Cloudflare D1)
                   </h2>
                   <p className="text-xs text-slate-900 mt-0.5 font-bold">
-                    Total {filteredMembers.length} member terdaftar. Kolom statistik share terhubung langsung secara realtime.
+                    Total {filteredMembers.length} member terdaftar. Data terhubung langsung ke Cloudflare D1 secara realtime.
                   </p>
                 </div>
 
