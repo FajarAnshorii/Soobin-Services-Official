@@ -11,7 +11,7 @@ import {
   ShoppingBag, CheckCircle, XCircle, Eye, RefreshCw, X, QrCode, Plus,
   Download, Users, DollarSign, FileSpreadsheet, Edit3, Save, ChevronLeft, ChevronRight,
   Search, LayoutDashboard, TrendingUp, Clock, Check, FileText, Trash2, Star, Calendar as CalendarIcon,
-  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, ImagePlus, Loader2, Gift, Sparkles, Award, ExternalLink, Copy
+  Menu, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, ImagePlus, Loader2, Gift, Sparkles, Award, ExternalLink, Copy, Flame
 } from 'lucide-react';
 import { compressChatImage } from '@/lib/imageCompressor';
 
@@ -454,6 +454,18 @@ export default function AdminPage() {
   };
 
   // Sync Redeems API
+  const [redeemBatchQuota, setRedeemBatchQuota] = useState<{
+    totalQuota: number;
+    claimedCount: number;
+    remainingQuota: number;
+    batchEndTime: number;
+  }>({
+    totalQuota: 10,
+    claimedCount: 0,
+    remainingQuota: 10,
+    batchEndTime: 0,
+  });
+
   const syncRedeemsWithCloud = async () => {
     try {
       setRedeemsLoading(true);
@@ -464,6 +476,14 @@ export default function AdminPage() {
           setRedeems(data);
           try {
             localStorage.setItem('soobin_redeems_list', JSON.stringify(data));
+          } catch (e) {}
+        } else if (data && Array.isArray(data.redeems)) {
+          setRedeems(data.redeems);
+          if (data.quota) {
+            setRedeemBatchQuota(data.quota);
+          }
+          try {
+            localStorage.setItem('soobin_redeems_list', JSON.stringify(data.redeems));
           } catch (e) {}
         }
       }
@@ -2666,6 +2686,43 @@ export default function AdminPage() {
                       <RefreshCw className={`w-3.5 h-3.5 ${redeemsLoading ? 'animate-spin' : ''}`} />
                       <span>{redeemsLoading ? 'Sinkron...' : 'Refresh Data'}</span>
                     </button>
+                  </div>
+                </div>
+
+                {/* 3-Day Batch Quota Monitor Card */}
+                <div className="mt-4 bg-slate-900 text-white rounded-xl p-4 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                      <Flame className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-white">Status Kuota Batch 3 Hari (Rebutan 10 Slot):</span>
+                        <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                          redeemBatchQuota.remainingQuota > 0 
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                            : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        }`}>
+                          {redeemBatchQuota.remainingQuota > 0 ? `${redeemBatchQuota.remainingQuota} / 10 Slot Tersedia` : 'Kuota Batch Penuh (0/10)'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Maksimal 10 ACC per batch 3 hari. Ter-ACC Batch Ini: <strong className="text-amber-300">{redeemBatchQuota.claimedCount} / 10</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-full sm:w-48 bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700 p-0.5">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        redeemBatchQuota.remainingQuota === 0
+                          ? 'bg-rose-500'
+                          : redeemBatchQuota.remainingQuota <= 3
+                          ? 'bg-amber-500'
+                          : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${Math.min(100, (redeemBatchQuota.claimedCount / 10) * 100)}%` }}
+                    />
                   </div>
                 </div>
 

@@ -28,7 +28,10 @@ import {
   Send,
   MessageCircle,
   Copy,
-  Check
+  Check,
+  Flame,
+  ShieldAlert,
+  Ticket,
 } from 'lucide-react';
 import { compressChatImage } from '@/lib/imageCompressor';
 
@@ -38,19 +41,23 @@ export default function MemberPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTabParam = searchParams.get('tab') || 'history';
-  const [activeTab, setActiveTab] = useState<string>(activeTabParam);
+
+  // Tabs: 'history' (Riwayat Pesanan) | 'cart' (Keranjang) | 'redeem' (Free Turnitin 1x)
+  const [activeTab, setActiveTab] = useState<'history' | 'cart' | 'redeem'>(
+    activeTabParam === 'redeem' ? 'redeem' : activeTabParam === 'cart' ? 'cart' : 'history'
+  );
 
   // Sync tab state when URL search params change
   useEffect(() => {
     if (activeTabParam) {
-      setActiveTab(activeTabParam);
+      setActiveTab(activeTabParam as 'history' | 'cart' | 'redeem');
     }
   }, [activeTabParam]);
 
   const [dbOrders, setDbOrders] = useState<any[]>([]);
   const [fetchingOrders, setFetchingOrders] = useState<boolean>(true);
 
-  // REDEEM FREE TURNITIN STATES
+  // Free Turnitin Share-To-Redeem States
   const [redeems, setRedeems] = useState<any[]>([]);
   const [fetchingRedeems, setFetchingRedeems] = useState<boolean>(true);
   const [redeemPlatform, setRedeemPlatform] = useState<'WhatsApp Status' | 'Instagram Story'>('WhatsApp Status');
@@ -61,8 +68,20 @@ export default function MemberPage() {
   const [redeemSubmitError, setRedeemSubmitError] = useState<string>('');
   const [copiedVoucher, setCopiedVoucher] = useState<boolean>(false);
   const [cooldownRemainingText, setCooldownRemainingText] = useState<string>('');
+  const [batchCountdownText, setBatchCountdownText] = useState<string>('');
+  const [batchQuota, setBatchQuota] = useState<{
+    totalQuota: number;
+    claimedCount: number;
+    remainingQuota: number;
+    batchEndTime: number;
+  }>({
+    totalQuota: 10,
+    claimedCount: 0,
+    remainingQuota: 10,
+    batchEndTime: 0,
+  });
 
-  // Fetch real-time member redeems from Supabase / API
+  // Fetch real-time member redeems & batch quota from Supabase / API
   useEffect(() => {
     if (!user) return;
     let isMounted = true;
@@ -72,8 +91,20 @@ export default function MemberPage() {
         const res = await fetch(`/api/redeems?email=${encodeURIComponent(user.email)}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
-        if (Array.isArray(data) && isMounted) {
-          setRedeems(data);
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            setRedeems(data);
+          } else if (data && Array.isArray(data.redeems)) {
+            setRedeems(data.redeems);
+            if (data.quota) {
+              setBatchQuota({
+                totalQuota: data.quota.totalQuota || 10,
+                claimedCount: data.quota.claimedCount || 0,
+                remainingQuota: data.quota.remainingQuota !== undefined ? data.quota.remainingQuota : 10,
+                batchEndTime: data.quota.batchEndTime || 0,
+              });
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to fetch member redeems:', err);
@@ -90,6 +121,34 @@ export default function MemberPage() {
       clearInterval(interval);
     };
   }, [user]);
+
+  // Live Timer for 3-Day Batch Reset
+  useEffect(() => {
+    if (!batchQuota.batchEndTime) return;
+
+    const updateBatchTimer = () => {
+      const diff = batchQuota.batchEndTime - Date.now();
+      if (diff <= 0) {
+        setBatchCountdownText('Sedang Reset Batch Baru...');
+        return;
+      }
+
+      const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+      const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+      const minutes = Math.floor((diff % (60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((diff % (60 * 1000)) / 1000);
+
+      if (days > 0) {
+        setBatchCountdownText(`${days} Hari ${hours} Jam ${minutes} Menit`);
+      } else {
+        setBatchCountdownText(`${hours} Jam ${minutes} Menit ${seconds} Detik`);
+      }
+    };
+
+    updateBatchTimer();
+    const timerInterval = setInterval(updateBatchTimer, 1000);
+    return () => clearInterval(timerInterval);
+  }, [batchQuota.batchEndTime]);
 
   // Derived Redeem Stats
   const latestRedeem = useMemo(() => {
@@ -663,6 +722,55 @@ Mohon segera diproses kak, terima kasih!`;
                     </div>
                   </div>
 
+                  {/* 3-Day Batch Quota Tracker (Rebutan 10 Kuota) */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-sm flex flex-col gap-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800">
+                      <div className="flex items-center gap-2.5">
+                        <Flame className="w-5 h-5 text-amber-400 shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-black text-white">Kuota Rebutan Batch 3 Hari</h4>
+                          <p className="text-[11px] text-slate-400">Sistem reset otomatis tiap 3 hari (Maksimal 10 Voucher per Batch)</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 self-start sm:self-auto bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+                        <Clock className="w-3.5 h-3.5 text-amber-300" />
+                        <span className="text-[11px] text-slate-400 font-semibold">Reset:</span>
+                        <span className="font-mono text-xs font-black text-amber-300">
+                          {batchCountdownText || 'Menghitung...'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar & Badges */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-slate-300">
+                          Status Kuota:{' '}
+                          <span className={batchQuota.remainingQuota > 0 ? "text-emerald-400 font-black" : "text-rose-400 font-black"}>
+                            {batchQuota.remainingQuota > 0 ? `${batchQuota.remainingQuota} / 10 Slot Tersedia` : 'Kuota Penuh (0/10 Tersisa)'}
+                          </span>
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          {batchQuota.claimedCount} Terklaim (ACC)
+                        </span>
+                      </div>
+
+                      {/* Smooth Progress Bar */}
+                      <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            batchQuota.remainingQuota === 0
+                              ? 'bg-rose-500'
+                              : batchQuota.remainingQuota <= 3
+                              ? 'bg-amber-500'
+                              : 'bg-emerald-500'
+                          }`}
+                          style={{ width: `${Math.min(100, (batchQuota.claimedCount / 10) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* ACTIVE CLAIM STATUS STATES */}
                   {fetchingRedeems ? (
                     <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center flex items-center justify-center">
@@ -722,7 +830,7 @@ Mohon segera diproses kak, terima kasih!`;
                       </div>
 
                       {/* Voucher Card Showcase */}
-                      <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-emerald-500/30">
+                      <div className="bg-linear-to-br from-emerald-900 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-emerald-500/30">
                         <div className="space-y-1">
                           <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-300">
                             KODE VOUCHER RESMI SOOBIN
@@ -773,8 +881,32 @@ Mohon segera diproses kak, terima kasih!`;
                         </span>
                       </div>
                     </div>
+                  ) : batchQuota.remainingQuota === 0 ? (
+                    /* STATE 3: BATCH QUOTA EXHAUSTED (0/10) */
+                    <div className="bg-white rounded-2xl border-2 border-rose-200 p-6 sm:p-8 shadow-sm flex flex-col items-center text-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shadow-xs">
+                        <ShieldAlert className="w-7 h-7" />
+                      </div>
+                      <div className="max-w-md space-y-1.5">
+                        <h4 className="text-base sm:text-lg font-black text-gray-900">Kuota Klaim Batch Ini Telah Habis</h4>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          10 kuota Free Turnitin untuk periode 3 hari ini sudah diklaim oleh member lain. Kuota akan di-reset kembali secara otomatis saat batch baru dibuka!
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-900 text-white rounded-xl p-4 w-full max-w-sm border border-slate-800 flex flex-col items-center gap-1.5 shadow-inner">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Batch Baru Dibuka Dalam:</span>
+                        <span className="font-mono text-base font-black text-amber-300">
+                          ⏳ {batchCountdownText || 'Menghitung...'}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-gray-500">
+                        💡 <em>Pasang pengingat agar Anda siap rebutan kuota 10 slot saat batch baru dibuka!</em>
+                      </p>
+                    </div>
                   ) : (
-                    /* STATE 3: SUBMIT FORM (NEW CLAIM / COOLDOWN EXPIRED / AFTER REJECT) */
+                    /* STATE 4: SUBMIT FORM (NEW CLAIM / COOLDOWN EXPIRED / AFTER REJECT) */
                     <div className="bg-white rounded-2xl border border-gray-150 p-5 sm:p-7 shadow-sm flex flex-col gap-6">
                       
                       {/* Rejected Notice if previous was rejected */}

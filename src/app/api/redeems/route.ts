@@ -4,6 +4,25 @@ import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
 
+const BATCH_DURATION_MS = 3 * 24 * 60 * 60 * 1000; // 3 Days (72 Hours)
+const BATCH_MAX_QUOTA = 10; // 10 Quota per 3-Day Batch
+
+// Helper to compute fixed 3-day batch interval aligned to Unix epoch
+export function getBatchInterval() {
+  const now = Date.now();
+  const batchIndex = Math.floor(now / BATCH_DURATION_MS);
+  const startTime = batchIndex * BATCH_DURATION_MS;
+  const endTime = startTime + BATCH_DURATION_MS;
+  return {
+    batchIndex,
+    startTime,
+    endTime,
+    startIso: new Date(startTime).toISOString(),
+    endIso: new Date(endTime).toISOString(),
+    nextBatchInMs: Math.max(0, endTime - now),
+  };
+}
+
 // Helper to generate a unique, cryptographically-secure, tamper-proof random voucher code
 const generateUniqueVoucherCode = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid ambiguous chars (O, 0, 1, I)
@@ -27,6 +46,7 @@ export async function GET(request: Request) {
       }
     }
 
+    const { startTime, endTime, nextBatchInMs } = getBatchInterval();
     let redeemsList: any[] = [];
 
     // 1. Try fetching from dedicated Supabase table 'turnitin_redeems'
@@ -59,10 +79,6 @@ export async function GET(request: Request) {
         .eq('payment_method', 'REDEEM_SHARE')
         .order('created_at', { ascending: false });
 
-      if (filterEmail) {
-        query = query.eq('customer_email', filterEmail);
-      }
-
       const { data: fallbackOrders, error: orderErr } = await query;
 
       if (!orderErr && Array.isArray(fallbackOrders)) {
@@ -87,15 +103,40 @@ export async function GET(request: Request) {
       }
     }
 
+    // Calculate real-time batch quota across all approved claims in current 3-day batch
+    const approvedInBatch = redeemsList.filter((r) => {
+      if (r.status !== 'DISETUJUI') return false;
+      const t = new Date(r.approvedAt || r.createdAt).getTime();
+      return t >= startTime && t < endTime;
+    });
+
+    const claimedCount = approvedInBatch.length;
+    const remainingQuota = Math.max(0, BATCH_MAX_QUOTA - claimedCount);
+
+    const quotaInfo = {
+      totalQuota: BATCH_MAX_QUOTA,
+      claimedCount,
+      remainingQuota,
+      batchStartTime: startTime,
+      batchEndTime: endTime,
+      nextBatchInMs,
+    };
+
     // Filter by member email if requested
     if (filterEmail) {
       const filtered = redeemsList.filter(
         (r) => (r.memberEmail || '').toLowerCase().trim() === filterEmail.trim()
       );
-      return NextResponse.json(filtered);
+      return NextResponse.json({
+        redeems: filtered,
+        quota: quotaInfo,
+      });
     }
 
-    return NextResponse.json(redeemsList);
+    return NextResponse.json({
+      redeems: redeemsList,
+      quota: quotaInfo,
+    });
   } catch (e: any) {
     console.error('API GET redeems error:', e);
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
@@ -114,18 +155,42 @@ export async function POST(request: Request) {
     }
 
     const email = body.memberEmail.toLowerCase().trim();
+    const { startTime, endTime, nextBatchInMs } = getBatchInterval();
 
-    // Check existing redeems for this member to enforce cooldown & prevent spam
-    const { data: existingClaims } = await supabaseAdmin
+    // 1. Query all redeems in database to evaluate batch quota and member cooldowns
+    const { data: allClaims } = await supabaseAdmin
       .from('orders')
       .select('*')
       .eq('payment_method', 'REDEEM_SHARE')
-      .eq('customer_email', email)
       .order('created_at', { ascending: false });
 
-    if (existingClaims && existingClaims.length > 0) {
-      // 1. Check if there's an active pending claim
-      const pendingClaim = existingClaims.find((c) => c.payment_status === 'MENUNGGU_VERIFIKASI');
+    const claimsList = allClaims || [];
+
+    // 2. Check 10-quota limit in current 3-day batch
+    const approvedInCurrentBatch = claimsList.filter((c: any) => {
+      if (c.payment_status !== 'DISETUJUI') return false;
+      const t = new Date((c.custom_fields && c.custom_fields.approvedAt) || c.created_at).getTime();
+      return t >= startTime && t < endTime;
+    });
+
+    if (approvedInCurrentBatch.length >= BATCH_MAX_QUOTA) {
+      const hoursRemaining = Math.ceil(nextBatchInMs / (60 * 60 * 1000));
+      return NextResponse.json(
+        {
+          error: `Kuota klaim batch 3 hari ini telah habis (10/10 kuota telah terisi). Batch baru akan dibuka dalam sekitar ${hoursRemaining} jam lagi.`,
+          quotaExhausted: true,
+          nextBatchInMs,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. Check individual member claims
+    const memberClaims = claimsList.filter((c: any) => (c.customer_email || '').toLowerCase().trim() === email);
+
+    if (memberClaims.length > 0) {
+      // Check active pending claim
+      const pendingClaim = memberClaims.find((c: any) => c.payment_status === 'MENUNGGU_VERIFIKASI');
       if (pendingClaim) {
         return NextResponse.json(
           { error: 'Anda masih memiliki pengajuan klaim yang sedang menunggu verifikasi admin.' },
@@ -133,8 +198,8 @@ export async function POST(request: Request) {
         );
       }
 
-      // 2. Check 3-day (72-hour) cooldown on approved claims
-      const approvedClaims = existingClaims.filter((c) => c.payment_status === 'DISETUJUI');
+      // Check personal 3-day (72-hour) cooldown on approved claims
+      const approvedClaims = memberClaims.filter((c: any) => c.payment_status === 'DISETUJUI');
       if (approvedClaims.length > 0) {
         const latest = approvedClaims[0];
         const approvedTime = new Date((latest.custom_fields && latest.custom_fields.approvedAt) || latest.created_at).getTime();
@@ -145,7 +210,7 @@ export async function POST(request: Request) {
           const remainingMs = THREE_DAYS_MS - elapsed;
           const hours = Math.ceil(remainingMs / (60 * 60 * 1000));
           return NextResponse.json(
-            { error: `Cooldown klaim masih aktif. Anda dapat melakukan klaim gratis berikutnya dalam sekitar ${hours} jam lagi.` },
+            { error: `Cooldown klaim pribadi Anda masih aktif. Anda dapat melakukan klaim gratis berikutnya dalam sekitar ${hours} jam lagi.` },
             { status: 400 }
           );
         }
