@@ -3,10 +3,6 @@
  * Serverless SQL at the Edge with Zero Egress Limits
  */
 
-const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || '';
-const DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID || '';
-const API_TOKEN = process.env.CLOUDFLARE_D1_API_TOKEN || '';
-
 export interface D1QueryResult<T = any> {
   results: T[];
   success: boolean;
@@ -16,12 +12,20 @@ export interface D1QueryResult<T = any> {
 
 export async function queryD1<T = any>(sql: string, params: any[] = []): Promise<D1QueryResult<T>> {
   try {
-    const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${DATABASE_ID}/query`;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || '69ab6d528c0c20bc8810d3edd33a11fa';
+    const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID || 'a14c0f58-46b4-4164-b067-87bd18ac7612';
+    const apiToken = process.env.CLOUDFLARE_D1_API_TOKEN || '';
+
+    if (!apiToken) {
+      console.warn('⚠️ [Cloudflare D1] CLOUDFLARE_D1_API_TOKEN is missing.');
+    }
+
+    const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`;
 
     const res = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ sql, params }),

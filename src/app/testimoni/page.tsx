@@ -75,8 +75,17 @@ export default function TestimoniPage() {
 
   useEffect(() => {
     fetchTestimonials();
-    const interval = setInterval(fetchTestimonials, 4000); // 4s fast background sync
-    return () => clearInterval(interval);
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchTestimonials();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    const interval = setInterval(handleFocus, 30000); // 30s background sync
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   // List of all active testimonials from Supabase
