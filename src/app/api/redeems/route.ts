@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
@@ -23,7 +23,7 @@ export function getBatchInterval() {
   };
 }
 
-// Helper to generate a unique, cryptographically-secure, tamper-proof random voucher code
+// Helper to generate a unique, cryptographically-secure random voucher code
 const generateUniqueVoucherCode = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid ambiguous chars (O, 0, 1, I)
   let result = '';
@@ -49,58 +49,25 @@ export async function GET(request: Request) {
     const { startTime, endTime, nextBatchInMs } = getBatchInterval();
     let redeemsList: any[] = [];
 
-    // 1. Try fetching from dedicated Supabase table 'turnitin_redeems'
-    const { data: supaRedeems, error: redeemTableErr } = await supabaseAdmin
-      .from('turnitin_redeems')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Fetch from Cloudflare D1 table 'turnitin_redeems'
+    const { results, success } = await queryD1('SELECT * FROM turnitin_redeems ORDER BY created_at DESC;');
 
-    if (!redeemTableErr && Array.isArray(supaRedeems) && supaRedeems.length > 0) {
-      redeemsList = supaRedeems.map((r: any) => ({
+    if (success && Array.isArray(results) && results.length > 0) {
+      redeemsList = results.map((r: any) => ({
         id: r.id,
-        memberEmail: r.member_email || r.memberEmail || '',
-        memberName: r.member_name || r.memberName || '',
-        memberUniversity: r.member_university || r.memberUniversity || '',
-        memberProdi: r.member_prodi || r.memberProdi || '',
-        memberPhone: r.member_phone || r.memberPhone || '',
+        memberEmail: r.member_email || '',
+        memberName: r.member_name || '',
+        memberUniversity: r.member_university || '',
+        memberProdi: r.member_prodi || '',
+        memberPhone: r.member_phone || '',
         platform: r.platform || 'WhatsApp Status',
-        proofImage: r.proof_image || r.proofImage || '',
+        proofImage: r.proof_image || '',
         status: r.status || 'MENUNGGU_VERIFIKASI',
-        voucherCode: r.voucher_code || r.voucherCode || null,
-        adminNote: r.admin_note || r.adminNote || null,
-        approvedAt: r.approved_at || r.approvedAt || null,
-        createdAt: r.created_at || r.createdAt || new Date().toISOString(),
+        voucherCode: r.voucher_code || null,
+        adminNote: r.admin_note || null,
+        approvedAt: r.approved_at || null,
+        createdAt: r.created_at || new Date().toISOString(),
       }));
-    } else {
-      // 2. Fetch from Supabase 'orders' table where payment_method = 'REDEEM_SHARE'
-      let query = supabaseAdmin
-        .from('orders')
-        .select('*')
-        .eq('payment_method', 'REDEEM_SHARE')
-        .order('created_at', { ascending: false });
-
-      const { data: fallbackOrders, error: orderErr } = await query;
-
-      if (!orderErr && Array.isArray(fallbackOrders)) {
-        redeemsList = fallbackOrders.map((o: any) => {
-          const custom = o.custom_fields || {};
-          return {
-            id: o.id,
-            memberEmail: o.customer_email || '',
-            memberName: o.customer_name || '',
-            memberUniversity: custom.memberUniversity || '',
-            memberProdi: custom.memberProdi || '',
-            memberPhone: custom.memberPhone || '',
-            platform: custom.platform || 'WhatsApp Status',
-            proofImage: o.proof_image || '',
-            status: o.payment_status || 'MENUNGGU_VERIFIKASI',
-            voucherCode: custom.voucherCode || null,
-            adminNote: custom.adminNote || null,
-            approvedAt: custom.approvedAt || null,
-            createdAt: o.created_at || new Date().toISOString(),
-          };
-        });
-      }
     }
 
     // Calculate real-time batch quota across all approved claims in current 3-day batch
@@ -157,19 +124,14 @@ export async function POST(request: Request) {
     const email = body.memberEmail.toLowerCase().trim();
     const { startTime, endTime, nextBatchInMs } = getBatchInterval();
 
-    // 1. Query all redeems in database to evaluate batch quota and member cooldowns
-    const { data: allClaims } = await supabaseAdmin
-      .from('orders')
-      .select('*')
-      .eq('payment_method', 'REDEEM_SHARE')
-      .order('created_at', { ascending: false });
-
+    // 1. Query all redeems in Cloudflare D1
+    const { results: allClaims } = await queryD1('SELECT * FROM turnitin_redeems ORDER BY created_at DESC;');
     const claimsList = allClaims || [];
 
     // 2. Check 10-quota limit in current 3-day batch
     const approvedInCurrentBatch = claimsList.filter((c: any) => {
-      if (c.payment_status !== 'DISETUJUI') return false;
-      const t = new Date((c.custom_fields && c.custom_fields.approvedAt) || c.created_at).getTime();
+      if (c.status !== 'DISETUJUI') return false;
+      const t = new Date(c.approved_at || c.created_at).getTime();
       return t >= startTime && t < endTime;
     });
 
@@ -186,11 +148,11 @@ export async function POST(request: Request) {
     }
 
     // 3. Check individual member claims
-    const memberClaims = claimsList.filter((c: any) => (c.customer_email || '').toLowerCase().trim() === email);
+    const memberClaims = claimsList.filter((c: any) => (c.member_email || '').toLowerCase().trim() === email);
 
     if (memberClaims.length > 0) {
       // Check active pending claim
-      const pendingClaim = memberClaims.find((c: any) => c.payment_status === 'MENUNGGU_VERIFIKASI');
+      const pendingClaim = memberClaims.find((c: any) => c.status === 'MENUNGGU_VERIFIKASI');
       if (pendingClaim) {
         return NextResponse.json(
           { error: 'Anda masih memiliki pengajuan klaim yang sedang menunggu verifikasi admin.' },
@@ -199,10 +161,10 @@ export async function POST(request: Request) {
       }
 
       // Check personal 3-day (72-hour) cooldown on approved claims
-      const approvedClaims = memberClaims.filter((c: any) => c.payment_status === 'DISETUJUI');
+      const approvedClaims = memberClaims.filter((c: any) => c.status === 'DISETUJUI');
       if (approvedClaims.length > 0) {
         const latest = approvedClaims[0];
-        const approvedTime = new Date((latest.custom_fields && latest.custom_fields.approvedAt) || latest.created_at).getTime();
+        const approvedTime = new Date(latest.approved_at || latest.created_at).getTime();
         const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
         const elapsed = Date.now() - approvedTime;
 
@@ -236,53 +198,42 @@ export async function POST(request: Request) {
       createdAt: createdAt,
     };
 
-    // 1. Try saving to dedicated table 'turnitin_redeems'
-    try {
-      await supabaseAdmin.from('turnitin_redeems').upsert({
-        id: redeemId,
-        member_email: formattedRedeem.memberEmail,
-        member_name: formattedRedeem.memberName,
-        member_university: formattedRedeem.memberUniversity,
-        member_prodi: formattedRedeem.memberProdi,
-        member_phone: formattedRedeem.memberPhone,
-        platform: formattedRedeem.platform,
-        proof_image: formattedRedeem.proofImage,
-        status: formattedRedeem.status,
-        voucher_code: formattedRedeem.voucherCode,
-        admin_note: formattedRedeem.adminNote,
-        approved_at: formattedRedeem.approvedAt,
-        created_at: createdAt,
-      }, { onConflict: 'id' });
-    } catch (e) {
-      // Ignore if table not present
-    }
+    // Save directly to Cloudflare D1 'turnitin_redeems'
+    const { success, error } = await queryD1(
+      `INSERT INTO turnitin_redeems (
+        id, member_email, member_name, member_university, member_prodi,
+        member_phone, platform, proof_image, status, voucher_code,
+        admin_note, approved_at, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        member_email=excluded.member_email,
+        member_name=excluded.member_name,
+        member_university=excluded.member_university,
+        member_prodi=excluded.member_prodi,
+        member_phone=excluded.member_phone,
+        platform=excluded.platform,
+        proof_image=excluded.proof_image,
+        status=excluded.status;`,
+      [
+        formattedRedeem.id,
+        formattedRedeem.memberEmail,
+        formattedRedeem.memberName,
+        formattedRedeem.memberUniversity,
+        formattedRedeem.memberProdi,
+        formattedRedeem.memberPhone,
+        formattedRedeem.platform,
+        formattedRedeem.proofImage,
+        formattedRedeem.status,
+        formattedRedeem.voucherCode,
+        formattedRedeem.adminNote,
+        formattedRedeem.approvedAt,
+        formattedRedeem.createdAt,
+      ]
+    );
 
-    // 2. Seamlessly save to Supabase 'orders' table with payment_method: 'REDEEM_SHARE'
-    const { error: orderErr } = await supabaseAdmin.from('orders').upsert({
-      id: redeemId,
-      customer_name: formattedRedeem.memberName,
-      customer_email: formattedRedeem.memberEmail,
-      service_name: 'Free Cek Turnitin 1x (Share Status/Story)',
-      price: 'Rp 0 (Klaim Voucher)',
-      payment_method: 'REDEEM_SHARE',
-      payment_status: 'MENUNGGU_VERIFIKASI',
-      custom_fields: {
-        platform: formattedRedeem.platform,
-        memberUniversity: formattedRedeem.memberUniversity,
-        memberProdi: formattedRedeem.memberProdi,
-        memberPhone: formattedRedeem.memberPhone,
-        voucherCode: null,
-        adminNote: null,
-        approvedAt: null,
-        isRedeemPromo: true,
-      },
-      proof_image: formattedRedeem.proofImage,
-      created_at: createdAt,
-    }, { onConflict: 'id' }).select();
-
-    if (orderErr) {
-      console.error('Supabase order save error:', orderErr);
-      return NextResponse.json({ error: orderErr.message || 'Gagal menyimpan ke database Supabase' }, { status: 500 });
+    if (!success) {
+      console.error('Cloudflare D1 redeem save error:', error);
+      return NextResponse.json({ error: error || 'Gagal menyimpan ke database' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, redeem: formattedRedeem });
@@ -313,42 +264,17 @@ export async function PATCH(request: Request) {
     const approvedAt = isApprove ? new Date().toISOString() : null;
     const adminNote = isApprove ? null : reason || 'Bukti status/story tidak memenuhi syarat publik (privat/dikecualikan).';
 
-    // 1. Update in dedicated 'turnitin_redeems' table if exists (automatically purge proof_image to free storage)
-    try {
-      await supabaseAdmin
-        .from('turnitin_redeems')
-        .update({
-          status: newStatus,
-          voucher_code: voucherCode,
-          approved_at: approvedAt,
-          admin_note: adminNote,
-          proof_image: null,
-        })
-        .eq('id', id);
-    } catch (e) {}
+    // Update in Cloudflare D1 'turnitin_redeems' table
+    const { success, error } = await queryD1(
+      `UPDATE turnitin_redeems
+       SET status = ?, voucher_code = ?, approved_at = ?, admin_note = ?, proof_image = NULL
+       WHERE id = ?;`,
+      [newStatus, voucherCode, approvedAt, adminNote, id]
+    );
 
-    // 2. Update in Supabase 'orders' table (automatically purge proof_image to free storage)
-    const { data: existingOrder } = await supabaseAdmin.from('orders').select('*').eq('id', id).single();
-    const currentCustom = (existingOrder && existingOrder.custom_fields) || {};
-
-    const updatedCustom = {
-      ...currentCustom,
-      voucherCode: voucherCode || currentCustom.voucherCode,
-      approvedAt: approvedAt || currentCustom.approvedAt,
-      adminNote: adminNote || currentCustom.adminNote,
-    };
-
-    const { error: updateErr } = await supabaseAdmin
-      .from('orders')
-      .update({
-        payment_status: newStatus,
-        custom_fields: updatedCustom,
-        proof_image: null,
-      })
-      .eq('id', id);
-
-    if (updateErr) {
-      console.error('Supabase order update error:', updateErr);
+    if (!success) {
+      console.error('Cloudflare D1 redeem update error:', error);
+      return NextResponse.json({ error: error || 'Gagal update status di D1' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -379,13 +305,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID wajib disertakan' }, { status: 400 });
     }
 
-    // 1. Delete from dedicated table
-    try {
-      await supabaseAdmin.from('turnitin_redeems').delete().eq('id', id);
-    } catch (e) {}
-
-    // 2. Delete from 'orders' table
-    await supabaseAdmin.from('orders').delete().eq('id', id);
+    await queryD1('DELETE FROM turnitin_redeems WHERE id = ?;', [id]);
 
     return NextResponse.json({ success: true, deletedId: id });
   } catch (e: any) {
@@ -393,3 +313,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+

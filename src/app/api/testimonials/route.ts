@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { queryD1 } from '@/lib/d1';
 
 export const runtime = 'edge';
 
@@ -29,36 +29,42 @@ const DEFAULT_INITIAL_TESTIMONIALS: TestimonialItem[] = [
 
 async function getStoredTestimonials(): Promise<TestimonialItem[]> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('chats')
-      .select('messages')
-      .eq('id', STORE_ID)
-      .single();
-
-    if (!error && data && Array.isArray(data.messages) && data.messages.length > 0) {
-      return data.messages as TestimonialItem[];
+    const { results } = await queryD1('SELECT messages FROM chats WHERE id = ? LIMIT 1;', [STORE_ID]);
+    if (results && results.length > 0) {
+      const msgs = typeof results[0].messages === 'string' ? JSON.parse(results[0].messages) : results[0].messages;
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        return msgs as TestimonialItem[];
+      }
     }
   } catch (e) {
-    console.error('Error fetching testimonials from Supabase:', e);
+    console.error('Error fetching testimonials from Cloudflare D1:', e);
   }
   return DEFAULT_INITIAL_TESTIMONIALS;
 }
 
 async function saveStoredTestimonials(list: TestimonialItem[]): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin.from('chats').upsert({
-      id: STORE_ID,
-      name: 'SOOBIN Testimonials Database',
-      email: 'admin@soobin.com',
-      university: 'Official System',
-      prodi: 'Database',
-      unread_count: list.length,
-      messages: list,
-      updated_at: new Date().toISOString(),
-    });
-    return !error;
+    const { success } = await queryD1(
+      `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         messages=excluded.messages,
+         unread_count=excluded.unread_count,
+         updated_at=excluded.updated_at;`,
+      [
+        STORE_ID,
+        'SOOBIN Testimonials Database',
+        'admin@soobin.com',
+        'Official System',
+        'Database',
+        list.length,
+        JSON.stringify(list),
+        new Date().toISOString(),
+      ]
+    );
+    return success;
   } catch (e) {
-    console.error('Error saving testimonials to Supabase:', e);
+    console.error('Error saving testimonials to Cloudflare D1:', e);
     return false;
   }
 }

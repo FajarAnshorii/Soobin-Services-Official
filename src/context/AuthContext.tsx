@@ -22,8 +22,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to auto-sync user profile to Supabase via /api/members
-const syncMemberToSupabase = (userData: User) => {
+// Helper to hash password securely with Web Crypto SHA-256
+async function hashPassword(password: string): Promise<string> {
+  if (!password) return '';
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + '_soobin_salt_2026');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Helper to auto-sync user profile to Cloudflare D1 via /api/members
+const syncMemberToDatabase = (userData: User, passwordHash?: string) => {
   if (!userData || !userData.email) return;
   fetch('/api/members', {
     method: 'POST',
@@ -33,6 +43,7 @@ const syncMemberToSupabase = (userData: User) => {
       email: userData.email,
       university: userData.university,
       prodi: userData.prodi,
+      passwordHash: passwordHash || null,
       createdAt: new Date().toISOString(),
     }),
   }).catch(console.error);
@@ -43,32 +54,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Load session from Supabase Auth & fallback to localStorage on mount
+  // Load session from localStorage on mount
   useEffect(() => {
-    const initAuth = async () => {
+    const initAuth = () => {
       try {
-        // 1. Check Supabase Auth Session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session && session.user) {
-          const meta = session.user.user_metadata || {};
-          const authUser: User = {
-            email: session.user.email || '',
-            name: meta.name || meta.full_name || session.user.email?.split('@')[0] || 'Member SOOBIN',
-            university: meta.university || '-',
-            prodi: meta.prodi || '-',
-          };
-          setUser(authUser);
-          localStorage.setItem('soobin_session', JSON.stringify(authUser));
-          syncMemberToSupabase(authUser);
-          return;
-        }
-
-        // 2. Fallback to cached session
         const savedSession = localStorage.getItem('soobin_session');
         if (savedSession) {
           const parsed = JSON.parse(savedSession);
-          setUser(parsed);
-          syncMemberToSupabase(parsed);
+          if (parsed && parsed.email) {
+            setUser(parsed);
+            syncMemberToDatabase(parsed);
+          }
         }
       } catch (e) {
         console.error('Failed to load auth session', e);
@@ -83,63 +79,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.removeItem('soobin_users');
     } catch {}
-
-    // Listen to Supabase Auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && session.user) {
-        const meta = session.user.user_metadata || {};
-        const authUser: User = {
-          email: session.user.email || '',
-          name: meta.name || meta.full_name || session.user.email?.split('@')[0] || 'Member SOOBIN',
-          university: meta.university || '-',
-          prodi: meta.prodi || '-',
-        };
-        setUser(authUser);
-        localStorage.setItem('soobin_session', JSON.stringify(authUser));
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        localStorage.removeItem('soobin_session');
-      }
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
   }, []);
 
   const register = async (userData: User & { password?: string }): Promise<boolean> => {
     try {
       const email = userData.email.toLowerCase().trim();
       const password = userData.password || '';
+      const passwordHash = await hashPassword(password);
 
-      // 1. Sign up securely in Supabase Auth (Bcrypt hashed on server)
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: userData.name,
-            university: userData.university,
-            prodi: userData.prodi,
-          },
-        },
-      });
-
-      if (error && !error.message.toLowerCase().includes('already registered')) {
-        console.warn('Supabase Auth signup notice:', error.message);
-      }
-
-      // 2. Realtime Sync member profile to database
       const sessionUser: User = {
         email,
-        name: userData.name,
-        university: userData.university,
-        prodi: userData.prodi,
+        name: userData.name || 'Member SOOBIN',
+        university: userData.university || 'Universitas Trunojoyo Madura',
+        prodi: userData.prodi || 'Program Studi S1',
       };
 
-      syncMemberToSupabase(sessionUser);
+      // 1. Save member to Cloudflare D1 Database
+      await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: sessionUser.name,
+          email: sessionUser.email,
+          university: sessionUser.university,
+          prodi: sessionUser.prodi,
+          passwordHash,
+          createdAt: new Date().toISOString(),
+        }),
+      });
 
-      // 3. Set secure session state
+      // 2. Set active session state
       localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
       setUser(sessionUser);
       return true;
@@ -153,32 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const email = emailInput.toLowerCase().trim();
       const pwd = password || '';
-
-      // 1. Attempt login with Supabase Auth
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password: pwd,
-      });
-
-      if (data && data.user) {
-        const meta = data.user.user_metadata || {};
-        const sessionUser: User = {
-          email: data.user.email || email,
-          name: meta.name || meta.full_name || email.split('@')[0],
-          university: meta.university || 'Universitas Trunojoyo Madura',
-          prodi: meta.prodi || 'Program Studi S1',
-        };
-
-        localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
-        setUser(sessionUser);
-        syncMemberToSupabase(sessionUser);
-        return true;
-      }
-
-      // 2. If user was registered before Supabase Auth integration, auto-upgrade account
-      if (error) {
-        console.warn('Supabase Auth login fallback:', error.message);
-      }
+      const passwordHash = await hashPassword(pwd);
 
       const sessionUser: User = {
         email,
@@ -187,9 +131,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         prodi: 'Program Studi S1',
       };
 
+      // Sync member record to Cloudflare D1
+      syncMemberToDatabase(sessionUser, passwordHash);
+
       localStorage.setItem('soobin_session', JSON.stringify(sessionUser));
       setUser(sessionUser);
-      syncMemberToSupabase(sessionUser);
       return true;
     } catch (err: any) {
       console.error('Login error:', err);
@@ -199,33 +145,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     setIsLoggingOut(true);
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.error('Supabase signout error:', e);
-    }
     setTimeout(() => {
       localStorage.removeItem('soobin_session');
       setUser(null);
       setIsLoggingOut(false);
-    }, 1200);
+    }, 1000);
   };
 
   const forgotPassword = async (emailInput: string, newPassword?: string): Promise<boolean> => {
     try {
       const email = emailInput.toLowerCase().trim();
-      
-      // 1. Attempt password update if session exists or reset email
       if (newPassword) {
-        try {
-          await supabase.auth.updateUser({ password: newPassword });
-        } catch (e) {}
+        const passwordHash = await hashPassword(newPassword);
+        syncMemberToDatabase({
+          email,
+          name: email.split('@')[0],
+          university: 'Universitas Trunojoyo Madura',
+          prodi: 'Program Studi S1',
+        }, passwordHash);
       }
-
-      try {
-        await supabase.auth.resetPasswordForEmail(email);
-      } catch (e) {}
-
       return true;
     } catch (err: any) {
       console.error('Forgot password error:', err);

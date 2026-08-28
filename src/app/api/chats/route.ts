@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
@@ -16,7 +16,7 @@ function parseIsoDate(val: any): string {
 
 /**
  * Otomatis membersihkan payload media foto yang sudah melewati batas 24 jam
- * agar kapasitas database Supabase tetap sangat hemat dan loading cepat.
+ * agar kapasitas database tetap sangat hemat dan loading cepat.
  */
 function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boolean } {
   if (!Array.isArray(messages)) return { messages: [], hasPruned: false };
@@ -63,35 +63,29 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
   return { messages: cleaned, hasPruned };
 }
 
-// GET all active chat sessions or a single session from Supabase
+// GET all active chat sessions or a single session from Cloudflare D1
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('session_id');
 
     if (sessionId) {
-      const { data, error } = await supabaseAdmin
-        .from('chats')
-        .select('*')
-        .eq('id', sessionId)
-        .maybeSingle();
-
-      if (error) {
-        throw error;
-      }
+      const { results } = await queryD1('SELECT * FROM chats WHERE id = ? LIMIT 1;', [sessionId]);
+      const data = results && results.length > 0 ? results[0] : null;
 
       if (!data) {
         return NextResponse.json(null);
       }
 
-      const { messages: cleanedMessages, hasPruned } = pruneExpiredMedia(data.messages || []);
+      let parsedMessages: any[] = [];
+      try {
+        parsedMessages = typeof data.messages === 'string' ? JSON.parse(data.messages) : data.messages || [];
+      } catch (e) {}
+
+      const { messages: cleanedMessages, hasPruned } = pruneExpiredMedia(parsedMessages);
 
       if (hasPruned) {
-        supabaseAdmin
-          .from('chats')
-          .update({ messages: cleanedMessages })
-          .eq('id', sessionId)
-          .then(() => {});
+        queryD1('UPDATE chats SET messages = ? WHERE id = ?;', [JSON.stringify(cleanedMessages), sessionId]).catch(() => {});
       }
 
       return NextResponse.json({
@@ -113,20 +107,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('chats')
-      .select('*')
-      .order('updated_at', { ascending: false });
-
-    if (error) {
-      throw error;
-    }
+    const { results } = await queryD1('SELECT * FROM chats ORDER BY updated_at DESC;');
 
     // Return as map { [id]: session }
     const chatsMap: Record<string, any> = {};
-    if (data && Array.isArray(data)) {
-      data.forEach((row) => {
-        const { messages: cleanedMessages } = pruneExpiredMedia(row.messages || []);
+    if (results && Array.isArray(results)) {
+      results.forEach((row: any) => {
+        let parsedMessages: any[] = [];
+        try {
+          parsedMessages = typeof row.messages === 'string' ? JSON.parse(row.messages) : row.messages || [];
+        } catch (e) {}
+
+        const { messages: cleanedMessages } = pruneExpiredMedia(parsedMessages);
         chatsMap[row.id] = {
           id: row.id,
           name: row.name,
@@ -148,7 +140,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST / Upsert chat session or messages map to Supabase
+// POST / Upsert chat session or messages map to Cloudflare D1
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -156,18 +148,32 @@ export async function POST(request: Request) {
     // Single session upsert from user
     if (body && body.id && body.name) {
       const { messages: cleanedMessages } = pruneExpiredMedia(body.messages || []);
-      const { error } = await supabaseAdmin.from('chats').upsert({
-        id: body.id,
-        name: body.name,
-        email: body.email || '',
-        university: body.university || '',
-        prodi: body.prodi || '',
-        unread_count: body.unreadCount || 0,
-        messages: cleanedMessages,
-        updated_at: parseIsoDate(body.lastUpdated),
-      });
+      const messagesStr = JSON.stringify(cleanedMessages);
+      const updatedAt = parseIsoDate(body.lastUpdated);
 
-      if (error) throw error;
+      await queryD1(
+        `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           name=excluded.name,
+           email=excluded.email,
+           university=excluded.university,
+           prodi=excluded.prodi,
+           unread_count=excluded.unread_count,
+           messages=excluded.messages,
+           updated_at=excluded.updated_at;`,
+        [
+          body.id,
+          body.name,
+          body.email || '',
+          body.university || '',
+          body.prodi || '',
+          body.unreadCount || 0,
+          messagesStr,
+          updatedAt,
+        ]
+      );
+
       return NextResponse.json({ success: true });
     }
 
@@ -178,25 +184,35 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
       }
 
-      const rows = Object.values(body)
-        .filter((session: any) => session && session.id && session.name)
-        .map((session: any) => {
+      for (const session of Object.values(body) as any[]) {
+        if (session && session.id && session.name) {
           const { messages: cleanedMessages } = pruneExpiredMedia(session.messages || []);
-          return {
-            id: session.id,
-            name: session.name || 'Member',
-            email: session.email || '',
-            university: session.university || '',
-            prodi: session.prodi || '',
-            unread_count: session.unreadCount || 0,
-            messages: cleanedMessages,
-            updated_at: parseIsoDate(session.lastUpdated),
-          };
-        });
+          const messagesStr = JSON.stringify(cleanedMessages);
+          const updatedAt = parseIsoDate(session.lastUpdated);
 
-      if (rows.length > 0) {
-        const { error } = await supabaseAdmin.from('chats').upsert(rows);
-        if (error) throw error;
+          await queryD1(
+            `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+               name=excluded.name,
+               email=excluded.email,
+               university=excluded.university,
+               prodi=excluded.prodi,
+               unread_count=excluded.unread_count,
+               messages=excluded.messages,
+               updated_at=excluded.updated_at;`,
+            [
+              session.id,
+              session.name || 'Member',
+              session.email || '',
+              session.university || '',
+              session.prodi || '',
+              session.unreadCount || 0,
+              messagesStr,
+              updatedAt,
+            ]
+          );
+        }
       }
       return NextResponse.json({ success: true });
     }
@@ -216,11 +232,11 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
     }
 
-    const { error } = await supabaseAdmin.from('chats').delete().neq('id', 'non_existent_id');
-    if (error) throw error;
+    await queryD1('DELETE FROM chats;');
     return NextResponse.json({ success: true, message: 'All chats reset successfully' });
   } catch (e: any) {
     console.error('API DELETE chats error:', e);
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+

@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
 
 export const runtime = 'edge';
-
-const MEMBERS_BIN_URL = 'https://jsonbin-zeta.vercel.app/api/bins/SoobinMembersList';
 
 const DEFAULT_MEMBERS = [
   {
@@ -33,14 +31,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
     }
 
-    // 1. Fetch directly from Supabase PostgreSQL Database using Service Role Client
-    const { data: supaMembers, error } = await supabaseAdmin
-      .from('members')
-      .select('*')
-      .order('created_at', { ascending: true });
+    // Fetch directly from Cloudflare D1 Serverless SQL Database
+    const { results, success } = await queryD1<any>('SELECT * FROM members ORDER BY created_at ASC;');
 
-    if (!error && Array.isArray(supaMembers) && supaMembers.length > 0) {
-      const formatted = supaMembers.map((m: any, idx: number) => {
+    if (success && Array.isArray(results) && results.length > 0) {
+      const formatted = results.map((m: any, idx: number) => {
         const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
         return {
           id: `MBR-${String(idx + 1).padStart(4, '0')}`,
@@ -55,31 +50,7 @@ export async function GET(request: Request) {
       return NextResponse.json(formatted);
     }
 
-    // 2. High-Availability Fallback Store
-    const res = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
-    let data: any[] = [];
-    if (res.ok) {
-      const parsed = await res.json();
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        data = parsed;
-      }
-    }
-
-    if (data.length === 0) {
-      data = DEFAULT_MEMBERS;
-    }
-
-    const formatted = data.map((m: any, idx: number) => {
-      const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
-      return {
-        ...m,
-        id: `MBR-${String(idx + 1).padStart(4, '0')}`,
-        university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Trunojoyo Madura',
-        prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
-      };
-    });
-
-    return NextResponse.json(formatted);
+    return NextResponse.json(DEFAULT_MEMBERS);
   } catch (error) {
     return NextResponse.json(DEFAULT_MEMBERS);
   }
@@ -94,61 +65,30 @@ export async function POST(request: Request) {
     }
 
     const isFilda = newMember.email.toLowerCase() === 'fildafelissa01@gmail.com';
-    const memberPayload = {
-      id: `MBR-${String(Date.now()).slice(-4)}`,
-      name: newMember.name,
-      email: newMember.email.toLowerCase(),
-      university: isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Trunojoyo Madura',
-      prodi: isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1',
-      created_at: newMember.createdAt || new Date().toISOString(),
-    };
+    const email = newMember.email.toLowerCase();
+    const name = newMember.name || 'Member';
+    const university = isFilda ? 'Universitas Trunojoyo Madura' : newMember.university || 'Universitas Trunojoyo Madura';
+    const prodi = isFilda ? 'Ekonomi Syariah' : newMember.prodi || 'Program Studi S1';
+    const createdAt = newMember.createdAt || new Date().toISOString();
+    const passwordHash = newMember.passwordHash || null;
+    const memberId = `MBR-${String(Date.now()).slice(-4)}`;
 
-    // 1. Save directly to Supabase PostgreSQL Table using Service Role Client
-    try {
-      await supabaseAdmin.from('members').upsert(memberPayload, { onConflict: 'email' });
-    } catch (e) {
-      console.error('Supabase save member error', e);
-    }
+    // Save directly to Cloudflare D1 SQL Table
+    await queryD1(
+      `INSERT INTO members (id, name, email, university, prodi, password_hash, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(email) DO UPDATE SET
+         name=excluded.name,
+         university=excluded.university,
+         prodi=excluded.prodi,
+         password_hash=COALESCE(excluded.password_hash, members.password_hash);`,
+      [memberId, name, email, university, prodi, passwordHash, createdAt]
+    );
 
-    // 2. Sync to High-Availability Cloud Bin Store
-    let currentMembers: any[] = [];
-    try {
-      const getRes = await fetch(MEMBERS_BIN_URL, { cache: 'no-store' });
-      if (getRes.ok) {
-        const existing = await getRes.json();
-        if (Array.isArray(existing)) currentMembers = existing;
-      }
-    } catch (e) {
-      currentMembers = DEFAULT_MEMBERS;
-    }
-
-    const memberMap = new Map<string, any>();
-    currentMembers.forEach((m) => {
-      if (m && m.email) {
-        const isF = m.email.toLowerCase() === 'fildafelissa01@gmail.com';
-        memberMap.set(m.email.toLowerCase(), {
-          ...m,
-          university: isF ? 'Universitas Trunojoyo Madura' : m.university,
-          prodi: isF ? 'Ekonomi Syariah' : m.prodi,
-        });
-      }
-    });
-
-    memberMap.set(newMember.email.toLowerCase(), memberPayload);
-
-    const updatedList = Array.from(memberMap.values()).map((m: any, idx: number) => ({
-      ...m,
-      id: `MBR-${String(idx + 1).padStart(4, '0')}`,
-    }));
-
-    await fetch(MEMBERS_BIN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedList),
-    });
-
-    return NextResponse.json(updatedList);
+    const { results } = await queryD1('SELECT * FROM members ORDER BY created_at ASC;');
+    return NextResponse.json(results || []);
   } catch (error) {
     return NextResponse.json({ error: 'Failed saving member' }, { status: 500 });
   }
 }
+
