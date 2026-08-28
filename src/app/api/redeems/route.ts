@@ -113,6 +113,45 @@ export async function POST(request: Request) {
       );
     }
 
+    const email = body.memberEmail.toLowerCase().trim();
+
+    // Check existing redeems for this member to enforce cooldown & prevent spam
+    const { data: existingClaims } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('payment_method', 'REDEEM_SHARE')
+      .eq('customer_email', email)
+      .order('created_at', { ascending: false });
+
+    if (existingClaims && existingClaims.length > 0) {
+      // 1. Check if there's an active pending claim
+      const pendingClaim = existingClaims.find((c) => c.payment_status === 'MENUNGGU_VERIFIKASI');
+      if (pendingClaim) {
+        return NextResponse.json(
+          { error: 'Anda masih memiliki pengajuan klaim yang sedang menunggu verifikasi admin.' },
+          { status: 400 }
+        );
+      }
+
+      // 2. Check 3-day (72-hour) cooldown on approved claims
+      const approvedClaims = existingClaims.filter((c) => c.payment_status === 'DISETUJUI');
+      if (approvedClaims.length > 0) {
+        const latest = approvedClaims[0];
+        const approvedTime = new Date((latest.custom_fields && latest.custom_fields.approvedAt) || latest.created_at).getTime();
+        const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+        const elapsed = Date.now() - approvedTime;
+
+        if (elapsed < THREE_DAYS_MS) {
+          const remainingMs = THREE_DAYS_MS - elapsed;
+          const hours = Math.ceil(remainingMs / (60 * 60 * 1000));
+          return NextResponse.json(
+            { error: `Cooldown klaim masih aktif. Anda dapat melakukan klaim gratis berikutnya dalam sekitar ${hours} jam lagi.` },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     const redeemId = body.id || `RDM-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const createdAt = new Date().toISOString();
 
