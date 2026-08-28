@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export interface ServiceItem {
   id: number;
@@ -18,7 +17,7 @@ export function useRealtimeServices(categoryFilter?: string) {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
 
-  // Function to fetch services from API
+  // Function to fetch services from Cloudflare D1 API
   const fetchServices = useCallback(async (silent = false) => {
     if (!silent) setIsSyncing(true);
     try {
@@ -47,43 +46,7 @@ export function useRealtimeServices(categoryFilter?: string) {
   useEffect(() => {
     fetchServices();
 
-    // 1. Layer 1: Supabase Realtime WebSocket Subscription
-    const channelId = `realtime_services_${categoryFilter || 'all'}_${Date.now()}`;
-    const channel = supabase
-      .channel(channelId)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'services' },
-        (payload) => {
-          setIsSyncing(true);
-          if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as ServiceItem;
-            setServices((prev) =>
-              prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s))
-            );
-          } else if (payload.eventType === 'INSERT') {
-            const newItem = payload.new as ServiceItem;
-            if (!categoryFilter || categoryFilter === 'all' || newItem.category === categoryFilter) {
-              setServices((prev) => {
-                if (prev.some((s) => s.id === newItem.id)) {
-                  return prev.map((s) => (s.id === newItem.id ? newItem : s));
-                }
-                return [...prev, newItem];
-              });
-            }
-          } else if (payload.eventType === 'DELETE') {
-            const oldItem = payload.old as { id: number };
-            setServices((prev) => prev.filter((s) => s.id !== oldItem.id));
-          }
-          setLastSyncTime(new Date());
-          setTimeout(() => setIsSyncing(false), 600);
-          // Also fetch fresh
-          fetchServices(true);
-        }
-      )
-      .subscribe();
-
-    // 2. Layer 2: Cross-Tab BroadcastChannel
+    // 1. Layer 1: Cross-Tab BroadcastChannel
     let bc: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -104,7 +67,7 @@ export function useRealtimeServices(categoryFilter?: string) {
       // Ignore broadcast channel errors if unsupported
     }
 
-    // 3. Layer 3: Window Focus & Visibility Change Listener
+    // 2. Layer 2: Window Focus & Visibility Change Listener
     const handleFocusOrVisible = () => {
       if (document.visibilityState === 'visible') {
         fetchServices(true);
@@ -114,15 +77,14 @@ export function useRealtimeServices(categoryFilter?: string) {
     window.addEventListener('focus', handleFocusOrVisible);
     document.addEventListener('visibilitychange', handleFocusOrVisible);
 
-    // 4. Layer 4: Fast smart background sync every 3.5 seconds
+    // 3. Layer 3: Background sync interval
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         fetchServices(true);
       }
-    }, 3500);
+    }, 5000);
 
     return () => {
-      supabase.removeChannel(channel);
       if (bc) {
         bc.close();
       }
