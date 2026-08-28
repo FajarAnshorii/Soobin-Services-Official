@@ -178,44 +178,44 @@ export default function TestimoniPage() {
       <section className="bg-gradient-to-br from-dark-800 via-primary-900 to-dark-800 pt-24 sm:pt-32 pb-12 sm:pb-16 px-4">
         <div className="container-custom">
           <motion.div className="text-center flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md">
                 Ulasan Realtime Member SOOBIN
               </span>
               <button
                 onClick={fetchTestimonials}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold backdrop-blur-md hover:bg-emerald-500/30 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md hover:bg-emerald-500/30 transition-all cursor-pointer"
                 title="Sinkronisasi Data Realtime"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>Realtime Sync</span>
               </button>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight mb-4 max-w-3xl">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight mb-4 max-w-3xl leading-tight">
               Pengalaman Ribuan Mahasiswa Bersama <span className="text-amber-400">SOOBIN Services</span>
             </h1>
 
-            <p className="text-gray-300 text-sm sm:text-base max-w-2xl mb-8 leading-relaxed">
+            <p className="text-gray-300 text-xs sm:text-base max-w-2xl mb-6 sm:mb-8 leading-relaxed">
               Ulasan asli dan terverifikasi dari mahasiswa berbagai universitas terkemuka di Indonesia yang telah mempercayakan tugas akhir & kebutuhan akademiknya.
             </p>
 
-            <motion.div className="flex flex-wrap items-center justify-center gap-4" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+            <motion.div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
               {/* Rating Badge */}
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 fill-amber-400" />
+                    <Star key={i} className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <span className="text-amber-400 font-extrabold text-lg sm:text-xl">{averageRating}</span>
-                <span className="text-gray-300 text-xs sm:text-sm">({allTestimonials.length} Ulasan Terverifikasi)</span>
+                <span className="text-amber-400 font-extrabold text-base sm:text-xl">{averageRating}</span>
+                <span className="text-gray-300 text-[11px] sm:text-sm">({allTestimonials.length} Ulasan)</span>
               </div>
 
               {/* Tulis Testimoni Button */}
               <button
                 onClick={handleOpenReviewModal}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Tulis Testimoni & Rating</span>
@@ -226,20 +226,20 @@ export default function TestimoniPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-white py-6 sm:py-8 border-b border-gray-150 shadow-xs relative">
-        <div className="container-custom px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
+      <section className="bg-white py-5 sm:py-8 border-b border-gray-150 shadow-xs relative">
+        <div className="container-custom px-3 sm:px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-8 text-center">
             {[
               { value: allTestimonials.length, label: 'Total Testimoni Masuk' },
               { value: `${averageRating} / 5.0`, label: 'Rata-Rata Kepuasan' },
               { value: `${fiveStarCount} Ulasan`, label: 'Bintang 5 Sempurna' },
               { value: '20.000+', label: 'Mahasiswa Terbantu' },
             ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center justify-center">
-                <p className={`text-2xl sm:text-3xl font-black ${i === 1 ? 'text-amber-600' : 'text-primary-800'}`}>
+              <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50/70 md:bg-transparent">
+                <p className={`text-lg sm:text-2xl md:text-3xl font-black whitespace-nowrap ${i === 1 ? 'text-amber-600' : 'text-primary-800'}`}>
                   {stat.value}
                 </p>
-                <p className="text-gray-500 text-xs sm:text-sm mt-0.5 font-semibold">{stat.label}</p>
+                <p className="text-gray-500 text-[10px] sm:text-xs md:text-sm mt-0.5 font-bold leading-tight">{stat.label}</p>
               </div>
             ))}
           </div>

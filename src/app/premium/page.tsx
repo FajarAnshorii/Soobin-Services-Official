@@ -1259,13 +1259,13 @@ export default function PremiumPage() {
       {/* Hero Section Header */}
       <section className="bg-[#0B1527] pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 text-center">
         <div className="container-custom max-w-4xl mx-auto space-y-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary-800/40 text-primary-200 border border-primary-700/50">
-            <Sparkles className="w-3.5 h-3.5" /> PUSAT AKUN PREMIUM INDONESIA
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-black bg-amber-400/15 text-amber-300 border border-amber-400/30 tracking-wide uppercase">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> PUSAT AKUN PREMIUM INDONESIA
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
             Langganan Akun Premium Resmi & Bergaransi
           </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-300 text-xs sm:text-base max-w-2xl mx-auto leading-relaxed">
             Akses ribuan hiburan streaming, tools produktivitas, AI, editing, hingga gamepass dengan harga termurah & legal 100%.
           </p>
 
@@ -1278,7 +1278,7 @@ export default function PremiumPage() {
                 placeholder="Cari akun (misal: Netflix, Spotify, ChatGPT, Canva)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white/15 backdrop-blur-md transition-all text-sm sm:text-base shadow-inner"
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white/15 backdrop-blur-md transition-all text-xs sm:text-base shadow-inner"
               />
             </div>
           </div>
@@ -1287,8 +1287,8 @@ export default function PremiumPage() {
 
       {/* Categories Filter Tabs */}
       <section className="bg-white border-b border-gray-200 sticky top-16 md:top-20 z-30 shadow-xs">
-        <div className="container-custom py-3 px-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+        <div className="container-custom py-2.5 px-3 sm:px-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth flex-1 min-w-0 py-0.5">
             {[
               { id: 'all', label: 'Semua Kategori' },
               { id: 'nokos', label: 'Nokos / OTP & Gmail' },
@@ -1312,7 +1312,7 @@ export default function PremiumPage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all border whitespace-nowrap shrink-0 ${
+                className={`rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all border whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedCategory === cat.id
                     ? 'bg-[#0F1E36] text-white border-[#0F1E36] shadow-sm'
                     : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
@@ -1327,7 +1327,7 @@ export default function PremiumPage() {
           <button
             onClick={() => refetch()}
             title="Sinkronisasi harga database realtime"
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-slate-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-xs"
+            className="p-2 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-slate-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isSyncing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline text-[11px] font-black text-slate-900">
@@ -1338,7 +1338,7 @@ export default function PremiumPage() {
       </section>
 
       {/* Main Content Product Grid */}
-      <section className="py-12 sm:py-16 px-4">
+      <section className="py-8 sm:py-16 px-3 sm:px-4">
         <div className="container-custom">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16 px-4 bg-white rounded-2xl border border-gray-200 max-w-md mx-auto space-y-3 shadow-sm">
@@ -1347,7 +1347,7 @@ export default function PremiumPage() {
               <p className="text-gray-500 text-xs">Coba kata kunci lain atau pilih kategori Semua.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredProducts.map((product, idx) => {
                 const logoUrl = product.logo || getCategoryLogo(product.category);
                 return (
@@ -1356,18 +1356,18 @@ export default function PremiumPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.03, duration: 0.3 }}
-                    className="flex flex-col justify-between rounded-2xl bg-white border border-gray-200 hover:border-primary-800/40 transition-all p-6 shadow-sm hover:shadow-md relative overflow-hidden group"
+                    className="flex flex-col justify-between rounded-2xl bg-white border border-gray-200 hover:border-primary-800/40 transition-all p-4 sm:p-6 shadow-sm hover:shadow-md relative overflow-hidden group"
                   >
                     {/* Top Badge & Logo */}
                     {(product.badge || logoUrl) && (
-                      <div className="absolute top-0 right-0 flex items-center shadow-sm rounded-bl-xl overflow-hidden border-b border-l border-gray-200/80">
+                      <div className="absolute top-0 right-0 flex items-center shadow-xs rounded-bl-xl overflow-hidden border-b border-l border-gray-200/80 max-w-[65%] z-10">
                         {logoUrl && (
-                          <div className="bg-white px-2.5 py-1 flex items-center justify-center h-7 border-r border-gray-100">
-                            <img src={logoUrl} alt={product.categoryLabel} className="h-4 w-auto max-w-[55px] object-contain" />
+                          <div className="bg-white px-2 py-1 flex items-center justify-center h-6 sm:h-7 border-r border-gray-100 shrink-0">
+                            <img src={logoUrl} alt={product.categoryLabel} className="h-3.5 sm:h-4 w-auto max-w-[40px] sm:max-w-[55px] object-contain" />
                           </div>
                         )}
                         {product.badge && (
-                          <span className="bg-[#00C853] text-white text-[10px] font-extrabold px-3 py-1 uppercase tracking-wider h-7 flex items-center">
+                          <span className="bg-[#00C853] text-white text-[8px] sm:text-[10px] font-black px-2 sm:px-3 py-1 uppercase tracking-wider h-6 sm:h-7 flex items-center shrink-0 truncate">
                             {product.badge}
                           </span>
                         )}
@@ -1376,15 +1376,15 @@ export default function PremiumPage() {
 
                   <div>
                     {/* Header Info */}
-                    <div className="mb-4">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 px-2.5 py-0.5 rounded bg-gray-100 border border-gray-200 inline-block mb-2">
+                    <div className="mb-3 sm:mb-4 pr-24 sm:pr-32">
+                      <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 px-2 py-0.5 rounded bg-gray-100 border border-gray-200 inline-block mb-1.5">
                         {product.categoryLabel}
                       </span>
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary-800 transition-colors">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-primary-800 transition-colors leading-snug">
                         {product.title}
                       </h3>
                     </div>
-                    <p className="text-gray-500 text-xs sm:text-sm mb-6 leading-relaxed">
+                    <p className="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">
                       {product.description}
                     </p>
 
