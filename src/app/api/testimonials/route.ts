@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { queryD1 } from '@/lib/d1';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export interface TestimonialItem {
   id: string;
@@ -16,65 +18,31 @@ export interface TestimonialItem {
   isApproved?: boolean;
 }
 
-const STORE_ID = 'testi_store_official';
-
-const DEFAULT_INITIAL_TESTIMONIALS: TestimonialItem[] = [
-  { id: 't-1', name: 'Farhan Rizki', email: 'farhan@student.its.ac.id', university: 'ITS Surabaya', prodi: 'S1 Teknik Elektro', serviceName: 'Jasa Pembuatan Website & Aplikasi', rating: 5, comment: 'Kode Python untuk machine learning saya dibuatkan dengan penjelasan lengkap. Nilai akhirnya A!', createdAt: '2026-07-30T14:20:00.000Z', isApproved: true },
-  { id: 't-2', name: 'Dewi Lestari', email: 'dewi.lestari@ipb.ac.id', university: 'IPB University', prodi: 'S1 Agronomi', serviceName: 'Pengolahan Data SPSS / SmartPLS / AMOS', rating: 5, comment: 'Data SPSS saya diolah dengan sempurna. Hasilnya rapi dan mudah dipahami. Makasih banyak!', createdAt: '2026-07-29T11:45:00.000Z', isApproved: true },
-  { id: 't-3', name: 'Budi Santoso', email: 'budi.s@unpad.ac.id', university: 'Universitas Padjadjaran', prodi: 'S1 Kedokteran', serviceName: 'Formatting Jurnal & Fast Track Sinta', rating: 5, comment: 'Berhasil unlock semua jurnal yang saya butuhkan untuk skripsi. Proses cepat cuma 30 menit!', createdAt: '2026-07-28T09:15:00.000Z', isApproved: true },
-  { id: 't-4', name: 'Siti Nurhaliza', email: 'siti.nur@ugm.ac.id', university: 'Universitas Gadjah Mada', prodi: 'S1 Farmasi', serviceName: 'Konsultasi Skripsi & Tugas Akhir', rating: 5, comment: 'Makalahnya berkualitas tinggi dan sesuai deadline. Revisi gratis sampai puas. Admin ramah banget!', createdAt: '2026-07-27T15:30:00.000Z', isApproved: true },
-  { id: 't-5', name: 'Ahmad Pratama', email: 'ahmad.p@itb.ac.id', university: 'Institut Teknologi Bandung', prodi: 'S1 Teknik Informatika', serviceName: 'Jasa Parafrase & Turnitin 0%', rating: 5, comment: 'Pelayanannya cepat dan hasilnya akurat. Harga paling terjangkau dibanding tempat lain. Highly recommended!', createdAt: '2026-07-26T12:00:00.000Z', isApproved: true },
-  { id: 't-6', name: 'Rina Wulandari', email: 'rina.w@ui.ac.id', university: 'Universitas Indonesia', prodi: 'S1 Hukum', serviceName: 'Jasa Parafrase & Cek Turnitin 0%', rating: 5, comment: 'Skripsi saya selesai tepat waktu dengan hasil yang memuaskan. Similarity Turnitin hanya 8%. Terima kasih Soobin!', createdAt: '2026-07-25T10:00:00.000Z', isApproved: true },
-];
-
-async function getStoredTestimonials(): Promise<TestimonialItem[]> {
+export async function GET(request: Request) {
   try {
-    const { results } = await queryD1('SELECT messages FROM chats WHERE id = ? LIMIT 1;', [STORE_ID]);
-    if (results && results.length > 0) {
-      const msgs = typeof results[0].messages === 'string' ? JSON.parse(results[0].messages) : results[0].messages;
-      if (Array.isArray(msgs) && msgs.length > 0) {
-        return msgs as TestimonialItem[];
-      }
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get('limit');
+    
+    let sql = 'SELECT id, name, email, university, prodi, service_name as serviceName, rating, comment, created_at as createdAt, is_approved as isApproved FROM testimonials ORDER BY created_at DESC;';
+    let params: any[] = [];
+
+    if (limit) {
+      sql = 'SELECT id, name, email, university, prodi, service_name as serviceName, rating, comment, created_at as createdAt, is_approved as isApproved FROM testimonials ORDER BY created_at DESC LIMIT ?;';
+      params = [parseInt(limit, 10)];
     }
-  } catch (e) {
-    console.error('Error fetching testimonials from Cloudflare D1:', e);
-  }
-  return DEFAULT_INITIAL_TESTIMONIALS;
-}
 
-async function saveStoredTestimonials(list: TestimonialItem[]): Promise<boolean> {
-  try {
-    const { success } = await queryD1(
-      `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET
-         messages=excluded.messages,
-         unread_count=excluded.unread_count,
-         updated_at=excluded.updated_at;`,
-      [
-        STORE_ID,
-        'SOOBIN Testimonials Database',
-        'admin@soobin.com',
-        'Official System',
-        'Database',
-        list.length,
-        JSON.stringify(list),
-        new Date().toISOString(),
-      ]
-    );
-    return success;
-  } catch (e) {
-    console.error('Error saving testimonials to Cloudflare D1:', e);
-    return false;
-  }
-}
+    const { results, error } = await queryD1(sql, params);
 
-export async function GET() {
-  try {
-    const testimonials = await getStoredTestimonials();
-    // Sort by createdAt descending (newest first)
-    testimonials.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    return NextResponse.json(testimonials);
+    if (error) {
+      console.error('Cloudflare D1 testimonials GET error:', error);
+      return NextResponse.json([], { status: 500 });
+    }
+
+    return NextResponse.json(results || [], {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      },
+    });
   } catch (e: any) {
     console.error('API GET testimonials error:', e);
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
@@ -90,8 +58,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Data testimoni tidak lengkap' }, { status: 400 });
     }
 
+    const id = `testi-${Date.now()}`;
+    const createdAt = new Date().toISOString();
+
+    const { error } = await queryD1(
+      `INSERT INTO testimonials (id, name, email, university, prodi, service_name, rating, comment, created_at, is_approved)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1);`,
+      [id, name.trim(), email || '', university || 'Member SOOBIN', prodi || '', serviceName.trim(), Number(rating) || 5, comment.trim(), createdAt]
+    );
+
+    if (error) {
+      console.error('Cloudflare D1 insert testimonial error:', error);
+      return NextResponse.json({ error }, { status: 500 });
+    }
+
     const newTestimonial: TestimonialItem = {
-      id: `testi-${Date.now()}`,
+      id,
       name: name.trim(),
       email: email || '',
       university: university || 'Member SOOBIN',
@@ -99,14 +81,9 @@ export async function POST(request: Request) {
       serviceName: serviceName.trim(),
       rating: Number(rating) || 5,
       comment: comment.trim(),
-      createdAt: new Date().toISOString(),
+      createdAt,
       isApproved: true,
     };
-
-    const currentList = await getStoredTestimonials();
-    const updatedList = [newTestimonial, ...currentList.filter((t) => t.id !== newTestimonial.id)];
-
-    await saveStoredTestimonials(updatedList);
 
     return NextResponse.json({ success: true, testimonial: newTestimonial });
   } catch (e: any) {
@@ -124,12 +101,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID testimoni tidak valid' }, { status: 400 });
     }
 
-    const currentList = await getStoredTestimonials();
-    const updatedList = currentList.filter((t) => t.id !== id);
+    const { error } = await queryD1('DELETE FROM testimonials WHERE id = ?;', [id]);
 
-    await saveStoredTestimonials(updatedList);
+    if (error) {
+      console.error('Cloudflare D1 delete testimonial error:', error);
+      return NextResponse.json({ error }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, deletedId: id });
   } catch (e: any) {
     console.error('API DELETE testimonials error:', e);
     return NextResponse.json({ error: e.message || 'Internal Server Error' }, { status: 500 });
