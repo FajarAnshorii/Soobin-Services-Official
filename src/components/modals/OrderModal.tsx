@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   X, Lock, CreditCard, QrCode, FileText, Send, CheckCircle2, Info,
-  UploadCloud, Paperclip, Trash2, CheckCircle, File, Tag, Sparkles
+  UploadCloud, Paperclip, Trash2, CheckCircle, File, Tag
 } from 'lucide-react';
 import QrisPaymentModal from './QrisPaymentModal';
 import { useAuth } from '@/context/AuthContext';
@@ -612,7 +612,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
                 </span>
                 {priceInfo.isDiscounted && (
                   <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                    <Sparkles className="w-3 h-3" /> Diskon Member 5%
+                    <Tag className="w-3 h-3" /> Diskon Member 5%
                   </span>
                 )}
               </div>

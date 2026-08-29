@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   GraduationCap, BookOpen, FileSearch, Archive,
-  Target, BookMarked, FlaskConical, Route, Sparkles, ChevronLeft, ChevronRight
+  Target, BookMarked, FlaskConical, Route, Award, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -78,7 +78,7 @@ const DEFAULT_PAKET_CARDS = [
     popular: true,
   },
   {
-    icon: Sparkles,
+    icon: Award,
     badge: 'Komprehensif',
     title: 'Paket Siap Sidang Skripsi',
     price: 'Chat Admin',

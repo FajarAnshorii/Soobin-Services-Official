@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
-import { Palette, Layers, Award, Sparkles, Monitor, ArrowRight } from 'lucide-react';
+import { Palette, Layers, Award, TrendingUp, Monitor, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Jasa Desain Slide PPT Presentasi Keren & Professional',
@@ -61,7 +61,7 @@ export default function JasaDesainPptPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { icon: Award, title: 'Sidang Skripsi & Sempro', desc: 'Desain ringkas, formal, dan fokus pada poin penting penelitian agar dosen penguji terkesan.' },
-                { icon: Sparkles, title: 'Pitch Deck & Bisnis', desc: 'Visualisasi modern berorientasi data untuk meyakinkan klien, investor, atau calon mitra bisnis.' },
+                { icon: TrendingUp, title: 'Pitch Deck & Bisnis', desc: 'Visualisasi modern berorientasi data untuk meyakinkan klien, investor, atau calon mitra bisnis.' },
                 { icon: Layers, title: 'Presentasi Kuliah', desc: 'Slide kreatif untuk tugas kelompok atau individu agar presentasi Anda berkesan di kelas.' },
                 { icon: Palette, title: 'Redesain Slide Lama', desc: 'Ubah slide lama Anda yang membosankan menjadi desain baru yang segar dan memikat.' },
                 { icon: Monitor, title: 'Company Profile', desc: 'Profil perusahaan yang dikemas menarik dalam bentuk presentasi untuk branding professional.' },

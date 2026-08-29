@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion } from 'framer-motion';
-import { Search, Film, Tv, Sparkles, MessageCircle, AlertCircle, CheckCircle2, Info, RefreshCw } from 'lucide-react';
+import { Search, Film, Tv, MessageCircle, AlertCircle, CheckCircle2, Info, RefreshCw } from 'lucide-react';
 import { useRealtimeServices } from '@/hooks/useRealtimeServices';
 import { useAuth } from '@/context/AuthContext';
 import { getPriceWithMemberDiscount, formatRupiah } from '@/lib/priceUtils';

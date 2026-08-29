@@ -18,8 +18,7 @@ import {
   ExternalLink,
   Gift,
   MessageSquareText,
-  Award,
-  Sparkles
+  Award
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -329,8 +328,8 @@ export default function Navbar() {
                       <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
                         Reputasi & Ulasan
                       </span>
-                      <span className="text-[10px] font-black text-primary-850 bg-primary-50 px-2 py-0.5 rounded-full border border-primary-200 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-primary-700" /> Terpercaya
+                      <span className="text-[10px] font-black text-primary-850 bg-primary-50 px-2 py-0.5 rounded-full border border-primary-200">
+                        Terpercaya
                       </span>
                     </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { School, Check, ChevronDown, Search, Sparkles } from 'lucide-react';
+import { School, Check, ChevronDown, Search } from 'lucide-react';
 
 interface UniversityComboboxProps {
   value: string;
