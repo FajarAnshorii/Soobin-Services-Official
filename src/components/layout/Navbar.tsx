@@ -45,7 +45,7 @@ const testimoniLinks = [
   {
     href: '/trusted-by',
     label: 'Trusted By',
-    desc: 'Dokumentasi endorsement influencer & figur publik',
+    desc: 'Bukti media & promosi influencer / figur publik',
     icon: Award,
     badge: 'Influencer',
     badgeColor: 'text-purple-700 bg-purple-50 border-purple-200',
