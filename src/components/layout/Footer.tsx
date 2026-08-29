@@ -46,9 +46,10 @@ const footerLinks = {
   ],
   info: [
     { href: '/', label: 'Tentang Kami' },
+    { href: '/testimoni', label: 'Review Customer' },
+    { href: '/trusted-by', label: 'Trusted By (Influencer)' },
     { href: '/kalkulator-order', label: 'Kalkulator Order' },
     { href: '/tools/daftar-pustaka', label: 'Daftar Pustaka Generator' },
-    { href: '/tools/word-counter', label: 'Hitung Kata & Waktu Baca' },
     { href: '/faq', label: 'FAQ' },
   ],
 };
