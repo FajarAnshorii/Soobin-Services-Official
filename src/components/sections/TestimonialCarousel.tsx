@@ -191,7 +191,7 @@ export default function TestimonialCarousel() {
           <div className="flex flex-wrap items-center justify-center gap-2.5 mt-4">
             <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <Star key={i} className="w-4 h-4 text-indigo-500 fill-indigo-500" />
               ))}
             </div>
             <span className="text-slate-900 font-black text-sm">4.8 / 5.0</span>
@@ -269,7 +269,7 @@ export default function TestimonialCarousel() {
                         {/* Stars */}
                         <div className="flex items-center gap-1 mb-2.5">
                           {[...Array(testi.rating || 5)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            <Star key={i} className="w-4 h-4 text-indigo-500 fill-indigo-500" />
                           ))}
                         </div>
 

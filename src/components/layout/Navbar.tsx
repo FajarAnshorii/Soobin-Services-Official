@@ -40,7 +40,7 @@ const testimoniLinks = [
     desc: '3.000+ ulasan riil & rating kepuasan mahasiswa Indonesia',
     icon: MessageSquareText,
     badge: '3000+ Ulasan',
-    badgeColor: 'text-amber-700 bg-amber-50 border-amber-200',
+    badgeColor: 'text-primary-850 bg-primary-50 border-primary-200',
   },
   {
     href: '/trusted-by',
@@ -48,7 +48,7 @@ const testimoniLinks = [
     desc: 'Bukti media & promosi influencer / figur publik',
     icon: Award,
     badge: 'Influencer',
-    badgeColor: 'text-purple-700 bg-purple-50 border-purple-200',
+    badgeColor: 'text-primary-850 bg-primary-50 border-primary-200',
   },
 ];
 
@@ -329,8 +329,8 @@ export default function Navbar() {
                       <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
                         Reputasi & Ulasan
                       </span>
-                      <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-amber-500" /> Terpercaya
+                      <span className="text-[10px] font-black text-primary-850 bg-primary-50 px-2 py-0.5 rounded-full border border-primary-200 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-primary-700" /> Terpercaya
                       </span>
                     </div>
 
@@ -458,17 +458,17 @@ export default function Navbar() {
                         <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                       </div>
 
-                      {/* Free Turnitin 1x Menu Item with Gold Styling */}
+                      {/* Free Turnitin 1x Menu Item */}
                       <Link
                         href="/member?tab=redeem"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center justify-between w-full text-left text-xs font-black text-amber-950 bg-gradient-to-r from-amber-100/90 via-yellow-100 to-amber-200/90 hover:from-amber-200 hover:to-amber-300 px-2.5 py-2 rounded-xl border border-amber-300 shadow-2xs cursor-pointer transition-all my-1 group"
+                        className="flex items-center justify-between w-full text-left text-xs font-black text-white bg-primary-900 hover:bg-primary-850 px-2.5 py-2 rounded-xl border border-primary-700/50 shadow-xs cursor-pointer transition-all my-1 group"
                       >
                         <div className="flex items-center gap-2">
-                          <Gift className="w-4 h-4 text-amber-700 group-hover:scale-110 transition-transform" />
-                          <span className="font-extrabold text-amber-950">Free Turnitin 1x</span>
+                          <Gift className="w-4 h-4 text-blue-300 group-hover:scale-110 transition-transform" />
+                          <span className="font-extrabold text-white">Free Turnitin 1x</span>
                         </div>
-                        <span className="bg-amber-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                        <span className="bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
                           Gratis
                         </span>
                       </Link>
@@ -601,7 +601,7 @@ export default function Navbar() {
               >
                 <div className="flex items-center gap-2">
                   <span>Testimoni & Reputasi</span>
-                  <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                  <span className="text-[10px] font-bold text-primary-850 bg-primary-50 px-1.5 py-0.5 rounded border border-primary-200">
                     Trusted
                   </span>
                 </div>
@@ -656,7 +656,7 @@ export default function Navbar() {
                 <div className="flex flex-col pb-2 border-b border-gray-200">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-dark-800 truncate">{user.name}</span>
-                    <span className="bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
+                    <span className="bg-primary-100 text-primary-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
                       Member
                     </span>
                   </div>
@@ -664,17 +664,17 @@ export default function Navbar() {
                   <span className="text-[10px] text-gray-400 truncate">{user.prodi}</span>
                 </div>
 
-                {/* Free Turnitin 1x Menu Item with Gold Styling */}
+                {/* Free Turnitin 1x Menu Item */}
                 <Link
                   href="/member?tab=redeem"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-between w-full text-left text-xs font-black text-amber-950 bg-gradient-to-r from-amber-100/90 via-yellow-100 to-amber-200/90 hover:from-amber-200 hover:to-amber-300 px-3 py-2.5 rounded-xl border border-amber-300 shadow-2xs cursor-pointer transition-all my-1 group"
+                  className="flex items-center justify-between w-full text-left text-xs font-black text-white bg-primary-900 hover:bg-primary-850 px-3 py-2.5 rounded-xl border border-primary-700/50 shadow-xs cursor-pointer transition-all my-1 group"
                 >
                   <div className="flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-amber-700 group-hover:scale-110 transition-transform" />
-                    <span className="font-extrabold text-amber-950">Free Turnitin 1x</span>
+                    <Gift className="w-4 h-4 text-blue-300 group-hover:scale-110 transition-transform" />
+                    <span className="font-extrabold text-white">Free Turnitin 1x</span>
                   </div>
-                  <span className="bg-amber-500 text-white font-black text-[9px] px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                  <span className="bg-blue-600 text-white font-black text-[9px] px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
                     Gratis
                   </span>
                 </Link>

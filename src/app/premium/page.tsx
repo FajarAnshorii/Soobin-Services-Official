@@ -1259,8 +1259,8 @@ export default function PremiumPage() {
       {/* Hero Section Header */}
       <section className="bg-[#0B1527] pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 text-center">
         <div className="container-custom max-w-4xl mx-auto space-y-4">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-black bg-amber-400/15 text-amber-300 border border-amber-400/30 tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> PUSAT AKUN PREMIUM INDONESIA
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-black bg-blue-500/15 text-blue-300 border border-blue-400/30 tracking-wide uppercase">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400" /> PUSAT AKUN PREMIUM INDONESIA
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
             Langganan Akun Premium Resmi & Bergaransi
@@ -1278,7 +1278,7 @@ export default function PremiumPage() {
                 placeholder="Cari akun (misal: Netflix, Spotify, ChatGPT, Canva)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white/15 backdrop-blur-md transition-all text-xs sm:text-base shadow-inner"
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white/15 backdrop-blur-md transition-all text-xs sm:text-base shadow-inner"
               />
             </div>
           </div>

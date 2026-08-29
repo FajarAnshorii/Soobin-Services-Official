@@ -524,9 +524,10 @@ Mohon segera diproses kak, terima kasih!`;
                 <span>Keranjang ({cart.length})</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setActiveTab('redeem');
-                  router.push('/member?tab=redeem');
+                  router.replace('/member?tab=redeem', { scroll: false });
                 }}
                 className={`py-3.5 px-4 sm:px-6 font-bold text-xs sm:text-base border-b-2 flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all relative ${
                   activeTab === 'redeem'
@@ -534,9 +535,9 @@ Mohon segera diproses kak, terima kasih!`;
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Gift className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-amber-500" />
+                <Gift className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-primary-700" />
                 <span>Free Turnitin (3 Hari)</span>
-                <span className="hidden sm:inline-block ml-1 px-1.5 py-0.2 bg-amber-100 text-amber-900 text-[10px] font-black rounded-full uppercase">
+                <span className="hidden sm:inline-block ml-1 px-1.5 py-0.2 bg-primary-100 text-primary-900 text-[10px] font-black rounded-full uppercase">
                   Gratis
                 </span>
               </button>
@@ -585,7 +586,7 @@ Mohon segera diproses kak, terima kasih!`;
                                 ? 'bg-green-100 text-green-800 border border-green-200'
                                 : isCancel
                                   ? 'bg-red-100 text-red-800 border border-red-200'
-                                  : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                  : 'bg-primary-100 text-primary-800 border border-primary-200'
                             }`}>
                               <Clock className="w-3 h-3" /> {order.status}
                             </span>
@@ -686,27 +687,27 @@ Mohon segera diproses kak, terima kasih!`;
                 /* Tab 3: Redeem Free Turnitin (3 Hari Sekali) */
                 <div className="flex flex-col gap-6">
                   {/* Top Highlights: Stats & Monthly Top Sharer Reward Info */}
-                  <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/60 rounded-2xl p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="bg-[#0B1527] text-white rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/10">
                     <div className="flex items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
-                        <Gift className="w-6 h-6" />
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center shadow-md shrink-0 border border-white/20">
+                        <Gift className="w-6 h-6 text-blue-300" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-extrabold text-base text-gray-950">Free Cek Turnitin (3 Hari Sekali)</h3>
-                          <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                          <h3 className="font-extrabold text-base text-white">Free Cek Turnitin (3 Hari Sekali)</h3>
+                          <span className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
                             No Repository
                           </span>
                         </div>
-                        <p className="text-xs text-gray-600 mt-0.5">
+                        <p className="text-xs text-slate-300 mt-0.5">
                           Bagikan info/poster SOOBIN ke Status WA atau Story IG publik dan dapatkan Cek Turnitin gratis 1x tiap 3 hari.
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-amber-200 shadow-2xs self-stretch sm:self-auto justify-between sm:justify-start">
-                      <span className="text-xs font-bold text-gray-500">Total Share Berhasil:</span>
-                      <span className="text-sm font-black text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
+                    <div className="flex items-center gap-2 bg-white/10 px-3.5 py-2 rounded-xl border border-white/10 shadow-2xs self-stretch sm:self-auto justify-between sm:justify-start">
+                      <span className="text-xs font-bold text-slate-300">Total Share Berhasil:</span>
+                      <span className="text-sm font-black text-white bg-white/10 px-2.5 py-0.5 rounded-lg border border-white/20">
                         {memberApprovedCount}x
                       </span>
                     </div>
@@ -715,7 +716,7 @@ Mohon segera diproses kak, terima kasih!`;
                   {/* Monthly Top Sharer Incentive Notice */}
                   <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 shadow-sm border border-slate-800">
                     <div>
-                      <h4 className="text-xs sm:text-sm font-black text-amber-300">Reward Bulanan: Gratis 1x Cek AI!</h4>
+                      <h4 className="text-xs sm:text-sm font-black text-blue-300">Reward Bulanan: Gratis 1x Cek AI!</h4>
                       <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5">
                         Member dengan frekuensi share terbanyak tiap bulan akan otomatis mendapatkan voucher <strong>Gratis 1x Cek AI ZeroGPT</strong>.
                       </p>
@@ -726,16 +727,16 @@ Mohon segera diproses kak, terima kasih!`;
                   <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-sm flex flex-col gap-3.5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800">
                       <div className="flex items-center gap-2.5">
-                        <Flame className="w-5 h-5 text-amber-400 shrink-0" />
+                        <Flame className="w-5 h-5 text-blue-400 shrink-0" />
                         <div>
                           <h4 className="text-sm font-black text-white">Kuota Rebutan Batch 3 Hari</h4>
                           <p className="text-[11px] text-slate-400">Sistem reset otomatis tiap 3 hari (Maksimal 10 Voucher per Batch)</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 self-start sm:self-auto bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-                        <Clock className="w-3.5 h-3.5 text-amber-300" />
+                        <Clock className="w-3.5 h-3.5 text-blue-300" />
                         <span className="text-[11px] text-slate-400 font-semibold">Reset:</span>
-                        <span className="font-mono text-xs font-black text-amber-300">
+                        <span className="font-mono text-xs font-black text-blue-300">
                           {batchCountdownText || 'Menghitung...'}
                         </span>
                       </div>
@@ -750,20 +751,20 @@ Mohon segera diproses kak, terima kasih!`;
                             {batchQuota.remainingQuota > 0 ? `${batchQuota.remainingQuota} / 10 Slot Tersedia` : 'Kuota Penuh (0/10 Tersisa)'}
                           </span>
                         </span>
-                        <span className="text-[11px] text-slate-400 font-medium">
-                          {batchQuota.claimedCount} Terklaim (ACC)
+                        <span className="text-[11px] text-slate-400">
+                          Terpakai: <strong className="text-white">{batchQuota.claimedCount}/10</strong> ({Math.round((batchQuota.claimedCount / 10) * 100)}%)
                         </span>
                       </div>
 
-                      {/* Smooth Progress Bar */}
-                      <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                      {/* Bar Fill */}
+                      <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${
+                          className={`h-full rounded-full transition-all duration-700 ${
                             batchQuota.remainingQuota === 0
                               ? 'bg-rose-500'
                               : batchQuota.remainingQuota <= 3
-                              ? 'bg-amber-500'
-                              : 'bg-emerald-500'
+                                ? 'bg-primary-500'
+                                : 'bg-emerald-500'
                           }`}
                           style={{ width: `${Math.min(100, (batchQuota.claimedCount / 10) * 100)}%` }}
                         />
@@ -771,20 +772,20 @@ Mohon segera diproses kak, terima kasih!`;
                     </div>
                   </div>
 
-                  {/* ACTIVE CLAIM STATUS STATES */}
+                  {/* Render based on User Status */}
                   {fetchingRedeems ? (
                     <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-800"></div>
                     </div>
-                  ) : latestRedeem && latestRedeem.status === 'MENUNGGU_VERIFIKASI' ? (
+                  ) : latestRedeem && latestRedeem.status === 'PENDING' ? (
                     /* STATE 1: PENDING VERIFICATION */
-                    <div className="bg-white rounded-2xl border border-amber-200 p-6 shadow-sm flex flex-col gap-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-amber-100">
+                    <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-sm flex flex-col gap-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-primary-100">
                         <div className="flex items-center gap-2.5">
-                          <Clock className="w-5 h-5 text-amber-600" />
+                          <Clock className="w-5 h-5 text-primary-800" />
                           <h4 className="text-sm font-black text-gray-900">Pengajuan Sedang Diverifikasi Admin</h4>
                         </div>
-                        <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                        <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-primary-100 text-primary-800 border border-primary-300">
                           Menunggu ACC
                         </span>
                       </div>
@@ -809,7 +810,7 @@ Mohon segera diproses kak, terima kasih!`;
                         </div>
                       )}
 
-                      <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3.5 text-xs text-amber-900">
+                      <div className="bg-primary-50/80 border border-primary-200/80 rounded-xl p-3.5 text-xs text-primary-900">
                         🔔 <strong>Tips:</strong> Setelah disetujui, halaman ini akan otomatis menampilkan tombol <strong>Klaim Voucher ke WhatsApp</strong> dengan kode acak resmi Anda.
                       </div>
                     </div>
@@ -836,7 +837,7 @@ Mohon segera diproses kak, terima kasih!`;
                             KODE VOUCHER RESMI SOOBIN
                           </span>
                           <div className="flex items-center gap-3">
-                            <span className="font-mono text-xl sm:text-2xl font-black text-amber-300 tracking-wider">
+                            <span className="font-mono text-xl sm:text-2xl font-black text-white tracking-wider">
                               {latestRedeem.voucherCode || 'SBN-TRN-OFFICIAL'}
                             </span>
                             <button
@@ -896,7 +897,7 @@ Mohon segera diproses kak, terima kasih!`;
 
                       <div className="bg-slate-900 text-white rounded-xl p-4 w-full max-w-sm border border-slate-800 flex flex-col items-center gap-1.5 shadow-inner">
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Batch Baru Dibuka Dalam:</span>
-                        <span className="font-mono text-base font-black text-amber-300">
+                        <span className="font-mono text-base font-black text-blue-300">
                           ⏳ {batchCountdownText || 'Menghitung...'}
                         </span>
                       </div>
@@ -926,12 +927,12 @@ Mohon segera diproses kak, terima kasih!`;
                       )}
 
                       {/* Rule Banner */}
-                      <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
+                      <div className="bg-[#0B1527] text-white rounded-2xl p-5 shadow-sm space-y-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xs">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-black text-xs">
                             !
                           </div>
-                          <h4 className="text-xs sm:text-sm font-black text-amber-300 uppercase tracking-wide">
+                          <h4 className="text-xs sm:text-sm font-black text-blue-300 uppercase tracking-wide">
                             Syarat & Ketentuan Wajib Share Publik
                           </h4>
                         </div>
@@ -939,7 +940,7 @@ Mohon segera diproses kak, terima kasih!`;
                           <li>
                             Share poster/banner promosi SOOBIN Services ke <strong>Status WhatsApp</strong> atau <strong>Story Instagram</strong>.
                           </li>
-                          <li className="text-amber-200 font-bold">
+                          <li className="text-blue-200 font-bold">
                             ⚠️ WAJIB PUBLIK: Status/Story WAJIB dapat dilihat oleh SEMUA KONTAK / PUBLIK. Screenshot yang hanya memperlihatkan status dibagikan ke kontak admin SOOBIN saja (dikecualikan/custom privacy) OTOMATIS DITOLAK.
                           </li>
                           <li>

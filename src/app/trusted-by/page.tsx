@@ -6,21 +6,18 @@ import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Sparkles,
-  CheckCircle2,
-  X,
-  ExternalLink,
-  Eye,
-  Download,
-  Image as ImageIcon,
   ShieldCheck,
   Users,
   TrendingUp,
   Share2,
-  Calendar
+  Calendar,
+  CheckCircle2,
+  X,
+  ExternalLink,
+  Eye,
+  Image as ImageIcon
 } from 'lucide-react';
 
-// Custom SVG Icons untuk Medsos
 function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -42,25 +39,22 @@ function TikTokIcon({ className = 'w-4 h-4' }: { className?: string }) {
 export interface PromotedInfluencer {
   id: string;
   name: string;
-  handle: string; // contoh: "@fajar_anshori"
+  handle: string;
   platform: 'instagram' | 'tiktok' | 'youtube';
-  platformUrl?: string; // Link akun IG / TikTok
+  platformUrl?: string;
   avatarUrl?: string;
-  followers?: string; // contoh: "250K Followers"
+  followers?: string;
   verified?: boolean;
-  category: string; // contoh: "Content Creator", "Public Figure", "Edukasi & Mahasiswa"
-  promotionTitle: string; // contoh: "Rekomendasi Cek Turnitin & Tugas di IG Story"
-  caption?: string; // Kata-kata promosi atau ulasan mereka
-  proofMediaUrl: string; // Foto bukti promosi / screenshot story
+  category: string;
+  promotionTitle: string;
+  caption?: string;
+  proofMediaUrl: string;
   proofMediaType?: 'image' | 'video';
   promotedDate?: string;
-  highlightBadge?: string; // contoh: "Instagram Story", "Feed Post", "Reels"
+  highlightBadge?: string;
 }
 
-// -------------------------------------------------------------
-// DATA BUKTI PROMOSI INFLUENCER & FIGUR PUBLIK
-// (Dikosongkan sementara, silakan tambahkan data di array ini)
-// -------------------------------------------------------------
+// Data daftar influencer yang mempromosikan SOOBIN Services (Dikosongkan sementara)
 const PROMOTED_INFLUENCERS: PromotedInfluencer[] = [];
 
 export default function TrustedByPage() {
@@ -89,7 +83,7 @@ export default function TrustedByPage() {
       <section className="relative bg-[#0B1527] pt-28 sm:pt-36 pb-14 sm:pb-20 px-4 overflow-hidden">
         {/* Background Ambient Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 sm:w-150 h-72 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container-custom max-w-4xl mx-auto text-center relative z-10 space-y-4">
           <motion.div
@@ -97,8 +91,8 @@ export default function TrustedByPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-amber-400/15 text-amber-300 border border-amber-400/30 tracking-wide uppercase backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-amber-400" /> BUKTI PROMOSI INFLUENCER
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-blue-500/15 text-blue-300 border border-blue-400/30 tracking-wide uppercase backdrop-blur-md">
+              <ShieldCheck className="w-4 h-4 text-blue-400" /> BUKTI PROMOSI INFLUENCER
             </span>
           </motion.div>
 
@@ -108,7 +102,7 @@ export default function TrustedByPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight"
           >
-            Dipromosikan & Direkomendasikan Oleh <span className="bg-linear-to-r from-amber-300 via-amber-400 to-yellow-400 bg-clip-text text-transparent">Influencer Ternama</span>
+            Dipromosikan & Direkomendasikan Oleh <span className="bg-linear-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">Influencer Ternama</span>
           </motion.h1>
 
           <motion.p
@@ -127,9 +121,9 @@ export default function TrustedByPage() {
         <div className="container-custom px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
             {[
-              { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck, color: 'text-primary-800' },
-              { value: 'Top Creator', label: 'Influencer & Figur Publik', icon: Users, color: 'text-amber-600' },
-              { value: 'Multi Platform', label: 'Instagram, TikTok & Media', icon: Share2, color: 'text-emerald-600' },
+              { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck, color: 'text-primary-850' },
+              { value: 'Top Creator', label: 'Influencer & Figur Publik', icon: Users, color: 'text-indigo-600' },
+              { value: 'Multi Platform', label: 'Instagram, TikTok & Media', icon: Share2, color: 'text-primary-850' },
               { value: 'Kualitas Teruji', label: 'Rekomendasi Nyata', icon: TrendingUp, color: 'text-blue-600' },
             ].map((stat, i) => {
               const Icon = stat.icon;
@@ -174,11 +168,11 @@ export default function TrustedByPage() {
           {/* If List is Empty (Placeholder State) */}
           {filteredList.length === 0 ? (
             <div className="mt-4 bg-white border border-slate-200 rounded-3xl p-8 sm:p-14 text-center max-w-3xl mx-auto shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/50 rounded-full blur-2xl pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-100/50 rounded-full blur-2xl pointer-events-none" />
 
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-purple-50 via-pink-50 to-amber-50 border border-pink-200 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-                <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-pink-600" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-50 border border-indigo-200 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+                <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-700" />
               </div>
 
               <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">
@@ -193,12 +187,12 @@ export default function TrustedByPage() {
                 Nantinya setiap kartu influencer di halaman ini dapat Anda klik untuk melihat langsung foto, screenshot story, atau video bukti saat mereka mempromosikan SOOBIN Services.
               </p>
 
-              {/* Interactive Mockup Example Card to Preview the Click Effect */}
+              {/* Interactive Mockup Example Card */}
               <div className="max-w-md mx-auto p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 text-left space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 p-0.5 shrink-0">
-                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center font-black text-xs text-slate-700">
+                    <div className="w-11 h-11 rounded-full bg-primary-800 p-0.5 shrink-0">
+                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center font-black text-xs text-primary-900">
                         SB
                       </div>
                     </div>
@@ -207,13 +201,13 @@ export default function TrustedByPage() {
                         <span className="text-xs sm:text-sm font-bold text-slate-900">Nama Influencer</span>
                         <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                       </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-pink-600 font-semibold">
+                      <div className="flex items-center gap-1.5 text-[11px] text-primary-750 font-semibold">
                         <InstagramIcon className="w-3 h-3" />
                         <span>@akun_instagram</span>
                       </div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary-50 text-primary-900 border border-primary-200">
                     Contoh Card
                   </span>
                 </div>
@@ -233,11 +227,11 @@ export default function TrustedByPage() {
                   whileHover={{ y: -4, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveProof(item)}
-                  className="bg-white border border-slate-200 hover:border-pink-300 rounded-3xl p-5 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+                  className="bg-white border border-slate-200 hover:border-primary-400 rounded-3xl p-5 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                 >
                   {/* Top Badge */}
                   {item.highlightBadge && (
-                    <div className="absolute top-0 right-0 bg-linear-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black px-3 py-1 rounded-bl-2xl shadow-xs">
+                    <div className="absolute top-0 right-0 bg-[#0B1527] text-white text-[10px] font-black px-3 py-1 rounded-bl-2xl shadow-xs">
                       {item.highlightBadge}
                     </div>
                   )}
@@ -245,7 +239,7 @@ export default function TrustedByPage() {
                   <div className="space-y-4">
                     {/* Influencer Profile Header */}
                     <div className="flex items-center gap-3 pt-1">
-                      <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 p-0.5 shrink-0 shadow-xs">
+                      <div className="w-13 h-13 rounded-full bg-primary-800 p-0.5 shrink-0 shadow-xs">
                         <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
                           {item.avatarUrl ? (
                             <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -263,7 +257,7 @@ export default function TrustedByPage() {
                           {item.verified && <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />}
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-xs text-pink-600 font-semibold mt-0.5">
+                        <div className="flex items-center gap-1.5 text-xs text-primary-750 font-semibold mt-0.5">
                           {item.platform === 'instagram' && <InstagramIcon className="w-3.5 h-3.5 shrink-0" />}
                           {item.platform === 'tiktok' && <TikTokIcon className="w-3.5 h-3.5 shrink-0" />}
                           <span className="truncate">{item.handle}</span>
@@ -291,7 +285,7 @@ export default function TrustedByPage() {
 
                   {/* Action Hint */}
                   <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span className="text-[11px] font-bold text-primary-750 flex items-center gap-1 group-hover:underline">
+                    <span className="text-[11px] font-bold text-primary-800 flex items-center gap-1 group-hover:underline">
                       <Eye className="w-3.5 h-3.5" />
                       <span>Buka Bukti Media</span>
                     </span>
@@ -327,7 +321,7 @@ export default function TrustedByPage() {
               {/* Modal Header */}
               <div className="px-4 sm:px-6 py-4 bg-slate-950/80 border-b border-white/10 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 p-0.5 shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary-800 p-0.5 shrink-0">
                     <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
                       {activeProof.avatarUrl ? (
                         <img src={activeProof.avatarUrl} alt={activeProof.name} className="w-full h-full object-cover" />
@@ -341,7 +335,7 @@ export default function TrustedByPage() {
                       <h4 className="text-sm font-bold text-white truncate">{activeProof.name}</h4>
                       {activeProof.verified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />}
                     </div>
-                    <p className="text-xs text-pink-400 font-semibold truncate flex items-center gap-1">
+                    <p className="text-xs text-blue-400 font-semibold truncate flex items-center gap-1">
                       {activeProof.platform === 'instagram' && <InstagramIcon className="w-3 h-3" />}
                       {activeProof.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
                       <span>{activeProof.handle}</span>
@@ -388,7 +382,7 @@ export default function TrustedByPage() {
 
                 {/* Caption / Promotion Details */}
                 <div className="mt-4 max-w-lg text-left bg-white/5 border border-white/10 rounded-2xl p-4 w-full">
-                  <p className="text-xs font-bold text-amber-300 mb-1">
+                  <p className="text-xs font-bold text-blue-300 mb-1">
                     📌 {activeProof.promotionTitle}
                   </p>
                   {activeProof.caption && (

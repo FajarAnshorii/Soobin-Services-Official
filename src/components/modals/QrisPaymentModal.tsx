@@ -110,7 +110,7 @@ export default function QrisPaymentModal({
         <div className="bg-primary-800 text-white p-5 flex items-center justify-between relative">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-              <QrCode className="w-5 h-5 text-amber-400" />
+              <QrCode className="w-5 h-5 text-blue-300" />
             </div>
             <div>
               <h3 className="font-bold text-base leading-tight">Pembayaran QRIS</h3>
@@ -131,7 +131,7 @@ export default function QrisPaymentModal({
             isExpired
               ? 'bg-red-500 text-white'
               : timeLeft < 60
-              ? 'bg-amber-500 text-white animate-pulse'
+              ? 'bg-primary-950 text-blue-300 border-b border-blue-500/30 animate-pulse'
               : 'bg-primary-50 text-primary-900 border-b border-primary-100'
           }`}
         >
@@ -193,9 +193,9 @@ export default function QrisPaymentModal({
               </div>
 
               {/* Instruction Banner */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-amber-900 leading-relaxed font-medium">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-primary-800 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-primary-900 leading-relaxed font-medium">
                   <strong>Penting:</strong> Setelah berhasil melakukan pembayaran QRIS, silakan <strong>screenshot bukti transfer/pembayaran</strong> lalu unggah pada form di bawah ini.
                 </p>
               </div>

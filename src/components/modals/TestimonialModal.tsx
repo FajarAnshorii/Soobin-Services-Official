@@ -105,8 +105,8 @@ export default function TestimonialModal({ isOpen, onClose, onSuccess }: Testimo
           {/* Modal Header */}
           <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-slate-900 px-6 py-5 text-white flex justify-between items-center relative">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-amber-400 backdrop-blur-md">
-                <Star className="w-5 h-5 fill-amber-400" />
+              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-blue-300 backdrop-blur-md">
+                <Star className="w-5 h-5 fill-blue-300" />
               </div>
               <div>
                 <h3 className="font-extrabold text-base sm:text-lg">Tulis Testimoni & Rating</h3>
@@ -164,7 +164,7 @@ export default function TestimonialModal({ isOpen, onClose, onSuccess }: Testimo
                       <Star
                         className={`w-8 h-8 ${
                           active
-                            ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
+                            ? 'text-primary-800 fill-primary-800 drop-shadow-[0_0_8px_rgba(15,39,68,0.3)]'
                             : 'text-slate-300'
                         }`}
                       />
@@ -172,7 +172,7 @@ export default function TestimonialModal({ isOpen, onClose, onSuccess }: Testimo
                   );
                 })}
               </div>
-              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full w-max">
+              <span className="text-xs font-bold text-primary-850 bg-primary-50 border border-primary-200 px-3 py-1 rounded-full w-max">
                 {getRatingLabel(hoverRating || rating)}
               </span>
             </div>

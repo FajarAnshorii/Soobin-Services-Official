@@ -87,7 +87,7 @@ export default function FormattingDokumenPage() {
               </div>
 
               <div className="p-6 bg-slate-50 rounded-2xl border border-gray-100 flex gap-4">
-                <AlignLeft className="w-8 h-8 text-amber-600 shrink-0" />
+                <AlignLeft className="w-8 h-8 text-primary-800 shrink-0" />
                 <div>
                   <h3 className="font-bold text-base text-gray-950">Konversi Format</h3>
                   <p className="text-gray-500 text-xs mt-1.5 leading-relaxed">Bantuan merapikan penulisan tabel, grafik, skema gambar, serta konversi dokumen antar format PDF/Word/LaTeX.</p>

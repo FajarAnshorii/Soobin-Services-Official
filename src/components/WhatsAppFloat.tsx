@@ -474,8 +474,8 @@ export default function WhatsAppFloat() {
                               {isMedia && (
                                 <div className="mb-2">
                                   {isExpired ? (
-                                    <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2">
-                                      <Clock className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                                    <div className="p-2.5 rounded-xl bg-slate-500/15 border border-slate-500/30 text-slate-800 dark:text-slate-300 text-xs flex items-center gap-2">
+                                      <Clock className="w-4 h-4 shrink-0 text-slate-600 dark:text-slate-400" />
                                       <div className="flex flex-col text-left">
                                         <span className="font-bold text-[11px]">Foto Telah Kadaluarsa</span>
                                         <span className="text-[10px] opacity-90 leading-tight">

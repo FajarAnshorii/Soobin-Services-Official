@@ -607,7 +607,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
           <div className="bg-primary-800 text-white p-5 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="bg-amber-400 text-dark-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">
+                <span className="bg-white/20 text-white border border-white/30 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">
                   Form Pemesanan
                 </span>
                 {priceInfo.isDiscounted && (
@@ -622,7 +622,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
                   <span className="text-xs text-primary-200 line-through font-medium opacity-80">
                     {priceInfo.originalPriceStr}
                   </span>
-                  <span className="text-sm text-amber-300 font-extrabold">
+                  <span className="text-sm text-blue-300 font-extrabold">
                     {priceInfo.discountedPriceStr}
                   </span>
                   <span className="text-[10px] text-emerald-300 font-bold">
@@ -660,10 +660,12 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
 
             {/* Service Name (UNEDITABLE / LOCKED) */}
             <div>
-              <label className="block text-xs font-bold text-dark-800 mb-1 flex items-center justify-between">
-                <span>Jenis Jasa Layanan</span>
-                <span className="text-[10px] text-gray-400 font-normal flex items-center gap-1">
-                  <Lock className="w-3 h-3 text-amber-500" /> Otomatis & Terkunci
+              <label className="block text-xs font-bold text-dark-800 mb-1">
+                <span className="flex items-center justify-between">
+                  <span>Jenis Jasa Layanan</span>
+                  <span className="text-[10px] text-gray-400 font-normal flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-primary-800" /> Otomatis & Terkunci
+                  </span>
                 </span>
               </label>
               <div className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-primary-900 flex items-center justify-between select-none">
@@ -717,13 +719,13 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
                       onClick={() => setPaymentMethod('qris')}
                       className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer ${
                         paymentMethod === 'qris'
-                          ? 'border-amber-500 bg-amber-50 text-amber-900 font-bold shadow-sm'
+                          ? 'border-primary-800 bg-primary-50 text-primary-900 font-bold shadow-sm'
                           : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50'
                       }`}
                     >
-                      <QrCode className={`w-5 h-5 ${paymentMethod === 'qris' ? 'text-amber-600' : 'text-gray-400'}`} />
+                      <QrCode className={`w-5 h-5 ${paymentMethod === 'qris' ? 'text-primary-800' : 'text-gray-400'}`} />
                       <span className="text-xs">QRIS (Scan Barcode)</span>
-                      <span className="text-[9px] text-amber-600 font-bold">Timer 5 Menit & Instant</span>
+                      <span className="text-[9px] text-primary-800 font-bold">Timer 5 Menit & Instant</span>
                     </button>
                   </div>
                 </div>
@@ -739,8 +741,8 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
                 </div>
               </>
             ) : (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2 text-xs text-amber-900">
-                <Info className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-start gap-2 text-xs text-slate-800">
+                <Info className="w-4.5 h-4.5 text-slate-600 shrink-0 mt-0.5" />
                 <span>
                   Layanan ini memerlukan estimasi harga kustom. Silakan lengkapi form di atas dan klik tombol di bawah untuk berdiskusi & negosiasi harga langsung dengan Admin via WhatsApp.
                 </span>

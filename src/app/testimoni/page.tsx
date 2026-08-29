@@ -179,12 +179,12 @@ export default function TestimoniPage() {
         <div className="container-custom">
           <motion.div className="text-center flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md">
+              <span className="bg-blue-500/15 text-blue-300 border border-blue-400/30 text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md">
                 Ulasan Realtime Member SOOBIN
               </span>
               <button
                 onClick={fetchTestimonials}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md hover:bg-emerald-500/30 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md hover:bg-indigo-500/30 transition-all cursor-pointer"
                 title="Sinkronisasi Data Realtime"
               >
                 <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -193,7 +193,7 @@ export default function TestimoniPage() {
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight mb-4 max-w-3xl leading-tight">
-              Pengalaman Ribuan Mahasiswa Bersama <span className="text-amber-400">SOOBIN Services</span>
+              Pengalaman Ribuan Mahasiswa Bersama <span className="bg-linear-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">SOOBIN Services</span>
             </h1>
 
             <p className="text-gray-300 text-xs sm:text-base max-w-2xl mb-6 sm:mb-8 leading-relaxed">
@@ -205,19 +205,19 @@ export default function TestimoniPage() {
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-amber-400 fill-amber-400" />
+                    <Star key={i} className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-indigo-400 fill-indigo-400" />
                   ))}
                 </div>
-                <span className="text-amber-400 font-extrabold text-base sm:text-xl">{averageRating}</span>
+                <span className="text-white font-extrabold text-base sm:text-xl">{averageRating}</span>
                 <span className="text-gray-300 text-[11px] sm:text-sm">({allTestimonials.length} Ulasan)</span>
               </div>
 
               {/* Tulis Testimoni Button */}
               <button
                 onClick={handleOpenReviewModal}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-[#0B1527] font-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-black/20 hover:scale-105 transition-all cursor-pointer"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="w-4 h-4 text-[#0B1527]" />
                 <span>Tulis Testimoni & Rating</span>
               </button>
             </motion.div>
@@ -236,7 +236,7 @@ export default function TestimoniPage() {
               { value: '20.000+', label: 'Mahasiswa Terbantu' },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50/70 md:bg-transparent">
-                <p className={`text-lg sm:text-2xl md:text-3xl font-black whitespace-nowrap ${i === 1 ? 'text-amber-600' : 'text-primary-800'}`}>
+                <p className="text-lg sm:text-2xl md:text-3xl font-black whitespace-nowrap text-primary-850">
                   {stat.value}
                 </p>
                 <p className="text-gray-500 text-[10px] sm:text-xs md:text-sm mt-0.5 font-bold leading-tight">{stat.label}</p>
@@ -354,7 +354,7 @@ export default function TestimoniPage() {
                       {/* Stars */}
                       <div className="flex items-center gap-1 mb-2.5">
                         {[...Array(testi.rating || 5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                          <Star key={i} className="w-4 h-4 text-indigo-400 fill-indigo-400" />
                         ))}
                       </div>
 
@@ -371,7 +371,7 @@ export default function TestimoniPage() {
 
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-400 font-medium">
                       <span>{dateStr}</span>
-                      <span className="text-green-600 font-bold flex items-center gap-1">
+                      <span className="text-primary-800 font-bold flex items-center gap-1">
                         <UserCheck className="w-3 h-3" /> Verifikasi SOOBIN
                       </span>
                     </div>
@@ -460,14 +460,14 @@ export default function TestimoniPage() {
           >
             <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
               {filteredTestimonials.slice(0, 5).map((testi) => (
-                <div key={testi.id} className="w-full flex-shrink-0 px-2 sm:px-4">
+                <div key={testi.id} className="w-full shrink-0 px-2 sm:px-4">
                   <div className="bg-gradient-to-br from-primary-900 via-primary-800 to-slate-900 rounded-3xl p-6 sm:p-10 text-white text-center shadow-xl">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-black mx-auto mb-4 backdrop-blur-md">
                       {testi.name?.charAt(0) || 'M'}
                     </div>
                     <div className="flex items-center justify-center gap-1 mb-3">
                       {[...Array(testi.rating || 5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <Star key={i} className="w-5 h-5 text-indigo-300 fill-indigo-300" />
                       ))}
                     </div>
                     <p className="text-xs sm:text-sm font-bold px-4 py-1.5 bg-white/10 border border-white/20 rounded-full inline-block mb-4">
@@ -489,19 +489,19 @@ export default function TestimoniPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-slate-950 py-12">
+      <section className="bg-[#0B1527] py-14">
         <div className="container-custom px-4 text-center">
           <h2 className="text-xl sm:text-3xl font-extrabold text-white mb-3">Ingin Memberikan Rating & Ulasan?</h2>
-          <p className="text-slate-400 mb-6 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-slate-300 mb-6 text-sm sm:text-base max-w-xl mx-auto">
             Berikan ulasan jujur Anda untuk membantu mahasiswa lain menemukan jasa akademik terbaik di SOOBIN Services.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button
               onClick={handleOpenReviewModal}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black py-3.5 px-8 rounded-2xl text-xs sm:text-sm transition-all shadow-lg cursor-pointer"
+              className="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-[#0B1527] font-black py-3.5 px-8 rounded-2xl text-xs sm:text-sm transition-all shadow-lg cursor-pointer hover:scale-105"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-4 h-4 text-[#0B1527]" />
               Tulis Testimoni Sekarang
             </button>
 
