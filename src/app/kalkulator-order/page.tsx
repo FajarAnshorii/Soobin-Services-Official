@@ -303,10 +303,6 @@ Mohon bantuannya untuk konfirmasi dan proses pesanan ini ya Kak. Terima kasih! ð
       {/* Header Section */}
       <section className="pt-28 sm:pt-36 pb-8 sm:pb-12 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Calculator className="w-3.5 h-3.5 text-slate-700" />
-            <span>Kalkulator & Total Order Seluruh Layanan</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
             Kalkulator Order
           </h1>

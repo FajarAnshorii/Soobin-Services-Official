@@ -23,13 +23,6 @@ export default function PosterCarouselSection() {
 
           {/* KOLOM KANAN: INFO PENGUMUMAN + Double Arrow Menunjuk ke Kiri */}
           <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-2 pl-0 lg:pl-4">
-            
-            {/* Badge Eksklusif */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary-50 text-primary-800 border border-primary-200 shadow-xs mb-3">
-              <Megaphone className="w-3.5 h-3.5 text-primary-600 animate-pulse" />
-              <span>UPDATE RESMI TERBARU</span>
-            </div>
-
             {/* Judul: INFO PENGUMUMAN */}
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
               INFO PENGUMUMAN

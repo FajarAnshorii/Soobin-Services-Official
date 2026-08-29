@@ -266,10 +266,6 @@ export default function DaftarPustakaGeneratorPage() {
       {/* Header Section */}
       <section className="pt-24 sm:pt-32 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3">
-            <BookMarked className="w-3.5 h-3.5 text-primary-700" />
-            <span>Mini Tool Akademik Gratis</span>
-          </div>
           <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Generator Sitasi & Daftar Pustaka
           </h1>
@@ -889,7 +885,7 @@ export default function DaftarPustakaGeneratorPage() {
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                 Harvard Referencing Style
               </h3>
               <p className="text-slate-600 leading-relaxed">

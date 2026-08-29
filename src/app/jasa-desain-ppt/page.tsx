@@ -25,10 +25,7 @@ export default function JasaDesainPptPage() {
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
           </div>
           <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-            <span className="bg-primary-700/50 border border-primary-600 text-primary-300 text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
-              Layanan Visual Kreatif
-            </span>
-            <h1 className="text-3xl md:text-5xl font-black mt-4 leading-tight">
+            <h1 className="text-3xl md:text-5xl font-black leading-tight">
               Jasa Desain Slide Presentasi & PPT Professional
             </h1>
             <p className="text-gray-300 text-base md:text-lg mt-6 leading-relaxed">

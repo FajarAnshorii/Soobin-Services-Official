@@ -120,19 +120,6 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Badge */}
-            <motion.div
-              className="inline-flex items-center gap-2 bg-black/50 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-6 shadow-xl"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]" />
-              <span className="text-white text-xs sm:text-sm font-bold uppercase tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
-                Trusted by 20K+ Customers
-              </span>
-            </motion.div>
-
             {/* Main Heading - WordsPullUp Animation */}
             <div className="mb-2">
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black text-white tracking-tight [text-shadow:_0_4px_20px_rgba(0,0,0,1),_0_2px_10px_rgba(0,0,0,0.9)]">

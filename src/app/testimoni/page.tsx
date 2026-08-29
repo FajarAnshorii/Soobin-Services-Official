@@ -178,17 +178,14 @@ export default function TestimoniPage() {
       <section className="bg-gradient-to-br from-dark-800 via-primary-900 to-dark-800 pt-24 sm:pt-32 pb-12 sm:pb-16 px-4">
         <div className="container-custom">
           <motion.div className="text-center flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-              <span className="bg-blue-500/15 text-blue-300 border border-blue-400/30 text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md">
-                Ulasan Realtime Member SOOBIN
-              </span>
+            <div className="flex items-center justify-center gap-2 mb-4">
               <button
                 onClick={fetchTestimonials}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md hover:bg-indigo-500/30 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md hover:bg-indigo-500/30 transition-all cursor-pointer"
                 title="Sinkronisasi Data Realtime"
               >
                 <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>Realtime Sync</span>
+                <span>Realtime Sync Database</span>
               </button>
             </div>
 

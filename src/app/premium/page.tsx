@@ -1259,9 +1259,6 @@ export default function PremiumPage() {
       {/* Hero Section Header */}
       <section className="bg-[#0B1527] pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 text-center">
         <div className="container-custom max-w-4xl mx-auto space-y-4">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-black bg-blue-500/15 text-blue-300 border border-blue-400/30 tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" /> PUSAT AKUN PREMIUM INDONESIA
-          </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
             Langganan Akun Premium Resmi & Bergaransi
           </h1>

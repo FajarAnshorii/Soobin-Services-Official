@@ -86,20 +86,10 @@ export default function TrustedByPage() {
         <div className="absolute top-1/2 right-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container-custom max-w-4xl mx-auto text-center relative z-10 space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-blue-500/15 text-blue-300 border border-blue-400/30 tracking-wide uppercase backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-blue-400" /> BUKTI PROMOSI INFLUENCER
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.5 }}
             className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight"
           >
             Dipromosikan & Direkomendasikan Oleh <span className="bg-linear-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">Influencer Ternama</span>

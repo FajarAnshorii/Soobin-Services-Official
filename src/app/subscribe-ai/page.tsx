@@ -583,10 +583,6 @@ export default function SubscribeAIPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="inline-block px-4 py-1.5 rounded-full bg-neutral-900 border border-neutral-700 text-neutral-300 text-xs font-bold tracking-widest uppercase mb-6">
-              SOOBIN SUBSCRIBE AI OFFICIAL
-            </div>
-
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6 text-white">
               Langganan AI Premium <br />
               <span className="text-neutral-400">

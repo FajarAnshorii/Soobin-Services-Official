@@ -181,10 +181,6 @@ Berdasarkan perhitungan Rumus Lemeshow di atas, diperoleh jumlah sampel minimal 
       {/* Header Section */}
       <section className="pt-28 sm:pt-36 pb-6 sm:pb-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
-            <Calculator className="w-3.5 h-3.5 text-primary-700" />
-            <span>Mini Tool Metodologi Penelitian</span>
-          </div>
           <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kalkulator Sampel Rumus Slovin & Lemeshow
           </h1>
