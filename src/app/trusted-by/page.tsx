@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -15,6 +15,10 @@ import {
   X,
   ExternalLink,
   Eye,
+  Search,
+  Globe,
+  Award,
+  MessageSquare,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -36,16 +40,25 @@ function TikTokIcon({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
-export interface PromotedInfluencer {
+function FacebookIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+export interface PromotedShowcase {
   id: string;
+  targetGroup: 'influencer' | 'public';
   name: string;
   handle: string;
-  platform: 'instagram' | 'tiktok' | 'youtube';
+  platform: 'instagram' | 'tiktok' | 'facebook';
   platformUrl?: string;
   avatarUrl?: string;
   followers?: string;
   verified?: boolean;
-  category: string;
+  category?: string;
   promotionTitle: string;
   caption?: string;
   proofMediaUrl: string;
@@ -54,26 +67,45 @@ export interface PromotedInfluencer {
   highlightBadge?: string;
 }
 
-// Data daftar influencer yang mempromosikan SOOBIN Services (Dikosongkan sementara)
-const PROMOTED_INFLUENCERS: PromotedInfluencer[] = [];
+// Data daftar bukti promosi (Dikosongkan sementara untuk siap diisi)
+const PROMOTED_SHOWCASES: PromotedShowcase[] = [];
 
 export default function TrustedByPage() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [activeProof, setActiveProof] = useState<PromotedInfluencer | null>(null);
+  const [mainGroup, setMainGroup] = useState<'influencer' | 'public'>('influencer');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeProof, setActiveProof] = useState<PromotedShowcase | null>(null);
 
-  const categories = [
-    { id: 'all', label: 'Semua Bukti Promosi' },
-    { id: 'instagram', label: 'Instagram Story & Feed' },
-    { id: 'tiktok', label: 'TikTok Review' },
-    { id: 'public-figure', label: 'Publik, Member & Influencer' },
+  // Platform filters depending on active main category
+  const platformFilters = [
+    { id: 'all', label: 'Semua Platform', icon: Globe },
+    { id: 'instagram', label: 'Instagram', icon: InstagramIcon },
+    { id: 'tiktok', label: 'TikTok', icon: TikTokIcon },
+    { id: 'facebook', label: 'Facebook', icon: FacebookIcon },
   ];
 
-  const filteredList = PROMOTED_INFLUENCERS.filter((item) => {
-    if (selectedCategory === 'all') return true;
-    if (selectedCategory === 'instagram') return item.platform === 'instagram';
-    if (selectedCategory === 'tiktok') return item.platform === 'tiktok';
-    return item.category.toLowerCase().includes(selectedCategory.toLowerCase());
-  });
+  // Filtered List based on Main Group, Platform, and Search Query
+  const filteredList = useMemo(() => {
+    return PROMOTED_SHOWCASES.filter((item) => {
+      // 1. Filter by target group (Influencer vs Public)
+      if (item.targetGroup !== mainGroup) return false;
+
+      // 2. Filter by platform
+      if (selectedPlatform !== 'all' && item.platform !== selectedPlatform) return false;
+
+      // 3. Filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchName = item.name.toLowerCase().includes(query);
+        const matchHandle = item.handle.toLowerCase().includes(query);
+        const matchTitle = item.promotionTitle.toLowerCase().includes(query);
+        const matchCaption = item.caption ? item.caption.toLowerCase().includes(query) : false;
+        if (!matchName && !matchHandle && !matchTitle && !matchCaption) return false;
+      }
+
+      return true;
+    });
+  }, [mainGroup, selectedPlatform, searchQuery]);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -88,7 +120,7 @@ export default function TrustedByPage() {
             transition={{ duration: 0.5 }}
             className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight"
           >
-            Dipromosikan & Direkomendasikan Oleh <span className="text-blue-400">Publik & Content Creator</span>
+            Dipromosikan & Direkomendasikan Oleh <span className="text-blue-400">Influencer & Publik</span>
           </motion.h1>
 
           <motion.p
@@ -97,7 +129,7 @@ export default function TrustedByPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-slate-300 text-xs sm:text-base max-w-2xl mx-auto leading-relaxed"
           >
-            Kumpulan dokumentasi foto, video, dan ulasan nyata saat publik, pelanggan setia, serta content creator membagikan pengalaman dan merekomendasikan SOOBIN Services.
+            Dokumentasi nyata bukti promosi dan rekomendasi dari para content creator, figur publik, serta pelanggan setia yang membagikan pengalaman mereka di berbagai media sosial.
           </motion.p>
         </div>
       </section>
@@ -108,9 +140,9 @@ export default function TrustedByPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
             {[
               { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck, color: 'text-primary-850' },
-              { value: 'Publik & Creator', label: 'Member, Publik & Influencer', icon: Users, color: 'text-indigo-600' },
-              { value: 'Multi Platform', label: 'Instagram, TikTok & Media', icon: Share2, color: 'text-primary-850' },
-              { value: 'Kualitas Teruji', label: 'Rekomendasi Nyata', icon: TrendingUp, color: 'text-blue-600' },
+              { value: 'Influencer', label: 'Creator & Figur Publik', icon: Award, color: 'text-indigo-600' },
+              { value: 'Publik & Member', label: 'Pelanggan & Komunitas', icon: Users, color: 'text-primary-850' },
+              { value: 'Multi Platform', label: 'Instagram, TikTok, Facebook', icon: Share2, color: 'text-blue-600' },
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
@@ -131,62 +163,152 @@ export default function TrustedByPage() {
         </div>
       </section>
 
-      {/* Main Content: Showcase Cards */}
-      <section className="py-10 sm:py-16 px-4 flex-1">
-        <div className="container-custom max-w-6xl mx-auto">
-          {/* Category Filter Tabs */}
-          <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar pb-6">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full px-4 sm:px-5 py-2 text-xs sm:text-sm font-bold transition-all border whitespace-nowrap cursor-pointer shrink-0 ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#0B1527] text-white border-[#0B1527] shadow-sm'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+      {/* Main Content: Dual Category Hub + Search & Platform Filters */}
+      <section className="py-8 sm:py-14 px-4 flex-1">
+        <div className="container-custom max-w-6xl mx-auto space-y-6">
+
+          {/* DUA KATEGORI UTAMA: INFLUENCER (KIRI) vs PUBLIK (KANAN) */}
+          <div className="max-w-xl mx-auto bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-2 gap-1.5">
+            <button
+              onClick={() => {
+                setMainGroup('influencer');
+                setSelectedPlatform('all');
+              }}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                mainGroup === 'influencer'
+                  ? 'bg-[#0B1527] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+              }`}
+            >
+              <Award className="w-4 h-4 shrink-0" />
+              <span>Influencer & Creator</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setMainGroup('public');
+                setSelectedPlatform('all');
+              }}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                mainGroup === 'public'
+                  ? 'bg-[#0B1527] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+              }`}
+            >
+              <Users className="w-4 h-4 shrink-0" />
+              <span>Publik & Member</span>
+            </button>
+          </div>
+
+          {/* SUB-FILTER & SEARCH BAR CONTAINER */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              
+              {/* Search Filter Component */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={
+                    mainGroup === 'influencer'
+                      ? 'Cari nama influencer, @akun Instagram, TikTok...'
+                      : 'Cari nama publik, akun medsos, atau ulasan...'
+                  }
+                  className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0B1527] focus:bg-white transition-all font-medium"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full"
+                    title="Hapus pencarian"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Platform Filter Buttons (Instagram, TikTok, Facebook) */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                {platformFilters.map((p) => {
+                  const Icon = p.icon;
+                  const isActive = selectedPlatform === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelectedPlatform(p.id)}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap cursor-pointer shrink-0 ${
+                        isActive
+                          ? 'bg-[#0B1527] text-white border-[#0B1527]'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{p.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Info bar / Context Note */}
+            <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+              <span className="font-semibold text-slate-700">
+                Menampilkan kategori: <strong className="text-[#0B1527]">{mainGroup === 'influencer' ? 'Influencer & Content Creator' : 'Publik & Member / Pelanggan'}</strong>
+              </span>
+              <span className="text-[11px] text-slate-400">
+                {filteredList.length} bukti promosi ditemukan
+              </span>
+            </div>
           </div>
 
           {/* If List is Empty (Placeholder State) */}
           {filteredList.length === 0 ? (
-            <div className="mt-4 bg-white border border-slate-200 rounded-3xl p-8 sm:p-14 text-center max-w-3xl mx-auto shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-14 text-center max-w-3xl mx-auto shadow-sm">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-5 text-slate-800">
-                <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-primary-900" />
+                {mainGroup === 'influencer' ? (
+                  <Award className="w-8 h-8 sm:w-10 sm:h-10 text-primary-900" />
+                ) : (
+                  <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-primary-900" />
+                )}
               </div>
 
               <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 mb-3 border border-slate-200">
-                Showcase Bukti Promosi
+                {mainGroup === 'influencer' ? 'Showcase Bukti Promosi Influencer' : 'Showcase Bukti Promosi Publik'}
               </span>
 
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-3">
-                Dokumentasi Bukti Promosi Publik & Influencer Sedang Disiapkan
+                {mainGroup === 'influencer'
+                  ? 'Dokumentasi Promosi Influencer Sedang Disiapkan'
+                  : 'Dokumentasi Promosi Publik & Member Sedang Disiapkan'}
               </h2>
 
               <p className="text-slate-500 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed mb-6">
-                Siapapun boleh berpartisipasi membantu promosi. Nantinya setiap kartu publik maupun creator di halaman ini dapat Anda klik untuk melihat langsung foto, screenshot story, atau video bukti promosi resmi.
+                {mainGroup === 'influencer'
+                  ? 'Nantinya setiap kartu influencer (Instagram, TikTok, Facebook) di halaman ini dapat Anda klik untuk melihat langsung foto, screenshot story, atau video bukti promosi resmi.'
+                  : 'Publik atau siapapun yang membantu mempromosikan jasa kami di Instagram, TikTok, atau Facebook dapat mengirimkan buktinya ke admin untuk dipajang di kartu showcase ini.'}
               </p>
 
               {/* Interactive Mockup Example Card */}
-              <div className="max-w-md mx-auto p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 text-left space-y-3">
+              <div className="max-w-md mx-auto p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-left space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-full bg-primary-800 p-0.5 shrink-0">
                       <div className="w-full h-full bg-white rounded-full flex items-center justify-center font-black text-xs text-primary-900">
-                        SB
+                        {mainGroup === 'influencer' ? 'INF' : 'PUB'}
                       </div>
                     </div>
                     <div>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs sm:text-sm font-bold text-slate-900">Nama Publik / Creator</span>
+                        <span className="text-xs sm:text-sm font-bold text-slate-900">
+                          {mainGroup === 'influencer' ? 'Nama Influencer / Creator' : 'Nama Publik / Member'}
+                        </span>
                         <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                       </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-primary-750 font-semibold">
                         <InstagramIcon className="w-3 h-3" />
-                        <span>@akun_instagram</span>
+                        <span>@akun_media_sosial</span>
                       </div>
                     </div>
                   </div>
@@ -196,13 +318,13 @@ export default function TrustedByPage() {
                 </div>
 
                 <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
-                  <span className="font-medium text-slate-700">📌 Klik card untuk buka popup bukti promosi</span>
+                  <span className="font-medium text-slate-700">📌 Klik card untuk buka popup foto / bukti promosi</span>
                   <Eye className="w-4 h-4 text-primary-700 shrink-0" />
                 </div>
               </div>
             </div>
           ) : (
-            /* Render Dynamic Influencer Cards */
+            /* Render Dynamic Cards */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredList.map((item) => (
                 <motion.div
@@ -220,7 +342,7 @@ export default function TrustedByPage() {
                   )}
 
                   <div className="space-y-4">
-                    {/* Influencer Profile Header */}
+                    {/* Profile Header */}
                     <div className="flex items-center gap-3 pt-1">
                       <div className="w-13 h-13 rounded-full bg-primary-800 p-0.5 shrink-0 shadow-xs">
                         <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
@@ -243,6 +365,7 @@ export default function TrustedByPage() {
                         <div className="flex items-center gap-1.5 text-xs text-primary-750 font-semibold mt-0.5">
                           {item.platform === 'instagram' && <InstagramIcon className="w-3.5 h-3.5 shrink-0" />}
                           {item.platform === 'tiktok' && <TikTokIcon className="w-3.5 h-3.5 shrink-0" />}
+                          {item.platform === 'facebook' && <FacebookIcon className="w-3.5 h-3.5 shrink-0" />}
                           <span className="truncate">{item.handle}</span>
                           {item.followers && (
                             <span className="text-[10px] text-slate-400 font-normal ml-1">
@@ -299,10 +422,10 @@ export default function TrustedByPage() {
               exit={{ scale: 0.94, opacity: 0, y: 15 }}
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 border border-white/20 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
+              className="bg-[#0B1527] border border-slate-700 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
             >
               {/* Modal Header */}
-              <div className="px-4 sm:px-6 py-4 bg-slate-950/80 border-b border-white/10 flex items-center justify-between gap-3">
+              <div className="px-4 sm:px-6 py-4 bg-[#080E1A] border-b border-slate-800 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-full bg-primary-800 p-0.5 shrink-0">
                     <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
@@ -321,6 +444,7 @@ export default function TrustedByPage() {
                     <p className="text-xs text-blue-400 font-semibold truncate flex items-center gap-1">
                       {activeProof.platform === 'instagram' && <InstagramIcon className="w-3 h-3" />}
                       {activeProof.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
+                      {activeProof.platform === 'facebook' && <FacebookIcon className="w-3 h-3" />}
                       <span>{activeProof.handle}</span>
                     </p>
                   </div>
