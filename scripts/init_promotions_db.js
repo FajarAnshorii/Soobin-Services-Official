@@ -56,13 +56,18 @@ async function queryD1(sql, params = []) {
   });
 }
 
-async function updateProof() {
-  console.log('--- Updating @fajaransh_ proof to Story Screenshot ---');
+async function updateSchemaAndData() {
+  console.log('--- Updating D1 Schema & Data for Followers/Following ---');
+
+  // Alter table if column missing (safe add)
+  await queryD1(`ALTER TABLE public_promotions ADD COLUMN followers TEXT;`).catch(() => {});
+  await queryD1(`ALTER TABLE public_promotions ADD COLUMN following TEXT;`).catch(() => {});
+  await queryD1(`ALTER TABLE influencer_promotions ADD COLUMN following TEXT;`).catch(() => {});
 
   const updateSql = `
     INSERT OR REPLACE INTO public_promotions (
       id, name, handle, platform, platform_url, avatar_url, university_or_role,
-      promotion_title, caption, proof_media_url, proof_media_type,
+      followers, following, promotion_title, caption, proof_media_url, proof_media_type,
       promoted_date, highlight_badge, is_approved, created_at
     ) VALUES (
       'pub-fajaransh',
@@ -70,8 +75,10 @@ async function updateProof() {
       '@fajaransh_',
       'instagram',
       'https://www.instagram.com/fajaransh_/',
-      '/images/proof/fajaransh_profile.jpg',
+      '/images/proof/fajaransh_avatar.jpg',
       'Fullstack & Web Dev (Head of SOOBIN Services)',
+      '1.830',
+      '1.033',
       'Instagram Story Promosi: Jasa Service Trusted 2023 - SOOBIN Services',
       '“Solusi kebutuhan akademikmu” • @soobinservices.id • https://soobinservices.com/',
       '/images/proof/fajaransh_story_proof.jpg',
@@ -90,4 +97,4 @@ async function updateProof() {
   console.log('Current DB Record:', JSON.stringify(check, null, 2));
 }
 
-updateProof();
+updateSchemaAndData();

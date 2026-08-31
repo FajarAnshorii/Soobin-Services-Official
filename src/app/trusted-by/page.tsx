@@ -57,6 +57,7 @@ export interface PromotedShowcase {
   platformUrl?: string;
   avatarUrl?: string;
   followers?: string;
+  following?: string;
   universityOrRole?: string;
   verified?: boolean;
   category?: string;
@@ -135,8 +136,6 @@ export default function TrustedByPage() {
       return true;
     });
   }, [items, selectedPlatform, searchQuery]);
-
-  const [modalTab, setModalTab] = useState<'proof' | 'profile'>('proof');
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -326,7 +325,7 @@ export default function TrustedByPage() {
                 </div>
 
                 <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
-                  <span className="font-medium text-slate-700">📌 Klik card untuk buka popup foto / bukti promosi</span>
+                  <span className="font-medium text-slate-700">📌 Klik card untuk buka popup foto bukti promosi</span>
                   <Eye className="w-4 h-4 text-primary-700 shrink-0" />
                 </div>
               </div>
@@ -339,10 +338,7 @@ export default function TrustedByPage() {
                   key={item.id}
                   whileHover={{ y: -4, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setActiveProof(item);
-                    setModalTab('proof');
-                  }}
+                  onClick={() => setActiveProof(item)}
                   className="bg-white border border-slate-200 hover:border-primary-400 rounded-3xl p-5 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                 >
                   {/* Top Badge */}
@@ -373,20 +369,32 @@ export default function TrustedByPage() {
                           {item.verified && <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />}
                         </div>
 
+                        {/* Handle & Platform */}
                         <div className="flex items-center gap-1.5 text-xs text-primary-750 font-semibold mt-0.5">
                           {item.platform === 'instagram' && <InstagramIcon className="w-3.5 h-3.5 shrink-0" />}
                           {item.platform === 'tiktok' && <TikTokIcon className="w-3.5 h-3.5 shrink-0" />}
                           {item.platform === 'facebook' && <FacebookIcon className="w-3.5 h-3.5 shrink-0" />}
                           <span className="truncate">{item.handle}</span>
-                          {item.followers && (
-                            <span className="text-[10px] text-slate-400 font-normal ml-1">
-                              • {item.followers}
-                            </span>
-                          )}
                         </div>
 
+                        {/* Total Followers & Following */}
+                        {(item.followers || item.following) && (
+                          <div className="flex items-center gap-1 text-[11px] text-slate-600 font-bold mt-1">
+                            {item.followers && (
+                              <span>{item.followers} pengikut</span>
+                            )}
+                            {item.followers && item.following && (
+                              <span className="text-slate-400">•</span>
+                            )}
+                            {item.following && (
+                              <span>{item.following} mengikuti</span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Role / University / Bio */}
                         {item.universityOrRole && (
-                          <p className="text-[11px] text-slate-500 font-medium truncate mt-1">
+                          <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
                             {item.universityOrRole}
                           </p>
                         )}
@@ -426,135 +434,43 @@ export default function TrustedByPage() {
         </div>
       </section>
 
-      {/* POPUP MODAL BUKTI MEDIA FOTO / SCREENSHOT */}
+      {/* POPUP LIGHTBOX MURNI GAMBAR BUKTI PROMOSI DENGAN BLUR BACKGROUND */}
       <AnimatePresence>
         {activeProof && (
           <div
-            className="fixed inset-0 z-100 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+            className="fixed inset-0 z-100 bg-black/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 cursor-zoom-out"
             onClick={() => setActiveProof(null)}
           >
+            {/* Floating Close Button */}
+            <button
+              onClick={() => setActiveProof(null)}
+              className="fixed top-4 right-4 sm:top-6 sm:right-6 p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-all shadow-xl cursor-pointer z-110"
+              title="Tutup Bukti Promosi"
+            >
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Pure Proof Image Lightbox */}
             <motion.div
-              initial={{ scale: 0.94, opacity: 0, y: 15 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.94, opacity: 0, y: 15 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#0B1527] border border-slate-700 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
+              className="relative max-h-[88vh] max-w-full flex items-center justify-center cursor-default"
             >
-              {/* Modal Header */}
-              <div className="px-4 sm:px-6 py-4 bg-[#080E1A] border-b border-slate-800 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-primary-800 p-0.5 shrink-0">
-                    <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
-                      {activeProof.avatarUrl ? (
-                        <img src={activeProof.avatarUrl} alt={activeProof.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-xs font-black text-slate-900">{activeProof.name.charAt(0)}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h4 className="text-sm font-bold text-white truncate">{activeProof.name}</h4>
-                      {activeProof.verified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />}
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-xs text-blue-400 font-semibold truncate flex items-center gap-1">
-                        {activeProof.platform === 'instagram' && <InstagramIcon className="w-3 h-3" />}
-                        {activeProof.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
-                        {activeProof.platform === 'facebook' && <FacebookIcon className="w-3 h-3" />}
-                        <span>{activeProof.handle}</span>
-                      </p>
-                      {activeProof.universityOrRole && (
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          • {activeProof.universityOrRole}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {activeProof.platformUrl && (
-                    <a
-                      href={activeProof.platformUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
-                    >
-                      <span>Buka Profil</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  <button
-                    onClick={() => setActiveProof(null)}
-                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                    title="Tutup Popup"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Optional Multi-Media Tab Switcher in Modal */}
-              {activeProof.avatarUrl && activeProof.avatarUrl.startsWith('/images/') && (
-                <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-black/50 border-b border-slate-800">
-                  <button
-                    onClick={() => setModalTab('proof')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      modalTab === 'proof'
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-white/10 text-slate-300 hover:bg-white/20'
-                    }`}
-                  >
-                    📱 Bukti Story Promosi
-                  </button>
-                  <button
-                    onClick={() => setModalTab('profile')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      modalTab === 'profile'
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-white/10 text-slate-300 hover:bg-white/20'
-                    }`}
-                  >
-                    👤 Bukti Bio & Profil Instagram
-                  </button>
+              {activeProof.proofMediaUrl ? (
+                <img
+                  src={activeProof.proofMediaUrl}
+                  alt={`Bukti Promosi ${activeProof.name}`}
+                  className="max-h-[85vh] w-auto max-w-[92vw] sm:max-w-xl object-contain rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20"
+                />
+              ) : (
+                <div className="p-12 text-slate-300 space-y-2 bg-slate-900 rounded-3xl border border-white/20 text-center">
+                  <ImageIcon className="w-12 h-12 mx-auto text-slate-400" />
+                  <p className="text-sm font-semibold">Media foto bukti promosi belum diunggah</p>
                 </div>
               )}
-
-              {/* Modal Body: Media Preview */}
-              <div className="p-4 sm:p-6 overflow-y-auto flex-1 flex flex-col items-center justify-center bg-black/40 text-center">
-                {modalTab === 'proof' && activeProof.proofMediaUrl ? (
-                  <img
-                    src={activeProof.proofMediaUrl}
-                    alt={`Bukti Story Promosi ${activeProof.name}`}
-                    className="max-h-[60vh] w-auto max-w-full rounded-2xl shadow-xl object-contain border border-white/10"
-                  />
-                ) : modalTab === 'profile' && activeProof.avatarUrl ? (
-                  <img
-                    src={activeProof.avatarUrl}
-                    alt={`Bukti Bio & Profil ${activeProof.name}`}
-                    className="max-h-[60vh] w-auto max-w-full rounded-2xl shadow-xl object-contain border border-white/10"
-                  />
-                ) : (
-                  <div className="p-12 text-slate-400 space-y-2">
-                    <ImageIcon className="w-12 h-12 mx-auto text-slate-500" />
-                    <p className="text-sm font-semibold">Media foto bukti promosi belum diunggah</p>
-                  </div>
-                )}
-
-                {/* Caption / Promotion Details */}
-                <div className="mt-4 max-w-lg text-left bg-white/5 border border-white/10 rounded-2xl p-4 w-full">
-                  <p className="text-xs font-bold text-blue-300 mb-1">
-                    📌 {activeProof.promotionTitle}
-                  </p>
-                  {activeProof.caption && (
-                    <p className="text-xs text-slate-300 italic leading-relaxed">
-                      &ldquo;{activeProof.caption}&rdquo;
-                    </p>
-                  )}
-                </div>
-              </div>
             </motion.div>
           </div>
         )}

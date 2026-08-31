@@ -14,6 +14,7 @@ export interface PromotionItem {
   platformUrl?: string;
   avatarUrl?: string;
   followers?: string;
+  following?: string;
   universityOrRole?: string;
   verified?: boolean;
   category?: string;
@@ -38,6 +39,7 @@ async function ensureTables() {
       platform_url TEXT,
       avatar_url TEXT,
       followers TEXT,
+      following TEXT,
       verified INTEGER DEFAULT 0,
       category TEXT,
       promotion_title TEXT NOT NULL,
@@ -60,6 +62,8 @@ async function ensureTables() {
       platform_url TEXT,
       avatar_url TEXT,
       university_or_role TEXT,
+      followers TEXT,
+      following TEXT,
       promotion_title TEXT NOT NULL,
       caption TEXT,
       proof_media_url TEXT NOT NULL,
@@ -96,6 +100,8 @@ export async function GET(request: Request) {
           platform_url as platformUrl,
           avatar_url as avatarUrl,
           university_or_role as universityOrRole,
+          followers,
+          following,
           promotion_title as promotionTitle,
           caption,
           proof_media_url as proofMediaUrl,
@@ -119,6 +125,7 @@ export async function GET(request: Request) {
           platform_url as platformUrl,
           avatar_url as avatarUrl,
           followers,
+          following,
           verified,
           category,
           promotion_title as promotionTitle,
