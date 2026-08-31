@@ -116,17 +116,17 @@ export default function TrustedByPage() {
         <div className="container-custom px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
             {[
-              { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck, color: 'text-primary-850' },
-              { value: 'Influencer', label: 'Creator & Figur Publik', icon: Award, color: 'text-indigo-600' },
-              { value: 'Publik & Member', label: 'Pelanggan & Komunitas', icon: Users, color: 'text-primary-850' },
-              { value: 'Multi Platform', label: 'Instagram, TikTok, Facebook', icon: Share2, color: 'text-blue-600' },
+              { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck },
+              { value: 'Influencer', label: 'Creator & Figur Publik', icon: Award },
+              { value: 'Publik & Member', label: 'Pelanggan & Komunitas', icon: Users },
+              { value: 'Multi Platform', label: 'Instagram, TikTok, Facebook', icon: Share2 },
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={i} className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-slate-50 md:bg-transparent">
                   <div className="flex items-center gap-1.5">
-                    <Icon className={`w-4 h-4 ${stat.color}`} />
-                    <p className={`text-base sm:text-2xl font-black ${stat.color}`}>
+                    <Icon className="w-4 h-4 text-[#0B1527]" />
+                    <p className="text-base sm:text-2xl font-black text-[#0B1527]">
                       {stat.value}
                     </p>
                   </div>
