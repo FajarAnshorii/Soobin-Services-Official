@@ -44,9 +44,9 @@ const testimoniLinks = [
   {
     href: '/trusted-by',
     label: 'Trusted By',
-    desc: 'Bukti media & promosi influencer / figur publik',
+    desc: 'Bukti promosi publik, member & content creator',
     icon: Award,
-    badge: 'Influencer',
+    badge: 'Publik & Creator',
     badgeColor: 'text-primary-850 bg-primary-50 border-primary-200',
   },
 ];
