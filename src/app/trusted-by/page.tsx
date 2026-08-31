@@ -111,31 +111,8 @@ export default function TrustedByPage() {
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar />
 
-      {/* Hero Section Header (Solid Deep Navy & White without Gradients) */}
-      <section className="bg-[#0B1527] border-b border-slate-800 pt-28 sm:pt-36 pb-14 sm:pb-20 px-4">
-        <div className="container-custom max-w-4xl mx-auto text-center relative z-10 space-y-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight"
-          >
-            Dipromosikan & Direkomendasikan Oleh <span className="text-blue-400">Influencer & Publik</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-slate-300 text-xs sm:text-base max-w-2xl mx-auto leading-relaxed"
-          >
-            Dokumentasi nyata bukti promosi dan rekomendasi dari para content creator, figur publik, serta pelanggan setia yang membagikan pengalaman mereka di berbagai media sosial.
-          </motion.p>
-        </div>
-      </section>
-
       {/* Stats Highlight Bar */}
-      <section className="bg-white border-b border-slate-200 py-5 sm:py-7">
+      <section className="bg-white border-b border-slate-200 pt-24 sm:pt-28 pb-5 sm:pb-7">
         <div className="container-custom px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
             {[
