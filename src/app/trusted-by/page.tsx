@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
@@ -57,6 +57,7 @@ export interface PromotedShowcase {
   platformUrl?: string;
   avatarUrl?: string;
   followers?: string;
+  universityOrRole?: string;
   verified?: boolean;
   category?: string;
   promotionTitle: string;
@@ -65,16 +66,47 @@ export interface PromotedShowcase {
   proofMediaType?: 'image' | 'video';
   promotedDate?: string;
   highlightBadge?: string;
+  isApproved?: boolean;
+  createdAt?: string;
 }
-
-// Data daftar bukti promosi (Dikosongkan sementara untuk siap diisi)
-const PROMOTED_SHOWCASES: PromotedShowcase[] = [];
 
 export default function TrustedByPage() {
   const [mainGroup, setMainGroup] = useState<'influencer' | 'public'>('influencer');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeProof, setActiveProof] = useState<PromotedShowcase | null>(null);
+  const [items, setItems] = useState<PromotedShowcase[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch live promotion database records
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+
+    fetch(`/api/promotions?type=${mainGroup}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            setItems(data);
+          } else {
+            setItems([]);
+          }
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching promotions:', err);
+        if (isMounted) {
+          setItems([]);
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [mainGroup]);
 
   // Platform filters depending on active main category
   const platformFilters = [
@@ -86,26 +118,23 @@ export default function TrustedByPage() {
 
   // Filtered List based on Main Group, Platform, and Search Query
   const filteredList = useMemo(() => {
-    return PROMOTED_SHOWCASES.filter((item) => {
-      // 1. Filter by target group (Influencer vs Public)
-      if (item.targetGroup !== mainGroup) return false;
-
-      // 2. Filter by platform
+    return items.filter((item) => {
+      // 1. Filter by platform
       if (selectedPlatform !== 'all' && item.platform !== selectedPlatform) return false;
 
-      // 3. Filter by search query
+      // 2. Filter by search query
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        const matchName = item.name.toLowerCase().includes(query);
-        const matchHandle = item.handle.toLowerCase().includes(query);
-        const matchTitle = item.promotionTitle.toLowerCase().includes(query);
+        const matchName = item.name?.toLowerCase().includes(query);
+        const matchHandle = item.handle?.toLowerCase().includes(query);
+        const matchTitle = item.promotionTitle?.toLowerCase().includes(query);
         const matchCaption = item.caption ? item.caption.toLowerCase().includes(query) : false;
         if (!matchName && !matchHandle && !matchTitle && !matchCaption) return false;
       }
 
       return true;
     });
-  }, [mainGroup, selectedPlatform, searchQuery]);
+  }, [items, selectedPlatform, searchQuery]);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
