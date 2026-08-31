@@ -136,6 +136,8 @@ export default function TrustedByPage() {
     });
   }, [items, selectedPlatform, searchQuery]);
 
+  const [modalTab, setModalTab] = useState<'proof' | 'profile'>('proof');
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar />
@@ -337,7 +339,10 @@ export default function TrustedByPage() {
                   key={item.id}
                   whileHover={{ y: -4, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveProof(item)}
+                  onClick={() => {
+                    setActiveProof(item);
+                    setModalTab('proof');
+                  }}
                   className="bg-white border border-slate-200 hover:border-primary-400 rounded-3xl p-5 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                 >
                   {/* Top Badge */}
@@ -491,12 +496,44 @@ export default function TrustedByPage() {
                 </div>
               </div>
 
+              {/* Optional Multi-Media Tab Switcher in Modal */}
+              {activeProof.avatarUrl && activeProof.avatarUrl.startsWith('/images/') && (
+                <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-black/50 border-b border-slate-800">
+                  <button
+                    onClick={() => setModalTab('proof')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      modalTab === 'proof'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                    }`}
+                  >
+                    📱 Bukti Story Promosi
+                  </button>
+                  <button
+                    onClick={() => setModalTab('profile')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      modalTab === 'profile'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                    }`}
+                  >
+                    👤 Bukti Bio & Profil Instagram
+                  </button>
+                </div>
+              )}
+
               {/* Modal Body: Media Preview */}
               <div className="p-4 sm:p-6 overflow-y-auto flex-1 flex flex-col items-center justify-center bg-black/40 text-center">
-                {activeProof.proofMediaUrl ? (
+                {modalTab === 'proof' && activeProof.proofMediaUrl ? (
                   <img
                     src={activeProof.proofMediaUrl}
-                    alt={`Bukti Promosi ${activeProof.name}`}
+                    alt={`Bukti Story Promosi ${activeProof.name}`}
+                    className="max-h-[60vh] w-auto max-w-full rounded-2xl shadow-xl object-contain border border-white/10"
+                  />
+                ) : modalTab === 'profile' && activeProof.avatarUrl ? (
+                  <img
+                    src={activeProof.avatarUrl}
+                    alt={`Bukti Bio & Profil ${activeProof.name}`}
                     className="max-h-[60vh] w-auto max-w-full rounded-2xl shadow-xl object-contain border border-white/10"
                   />
                 ) : (

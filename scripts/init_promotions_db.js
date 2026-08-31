@@ -56,62 +56,10 @@ async function queryD1(sql, params = []) {
   });
 }
 
-async function initTablesAndSeed() {
-  console.log('--- Initializing Promotions Database Tables in Cloudflare D1 ---');
+async function updateProof() {
+  console.log('--- Updating @fajaransh_ proof to Story Screenshot ---');
 
-  // 1. Table for Influencer Promotions
-  console.log('Creating table `influencer_promotions`...');
-  const createInfluencerTable = `
-    CREATE TABLE IF NOT EXISTS influencer_promotions (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      handle TEXT NOT NULL,
-      platform TEXT NOT NULL,
-      platform_url TEXT,
-      avatar_url TEXT,
-      followers TEXT,
-      verified INTEGER DEFAULT 0,
-      category TEXT,
-      promotion_title TEXT NOT NULL,
-      caption TEXT,
-      proof_media_url TEXT NOT NULL,
-      proof_media_type TEXT DEFAULT 'image',
-      promoted_date TEXT,
-      highlight_badge TEXT,
-      is_approved INTEGER DEFAULT 1,
-      created_at TEXT NOT NULL
-    );
-  `;
-  const res1 = await queryD1(createInfluencerTable);
-  console.log('Result influencer_promotions:', JSON.stringify(res1));
-
-  // 2. Table for Public / Member Promotions
-  console.log('Creating table `public_promotions`...');
-  const createPublicTable = `
-    CREATE TABLE IF NOT EXISTS public_promotions (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      handle TEXT NOT NULL,
-      platform TEXT NOT NULL,
-      platform_url TEXT,
-      avatar_url TEXT,
-      university_or_role TEXT,
-      promotion_title TEXT NOT NULL,
-      caption TEXT,
-      proof_media_url TEXT NOT NULL,
-      proof_media_type TEXT DEFAULT 'image',
-      promoted_date TEXT,
-      highlight_badge TEXT,
-      is_approved INTEGER DEFAULT 1,
-      created_at TEXT NOT NULL
-    );
-  `;
-  const res2 = await queryD1(createPublicTable);
-  console.log('Result public_promotions:', JSON.stringify(res2));
-
-  // 3. Insert @fajaransh_ into public_promotions
-  console.log('Inserting @fajaransh_ into public_promotions...');
-  const insertFajarSql = `
+  const updateSql = `
     INSERT OR REPLACE INTO public_promotions (
       id, name, handle, platform, platform_url, avatar_url, university_or_role,
       promotion_title, caption, proof_media_url, proof_media_type,
@@ -122,24 +70,24 @@ async function initTablesAndSeed() {
       '@fajaransh_',
       'instagram',
       'https://www.instagram.com/fajaransh_/',
-      '',
+      '/images/proof/fajaransh_profile.jpg',
       'Fullstack & Web Dev (Head of SOOBIN Services)',
-      'Service Tugas @soobinservices.id di Bio Instagram Resmi',
-      '📌 Service Tugas @soobinservices.id • soobinservices.com/ dan 4 lainnya',
-      '/images/proof/fajaransh_proof.jpg',
+      'Instagram Story Promosi: Jasa Service Trusted 2023 - SOOBIN Services',
+      '“Solusi kebutuhan akademikmu” • @soobinservices.id • https://soobinservices.com/',
+      '/images/proof/fajaransh_story_proof.jpg',
       'image',
       '31 Agu 2026',
-      'Official Profile',
+      'Official Story Proof',
       1,
-      '2026-08-31T23:03:00.000Z'
+      '2026-08-31T23:05:00.000Z'
     );
   `;
-  const res3 = await queryD1(insertFajarSql);
-  console.log('Result insert @fajaransh_:', JSON.stringify(res3));
 
-  // Check count
-  const checkRes = await queryD1('SELECT * FROM public_promotions;');
-  console.log('All Public Promotions in Cloudflare D1:', JSON.stringify(checkRes, null, 2));
+  const res = await queryD1(updateSql);
+  console.log('Update Result:', JSON.stringify(res));
+
+  const check = await queryD1('SELECT * FROM public_promotions WHERE id = ?;', ['pub-fajaransh']);
+  console.log('Current DB Record:', JSON.stringify(check, null, 2));
 }
 
-initTablesAndSeed();
+updateProof();
