@@ -174,11 +174,12 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: Add new promotion (Influencer or Public)
+// POST: Add or Update promotion (Influencer or Public)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
+      id: existingId,
       targetGroup = 'influencer',
       name,
       handle,
@@ -186,6 +187,7 @@ export async function POST(request: Request) {
       platformUrl,
       avatarUrl,
       followers,
+      following,
       universityOrRole,
       verified = false,
       category,
@@ -195,6 +197,7 @@ export async function POST(request: Request) {
       proofMediaType = 'image',
       promotedDate,
       highlightBadge,
+      isApproved = true,
     } = body;
 
     if (!name || !handle || !promotionTitle || !proofMediaUrl) {
@@ -206,16 +209,16 @@ export async function POST(request: Request) {
 
     await ensureTables();
 
-    const id = `${targetGroup === 'public' ? 'pub' : 'inf'}-${Date.now()}`;
+    const id = existingId || `${targetGroup === 'public' ? 'pub' : 'inf'}-${Date.now()}`;
     const createdAt = new Date().toISOString();
 
     if (targetGroup === 'public') {
       const { error } = await queryD1(
-        `INSERT INTO public_promotions (
+        `INSERT OR REPLACE INTO public_promotions (
           id, name, handle, platform, platform_url, avatar_url, university_or_role,
-          promotion_title, caption, proof_media_url, proof_media_type,
+          followers, following, promotion_title, caption, proof_media_url, proof_media_type,
           promoted_date, highlight_badge, is_approved, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?);`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
         [
           id,
           name.trim(),
@@ -224,12 +227,15 @@ export async function POST(request: Request) {
           platformUrl || '',
           avatarUrl || '',
           universityOrRole || '',
+          followers || '',
+          following || '',
           promotionTitle.trim(),
           caption || '',
           proofMediaUrl.trim(),
           proofMediaType,
           promotedDate || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
           highlightBadge || '',
+          isApproved ? 1 : 0,
           createdAt,
         ]
       );
@@ -240,11 +246,11 @@ export async function POST(request: Request) {
       }
     } else {
       const { error } = await queryD1(
-        `INSERT INTO influencer_promotions (
-          id, name, handle, platform, platform_url, avatar_url, followers, verified, category,
+        `INSERT OR REPLACE INTO influencer_promotions (
+          id, name, handle, platform, platform_url, avatar_url, followers, following, verified, category,
           promotion_title, caption, proof_media_url, proof_media_type,
           promoted_date, highlight_badge, is_approved, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?);`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
         [
           id,
           name.trim(),
@@ -253,6 +259,7 @@ export async function POST(request: Request) {
           platformUrl || '',
           avatarUrl || '',
           followers || '',
+          following || '',
           verified ? 1 : 0,
           category || '',
           promotionTitle.trim(),
@@ -261,6 +268,7 @@ export async function POST(request: Request) {
           proofMediaType,
           promotedDate || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
           highlightBadge || '',
+          isApproved ? 1 : 0,
           createdAt,
         ]
       );

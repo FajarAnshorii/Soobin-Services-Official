@@ -215,13 +215,99 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
 
   // Tab & Search state
-  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'orders' | 'members' | 'redeems' | 'revenue' | 'services' | 'testimonials'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'orders' | 'members' | 'redeems' | 'revenue' | 'services' | 'testimonials' | 'promotions'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Testimonials state
   const [testimonialsList, setTestimonialsList] = useState<any[]>([]);
   const [testiSearchQuery, setTestiSearchQuery] = useState('');
   const [testiCurrentPage, setTestiCurrentPage] = useState(1);
+
+  // Promotions (Trusted By) Showcase CRUD state
+  const [promotionsGroup, setPromotionsGroup] = useState<'influencer' | 'public'>('influencer');
+  const [promotionsList, setPromotionsList] = useState<any[]>([]);
+  const [promotionsLoading, setPromotionsLoading] = useState(false);
+  const [promotionsSearchQuery, setPromotionsSearchQuery] = useState('');
+  const [promotionsPlatformFilter, setPromotionsPlatformFilter] = useState('all');
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
+  const [editingPromotion, setEditingPromotion] = useState<any | null>(null);
+  const [isSavingPromotion, setIsSavingPromotion] = useState(false);
+  const [deletingPromotionId, setDeletingPromotionId] = useState<string | null>(null);
+  const [promotionPreviewZoom, setPromotionPreviewZoom] = useState<string | null>(null);
+
+  // Fetch real-time promotions for Admin
+  const fetchAdminPromotions = async () => {
+    try {
+      setPromotionsLoading(true);
+      const res = await fetch(`/api/promotions?type=${promotionsGroup}&all=true`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setPromotionsList(data);
+      }
+    } catch (e) {
+      console.error('Failed fetching admin promotions', e);
+    } finally {
+      setPromotionsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      fetchAdminPromotions();
+    }
+  }, [isAdminLoggedIn, promotionsGroup]);
+
+  const handleDeletePromotion = async (id: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus data promosi ini dari database?')) return;
+    try {
+      setDeletingPromotionId(id);
+      const res = await fetch(`/api/promotions?id=${id}&type=${promotionsGroup}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchAdminPromotions();
+      } else {
+        alert('Gagal menghapus data promosi');
+      }
+    } catch (e) {
+      alert('Terjadi kesalahan saat menghapus data promosi');
+    } finally {
+      setDeletingPromotionId(null);
+    }
+  };
+
+  const handleSavePromotion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPromotion?.name || !editingPromotion?.handle || !editingPromotion?.promotionTitle || !editingPromotion?.proofMediaUrl) {
+      alert('Mohon lengkapi Nama, Handle (@username), Judul Promosi, dan Foto Bukti Promosi.');
+      return;
+    }
+
+    try {
+      setIsSavingPromotion(true);
+      const payload = {
+        ...editingPromotion,
+        targetGroup: editingPromotion.targetGroup || promotionsGroup,
+      };
+
+      const res = await fetch('/api/promotions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsPromotionModalOpen(false);
+        setEditingPromotion(null);
+        fetchAdminPromotions();
+      } else {
+        alert(data.error || 'Gagal menyimpan data promosi');
+      }
+    } catch (e: any) {
+      alert(e.message || 'Terjadi kesalahan saat menyimpan data promosi');
+    } finally {
+      setIsSavingPromotion(false);
+    }
+  };
 
   // Fetch real-time testimonials for Admin
   const fetchAdminTestimonials = async () => {
@@ -1505,6 +1591,23 @@ export default function AdminPage() {
                       {testimonialsList.length}
                     </span>
                   </button>
+
+                  <button
+                    onClick={() => { setActiveTab('promotions'); setIsMobileSidebarOpen(false); }}
+                    className={`w-full px-3.5 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-between cursor-pointer border ${
+                      activeTab === 'promotions'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                        : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Award className={`w-4 h-4 ${activeTab === 'promotions' ? 'text-white' : 'text-slate-900'}`} />
+                      <span>Showcase Promosi</span>
+                    </div>
+                    <span className="bg-primary-100 text-primary-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-primary-300">
+                      {promotionsList.length}
+                    </span>
+                  </button>
                 </nav>
               </div>
 
@@ -1751,6 +1854,28 @@ export default function AdminPage() {
               {!isSidebarCollapsed && (
                 <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-amber-300">
                   {testimonialsList.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('promotions')}
+              title="Showcase Promosi (Trusted By)"
+              className={`w-full rounded-xl text-xs font-black transition-all flex items-center cursor-pointer border ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } ${
+                activeTab === 'promotions'
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                  : 'bg-white text-slate-900 hover:bg-slate-100 border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Award className={`w-4 h-4 shrink-0 ${activeTab === 'promotions' ? 'text-white' : 'text-slate-900'}`} />
+                {!isSidebarCollapsed && <span>Showcase Promosi</span>}
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="bg-primary-100 text-primary-900 text-[10px] px-2 py-0.5 rounded-full font-black border border-primary-300">
+                  {promotionsList.length}
                 </span>
               )}
             </button>
@@ -3773,8 +3898,725 @@ export default function AdminPage() {
               </div>
             );
           })()}
+
+          {/* TAB 8: SHOWCASE PROMOSI (TRUSTED BY) CMS */}
+          {activeTab === 'promotions' && (() => {
+            const filtered = promotionsList.filter((item: any) => {
+              // 1. Platform filter
+              if (promotionsPlatformFilter !== 'all' && item.platform !== promotionsPlatformFilter) {
+                return false;
+              }
+              // 2. Search query filter
+              if (promotionsSearchQuery.trim()) {
+                const q = promotionsSearchQuery.toLowerCase().trim();
+                const matchName = (item.name || '').toLowerCase().includes(q);
+                const matchHandle = (item.handle || '').toLowerCase().includes(q);
+                const matchTitle = (item.promotionTitle || '').toLowerCase().includes(q);
+                const matchRole = (item.universityOrRole || '').toLowerCase().includes(q);
+                const matchCaption = (item.caption || '').toLowerCase().includes(q);
+                if (!matchName && !matchHandle && !matchTitle && !matchRole && !matchCaption) return false;
+              }
+              return true;
+            });
+
+            return (
+              <div className="space-y-6">
+                {/* Header & Controls */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-300 pb-4">
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                      <Award className="w-5 h-5 text-primary-900" />
+                      Kelola Showcase Bukti Promosi (Trusted By)
+                    </h2>
+                    <p className="text-xs text-slate-600 font-bold mt-1">
+                      Data tersimpan di Cloudflare D1 Database & tampil realtime di halaman <Link href="/trusted-by" target="_blank" className="text-primary-800 underline font-black">/trusted-by</Link>
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingPromotion({
+                          targetGroup: promotionsGroup,
+                          name: '',
+                          handle: '@',
+                          platform: 'instagram',
+                          platformUrl: '',
+                          avatarUrl: '',
+                          followers: '',
+                          following: '',
+                          universityOrRole: '',
+                          verified: false,
+                          category: '',
+                          promotionTitle: '',
+                          caption: '',
+                          proofMediaUrl: '',
+                          proofMediaType: 'image',
+                          highlightBadge: 'Official Story Proof',
+                          isApproved: true,
+                        });
+                        setIsPromotionModalOpen(true);
+                      }}
+                      className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambah Data Promosi</span>
+                    </button>
+
+                    <button
+                      onClick={fetchAdminPromotions}
+                      disabled={promotionsLoading}
+                      className="p-2 bg-white border border-slate-300 text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                      title="Refresh Data Promosi"
+                    >
+                      <RefreshCw className={`w-4 h-4 text-slate-900 ${promotionsLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sub Category Switcher: Influencer vs Public */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-3 rounded-2xl border border-slate-300 shadow-xs">
+                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl max-w-md w-full">
+                    <button
+                      onClick={() => {
+                        setPromotionsGroup('influencer');
+                        setPromotionsPlatformFilter('all');
+                      }}
+                      className={`py-2 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        promotionsGroup === 'influencer'
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Influencer & Creator</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPromotionsGroup('public');
+                        setPromotionsPlatformFilter('all');
+                      }}
+                      className={`py-2 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        promotionsGroup === 'public'
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      <span>Publik & Member</span>
+                    </button>
+                  </div>
+
+                  {/* Search & Platform Filter */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative w-full sm:w-56">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={promotionsSearchQuery}
+                        onChange={(e) => setPromotionsSearchQuery(e.target.value)}
+                        placeholder="Cari nama, handle, judul..."
+                        className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-900"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      {['all', 'instagram', 'tiktok', 'facebook'].map((plat) => (
+                        <button
+                          key={plat}
+                          onClick={() => setPromotionsPlatformFilter(plat)}
+                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-black uppercase transition-all cursor-pointer border ${
+                            promotionsPlatformFilter === plat
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          {plat === 'all' ? 'Semua' : plat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cards List Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {promotionsLoading ? (
+                    <div className="col-span-full bg-white border border-slate-300 rounded-2xl p-12 text-center text-slate-500 font-bold space-y-2">
+                      <RefreshCw className="w-6 h-6 animate-spin mx-auto text-slate-700" />
+                      <p>Memuat data promosi dari Cloudflare D1...</p>
+                    </div>
+                  ) : filtered.length === 0 ? (
+                    <div className="col-span-full bg-white border border-slate-300 rounded-2xl p-12 text-center space-y-3">
+                      <Award className="w-10 h-10 text-slate-400 mx-auto" />
+                      <p className="text-slate-900 font-black text-sm">
+                        Belum ada data promosi di kategori {promotionsGroup === 'influencer' ? 'Influencer & Creator' : 'Publik & Member'}.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setEditingPromotion({
+                            targetGroup: promotionsGroup,
+                            name: '',
+                            handle: '@',
+                            platform: 'instagram',
+                            platformUrl: '',
+                            avatarUrl: '',
+                            followers: '',
+                            following: '',
+                            universityOrRole: '',
+                            verified: false,
+                            category: '',
+                            promotionTitle: '',
+                            caption: '',
+                            proofMediaUrl: '',
+                            proofMediaType: 'image',
+                            highlightBadge: 'Official Story Proof',
+                            isApproved: true,
+                          });
+                          setIsPromotionModalOpen(true);
+                        }}
+                        className="px-4 py-2 bg-slate-900 text-white text-xs font-black rounded-xl hover:bg-black transition-colors"
+                      >
+                        + Tambah Data Pertama
+                      </button>
+                    </div>
+                  ) : (
+                    filtered.map((item: any) => (
+                      <div
+                        key={item.id}
+                        className="bg-white border border-slate-300 rounded-2xl p-4 flex flex-col justify-between shadow-xs hover:shadow-md transition-all space-y-3 relative overflow-hidden"
+                      >
+                        {/* Top Highlight Badge */}
+                        {item.highlightBadge && (
+                          <div className="absolute top-0 right-0 bg-slate-900 text-white text-[9px] font-black px-2.5 py-0.5 rounded-bl-xl shadow-xs">
+                            {item.highlightBadge}
+                          </div>
+                        )}
+
+                        <div className="space-y-3">
+                          {/* Profile Header */}
+                          <div className="flex items-center gap-3 pt-1">
+                            <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs">
+                              {item.avatarUrl ? (
+                                <img
+                                  src={item.avatarUrl}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover rounded-full"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <span>{item.name?.charAt(0) || 'P'}</span>
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1 pr-12">
+                              <div className="flex items-center gap-1">
+                                <h4 className="font-black text-sm text-slate-900 truncate">{item.name}</h4>
+                                {item.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
+                              </div>
+                              <p className="text-xs text-primary-800 font-bold flex items-center gap-1 mt-0.5">
+                                <span className="capitalize font-black">[{item.platform}]</span>
+                                <span className="truncate">{item.handle}</span>
+                              </p>
+                              {(item.followers || item.following) && (
+                                <p className="text-[10px] text-slate-600 font-extrabold mt-0.5">
+                                  {item.followers && `${item.followers} pengikut`}
+                                  {item.followers && item.following && ' • '}
+                                  {item.following && `${item.following} mengikuti`}
+                                </p>
+                              )}
+                              {item.universityOrRole && (
+                                <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                                  {item.universityOrRole}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Promotion Details */}
+                          <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-1">
+                            <p className="text-xs font-black text-slate-900 line-clamp-2">
+                              {item.promotionTitle}
+                            </p>
+                            {item.caption && (
+                              <p className="text-[11px] text-slate-600 italic line-clamp-2 leading-relaxed">
+                                &ldquo;{item.caption}&rdquo;
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Proof Media Preview */}
+                          {item.proofMediaUrl && (
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Bukti Foto / Story:</span>
+                              <div
+                                onClick={() => setPromotionPreviewZoom(item.proofMediaUrl)}
+                                className="w-full h-32 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden relative group cursor-pointer"
+                                title="Klik untuk perbesar foto bukti"
+                              >
+                                <img
+                                  src={item.proofMediaUrl}
+                                  alt="Bukti Promosi"
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity gap-1">
+                                  <Eye className="w-4 h-4" />
+                                  <span>Lihat Penuh</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-bold text-slate-400">
+                            {item.promotedDate || 'Aktif'}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            {item.platformUrl && (
+                              <a
+                                href={item.platformUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors cursor-pointer"
+                                title="Buka Link Profil Medsos"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                            <button
+                              onClick={() => {
+                                setEditingPromotion({ ...item, targetGroup: item.targetGroup || promotionsGroup });
+                                setIsPromotionModalOpen(true);
+                              }}
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg text-xs font-black transition-colors cursor-pointer flex items-center gap-1"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeletePromotion(item.id)}
+                              disabled={deletingPromotionId === item.id}
+                              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors cursor-pointer"
+                              title="Hapus Promosi"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </main>
       </div>
+
+      {/* MODAL FORM CREATE / EDIT PROMOTION */}
+      <AnimatePresence>
+        {isPromotionModalOpen && editingPromotion && (
+          <div
+            className="fixed inset-0 z-100 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+            onClick={() => setIsPromotionModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white border border-slate-300 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl my-auto"
+            >
+              {/* Modal Header */}
+              <div className="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Award className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black">
+                      {editingPromotion.id ? 'Edit Data Showcase Promosi' : 'Tambah Bukti Promosi Baru'}
+                    </h3>
+                    <p className="text-[10px] text-slate-300">
+                      Tersimpan langsung ke Cloudflare D1 Database
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsPromotionModalOpen(false)}
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal Form Body */}
+              <form onSubmit={handleSavePromotion} className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+                {/* Target Group Selector */}
+                <div>
+                  <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                    Kategori Showcase
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingPromotion((prev: any) => ({ ...prev, targetGroup: 'influencer' }))}
+                      className={`py-2 px-3 rounded-xl text-xs font-black transition-all border cursor-pointer ${
+                        editingPromotion.targetGroup === 'influencer'
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      Influencer & Content Creator
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingPromotion((prev: any) => ({ ...prev, targetGroup: 'public' }))}
+                      className={`py-2 px-3 rounded-xl text-xs font-black transition-all border cursor-pointer ${
+                        editingPromotion.targetGroup === 'public'
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      Publik & Member / Komunitas
+                    </button>
+                  </div>
+                </div>
+
+                {/* Name & Handle */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Nama Akun / Creator <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingPromotion.name || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, name: e.target.value }))}
+                      placeholder="Contoh: 파자르 (Fajar)"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Handle / Username Medsos <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingPromotion.handle || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, handle: e.target.value }))}
+                      placeholder="Contoh: @fajaransh_"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Platform & Platform URL */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Platform Medsos
+                    </label>
+                    <select
+                      value={editingPromotion.platform || 'instagram'}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, platform: e.target.value }))}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    >
+                      <option value="instagram">Instagram</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="facebook">Facebook</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Link URL Profil (Opsional)
+                    </label>
+                    <input
+                      type="url"
+                      value={editingPromotion.platformUrl || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, platformUrl: e.target.value }))}
+                      placeholder="https://www.instagram.com/fajaransh_/"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Followers & Following */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Jumlah Pengikut (Followers)
+                    </label>
+                    <input
+                      type="text"
+                      value={editingPromotion.followers || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, followers: e.target.value }))}
+                      placeholder="Contoh: 1.830 atau 12.5K"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Jumlah Mengikuti (Following)
+                    </label>
+                    <input
+                      type="text"
+                      value={editingPromotion.following || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, following: e.target.value }))}
+                      placeholder="Contoh: 1.033 atau 250"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Role / University / Bio */}
+                <div>
+                  <label className="block text-xs font-black text-slate-800 mb-1">
+                    Role / Kampus / Keterangan Bio
+                  </label>
+                  <input
+                    type="text"
+                    value={editingPromotion.universityOrRole || ''}
+                    onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, universityOrRole: e.target.value }))}
+                    placeholder="Contoh: Fullstack & Web Dev (Head of SOOBIN Services)"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                  />
+                </div>
+
+                {/* Avatar Photo (Upload or URL) */}
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black text-slate-900">
+                      Foto Profil / Avatar
+                    </label>
+                    {editingPromotion.avatarUrl && (
+                      <span className="text-[10px] text-emerald-700 font-black">✓ Foto Terpasang</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs">
+                      {editingPromotion.avatarUrl ? (
+                        <img
+                          src={editingPromotion.avatarUrl}
+                          alt="Avatar Preview"
+                          className="w-full h-full object-cover rounded-full"
+                          onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                        />
+                      ) : (
+                        <span>{editingPromotion.name?.charAt(0) || 'A'}</span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1.5">
+                      <input
+                        type="text"
+                        value={editingPromotion.avatarUrl || ''}
+                        onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, avatarUrl: e.target.value }))}
+                        placeholder="Masukkan URL foto atau klik unggah di samping"
+                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                      />
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-black cursor-pointer transition-colors">
+                        <ImagePlus className="w-3.5 h-3.5" />
+                        <span>Pilih File Foto Avatar</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                if (ev.target?.result) {
+                                  setEditingPromotion((prev: any) => ({ ...prev, avatarUrl: ev.target?.result as string }));
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Promotion Title & Caption */}
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Judul Bukti Promosi <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingPromotion.promotionTitle || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, promotionTitle: e.target.value }))}
+                      placeholder="Contoh: Instagram Story Promosi: Jasa Service Trusted 2023 - SOOBIN Services"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Kutipan Ulasan / Caption Promosi
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={editingPromotion.caption || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, caption: e.target.value }))}
+                      placeholder="Contoh: “Solusi kebutuhan akademikmu” • @soobinservices.id"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Proof Media Photo (Upload or URL) */}
+                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black text-slate-900">
+                      Foto Screenshot Bukti Promosi (Story/Feed/Post) <span className="text-rose-500">*</span>
+                    </label>
+                    {editingPromotion.proofMediaUrl && (
+                      <span className="text-[10px] text-emerald-700 font-black">✓ Gambar Terpasang</span>
+                    )}
+                  </div>
+
+                  <input
+                    type="text"
+                    required
+                    value={editingPromotion.proofMediaUrl || ''}
+                    onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, proofMediaUrl: e.target.value }))}
+                    placeholder="URL gambar atau klik unggah di bawah"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                  />
+
+                  <div className="flex items-center gap-3">
+                    <label className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-black cursor-pointer transition-colors shadow-xs">
+                      <ImagePlus className="w-4 h-4 text-amber-400" />
+                      <span>Unggah File Screenshot Bukti</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              if (ev.target?.result) {
+                                setEditingPromotion((prev: any) => ({ ...prev, proofMediaUrl: ev.target?.result as string }));
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {editingPromotion.proofMediaUrl && (
+                      <div className="h-14 w-20 rounded-lg overflow-hidden border border-slate-300 bg-black">
+                        <img
+                          src={editingPromotion.proofMediaUrl}
+                          alt="Thumbnail Bukti"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Highlight Badge & Verified Status */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-black text-slate-800 mb-1">
+                      Highlight Badge (Pojok Kanan Atas)
+                    </label>
+                    <input
+                      type="text"
+                      value={editingPromotion.highlightBadge || ''}
+                      onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, highlightBadge: e.target.value }))}
+                      placeholder="Official Story Proof"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+
+                  <div className="flex flex-col justify-end">
+                    <label className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(editingPromotion.verified)}
+                        onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, verified: e.target.checked }))}
+                        className="w-4 h-4 accent-blue-600 rounded"
+                      />
+                      <span className="text-xs font-bold text-slate-800">
+                        Centang Akun Terverifikasi (Verified)
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Modal Footer Buttons */}
+                <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setIsPromotionModalOpen(false)}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black rounded-xl transition-colors cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingPromotion}
+                    className="px-5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {isSavingPromotion && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isSavingPromotion ? 'Menyimpan...' : 'Simpan Data Promosi'}</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL ZOOM PREVIEW SCREENSHOT BUKTI */}
+      <AnimatePresence>
+        {promotionPreviewZoom && (
+          <div
+            className="fixed inset-0 z-100 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setPromotionPreviewZoom(null)}
+          >
+            <button
+              onClick={() => setPromotionPreviewZoom(null)}
+              className="fixed top-4 right-4 p-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors cursor-pointer z-110"
+              title="Tutup Zoom"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[85vh] max-w-[92vw] sm:max-w-xl flex items-center justify-center"
+            >
+              <img
+                src={promotionPreviewZoom}
+                alt="Bukti Screenshot Fullsize"
+                className="max-h-[82vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl border border-white/20"
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Save Toast Notification */}
       <AnimatePresence>

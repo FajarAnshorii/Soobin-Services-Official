@@ -48,6 +48,28 @@ function FacebookIcon({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
+function ShowcaseAvatar({ url, name }: { url?: string; name: string }) {
+  const [hasError, setHasError] = useState(false);
+  const initial = name ? name.charAt(0).toUpperCase() : '?';
+
+  return (
+    <div className="w-13 h-13 rounded-full bg-[#0B1527] p-0.5 shrink-0 shadow-xs">
+      <div className="w-full h-full bg-[#0B1527] rounded-full overflow-hidden flex items-center justify-center text-white font-black text-sm">
+        {url && !hasError ? (
+          <img
+            src={url}
+            alt={name}
+            onError={() => setHasError(true)}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span>{initial}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export interface PromotedShowcase {
   id: string;
   targetGroup: 'influencer' | 'public';
@@ -351,15 +373,7 @@ export default function TrustedByPage() {
                   <div className="space-y-4">
                     {/* Profile Header */}
                     <div className="flex items-center gap-3 pt-1">
-                      <div className="w-13 h-13 rounded-full bg-primary-800 p-0.5 shrink-0 shadow-xs">
-                        <div className="w-full h-full bg-white rounded-full overflow-hidden flex items-center justify-center">
-                          {item.avatarUrl ? (
-                            <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-sm font-black text-slate-800">{item.name.charAt(0)}</span>
-                          )}
-                        </div>
-                      </div>
+                      <ShowcaseAvatar url={item.avatarUrl} name={item.name} />
 
                       <div className="min-w-0 flex-1 pr-14">
                         <div className="flex items-center gap-1.5">
