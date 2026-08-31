@@ -232,6 +232,8 @@ export default function AdminPage() {
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
   const [editingPromotion, setEditingPromotion] = useState<any | null>(null);
   const [isSavingPromotion, setIsSavingPromotion] = useState(false);
+  const [isCompressingAvatar, setIsCompressingAvatar] = useState(false);
+  const [isCompressingProof, setIsCompressingProof] = useState(false);
   const [deletingPromotionId, setDeletingPromotionId] = useState<string | null>(null);
   const [promotionPreviewZoom, setPromotionPreviewZoom] = useState<string | null>(null);
 
@@ -4418,28 +4420,35 @@ export default function AdminPage() {
                     <div className="flex-1 space-y-1.5">
                       <input
                         type="text"
-                        value={editingPromotion.avatarUrl || ''}
+                        value={editingPromotion.avatarUrl?.startsWith('data:image') ? '[Foto Terkompresi Siap Simpan]' : (editingPromotion.avatarUrl || '')}
                         onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, avatarUrl: e.target.value }))}
                         placeholder="Masukkan URL foto atau klik unggah di samping"
                         className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
                       />
                       <label className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-black cursor-pointer transition-colors">
-                        <ImagePlus className="w-3.5 h-3.5" />
-                        <span>Pilih File Foto Avatar</span>
+                        {isCompressingAvatar ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-700" />
+                        ) : (
+                          <ImagePlus className="w-3.5 h-3.5" />
+                        )}
+                        <span>{isCompressingAvatar ? 'Mengompres...' : 'Pilih File Foto Avatar'}</span>
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
+                          disabled={isCompressingAvatar}
+                          onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (ev) => {
-                                if (ev.target?.result) {
-                                  setEditingPromotion((prev: any) => ({ ...prev, avatarUrl: ev.target?.result as string }));
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              try {
+                                setIsCompressingAvatar(true);
+                                const res = await compressChatImage(file, 240, 240, 0.85);
+                                setEditingPromotion((prev: any) => ({ ...prev, avatarUrl: res.dataUrl }));
+                              } catch (err) {
+                                alert('Gagal memproses gambar avatar');
+                              } finally {
+                                setIsCompressingAvatar(false);
+                              }
                             }
                           }}
                         />
@@ -4492,7 +4501,7 @@ export default function AdminPage() {
                   <input
                     type="text"
                     required
-                    value={editingPromotion.proofMediaUrl || ''}
+                    value={editingPromotion.proofMediaUrl?.startsWith('data:image') ? '[Screenshot Terkompresi Siap Simpan]' : (editingPromotion.proofMediaUrl || '')}
                     onChange={(e) => setEditingPromotion((prev: any) => ({ ...prev, proofMediaUrl: e.target.value }))}
                     placeholder="URL gambar atau klik unggah di bawah"
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
@@ -4500,22 +4509,29 @@ export default function AdminPage() {
 
                   <div className="flex items-center gap-3">
                     <label className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-black cursor-pointer transition-colors shadow-xs">
-                      <ImagePlus className="w-4 h-4 text-amber-400" />
-                      <span>Unggah File Screenshot Bukti</span>
+                      {isCompressingProof ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                      ) : (
+                        <ImagePlus className="w-4 h-4 text-amber-400" />
+                      )}
+                      <span>{isCompressingProof ? 'Mengompres...' : 'Unggah File Screenshot Bukti'}</span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => {
+                        disabled={isCompressingProof}
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (ev) => {
-                              if (ev.target?.result) {
-                                setEditingPromotion((prev: any) => ({ ...prev, proofMediaUrl: ev.target?.result as string }));
-                              }
-                            };
-                            reader.readAsDataURL(file);
+                            try {
+                              setIsCompressingProof(true);
+                              const res = await compressChatImage(file, 900, 1200, 0.8);
+                              setEditingPromotion((prev: any) => ({ ...prev, proofMediaUrl: res.dataUrl }));
+                            } catch (err) {
+                              alert('Gagal memproses gambar bukti promosi');
+                            } finally {
+                              setIsCompressingProof(false);
+                            }
                           }
                         }}
                       />
