@@ -379,12 +379,18 @@ export default function TrustedByPage() {
                             </span>
                           )}
                         </div>
+
+                        {item.universityOrRole && (
+                          <p className="text-[11px] text-slate-500 font-medium truncate mt-1">
+                            {item.universityOrRole}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     {/* Promotion Title & Caption */}
                     <div className="space-y-1.5">
-                      <p className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1">
+                      <p className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2">
                         {item.promotionTitle}
                       </p>
                       {item.caption && (
@@ -447,12 +453,19 @@ export default function TrustedByPage() {
                       <h4 className="text-sm font-bold text-white truncate">{activeProof.name}</h4>
                       {activeProof.verified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />}
                     </div>
-                    <p className="text-xs text-blue-400 font-semibold truncate flex items-center gap-1">
-                      {activeProof.platform === 'instagram' && <InstagramIcon className="w-3 h-3" />}
-                      {activeProof.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
-                      {activeProof.platform === 'facebook' && <FacebookIcon className="w-3 h-3" />}
-                      <span>{activeProof.handle}</span>
-                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-xs text-blue-400 font-semibold truncate flex items-center gap-1">
+                        {activeProof.platform === 'instagram' && <InstagramIcon className="w-3 h-3" />}
+                        {activeProof.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
+                        {activeProof.platform === 'facebook' && <FacebookIcon className="w-3 h-3" />}
+                        <span>{activeProof.handle}</span>
+                      </p>
+                      {activeProof.universityOrRole && (
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          • {activeProof.universityOrRole}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
