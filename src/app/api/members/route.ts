@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'edge';
 
@@ -31,14 +32,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
     }
 
-    // Fetch directly from Cloudflare D1 Serverless SQL Database
+    // 1. Fetch directly from Cloudflare D1 Serverless SQL Database
     const { results, success } = await queryD1<any>('SELECT * FROM members ORDER BY created_at ASC;');
 
     if (success && Array.isArray(results) && results.length > 0) {
       const formatted = results.map((m: any, idx: number) => {
         const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
         return {
-          id: `MBR-${String(idx + 1).padStart(4, '0')}`,
+          id: m.id || `MBR-${String(idx + 1).padStart(4, '0')}`,
           name: m.name,
           email: m.email,
           university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Trunojoyo Madura',
@@ -48,6 +49,32 @@ export async function GET(request: Request) {
       });
 
       return NextResponse.json(formatted);
+    }
+
+    // 2. Fallback to Supabase Database (if Cloudflare D1 daily quota is exceeded or unavailable)
+    try {
+      const { data: supaMembers, error: supaErr } = await supabaseAdmin
+        .from('members')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!supaErr && Array.isArray(supaMembers) && supaMembers.length > 0) {
+        const formatted = supaMembers.map((m: any, idx: number) => {
+          const isFilda = m.email?.toLowerCase() === 'fildafelissa01@gmail.com';
+          return {
+            id: m.id || `MBR-${String(idx + 1).padStart(4, '0')}`,
+            name: m.name,
+            email: m.email,
+            university: isFilda ? 'Universitas Trunojoyo Madura' : m.university || 'Universitas Trunojoyo Madura',
+            prodi: isFilda ? 'Ekonomi Syariah' : m.prodi || 'Program Studi S1',
+            createdAt: m.created_at || m.createdAt || new Date().toISOString(),
+          };
+        });
+
+        return NextResponse.json(formatted);
+      }
+    } catch (supaEx) {
+      console.error('Supabase fallback error for members:', supaEx);
     }
 
     return NextResponse.json(DEFAULT_MEMBERS);
@@ -73,20 +100,43 @@ export async function POST(request: Request) {
     const passwordHash = newMember.passwordHash || null;
     const memberId = `MBR-${String(Date.now()).slice(-4)}`;
 
-    // Save directly to Cloudflare D1 SQL Table
-    await queryD1(
-      `INSERT INTO members (id, name, email, university, prodi, password_hash, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(email) DO UPDATE SET
-         name=excluded.name,
-         university=excluded.university,
-         prodi=excluded.prodi,
-         password_hash=COALESCE(excluded.password_hash, members.password_hash);`,
-      [memberId, name, email, university, prodi, passwordHash, createdAt]
-    );
+    // 1. Save directly to Cloudflare D1 SQL Table
+    try {
+      await queryD1(
+        `INSERT INTO members (id, name, email, university, prodi, password_hash, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(email) DO UPDATE SET
+           name=excluded.name,
+           university=excluded.university,
+           prodi=excluded.prodi,
+           password_hash=COALESCE(excluded.password_hash, members.password_hash);`,
+        [memberId, name, email, university, prodi, passwordHash, createdAt]
+      );
+    } catch (d1Err) {
+      console.error('Cloudflare D1 member save error:', d1Err);
+    }
+
+    // 2. Dual-sync to Supabase members table
+    try {
+      await supabaseAdmin.from('members').upsert({
+        id: memberId,
+        name,
+        email,
+        university,
+        prodi,
+        created_at: createdAt,
+      }, { onConflict: 'email' });
+    } catch (supaErr) {
+      console.error('Supabase member sync error:', supaErr);
+    }
 
     const { results } = await queryD1('SELECT * FROM members ORDER BY created_at ASC;');
-    return NextResponse.json(results || []);
+    if (results && results.length > 0) {
+      return NextResponse.json(results);
+    }
+
+    const { data: supaList } = await supabaseAdmin.from('members').select('*').order('created_at', { ascending: true });
+    return NextResponse.json(supaList || []);
   } catch (error) {
     return NextResponse.json({ error: 'Failed saving member' }, { status: 500 });
   }

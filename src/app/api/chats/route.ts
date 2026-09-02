@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'edge';
 
@@ -23,41 +24,23 @@ function pruneExpiredMedia(messages: any[]): { messages: any[]; hasPruned: boole
   const now = Date.now();
   let hasPruned = false;
 
-  const cleaned = messages.map((msg) => {
-    const isMediaMessage = Boolean(msg.mediaUrl || msg.mediaName || msg.hasMedia);
-    if (!isMediaMessage) {
-      if (msg.isExpired) {
+  const cleaned = messages.map((m) => {
+    if (!m) return m;
+    const msgTime = new Date(m.timestamp || 0).getTime();
+    if (msgTime > 0 && now - msgTime > EXPIRATION_MS) {
+      if (m.mediaUrl || m.fileUrl || m.fileName) {
         hasPruned = true;
-        const copy = { ...msg };
-        delete copy.isExpired;
-        return copy;
+        return {
+          ...m,
+          mediaUrl: null,
+          fileUrl: null,
+          fileName: null,
+          mediaPruned: true,
+          text: m.text ? `${m.text} (Lampiran kedaluwarsa)` : 'Lampiran media telah kedaluwarsa (24 jam)',
+        };
       }
-      return msg;
     }
-
-    let createdAtMs = 0;
-    if (typeof msg.createdAt === 'number' && msg.createdAt > 0) {
-      createdAtMs = msg.createdAt;
-    } else if (typeof msg.createdAt === 'string') {
-      const parsed = new Date(msg.createdAt).getTime();
-      if (!isNaN(parsed) && parsed > 0) createdAtMs = parsed;
-    }
-
-    if (createdAtMs <= 0) {
-      return msg;
-    }
-
-    const isExpired = now - createdAtMs > EXPIRATION_MS;
-
-    if (isExpired) {
-      if (msg.mediaUrl || !msg.isExpired) {
-        hasPruned = true;
-      }
-      const copy = { ...msg, isExpired: true, hasMedia: true };
-      delete copy.mediaUrl;
-      return copy;
-    }
-    return msg;
+    return m;
   });
 
   return { messages: cleaned, hasPruned };
@@ -71,7 +54,15 @@ export async function GET(request: Request) {
 
     if (sessionId) {
       const { results } = await queryD1('SELECT * FROM chats WHERE id = ? LIMIT 1;', [sessionId]);
-      const data = results && results.length > 0 ? results[0] : null;
+      let data = results && results.length > 0 ? results[0] : null;
+
+      if (!data) {
+        // Fallback to Supabase
+        try {
+          const { data: supaChat } = await supabaseAdmin.from('chats').select('*').eq('id', sessionId).single();
+          if (supaChat) data = supaChat;
+        } catch (e) {}
+      }
 
       if (!data) {
         return NextResponse.json(null);
@@ -107,12 +98,28 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: auth.error || 'Akses ditolak' }, { status: 401 });
     }
 
-    const { results } = await queryD1('SELECT * FROM chats ORDER BY updated_at DESC;');
+    const { results, success } = await queryD1('SELECT * FROM chats ORDER BY updated_at DESC;');
+    let chatRows = results;
+
+    // Fallback to Supabase if Cloudflare D1 is rate-limited or empty
+    if (!success || !Array.isArray(results) || results.length === 0) {
+      try {
+        const { data: supaChats, error: supaErr } = await supabaseAdmin
+          .from('chats')
+          .select('*')
+          .order('updated_at', { ascending: false });
+        if (!supaErr && Array.isArray(supaChats) && supaChats.length > 0) {
+          chatRows = supaChats;
+        }
+      } catch (supaEx) {
+        console.error('Supabase chats fallback error:', supaEx);
+      }
+    }
 
     // Return as map { [id]: session }
     const chatsMap: Record<string, any> = {};
-    if (results && Array.isArray(results)) {
-      results.forEach((row: any) => {
+    if (chatRows && Array.isArray(chatRows)) {
+      chatRows.forEach((row: any) => {
         let parsedMessages: any[] = [];
         try {
           parsedMessages = typeof row.messages === 'string' ? JSON.parse(row.messages) : row.messages || [];
@@ -151,28 +158,48 @@ export async function POST(request: Request) {
       const messagesStr = JSON.stringify(cleanedMessages);
       const updatedAt = parseIsoDate(body.lastUpdated);
 
-      await queryD1(
-        `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(id) DO UPDATE SET
-           name=excluded.name,
-           email=excluded.email,
-           university=excluded.university,
-           prodi=excluded.prodi,
-           unread_count=excluded.unread_count,
-           messages=excluded.messages,
-           updated_at=excluded.updated_at;`,
-        [
-          body.id,
-          body.name,
-          body.email || '',
-          body.university || '',
-          body.prodi || '',
-          body.unreadCount || 0,
-          messagesStr,
-          updatedAt,
-        ]
-      );
+      try {
+        await queryD1(
+          `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(id) DO UPDATE SET
+             name=excluded.name,
+             email=excluded.email,
+             university=excluded.university,
+             prodi=excluded.prodi,
+             unread_count=excluded.unread_count,
+             messages=excluded.messages,
+             updated_at=excluded.updated_at;`,
+          [
+            body.id,
+            body.name,
+            body.email || '',
+            body.university || '',
+            body.prodi || '',
+            body.unreadCount || 0,
+            messagesStr,
+            updatedAt,
+          ]
+        );
+      } catch (d1Err) {
+        console.error('Cloudflare D1 chat save error:', d1Err);
+      }
+
+      // Dual-sync to Supabase
+      try {
+        await supabaseAdmin.from('chats').upsert({
+          id: body.id,
+          name: body.name,
+          email: body.email || '',
+          university: body.university || '',
+          prodi: body.prodi || '',
+          unread_count: body.unreadCount || 0,
+          messages: cleanedMessages,
+          updated_at: updatedAt,
+        }, { onConflict: 'id' });
+      } catch (supaErr) {
+        console.error('Supabase chat save error:', supaErr);
+      }
 
       return NextResponse.json({ success: true });
     }
@@ -190,28 +217,48 @@ export async function POST(request: Request) {
           const messagesStr = JSON.stringify(cleanedMessages);
           const updatedAt = parseIsoDate(session.lastUpdated);
 
-          await queryD1(
-            `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-             ON CONFLICT(id) DO UPDATE SET
-               name=excluded.name,
-               email=excluded.email,
-               university=excluded.university,
-               prodi=excluded.prodi,
-               unread_count=excluded.unread_count,
-               messages=excluded.messages,
-               updated_at=excluded.updated_at;`,
-            [
-              session.id,
-              session.name || 'Member',
-              session.email || '',
-              session.university || '',
-              session.prodi || '',
-              session.unreadCount || 0,
-              messagesStr,
-              updatedAt,
-            ]
-          );
+          try {
+            await queryD1(
+              `INSERT INTO chats (id, name, email, university, prodi, unread_count, messages, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+               ON CONFLICT(id) DO UPDATE SET
+                 name=excluded.name,
+                 email=excluded.email,
+                 university=excluded.university,
+                 prodi=excluded.prodi,
+                 unread_count=excluded.unread_count,
+                 messages=excluded.messages,
+                 updated_at=excluded.updated_at;`,
+              [
+                session.id,
+                session.name || 'Member',
+                session.email || '',
+                session.university || '',
+                session.prodi || '',
+                session.unreadCount || 0,
+                messagesStr,
+                updatedAt,
+              ]
+            );
+          } catch (d1Err) {
+            console.error('Cloudflare D1 bulk chat save error:', d1Err);
+          }
+
+          // Dual-sync to Supabase
+          try {
+            await supabaseAdmin.from('chats').upsert({
+              id: session.id,
+              name: session.name || 'Member',
+              email: session.email || '',
+              university: session.university || '',
+              prodi: session.prodi || '',
+              unread_count: session.unreadCount || 0,
+              messages: cleanedMessages,
+              updated_at: updatedAt,
+            }, { onConflict: 'id' });
+          } catch (supaErr) {
+            console.error('Supabase bulk chat save error:', supaErr);
+          }
         }
       }
       return NextResponse.json({ success: true });

@@ -327,8 +327,6 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAdminLoggedIn) {
       fetchAdminTestimonials();
-      const interval = setInterval(fetchAdminTestimonials, 5000);
-      return () => clearInterval(interval);
     }
   }, [isAdminLoggedIn]);
 

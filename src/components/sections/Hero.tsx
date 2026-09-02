@@ -72,7 +72,7 @@ export default function Hero() {
   useEffect(() => {
     const fetchRating = async () => {
       try {
-        const res = await fetch('/api/testimonials', { cache: 'no-store' });
+        const res = await fetch('/api/testimonials?limit=100');
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
@@ -89,8 +89,6 @@ export default function Hero() {
     };
 
     fetchRating();
-    const interval = setInterval(fetchRating, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   return (

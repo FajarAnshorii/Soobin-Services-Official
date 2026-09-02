@@ -107,10 +107,10 @@ export default function TestimonialCarousel() {
   const [isPaused, setIsPaused] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch real-time testimonials from the same API as /testimoni page
+  // Fetch real-time testimonials from API (limit to 15 items for smooth carousel)
   const fetchTestimonials = async () => {
     try {
-      const res = await fetch('/api/testimonials', { cache: 'no-store' });
+      const res = await fetch('/api/testimonials?limit=15');
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -126,8 +126,6 @@ export default function TestimonialCarousel() {
 
   useEffect(() => {
     fetchTestimonials();
-    const interval = setInterval(fetchTestimonials, 5000); // 5s realtime sync with DB
-    return () => clearInterval(interval);
   }, []);
 
   const testimonialsList = useMemo(() => {

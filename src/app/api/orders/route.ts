@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryD1 } from '@/lib/d1';
 import { verifyAdminRequest } from '@/lib/adminAuth';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'edge';
 
@@ -30,15 +31,28 @@ export async function GET(request: Request) {
 
     const { results, success, error } = await queryD1(sql, params);
 
-    if (!success) {
-      console.error('API GET Cloudflare D1 error:', error);
-      return NextResponse.json([]);
+    let rawOrders = results;
+
+    // Fallback to Supabase if Cloudflare D1 is rate-limited or fails
+    if (!success || !Array.isArray(results) || results.length === 0) {
+      try {
+        let query = supabaseAdmin.from('orders').select('*').order('created_at', { ascending: false });
+        if (filterEmail) {
+          query = query.eq('customer_email', filterEmail);
+        }
+        const { data: supaOrders, error: supaErr } = await query;
+        if (!supaErr && Array.isArray(supaOrders) && supaOrders.length > 0) {
+          rawOrders = supaOrders;
+        }
+      } catch (supaEx) {
+        console.error('Supabase orders fallback error:', supaEx);
+      }
     }
 
     const now = Date.now();
     const TWO_DAYS_MS = 48 * 60 * 60 * 1000;
 
-    const formatted = (results || []).map((o: any) => {
+    const formatted = (rawOrders || []).map((o: any) => {
       const orderTime = new Date(o.created_at || 0).getTime() || parseInt(String(o.id).replace(/\D/g, '') || '0', 10);
       const isExpired = orderTime > 0 && (now - orderTime) > TWO_DAYS_MS;
 
@@ -87,43 +101,62 @@ export async function POST(request: Request) {
       ? JSON.stringify(newOrder.customFields) 
       : String(newOrder.customFields || '{}');
 
-    // Save directly to Cloudflare D1 Database Table
-    const { success, error } = await queryD1(
-      `INSERT INTO orders (
-        id, customer_name, customer_email, service_name, price,
-        payment_method, payment_status, custom_fields, proof_image,
-        uploaded_file_data, uploaded_file_name, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-        customer_name=excluded.customer_name,
-        customer_email=excluded.customer_email,
-        service_name=excluded.service_name,
-        price=excluded.price,
-        payment_method=excluded.payment_method,
-        payment_status=excluded.payment_status,
-        custom_fields=excluded.custom_fields,
-        proof_image=COALESCE(excluded.proof_image, orders.proof_image),
-        uploaded_file_data=COALESCE(excluded.uploaded_file_data, orders.uploaded_file_data),
-        uploaded_file_name=COALESCE(excluded.uploaded_file_name, orders.uploaded_file_name);`,
-      [
-        newOrder.id,
-        newOrder.customerName || '',
-        newOrder.customerEmail || '',
-        newOrder.serviceName || '',
-        newOrder.price || '',
-        newOrder.paymentMethod || 'QRIS',
-        newOrder.paymentStatus || 'Menunggu Verifikasi Admin',
-        customFieldsStr,
-        newOrder.proofImage || null,
-        newOrder.uploadedFileData || null,
-        newOrder.uploadedFileName || null,
-        newOrder.createdAt || new Date().toISOString(),
-      ]
-    );
+    // 1. Save to Cloudflare D1 Database Table
+    try {
+      await queryD1(
+        `INSERT INTO orders (
+          id, customer_name, customer_email, service_name, price,
+          payment_method, payment_status, custom_fields, proof_image,
+          uploaded_file_data, uploaded_file_name, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          customer_name=excluded.customer_name,
+          customer_email=excluded.customer_email,
+          service_name=excluded.service_name,
+          price=excluded.price,
+          payment_method=excluded.payment_method,
+          payment_status=excluded.payment_status,
+          custom_fields=excluded.custom_fields,
+          proof_image=COALESCE(excluded.proof_image, orders.proof_image),
+          uploaded_file_data=COALESCE(excluded.uploaded_file_data, orders.uploaded_file_data),
+          uploaded_file_name=COALESCE(excluded.uploaded_file_name, orders.uploaded_file_name);`,
+        [
+          newOrder.id,
+          newOrder.customerName || '',
+          newOrder.customerEmail || '',
+          newOrder.serviceName || '',
+          newOrder.price || '',
+          newOrder.paymentMethod || 'QRIS',
+          newOrder.paymentStatus || 'Menunggu Verifikasi Admin',
+          customFieldsStr,
+          newOrder.proofImage || null,
+          newOrder.uploadedFileData || null,
+          newOrder.uploadedFileName || null,
+          newOrder.createdAt || new Date().toISOString(),
+        ]
+      );
+    } catch (d1Err) {
+      console.error('Cloudflare D1 order POST error:', d1Err);
+    }
 
-    if (!success) {
-      console.error('Cloudflare D1 order POST error:', error);
-      return NextResponse.json({ error }, { status: 500 });
+    // 2. Dual-sync to Supabase orders table
+    try {
+      await supabaseAdmin.from('orders').upsert({
+        id: newOrder.id,
+        customer_name: newOrder.customerName || '',
+        customer_email: newOrder.customerEmail || '',
+        service_name: newOrder.serviceName || '',
+        price: newOrder.price || '',
+        payment_method: newOrder.paymentMethod || 'QRIS',
+        payment_status: newOrder.paymentStatus || 'Menunggu Verifikasi Admin',
+        custom_fields: typeof newOrder.customFields === 'object' ? newOrder.customFields : {},
+        proof_image: newOrder.proofImage || null,
+        uploaded_file_data: newOrder.uploadedFileData || null,
+        uploaded_file_name: newOrder.uploadedFileName || null,
+        created_at: newOrder.createdAt || new Date().toISOString(),
+      }, { onConflict: 'id' });
+    } catch (supaErr) {
+      console.error('Supabase order POST error:', supaErr);
     }
 
     return NextResponse.json({ success: true, data: newOrder });
@@ -147,15 +180,23 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Missing orderId or status' }, { status: 400 });
     }
 
-    // Update status in Cloudflare D1 SQL Table
-    const { success, error } = await queryD1(
-      'UPDATE orders SET payment_status = ? WHERE id = ?;',
-      [status, orderId]
-    );
+    // 1. Update status in Cloudflare D1 SQL Table
+    try {
+      await queryD1(
+        'UPDATE orders SET payment_status = ? WHERE id = ?;',
+        [status, orderId]
+      );
+    } catch (d1Err) {
+      console.error('Cloudflare D1 order status update error:', d1Err);
+    }
 
-    if (!success) {
-      console.error('Cloudflare D1 order status update error:', error);
-      return NextResponse.json({ error }, { status: 500 });
+    // 2. Dual-sync status to Supabase
+    try {
+      await supabaseAdmin.from('orders').update({
+        payment_status: status
+      }).eq('id', orderId);
+    } catch (supaErr) {
+      console.error('Supabase order status update error:', supaErr);
     }
 
     return NextResponse.json({ success: true, orderId, status });
