@@ -163,10 +163,24 @@ export default function TrustedByPage() {
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar />
 
-      {/* Stats Highlight Bar */}
-      <section className="bg-white border-b border-slate-200 pt-24 sm:pt-28 pb-5 sm:pb-7">
-        <div className="container-custom px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
+      {/* Hero & Title Bar */}
+      <section className="bg-white border-b border-slate-200 pt-24 sm:pt-28 pb-6 sm:pb-8">
+        <div className="container-custom px-4 text-center max-w-3xl mx-auto space-y-2.5">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
+            <Award className="w-3.5 h-3.5 text-amber-500" />
+            <span>Dokumentasi Resmi & Bukti Nyata</span>
+          </span>
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            Showcase Bukti Promosi
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-xl mx-auto">
+            Dokumentasi riil postingan dan story Instagram, TikTok, dan Facebook dari influencer ternama serta pelanggan publik yang merekomendasikan SOOBIN Services.
+          </p>
+        </div>
+
+        {/* Stats Highlight Bar */}
+        <div className="container-custom px-4 mt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 text-center max-w-4xl mx-auto">
             {[
               { value: '100% Asli', label: 'Dokumentasi Terverifikasi', icon: ShieldCheck },
               { value: 'Influencer', label: 'Creator & Figur Publik', icon: Award },
@@ -175,14 +189,14 @@ export default function TrustedByPage() {
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={i} className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-slate-50 md:bg-transparent">
+                <div key={i} className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 md:border-transparent">
                   <div className="flex items-center gap-1.5">
                     <Icon className="w-4 h-4 text-[#0B1527]" />
-                    <p className="text-base sm:text-2xl font-black text-[#0B1527]">
+                    <p className="text-sm sm:text-xl font-black text-[#0B1527]">
                       {stat.value}
                     </p>
                   </div>
-                  <p className="text-slate-500 text-[11px] sm:text-xs mt-0.5 font-bold">
+                  <p className="text-slate-500 text-[10px] sm:text-xs mt-0.5 font-bold">
                     {stat.label}
                   </p>
                 </div>
@@ -193,19 +207,19 @@ export default function TrustedByPage() {
       </section>
 
       {/* Main Content: Dual Category Hub + Search & Platform Filters */}
-      <section className="py-8 sm:py-14 px-4 flex-1">
-        <div className="container-custom max-w-6xl mx-auto space-y-6">
+      <section className="py-6 sm:py-12 px-4 flex-1">
+        <div className="container-custom max-w-6xl mx-auto space-y-4 sm:space-y-6">
 
           {/* DUA KATEGORI UTAMA: INFLUENCER (KIRI) vs PUBLIK (KANAN) */}
-          <div className="max-w-xl mx-auto bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-2 gap-1.5">
+          <div className="max-w-xl mx-auto bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs grid grid-cols-2 gap-1.5">
             <button
               onClick={() => {
                 setMainGroup('influencer');
                 setSelectedPlatform('all');
               }}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer active:scale-95 ${
                 mainGroup === 'influencer'
-                  ? 'bg-[#0B1527] text-white shadow-sm'
+                  ? 'bg-[#0B1527] text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
               }`}
             >
@@ -218,9 +232,9 @@ export default function TrustedByPage() {
                 setMainGroup('public');
                 setSelectedPlatform('all');
               }}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer active:scale-95 ${
                 mainGroup === 'public'
-                  ? 'bg-[#0B1527] text-white shadow-sm'
+                  ? 'bg-[#0B1527] text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
               }`}
             >
@@ -230,8 +244,8 @@ export default function TrustedByPage() {
           </div>
 
           {/* SUB-FILTER & SEARCH BAR CONTAINER */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-5 shadow-2xs space-y-3 sm:space-y-4">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
               
               {/* Search Filter Component */}
               <div className="relative flex-1 max-w-md">
@@ -245,7 +259,7 @@ export default function TrustedByPage() {
                       ? 'Cari nama influencer, @akun Instagram, TikTok...'
                       : 'Cari nama publik, akun medsos, atau ulasan...'
                   }
-                  className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0B1527] focus:bg-white transition-all font-medium"
+                  className="w-full pl-10 pr-9 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0B1527] focus:bg-white transition-all font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -267,9 +281,9 @@ export default function TrustedByPage() {
                     <button
                       key={p.id}
                       onClick={() => setSelectedPlatform(p.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap cursor-pointer shrink-0 ${
+                      className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap cursor-pointer shrink-0 active:scale-95 ${
                         isActive
-                          ? 'bg-[#0B1527] text-white border-[#0B1527]'
+                          ? 'bg-[#0B1527] text-white border-[#0B1527] shadow-2xs'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
@@ -282,9 +296,9 @@ export default function TrustedByPage() {
             </div>
 
             {/* Info bar / Context Note */}
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100 gap-1">
               <span className="font-semibold text-slate-700">
-                Menampilkan kategori: <strong className="text-[#0B1527]">{mainGroup === 'influencer' ? 'Influencer & Content Creator' : 'Publik & Member / Pelanggan'}</strong>
+                Kategori: <strong className="text-[#0B1527]">{mainGroup === 'influencer' ? 'Influencer & Content Creator' : 'Publik & Member'}</strong>
               </span>
               <span className="text-[11px] text-slate-400">
                 {filteredList.length} bukti promosi ditemukan
@@ -307,7 +321,7 @@ export default function TrustedByPage() {
                 {mainGroup === 'influencer' ? 'Showcase Bukti Promosi Influencer' : 'Showcase Bukti Promosi Publik'}
               </span>
 
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-3">
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 mb-3">
                 {mainGroup === 'influencer'
                   ? 'Dokumentasi Promosi Influencer Sedang Disiapkan'
                   : 'Dokumentasi Promosi Publik & Member Sedang Disiapkan'}
@@ -353,60 +367,61 @@ export default function TrustedByPage() {
               </div>
             </div>
           ) : (
-            /* Render Dynamic Cards */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            /* Render Dynamic Cards with Clean Story Proof Preview */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredList.map((item) => (
                 <motion.div
                   key={item.id}
-                  whileHover={{ y: -4, scale: 1.01 }}
+                  whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveProof(item)}
-                  className="bg-white border border-slate-200 hover:border-primary-400 rounded-3xl p-5 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+                  className="bg-white border border-slate-200 hover:border-slate-400 rounded-3xl p-4 sm:p-5 shadow-2xs hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden active:scale-[0.99]"
                 >
-                  {/* Top Badge */}
-                  {item.highlightBadge && (
-                    <div className="absolute top-0 right-0 bg-[#0B1527] text-white text-[10px] font-black px-3 py-1 rounded-bl-2xl shadow-xs">
-                      {item.highlightBadge}
+                  {/* Top Category & Highlight Badge Row */}
+                  <div className="flex items-center justify-between gap-2 pb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="capitalize font-black text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                        {item.platform === 'instagram' && <InstagramIcon className="w-3 h-3 text-pink-600" />}
+                        {item.platform === 'tiktok' && <TikTokIcon className="w-3 h-3" />}
+                        {item.platform === 'facebook' && <FacebookIcon className="w-3 h-3 text-blue-600" />}
+                        <span className="capitalize">{item.platform}</span>
+                      </span>
+                      {item.promotedDate && (
+                        <span className="text-[10px] text-slate-400 font-bold">{item.promotedDate}</span>
+                      )}
                     </div>
-                  )}
+                    {item.highlightBadge && (
+                      <span className="bg-[#0B1527] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-2xs truncate max-w-35">
+                        {item.highlightBadge}
+                      </span>
+                    )}
+                  </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 pt-1">
                     {/* Profile Header */}
-                    <div className="flex items-center gap-3 pt-1">
+                    <div className="flex items-center gap-3">
                       <ShowcaseAvatar url={item.avatarUrl} name={item.name} />
 
-                      <div className="min-w-0 flex-1 pr-14">
-                        <div className="flex items-center gap-1.5">
-                          <h3 className="text-base font-bold text-slate-900 group-hover:text-primary-800 transition-colors truncate">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-primary-850 transition-colors truncate">
                             {item.name}
                           </h3>
                           {item.verified && <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />}
                         </div>
 
-                        {/* Handle & Platform */}
-                        <div className="flex items-center gap-1.5 text-xs text-primary-750 font-semibold mt-0.5">
-                          {item.platform === 'instagram' && <InstagramIcon className="w-3.5 h-3.5 shrink-0" />}
-                          {item.platform === 'tiktok' && <TikTokIcon className="w-3.5 h-3.5 shrink-0" />}
-                          {item.platform === 'facebook' && <FacebookIcon className="w-3.5 h-3.5 shrink-0" />}
-                          <span className="truncate">{item.handle}</span>
-                        </div>
+                        <p className="text-xs text-primary-850 font-bold truncate">
+                          {item.handle}
+                        </p>
 
-                        {/* Total Followers & Following */}
                         {(item.followers || item.following) && (
-                          <div className="flex items-center gap-1 text-[11px] text-slate-600 font-bold mt-1">
-                            {item.followers && (
-                              <span>{item.followers} pengikut</span>
-                            )}
-                            {item.followers && item.following && (
-                              <span className="text-slate-400">•</span>
-                            )}
-                            {item.following && (
-                              <span>{item.following} mengikuti</span>
-                            )}
+                          <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600 font-extrabold mt-0.5">
+                            {item.followers && <span>{item.followers} pengikut</span>}
+                            {item.followers && item.following && <span>•</span>}
+                            {item.following && <span>{item.following} mengikuti</span>}
                           </div>
                         )}
 
-                        {/* Role / University / Bio */}
                         {item.universityOrRole && (
                           <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
                             {item.universityOrRole}
@@ -415,30 +430,54 @@ export default function TrustedByPage() {
                       </div>
                     </div>
 
-                    {/* Promotion Title & Caption */}
-                    <div className="space-y-1.5">
-                      <p className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2">
+                    {/* Promotion Details Box */}
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-1">
+                      <p className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2 leading-snug">
                         {item.promotionTitle}
                       </p>
                       {item.caption && (
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">
+                        <p className="text-[11px] sm:text-xs text-slate-600 line-clamp-2 leading-relaxed italic">
                           &ldquo;{item.caption}&rdquo;
                         </p>
                       )}
                     </div>
+
+                    {/* Proof Media Preview Thumbnail (Clean 9:16 / 4:3 fit) */}
+                    {item.proofMediaUrl && (
+                      <div className="w-full h-44 sm:h-52 rounded-2xl bg-[#0B1527] overflow-hidden relative flex items-center justify-center border border-slate-200 group-hover:border-slate-400 transition-colors">
+                        <img
+                          src={item.proofMediaUrl}
+                          alt={item.promotionTitle}
+                          className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-bold pointer-events-none">
+                          <span className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
+                            <Eye className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Ketuk untuk lihat foto bukti</span>
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Hint */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span className="text-[11px] font-bold text-primary-800 flex items-center gap-1 group-hover:underline">
+                  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span className="text-[11px] font-black text-primary-850 flex items-center gap-1 group-hover:underline">
                       <Eye className="w-3.5 h-3.5" />
-                      <span>Buka Bukti Media</span>
+                      <span>Lihat Bukti Penuh</span>
                     </span>
-                    {item.promotedDate && (
-                      <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {item.promotedDate}
-                      </span>
+                    {item.platformUrl && (
+                      <a
+                        href={item.platformUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                        title="Kunjungi Profil Medsos"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
                     )}
                   </div>
                 </motion.div>

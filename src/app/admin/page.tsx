@@ -3922,20 +3922,27 @@ export default function AdminPage() {
             });
 
             return (
-              <div className="space-y-6">
-                {/* Header & Controls */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-300 pb-4">
-                  <div>
-                    <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                      <Award className="w-5 h-5 text-primary-900" />
-                      Kelola Showcase Bukti Promosi (Trusted By)
-                    </h2>
-                    <p className="text-xs text-slate-600 font-bold mt-1">
-                      Data tersimpan di Cloudflare D1 Database & tampil realtime di halaman <Link href="/trusted-by" target="_blank" className="text-primary-800 underline font-black">/trusted-by</Link>
-                    </p>
+              <div className="space-y-4 sm:space-y-6">
+                {/* Header & Mobile Action Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Award className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+                        Kelola Bukti Promosi (Trusted By)
+                      </h2>
+                      <p className="text-[11px] text-slate-500 font-bold mt-0.5">
+                        Tersimpan di Cloudflare D1 • Realtime di{' '}
+                        <Link href="/trusted-by" target="_blank" className="text-primary-850 underline font-black hover:text-black">
+                          /trusted-by
+                        </Link>
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto pt-1 sm:pt-0">
                     <button
                       onClick={() => {
                         setEditingPromotion({
@@ -3959,16 +3966,16 @@ export default function AdminPage() {
                         });
                         setIsPromotionModalOpen(true);
                       }}
-                      className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+                      className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>Tambah Data Promosi</span>
+                      <Plus className="w-4 h-4 text-amber-400" />
+                      <span>Tambah Promosi</span>
                     </button>
 
                     <button
                       onClick={fetchAdminPromotions}
                       disabled={promotionsLoading}
-                      className="p-2 bg-white border border-slate-300 text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                      className="p-2.5 bg-white border border-slate-200 text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer shrink-0"
                       title="Refresh Data Promosi"
                     >
                       <RefreshCw className={`w-4 h-4 text-slate-900 ${promotionsLoading ? 'animate-spin' : ''}`} />
@@ -3976,15 +3983,16 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Sub Category Switcher: Influencer vs Public */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-3 rounded-2xl border border-slate-300 shadow-xs">
-                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl max-w-md w-full">
+                {/* Sub Category Switcher & Mobile Filters */}
+                <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                  {/* Segmented Category Pill Switcher */}
+                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl">
                     <button
                       onClick={() => {
                         setPromotionsGroup('influencer');
                         setPromotionsPlatformFilter('all');
                       }}
-                      className={`py-2 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`py-2.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                         promotionsGroup === 'influencer'
                           ? 'bg-slate-900 text-white shadow-xs'
                           : 'text-slate-600 hover:text-slate-900'
@@ -3998,7 +4006,7 @@ export default function AdminPage() {
                         setPromotionsGroup('public');
                         setPromotionsPlatformFilter('all');
                       }}
-                      className={`py-2 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`py-2.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                         promotionsGroup === 'public'
                           ? 'bg-slate-900 text-white shadow-xs'
                           : 'text-slate-600 hover:text-slate-900'
@@ -4009,27 +4017,27 @@ export default function AdminPage() {
                     </button>
                   </div>
 
-                  {/* Search & Platform Filter */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="relative w-full sm:w-56">
-                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  {/* Search Bar & Platform Filters Row */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={promotionsSearchQuery}
                         onChange={(e) => setPromotionsSearchQuery(e.target.value)}
-                        placeholder="Cari nama, handle, judul..."
-                        className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-900"
+                        placeholder="Cari nama, handle @, atau ulasan..."
+                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-900"
                       />
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 sm:pb-0 shrink-0">
                       {['all', 'instagram', 'tiktok', 'facebook'].map((plat) => (
                         <button
                           key={plat}
                           onClick={() => setPromotionsPlatformFilter(plat)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-black uppercase transition-all cursor-pointer border ${
+                          className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase transition-all cursor-pointer border whitespace-nowrap shrink-0 ${
                             promotionsPlatformFilter === plat
-                              ? 'bg-slate-900 text-white border-slate-900'
+                              ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                               : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
                           }`}
                         >
@@ -4041,14 +4049,14 @@ export default function AdminPage() {
                 </div>
 
                 {/* Cards List Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
                   {promotionsLoading ? (
-                    <div className="col-span-full bg-white border border-slate-300 rounded-2xl p-12 text-center text-slate-500 font-bold space-y-2">
+                    <div className="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-500 font-bold space-y-2">
                       <RefreshCw className="w-6 h-6 animate-spin mx-auto text-slate-700" />
-                      <p>Memuat data promosi dari Cloudflare D1...</p>
+                      <p className="text-xs">Memuat data promosi dari Cloudflare D1...</p>
                     </div>
                   ) : filtered.length === 0 ? (
-                    <div className="col-span-full bg-white border border-slate-300 rounded-2xl p-12 text-center space-y-3">
+                    <div className="col-span-full bg-white border border-slate-200 rounded-2xl p-10 sm:p-14 text-center space-y-3">
                       <Award className="w-10 h-10 text-slate-400 mx-auto" />
                       <p className="text-slate-900 font-black text-sm">
                         Belum ada data promosi di kategori {promotionsGroup === 'influencer' ? 'Influencer & Creator' : 'Publik & Member'}.
@@ -4085,19 +4093,29 @@ export default function AdminPage() {
                     filtered.map((item: any) => (
                       <div
                         key={item.id}
-                        className="bg-white border border-slate-300 rounded-2xl p-4 flex flex-col justify-between shadow-xs hover:shadow-md transition-all space-y-3 relative overflow-hidden"
+                        className="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all space-y-3 relative overflow-hidden"
                       >
-                        {/* Top Highlight Badge */}
-                        {item.highlightBadge && (
-                          <div className="absolute top-0 right-0 bg-slate-900 text-white text-[9px] font-black px-2.5 py-0.5 rounded-bl-xl shadow-xs">
-                            {item.highlightBadge}
+                        {/* Top Category & Highlight Badge Row */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="capitalize font-black text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                              {item.platform}
+                            </span>
+                            {item.promotedDate && (
+                              <span className="text-[10px] text-slate-400 font-bold">{item.promotedDate}</span>
+                            )}
                           </div>
-                        )}
+                          {item.highlightBadge && (
+                            <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-2xs truncate max-w-40">
+                              {item.highlightBadge}
+                            </span>
+                          )}
+                        </div>
 
                         <div className="space-y-3">
                           {/* Profile Header */}
-                          <div className="flex items-center gap-3 pt-1">
-                            <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs shadow-2xs">
                               {item.avatarUrl ? (
                                 <img
                                   src={item.avatarUrl}
@@ -4112,14 +4130,13 @@ export default function AdminPage() {
                               )}
                             </div>
 
-                            <div className="min-w-0 flex-1 pr-12">
+                            <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-1">
                                 <h4 className="font-black text-sm text-slate-900 truncate">{item.name}</h4>
                                 {item.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
                               </div>
-                              <p className="text-xs text-primary-800 font-bold flex items-center gap-1 mt-0.5">
-                                <span className="capitalize font-black">[{item.platform}]</span>
-                                <span className="truncate">{item.handle}</span>
+                              <p className="text-xs text-primary-850 font-bold truncate">
+                                {item.handle}
                               </p>
                               {(item.followers || item.following) && (
                                 <p className="text-[10px] text-slate-600 font-extrabold mt-0.5">
@@ -4136,7 +4153,7 @@ export default function AdminPage() {
                             </div>
                           </div>
 
-                          {/* Promotion Details */}
+                          {/* Promotion Details Box */}
                           <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-1">
                             <p className="text-xs font-black text-slate-900 line-clamp-2">
                               {item.promotionTitle}
@@ -4148,61 +4165,69 @@ export default function AdminPage() {
                             )}
                           </div>
 
-                          {/* Proof Media Preview */}
+                          {/* Proof Media Preview Thumbnail (Aspect Ratio Clean) */}
                           {item.proofMediaUrl && (
                             <div className="space-y-1">
-                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Bukti Foto / Story:</span>
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                Bukti Foto / Story:
+                              </span>
                               <div
                                 onClick={() => setPromotionPreviewZoom(item.proofMediaUrl)}
-                                className="w-full h-32 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden relative group cursor-pointer"
+                                className="w-full h-44 sm:h-48 rounded-xl bg-slate-950 border border-slate-200 overflow-hidden relative group cursor-pointer flex items-center justify-center"
                                 title="Klik untuk perbesar foto bukti"
                               >
                                 <img
                                   src={item.proofMediaUrl}
                                   alt="Bukti Promosi"
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                  className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-300"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity gap-1">
-                                  <Eye className="w-4 h-4" />
+                                  <Eye className="w-4 h-4 text-amber-400" />
                                   <span>Lihat Penuh</span>
+                                </div>
+                                <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 pointer-events-none">
+                                  <Eye className="w-3 h-3 text-amber-400" />
+                                  <span>Perbesar</span>
                                 </div>
                               </div>
                             </div>
                           )}
                         </div>
 
-                        {/* Action Buttons */}
+                        {/* Action Buttons Row */}
                         <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-bold text-slate-400">
-                            {item.promotedDate || 'Aktif'}
-                          </span>
-
-                          <div className="flex items-center gap-1.5">
-                            {item.platformUrl && (
+                          <div>
+                            {item.platformUrl ? (
                               <a
                                 href={item.platformUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                                 title="Buka Link Profil Medsos"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
+                                <span className="text-[11px]">Profil</span>
                               </a>
+                            ) : (
+                              <span className="text-[10px] font-bold text-slate-400">Aktif</span>
                             )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
                             <button
                               onClick={() => {
                                 setEditingPromotion({ ...item, targetGroup: item.targetGroup || promotionsGroup });
                                 setIsPromotionModalOpen(true);
                               }}
-                              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg text-xs font-black transition-colors cursor-pointer flex items-center gap-1"
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg text-xs font-black transition-colors cursor-pointer flex items-center gap-1 active:scale-95"
                             >
-                              <Edit3 className="w-3 h-3" />
+                              <Edit3 className="w-3.5 h-3.5" />
                               <span>Edit</span>
                             </button>
                             <button
                               onClick={() => handleDeletePromotion(item.id)}
                               disabled={deletingPromotionId === item.id}
-                              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors cursor-pointer active:scale-95"
                               title="Hapus Promosi"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -4219,26 +4244,28 @@ export default function AdminPage() {
         </main>
       </div>
 
-      {/* MODAL FORM CREATE / EDIT PROMOTION */}
+      {/* MODAL FORM CREATE / EDIT PROMOTION (MOBILE APP SHEET & DESKTOP MODAL) */}
       <AnimatePresence>
         {isPromotionModalOpen && editingPromotion && (
           <div
-            className="fixed inset-0 z-100 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+            className="fixed inset-0 z-100 bg-black/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden"
             onClick={() => setIsPromotionModalOpen(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white border border-slate-300 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl my-auto"
+              className="bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
             >
-              {/* Modal Header */}
-              <div className="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+              {/* Sticky Modal Header */}
+              <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <Award className="w-5 h-5 text-amber-400" />
+                  <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                    <Award className="w-4 h-4 text-amber-400" />
+                  </div>
                   <div>
-                    <h3 className="text-sm sm:text-base font-black">
+                    <h3 className="text-sm sm:text-base font-black leading-tight">
                       {editingPromotion.id ? 'Edit Data Showcase Promosi' : 'Tambah Bukti Promosi Baru'}
                     </h3>
                     <p className="text-[10px] text-slate-300">
@@ -4248,14 +4275,14 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => setIsPromotionModalOpen(false)}
-                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer active:scale-95"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Modal Form Body */}
-              <form onSubmit={handleSavePromotion} className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+              {/* Scrollable Form Body */}
+              <form onSubmit={handleSavePromotion} id="promotion-form" className="p-4 sm:p-6 overflow-y-auto space-y-3.5 sm:space-y-4 flex-1">
                 {/* Target Group Selector */}
                 <div>
                   <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
@@ -4267,22 +4294,22 @@ export default function AdminPage() {
                       onClick={() => setEditingPromotion((prev: any) => ({ ...prev, targetGroup: 'influencer' }))}
                       className={`py-2 px-3 rounded-xl text-xs font-black transition-all border cursor-pointer ${
                         editingPromotion.targetGroup === 'influencer'
-                          ? 'bg-slate-900 text-white border-slate-900'
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      Influencer & Content Creator
+                      Influencer & Creator
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingPromotion((prev: any) => ({ ...prev, targetGroup: 'public' }))}
                       className={`py-2 px-3 rounded-xl text-xs font-black transition-all border cursor-pointer ${
                         editingPromotion.targetGroup === 'public'
-                          ? 'bg-slate-900 text-white border-slate-900'
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      Publik & Member / Komunitas
+                      Publik & Member
                     </button>
                   </div>
                 </div>
@@ -4392,8 +4419,8 @@ export default function AdminPage() {
                   />
                 </div>
 
-                {/* Avatar Photo (Upload or URL) */}
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-3.5 space-y-2">
+                {/* Avatar Photo (Upload with auto-compression or URL) */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-black text-slate-900">
                       Foto Profil / Avatar
@@ -4404,7 +4431,7 @@ export default function AdminPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs">
+                    <div className="w-12 h-12 rounded-full bg-slate-900 p-0.5 shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-xs shadow-2xs">
                       {editingPromotion.avatarUrl ? (
                         <img
                           src={editingPromotion.avatarUrl}
@@ -4425,7 +4452,7 @@ export default function AdminPage() {
                         placeholder="Masukkan URL foto atau klik unggah di samping"
                         className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
                       />
-                      <label className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-black cursor-pointer transition-colors">
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-black cursor-pointer transition-colors active:scale-95">
                         {isCompressingAvatar ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-700" />
                         ) : (
@@ -4487,8 +4514,8 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Proof Media Photo (Upload or URL) */}
-                <div className="bg-slate-50 border border-slate-300 rounded-2xl p-3.5 space-y-2">
+                {/* Proof Media Photo (Upload with auto-compression or URL) */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-black text-slate-900">
                       Foto Screenshot Bukti Promosi (Story/Feed/Post) <span className="text-rose-500">*</span>
@@ -4508,7 +4535,7 @@ export default function AdminPage() {
                   />
 
                   <div className="flex items-center gap-3">
-                    <label className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-black cursor-pointer transition-colors shadow-xs">
+                    <label className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-black cursor-pointer transition-colors shadow-xs active:scale-95">
                       {isCompressingProof ? (
                         <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
                       ) : (
@@ -4538,7 +4565,7 @@ export default function AdminPage() {
                     </label>
 
                     {editingPromotion.proofMediaUrl && (
-                      <div className="h-14 w-20 rounded-lg overflow-hidden border border-slate-300 bg-black">
+                      <div className="h-14 w-20 rounded-lg overflow-hidden border border-slate-300 bg-black shrink-0">
                         <img
                           src={editingPromotion.proofMediaUrl}
                           alt="Thumbnail Bukti"
@@ -4578,26 +4605,27 @@ export default function AdminPage() {
                     </label>
                   </div>
                 </div>
-
-                {/* Modal Footer Buttons */}
-                <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setIsPromotionModalOpen(false)}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black rounded-xl transition-colors cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingPromotion}
-                    className="px-5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-                  >
-                    {isSavingPromotion && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{isSavingPromotion ? 'Menyimpan...' : 'Simpan Data Promosi'}</span>
-                  </button>
-                </div>
               </form>
+
+              {/* Sticky Modal Action Footer */}
+              <div className="px-4 sm:px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsPromotionModalOpen(false)}
+                  className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-black rounded-xl transition-colors cursor-pointer active:scale-95"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  form="promotion-form"
+                  disabled={isSavingPromotion || isCompressingAvatar || isCompressingProof}
+                  className="flex-1 sm:flex-initial px-6 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                >
+                  {isSavingPromotion && <Loader2 className="w-4 h-4 animate-spin text-amber-400" />}
+                  <span>{isSavingPromotion ? 'Menyimpan...' : 'Simpan Data Promosi'}</span>
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
