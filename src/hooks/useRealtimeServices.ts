@@ -77,20 +77,12 @@ export function useRealtimeServices(categoryFilter?: string) {
     window.addEventListener('focus', handleFocusOrVisible);
     document.addEventListener('visibilitychange', handleFocusOrVisible);
 
-    // 3. Layer 3: Background sync interval
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchServices(true);
-      }
-    }, 5000);
-
     return () => {
       if (bc) {
         bc.close();
       }
       window.removeEventListener('focus', handleFocusOrVisible);
       document.removeEventListener('visibilitychange', handleFocusOrVisible);
-      clearInterval(interval);
     };
   }, [fetchServices, categoryFilter]);
 

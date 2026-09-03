@@ -72,19 +72,15 @@ export default function Hero() {
   useEffect(() => {
     const fetchRating = async () => {
       try {
-        const res = await fetch('/api/testimonials?limit=100');
+        const res = await fetch('/api/testimonials?summary=true');
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            const sum = data.reduce((acc: number, curr: { rating?: number }) => acc + (curr.rating || 5), 0);
-            const avg = Number((sum / data.length).toFixed(1));
-            if (!isNaN(avg) && avg > 0) {
-              setRatingValue(avg);
-            }
+          if (data && typeof data.avgRating === 'number' && data.avgRating > 0) {
+            setRatingValue(Number(data.avgRating.toFixed(1)));
           }
         }
       } catch (err) {
-        console.error('Failed to fetch rating for hero:', err);
+        console.error('Failed to fetch rating summary for hero:', err);
       }
     };
 

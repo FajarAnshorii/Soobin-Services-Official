@@ -114,11 +114,19 @@ export default function MemberPage() {
     };
 
     fetchMemberRedeems();
-    const interval = setInterval(fetchMemberRedeems, 4000); // 4s realtime poll
+
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMemberRedeems();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, [user]);
 
@@ -353,11 +361,19 @@ Berikut saya lampirkan dokumen skripsi / tugas saya untuk dicekkan Turnitin No R
     };
 
     fetchMemberOrders();
-    const interval = setInterval(fetchMemberOrders, 5000); // 5s realtime sync
+
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMemberOrders();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, [user]);
 

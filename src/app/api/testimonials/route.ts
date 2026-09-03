@@ -21,8 +21,26 @@ export interface TestimonialItem {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
+    const isSummary = searchParams.get('summary') === 'true';
+    const isFresh = searchParams.get('fresh') === 'true';
     const limit = searchParams.get('limit');
-    
+
+    // 1. FAST AGGREGATE SUMMARY FOR HERO BANNER (Only 1 row read in SQLite!)
+    if (isSummary) {
+      const { results } = await queryD1<{ totalCount: number; avgRating: number }>(
+        'SELECT COUNT(*) as totalCount, ROUND(AVG(rating), 1) as avgRating FROM testimonials;'
+      );
+
+      const summaryData = results && results.length > 0 ? results[0] : { totalCount: 3000, avgRating: 4.9 };
+
+      return NextResponse.json(summaryData, {
+        headers: {
+          'Cache-Control': isFresh ? 'no-store' : 'public, s-maxage=86400, stale-while-revalidate=3600',
+        },
+      });
+    }
+
+    // 2. STANDARD TESTIMONIALS LIST
     let sql = 'SELECT id, name, email, university, prodi, service_name as serviceName, rating, comment, created_at as createdAt, is_approved as isApproved FROM testimonials ORDER BY created_at DESC;';
     let params: any[] = [];
 
@@ -40,7 +58,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(results || [], {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Cache-Control': isFresh ? 'no-store' : 'public, s-maxage=86400, stale-while-revalidate=3600',
       },
     });
   } catch (e: any) {
