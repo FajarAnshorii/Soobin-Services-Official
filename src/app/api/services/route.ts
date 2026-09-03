@@ -26,11 +26,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error, services: [] }, { status: 500 });
     }
 
+    const isFresh = searchParams.get('fresh') === 'true';
+
     return NextResponse.json(
       { services: results || [] },
       {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Cache-Control': isFresh ? 'no-store' : 'public, s-maxage=86400, stale-while-revalidate=3600',
         },
       }
     );

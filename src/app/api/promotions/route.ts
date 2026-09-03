@@ -163,9 +163,11 @@ export async function GET(request: Request) {
       isApproved: Boolean(row.isApproved),
     }));
 
+    const isFresh = searchParams.get('fresh') === 'true' || Boolean(adminMode);
+
     return NextResponse.json(formatted, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Cache-Control': isFresh ? 'no-store' : 'public, s-maxage=86400, stale-while-revalidate=3600',
       },
     });
   } catch (e: any) {
