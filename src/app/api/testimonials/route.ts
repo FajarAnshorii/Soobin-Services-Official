@@ -31,9 +31,13 @@ export async function GET(request: Request) {
         'SELECT COUNT(*) as totalCount, ROUND(AVG(rating), 1) as avgRating FROM testimonials;'
       );
 
-      const summaryData = results && results.length > 0 ? results[0] : { totalCount: 3000, avgRating: 4.9 };
+      const dbCount = results && results.length > 0 ? (results[0].totalCount || 0) : 0;
+      const dbAvg = results && results.length > 0 && results[0].avgRating ? results[0].avgRating : 4.9;
 
-      return NextResponse.json(summaryData, {
+      const totalCount = 3000 + dbCount;
+      const avgRating = dbCount > 0 ? Number(((3000 * 4.9 + dbCount * dbAvg) / totalCount).toFixed(1)) : 4.9;
+
+      return NextResponse.json({ totalCount, avgRating, memberReviewsCount: dbCount }, {
         headers: {
           'Cache-Control': isFresh ? 'no-store' : 'public, s-maxage=86400, stale-while-revalidate=3600',
         },

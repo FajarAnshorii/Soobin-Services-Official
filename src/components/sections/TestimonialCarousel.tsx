@@ -19,68 +19,7 @@ interface TestimonialData {
   date?: string;
 }
 
-const FALLBACK_TESTIMONIALS: TestimonialData[] = [
-  {
-    id: 't-1',
-    name: 'Rina Wulandari',
-    university: 'Universitas Indonesia',
-    prodi: 'S1 Hukum',
-    serviceName: 'Jasa Parafrase & Cek Turnitin 0%',
-    rating: 5,
-    comment: 'Skripsi saya selesai tepat waktu dengan hasil yang memuaskan. Similarity Turnitin hanya 8%. Terima kasih Soobin!',
-    createdAt: '2026-07-25T10:00:00.000Z',
-  },
-  {
-    id: 't-2',
-    name: 'Ahmad Pratama',
-    university: 'Institut Teknologi Bandung',
-    prodi: 'S1 Teknik Informatika',
-    serviceName: 'Jasa Parafrase & Turnitin 0%',
-    rating: 5,
-    comment: 'Pelayanannya cepat dan hasilnya akurat. Harga paling terjangkau dibanding tempat lain. Highly recommended!',
-    createdAt: '2026-07-26T12:00:00.000Z',
-  },
-  {
-    id: 't-3',
-    name: 'Siti Nurhaliza',
-    university: 'Universitas Gadjah Mada',
-    prodi: 'S1 Farmasi',
-    serviceName: 'Konsultasi Skripsi & Tugas Akhir',
-    rating: 5,
-    comment: 'Makalahnya berkualitas tinggi dan sesuai deadline. Revisi gratis sampai puas. Admin ramah banget!',
-    createdAt: '2026-07-27T15:30:00.000Z',
-  },
-  {
-    id: 't-4',
-    name: 'Budi Santoso',
-    university: 'Universitas Padjadjaran',
-    prodi: 'S1 Kedokteran',
-    serviceName: 'Formatting Jurnal & Fast Track Sinta',
-    rating: 5,
-    comment: 'Berhasil unlock semua jurnal yang saya butuhkan untuk skripsi. Proses cepat cuma 30 menit!',
-    createdAt: '2026-07-28T09:15:00.000Z',
-  },
-  {
-    id: 't-5',
-    name: 'Dewi Lestari',
-    university: 'IPB University',
-    prodi: 'S1 Agronomi',
-    serviceName: 'Pengolahan Data SPSS / SmartPLS / AMOS',
-    rating: 5,
-    comment: 'Data SPSS saya diolah dengan sempurna. Hasilnya rapi dan mudah dipahami. Makasih banyak!',
-    createdAt: '2026-07-29T11:45:00.000Z',
-  },
-  {
-    id: 't-6',
-    name: 'Farhan Rizki',
-    university: 'ITS Surabaya',
-    prodi: 'S1 Teknik Elektro',
-    serviceName: 'Jasa Pembuatan Website & Aplikasi',
-    rating: 5,
-    comment: 'Kode Python untuk machine learning saya dibuatkan dengan penjelasan lengkap. Nilai akhirnya A!',
-    createdAt: '2026-07-30T14:20:00.000Z',
-  },
-];
+import { STATIC_TESTIMONIALS } from '@/data/staticTestimonials';
 
 function formatRelativeOrDate(createdAt?: string, fallbackDate?: string): string {
   if (!createdAt) return fallbackDate || 'Baru saja';
@@ -113,7 +52,7 @@ export default function TestimonialCarousel() {
       const res = await fetch('/api/testimonials?limit=15');
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setDbTestimonials(data);
         }
       }
@@ -130,9 +69,9 @@ export default function TestimonialCarousel() {
 
   const testimonialsList = useMemo(() => {
     if (dbTestimonials && dbTestimonials.length > 0) {
-      return dbTestimonials;
+      return [...dbTestimonials, ...STATIC_TESTIMONIALS];
     }
-    return FALLBACK_TESTIMONIALS;
+    return STATIC_TESTIMONIALS;
   }, [dbTestimonials]);
 
   const totalSlides = testimonialsList.length;
@@ -194,7 +133,7 @@ export default function TestimonialCarousel() {
             </div>
             <span className="text-slate-900 font-black text-sm">4.8 / 5.0</span>
             <span className="text-slate-500 text-xs font-semibold">
-              ({testimonialsList.length} Ulasan Terverifikasi Database)
+              (3.000+ Ulasan Terverifikasi Mahasiswa)
             </span>
           </div>
         </motion.div>
@@ -235,9 +174,9 @@ export default function TestimonialCarousel() {
                   if (!testi) return null;
 
                   const initialLetter = testi.name?.charAt(0)?.toUpperCase() || 'M';
-                  const serviceTitle = testi.serviceName || testi.layanan || 'Layanan Resmi Soobin';
-                  const messageText = testi.comment || testi.message || '';
-                  const timeAgo = formatRelativeOrDate(testi.createdAt, testi.date);
+                  const serviceTitle = testi.serviceName || (testi as any).layanan || 'Layanan Resmi Soobin';
+                  const messageText = testi.comment || (testi as any).message || '';
+                  const timeAgo = formatRelativeOrDate(testi.createdAt, (testi as any).date);
 
                   return (
                     <motion.div

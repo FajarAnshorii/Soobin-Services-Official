@@ -9,6 +9,8 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
 import { Star, MessageCircle, Filter, PlusCircle, UserCheck, Search, ChevronLeft, ChevronRight, RefreshCw, X } from 'lucide-react';
 
+import { STATIC_TESTIMONIALS, BASELINE_REVIEW_COUNT, BASELINE_RATING } from '@/data/staticTestimonials';
+
 interface TestimonialData {
   id: string;
   name: string;
@@ -18,16 +20,8 @@ interface TestimonialData {
   rating: number;
   comment: string;
   createdAt: string;
+  isMemberVerified?: boolean;
 }
-
-const DEFAULT_TESTIMONIALS: TestimonialData[] = [
-  { id: 't-1', name: 'Rina Wulandari', university: 'Universitas Indonesia', prodi: 'S1 Hukum', serviceName: 'Jasa Parafrase & Cek Turnitin 0%', rating: 5, comment: 'Skripsi saya selesai tepat waktu dengan hasil yang memuaskan. Similarity Turnitin hanya 8%. Terima kasih Soobin!', createdAt: '2026-07-25T10:00:00.000Z' },
-  { id: 't-2', name: 'Ahmad Pratama', university: 'Institut Teknologi Bandung', prodi: 'S1 Teknik Informatika', serviceName: 'Jasa Parafrase & Turnitin 0%', rating: 5, comment: 'Pelayanannya cepat dan hasilnya akurat. Harga paling terjangkau dibanding tempat lain. Highly recommended!', createdAt: '2026-07-26T12:00:00.000Z' },
-  { id: 't-3', name: 'Siti Nurhaliza', university: 'Universitas Gadjah Mada', prodi: 'S1 Farmasi', serviceName: 'Konsultasi Skripsi & Tugas Akhir', rating: 5, comment: 'Makalahnya berkualitas tinggi dan sesuai deadline. Revisi gratis sampai puas. Admin ramah banget!', createdAt: '2026-07-27T15:30:00.000Z' },
-  { id: 't-4', name: 'Budi Santoso', university: 'Universitas Padjadjaran', prodi: 'S1 Kedokteran', serviceName: 'Formatting Jurnal & Fast Track Sinta', rating: 5, comment: 'Berhasil unlock semua jurnal yang saya butuhkan untuk skripsi. Proses cepat cuma 30 menit!', createdAt: '2026-07-28T09:15:00.000Z' },
-  { id: 't-5', name: 'Dewi Lestari', university: 'IPB University', prodi: 'S1 Agronomi', serviceName: 'Pengolahan Data SPSS / SmartPLS / AMOS', rating: 5, comment: 'Data SPSS saya diolah dengan sempurna. Hasilnya rapi dan mudah dipahami. Makasih banyak!', createdAt: '2026-07-29T11:45:00.000Z' },
-  { id: 't-6', name: 'Farhan Rizki', university: 'ITS Surabaya', prodi: 'S1 Teknik Elektro', serviceName: 'Jasa Pembuatan Website & Aplikasi', rating: 5, comment: 'Kode Python untuk machine learning saya dibuatkan dengan penjelasan lengkap. Nilai akhirnya A!', createdAt: '2026-07-30T14:20:00.000Z' },
-];
 
 const categories = [
   { id: 'all', label: 'Semua Ulasan' },
@@ -54,15 +48,19 @@ export default function TestimoniPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
 
-  // Real-time fetching of testimonials from Supabase Cloud Database
+  // Fetch only authentic member reviews from Cloudflare D1 / Supabase Database
   const fetchTestimonials = async () => {
     try {
       setIsSyncing(true);
-      const res = await fetch('/api/testimonials', { cache: 'no-store' });
+      const res = await fetch('/api/testimonials?fresh=true', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setDbTestimonials(data);
+        if (Array.isArray(data)) {
+          const formatted = data.map((item: any) => ({
+            ...item,
+            isMemberVerified: true,
+          }));
+          setDbTestimonials(formatted);
         }
       }
     } catch (err) {
@@ -81,19 +79,17 @@ export default function TestimoniPage() {
       }
     };
     window.addEventListener('focus', handleFocus);
-    const interval = setInterval(handleFocus, 30000); // 30s background sync
     return () => {
       window.removeEventListener('focus', handleFocus);
-      clearInterval(interval);
     };
   }, []);
 
-  // List of all active testimonials from Supabase
+  // List of all active testimonials: Authentic Member reviews FIRST + Curated Presets from Codingan
   const allTestimonials = useMemo(() => {
     if (dbTestimonials && dbTestimonials.length > 0) {
-      return dbTestimonials;
+      return [...dbTestimonials, ...STATIC_TESTIMONIALS];
     }
-    return DEFAULT_TESTIMONIALS;
+    return STATIC_TESTIMONIALS;
   }, [dbTestimonials]);
 
   // Filtered Testimonials based on category & search query
@@ -206,7 +202,7 @@ export default function TestimoniPage() {
                   ))}
                 </div>
                 <span className="text-white font-extrabold text-base sm:text-xl">{averageRating}</span>
-                <span className="text-gray-300 text-[11px] sm:text-sm">({allTestimonials.length} Ulasan)</span>
+                <span className="text-gray-300 text-[11px] sm:text-sm">({BASELINE_REVIEW_COUNT + (dbTestimonials?.length || 0)}+ Ulasan)</span>
               </div>
 
               {/* Tulis Testimoni Button */}
@@ -326,7 +322,11 @@ export default function TestimoniPage() {
                 return (
                   <motion.div
                     key={testi.id}
-                    className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-primary-800/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                    className={`rounded-2xl p-5 border transition-all duration-300 flex flex-col justify-between ${
+                      testi.isMemberVerified
+                        ? 'bg-gradient-to-b from-emerald-50/40 via-white to-white border-emerald-300 ring-1 ring-emerald-400/30 shadow-lg shadow-emerald-500/5'
+                        : 'bg-white border-gray-200 hover:border-primary-800/50 hover:shadow-xl'
+                    }`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.03 }}
@@ -334,13 +334,21 @@ export default function TestimoniPage() {
                     <div>
                       {/* Member Info */}
                       <div className="flex items-center gap-3.5 mb-3.5">
-                        <div className="w-11 h-11 bg-primary-800 text-white rounded-full flex items-center justify-center font-black text-base uppercase shrink-0 shadow-sm">
+                        <div className={`w-11 h-11 rounded-full flex items-center justify-center font-black text-base uppercase shrink-0 shadow-sm text-white ${
+                          testi.isMemberVerified ? 'bg-emerald-600 ring-2 ring-emerald-300' : 'bg-primary-800'
+                        }`}>
                           {testi.name?.charAt(0) || 'M'}
                         </div>
                         <div className="flex flex-col truncate">
                           <div className="flex items-center gap-1.5">
                             <span className="font-bold text-gray-900 text-sm truncate">{testi.name}</span>
-                            <UserCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                            {testi.isMemberVerified ? (
+                              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300 shrink-0">
+                                <UserCheck className="w-3 h-3 text-emerald-600" /> Member Asli
+                              </span>
+                            ) : (
+                              <UserCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                            )}
                           </div>
                           <span className="text-xs text-gray-500 truncate">
                             {testi.university || 'Mahasiswa'} {testi.prodi ? `• ${testi.prodi}` : ''}
@@ -356,7 +364,11 @@ export default function TestimoniPage() {
                       </div>
 
                       {/* Service Tag */}
-                      <div className="bg-slate-100 text-slate-800 text-[11px] font-bold px-3 py-1 rounded-lg inline-block mb-3 border border-slate-200">
+                      <div className={`text-[11px] font-bold px-3 py-1 rounded-lg inline-block mb-3 border ${
+                        testi.isMemberVerified
+                          ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+                          : 'bg-slate-100 text-slate-800 border-slate-200'
+                      }`}>
                         {testi.serviceName}
                       </div>
 
@@ -368,8 +380,8 @@ export default function TestimoniPage() {
 
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-400 font-medium">
                       <span>{dateStr}</span>
-                      <span className="text-primary-800 font-bold flex items-center gap-1">
-                        <UserCheck className="w-3 h-3" /> Verifikasi SOOBIN
+                      <span className={testi.isMemberVerified ? 'text-emerald-700 font-bold flex items-center gap-1' : 'text-primary-800 font-bold flex items-center gap-1'}>
+                        <UserCheck className="w-3 h-3" /> {testi.isMemberVerified ? 'Ulasan Member Terverifikasi' : 'Verifikasi SOOBIN'}
                       </span>
                     </div>
                   </motion.div>
